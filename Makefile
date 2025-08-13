@@ -1,21 +1,20 @@
 IMAGE_NAME=ft_transcendence
-CONTAINER_NAME=ft_transcendence
+SERVICE_NAME=web
 
 all: build up
 
 build:
-	docker build -t $(IMAGE_NAME) .
+	docker-compose build
 
 up:
-	docker run -d --name $(CONTAINER_NAME) $(IMAGE_NAME)
+	docker-compose up -d
 
 down:
-	docker stop $(CONTAINER_NAME) && docker rm $(CONTAINER_NAME)
+	docker-compose down
 
 clean:
-	docker stop $(CONTAINER_NAME) || true
-	docker rm -v $(CONTAINER_NAME) || true
-	docker rmi $(IMAGE_NAME) || true
+	docker-compose down --remove-orphans
+	docker image rm $(IMAGE_NAME) || true
 
 reset:
 	$(MAKE) clean
