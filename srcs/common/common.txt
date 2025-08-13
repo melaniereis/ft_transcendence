@@ -1,0 +1,5 @@
+#TODO
+
+- Share between backend and frontend to avoid duplication
+- Types/Interfaces - Shared definitions (Game state interface for ball position, scores (AI prediction)), User interface (for auth/stats across modules)
+- Constants - Global values (Game dimensions, error codes)

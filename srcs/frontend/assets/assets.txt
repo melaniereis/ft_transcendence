@@ -1,0 +1,5 @@
+#TODO
+
+- Images
+- Styles (Tailwind config)
+- Locales for multi-language support
