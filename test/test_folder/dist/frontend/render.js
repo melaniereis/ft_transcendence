@@ -1,11 +1,44 @@
-// public/render.ts
-export function renderRegistrationForm(name) {
-    const form = document.createElement('form');
-    form.innerHTML = `
-    <h2>Welcome, ${name}!</h2>
-    <label>Username: <input type="text" name="username" /></label><br/>
-    <label>Team: <input type="text" name="team" /></label><br/>
-    <button type="submit">Register</button>
+export function renderRegistrationForm(container) {
+    container.innerHTML = `
+    <h2>Register</h2>
+    <form id="registration-form">
+      <label>
+        Name:
+        <input type="text" id="name" required />
+      </label>
+      <label>
+        Username:
+        <input type="text" id="username" required />
+      </label>
+      <label>
+        Team:
+        <input type="text" id="team" required />
+      </label>
+      <button type="submit">Register</button>
+    </form>
+    <div id="result"></div>
   `;
-    document.body.appendChild(form);
+    const form = document.getElementById('registration-form');
+    const result = document.getElementById('result');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const username = document.getElementById('username').value;
+        const team = document.getElementById('team').value;
+        try {
+            const response = await fetch('/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, username, team })
+            });
+            if (!response.ok)
+                throw new Error('Failed to register');
+            const data = await response.json();
+            result.innerText = `✅ Registered: ${JSON.stringify(data)}`;
+            form.reset();
+        }
+        catch (err) {
+            result.innerText = `❌ ${err}`;
+        }
+    });
 }

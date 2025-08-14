@@ -1,4 +1,4 @@
-import db from '../database';
+import db from '../db/database';
 import { RunResult } from 'sqlite3';
 
 // 🟢 Create a new user

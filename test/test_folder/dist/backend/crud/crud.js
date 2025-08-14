@@ -1,4 +1,4 @@
-import db from '../database';
+import db from '../db/database';
 // 🟢 Create a new user
 export function createUser(name, username, team) {
     return new Promise((resolve, reject) => {
