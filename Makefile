@@ -20,3 +20,17 @@ clean:
 reset:
 	$(MAKE) clean
 	$(MAKE) all
+
+NPM=npm --prefix srcs/
+
+npmClean:
+	$(NPM) run clean
+
+buildFront:
+	$(NPM) run build:frontend
+
+buildBack:
+	$(NPM) run build:backend
+
+npmRun:
+	$(NPM) run dev
