@@ -3,40 +3,33 @@ import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
 
-import { fileURLToPath } from 'url';
 import { userRoutes } from './routes/user.js';
 import { tournamentRoutes } from './routes/tournamentRoutes.js';
-import { hacktivistRoutes } from './routes/hacktivistsRoutes.js';
-import { bugBusterRoutes } from './routes/bugBusterRoutes.js';
-import { logicLeagueRoutes } from './routes/logicLeagueRoutes.js';
-import { codeAllienceRoutes } from './routes/codeAllienceRoutes.js';
+import { registerTeamRoutes } from './routes/teamRoutes.js';
 
 import '../backend/db/database.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const fastify = Fastify({ logger: true });
 
+// Enable CORS for all origins
 fastify.register(fastifyCors, {
   origin: true,
 });
 
+// Serve static files from 'pages' at root '/'
+const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
+console.log('Serving pages from:', pagesPath);
 fastify.register(fastifyStatic, {
-  root: path.join(__dirname, '..', 'frontend'),
+  root: pagesPath,
   prefix: '/',
-});
-
-fastify.get('/', async (_request, reply) => {
-  return reply.sendFile('index.html');
+  index: ['index.html'],
 });
 
 fastify.register(userRoutes);
 fastify.register(tournamentRoutes);
-fastify.register(hacktivistRoutes);
-fastify.register(bugBusterRoutes);
-fastify.register(logicLeagueRoutes);
-fastify.register(codeAllienceRoutes);
+fastify.register(registerTeamRoutes);
+
+// Explicit '/' route not required because of index: ['index.html'] in pages static
 
 const start = async () => {
   try {
@@ -47,6 +40,5 @@ const start = async () => {
     process.exit(1);
   }
 };
-
 
 start();

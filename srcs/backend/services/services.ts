@@ -1,4 +1,4 @@
 export * from './usersService.js';
-export * from './userStatsCrud.js';
+export * from './userStatsService.js';
 export * from './tournamentsService.js';
-export * from './teamService.ts';
+export * from './teamService.js';

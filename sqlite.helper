@@ -1,17 +1,3 @@
-USERS TABLE
--id
--name
--nickname
--team??
-
-USER DATA
--numero de partidas efetuadas
--numero de vitorias
--numero de derrotas
--tempo medio de partidas
--numero de "golos sofridos"
--numero de golos marcados
-
 USER TOURNMANTS
 -numeros de torneios realizados pelo palyer
 -numero de torneiros vencidos
@@ -20,16 +6,6 @@ USER TOURNMANTS
 -quantas vezes chefou as finais
 -percentagem de vitorias em partidas de torneios
 
-TEAM SCORES
--vitorias totais das equipas
--torneios vencidos pelas equipas
--win rate
-
-TOURNMANTS History TABLE
--quantos houve
--equipas com mais vitorias
--players com mais vitorias
--media de participantes
 
 TOURNMANT TABLE (torneio pode ter entre 16 e 4 players, se for impar um AI entra)
 - participantes

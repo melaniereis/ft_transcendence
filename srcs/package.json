@@ -24,7 +24,7 @@
   },
   "scripts": {
   "dev": "node dist/backend/server.js",
-  "build:frontend": "tsc -p tsconfig.frontend.json && cp frontend/index.html dist/frontend/",
+  "build:frontend": "tsc -p tsconfig.frontend.json && cp frontend/pages/index.html dist/frontend/pages",
   "build:backend": "tsc -p tsconfig.backend.json",
   "build": "npm run build:backend && npm run build:frontend",
   "clean": "rm -rf dist"
