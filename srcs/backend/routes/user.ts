@@ -28,7 +28,6 @@ export async function userRoutes(fastify: FastifyInstance) {
     return reply.send(users);
   });
 
-  // 🔴 Add this route to support user deletion
   fastify.delete('/users/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
 

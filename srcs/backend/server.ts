@@ -5,8 +5,13 @@ import path from 'path';
 
 import { fileURLToPath } from 'url';
 import { userRoutes } from './routes/user.js';
+import { tournamentRoutes } from './routes/tournamentRoutes.js';
+import { hacktivistRoutes } from './routes/hacktivistsRoutes.js';
+import { bugBusterRoutes } from './routes/bugBusterRoutes.js';
+import { logicLeagueRoutes } from './routes/logicLeagueRoutes.js';
+import { codeAllienceRoutes } from './routes/codeAllienceRoutes.js';
 
-import '../backend/db/database.js'; // Runs DB setup
+import '../backend/db/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +32,11 @@ fastify.get('/', async (_request, reply) => {
 });
 
 fastify.register(userRoutes);
+fastify.register(tournamentRoutes);
+fastify.register(hacktivistRoutes);
+fastify.register(bugBusterRoutes);
+fastify.register(logicLeagueRoutes);
+fastify.register(codeAllienceRoutes);
 
 const start = async () => {
   try {
