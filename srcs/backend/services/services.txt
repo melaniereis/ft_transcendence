@@ -1,0 +1,5 @@
+#TODO
+
+- Business logic classes/modules (i.e Pong physics/matchmaking(AI part))
+- Profiles/stats (links to DB)
+- AI prediction, input simulation.

@@ -1,0 +1,3 @@
+#TODO
+
+- Client-side logic (fetching backend data (secure via HTTPS), real-time game updates)

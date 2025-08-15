@@ -1,0 +1,6 @@
+#TODO
+
+- Bootstrap Fastify
+- Set up routes
+- Middleware
+- Plugins (WebSockets if needed for real-time pong)

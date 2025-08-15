@@ -1,0 +1,6 @@
+#TODO
+
+- API endpoints
+- On subfolder /auth: User logins
+- On subfolder /game: Start matches/tournaments
+- On subfolder /stats: Dashboard
