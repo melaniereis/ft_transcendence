@@ -1,6 +1,5 @@
-// routes/userRoutes.ts
 import { FastifyInstance } from 'fastify';
-import { createUser, getAllUsers } from '../crud/crud.js';
+import { createUser, getAllUsers, deleteUser } from '../crud/crud.js'; // make sure deleteUser is imported
 
 export async function userRoutes(fastify: FastifyInstance) {
   fastify.post('/users', async (request, reply) => {
@@ -28,5 +27,17 @@ export async function userRoutes(fastify: FastifyInstance) {
     const users = await getAllUsers();
     return reply.send(users);
   });
-}
 
+  // 🔴 Add this route to support user deletion
+  fastify.delete('/users/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+      await deleteUser(Number(id));
+      return reply.send({ message: `User ${id} deleted` });
+    } catch (err) {
+      console.error('Delete error:', err);
+      return reply.status(500).send({ error: 'Failed to delete user' });
+    }
+  });
+}
