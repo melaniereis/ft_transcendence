@@ -1,36 +1,21 @@
 IMAGE_NAME=ft_transcendence
-CONTAINER_NAME=ft_transcendence
+COMPOSE=docker-compose
+COMPOSE_FILE=srcs/docker-compose.yml
 
 all: build up
 
 build:
-	docker build -t $(IMAGE_NAME) .
+	$(COMPOSE) -f $(COMPOSE_FILE) build
 
 up:
-	docker run -d --name $(CONTAINER_NAME) $(IMAGE_NAME)
+	$(COMPOSE) -f $(COMPOSE_FILE) up -d
 
 down:
-	docker stop $(CONTAINER_NAME) && docker rm $(CONTAINER_NAME)
+	$(COMPOSE) -f $(COMPOSE_FILE) down
 
 clean:
-	docker stop $(CONTAINER_NAME) || true
-	docker rm -v $(CONTAINER_NAME) || true
-	docker rmi $(IMAGE_NAME) || true
+	$(COMPOSE) -f $(COMPOSE_FILE) down --rmi all --volumes --remove-orphans
 
 reset:
 	$(MAKE) clean
 	$(MAKE) all
-
-NPM=npm --prefix srcs/
-
-npmClean:
-	$(NPM) run clean
-
-buildFront:
-	$(NPM) run build:frontend
-
-buildBack:
-	$(NPM) run build:backend
-
-npmRun:
-	$(NPM) run dev

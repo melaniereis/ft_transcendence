@@ -19,13 +19,14 @@
   "dependencies": {
     "@fastify/cors": "^11.1.0",
     "fastify": "^5.5.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "bcrypt": "^5.1.0"
   },
   "scripts": {
   "dev": "node dist/backend/server.js",
   "build:frontend": "tsc -p tsconfig.frontend.json && cp frontend/index.html dist/frontend/",
   "build:backend": "tsc -p tsconfig.backend.json",
-  "build": "npm run clean && npm run build:frontend && npm run build:backend",
+  "build": "npm run build:backend && npm run build:frontend",
   "clean": "rm -rf dist"
 }
 

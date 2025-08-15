@@ -3,7 +3,7 @@ import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import userRoutes from './routes/user.js';
+import { userRoutes } from './routes/user.js';
 import '../backend/db/database.js'; // Runs DB setup
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

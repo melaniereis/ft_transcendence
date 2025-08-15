@@ -2,9 +2,10 @@ import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-import userRoutes from './routes/user.js';
+import { fileURLToPath } from 'url';
+import { userRoutes } from './routes/user.js';
+
 import '../backend/db/database.js'; // Runs DB setup
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,12 +30,13 @@ fastify.register(userRoutes);
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 });
+    await fastify.listen({ port: 3000, host: '0.0.0.0' });
     console.log('Server running at http://localhost:3000');
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
   }
 };
+
 
 start();

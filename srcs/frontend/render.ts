@@ -14,6 +14,10 @@ export function renderRegistrationForm(container: HTMLElement) {
         Team:
         <input type="text" id="team" required />
       </label>
+      <label>
+        Password:
+        <input type="password" id="password" required />
+      </label>
       <button type="submit">Register</button>
     </form>
     <div id="result"></div>
@@ -28,12 +32,13 @@ export function renderRegistrationForm(container: HTMLElement) {
     const name = (document.getElementById('name') as HTMLInputElement).value;
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const team = (document.getElementById('team') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
 
     try {
       const response = await fetch('/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, username, team })
+        body: JSON.stringify({ name, username, team, password })
       });
 
       if (!response.ok) throw new Error('Failed to register');
@@ -42,7 +47,7 @@ export function renderRegistrationForm(container: HTMLElement) {
       result.innerText = `✅ Registered: ${JSON.stringify(data)}`;
       form.reset();
     } catch (err) {
-      result.innerText = `❌ ${err}`;
+      result.innerText = `❌ ${(err as Error).message}`;
     }
   });
 }

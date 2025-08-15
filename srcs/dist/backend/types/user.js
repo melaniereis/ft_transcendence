@@ -1,0 +1,2 @@
+// types/User.ts
+export {};
