@@ -1,5 +1,5 @@
 import db from '../db/database.js';
-import { Tournament } from '../types/tournament';
+import { Tournament } from '../types/tournament.js';
 
 function runAsync(query: string, params: any[] = []): Promise<void> {
 return new Promise((resolve, reject) => {

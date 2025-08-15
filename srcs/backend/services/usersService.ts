@@ -1,6 +1,6 @@
 import db from '../db/database.js';
 import bcrypt from 'bcrypt';
-import { User } from '../types/user';
+import { User } from '../types/user.js';
 
 // Manually promisify db.run
 function runAsync(query: string, params: any[] = []): Promise<void> {

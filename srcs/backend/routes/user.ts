@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { createUser, getAllUsers, deleteUser } from '../crud/crud.js'; // make sure deleteUser is imported
+import { createUser, getAllUsers, deleteUser } from '../services/services.js'; // make sure deleteUser is imported
 
 export async function userRoutes(fastify: FastifyInstance) {
   fastify.post('/users', async (request, reply) => {

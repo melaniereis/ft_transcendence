@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import * as TeamService from '../crud/teamCrud.js';
+import * as TeamService from '../services/teamService.js';
 
 export async function codeAllienceRoutes(fastify: FastifyInstance) {
 const table = 'code_allience';

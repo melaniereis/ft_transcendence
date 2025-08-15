@@ -6,7 +6,7 @@ getAllTournaments,
 getTournamentById,
 updateTournament,
 deleteTournament,
-} from '../crud/tournamentsCrud.js';
+} from '../services/tournamentsService.js';
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
 fastify.post('/tournaments', async (request, reply) => {
