@@ -6,13 +6,5 @@ services:
     image: ft_transcendence
     ports:
       - "3000:3000"
-<<<<<<<< HEAD:docker-compose.yml
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-
-    restart: unless-stopped
-========
     command: npm run dev
     restart: unless-stopped
->>>>>>>> main:srcs/docker-compose.yml
