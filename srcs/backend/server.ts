@@ -6,6 +6,7 @@ import path from 'path';
 import { userRoutes } from './routes/user.js';
 import { tournamentRoutes } from './routes/tournamentRoutes.js';
 import { registerTeamRoutes } from './routes/teamRoutes.js';
+import { gameRoutes } from './routes/gameRoutes.js';
 
 import '../backend/db/database.js';
 
@@ -28,6 +29,7 @@ fastify.register(fastifyStatic, {
 fastify.register(userRoutes);
 fastify.register(tournamentRoutes);
 fastify.register(registerTeamRoutes);
+fastify.register(gameRoutes); 
 
 // Explicit '/' route not required because of index: ['index.html'] in pages static
 

@@ -99,4 +99,42 @@ db.serialize(() => {
   `);
 });
 
+// User stats table
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS user_stats (
+      user_id INTEGER PRIMARY KEY,
+      matches_played INTEGER DEFAULT 0,
+      matches_won INTEGER DEFAULT 0,
+      matches_lost INTEGER DEFAULT 0,
+      points_scored INTEGER DEFAULT 0,
+      points_conceded INTEGER DEFAULT 0,
+      total_play_time INTEGER DEFAULT 0, -- in seconds
+      win_rate REAL DEFAULT 0.0,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+});
+
+db.serialize(() => {
+db.run(`
+	CREATE TABLE IF NOT EXISTS games (
+	game_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	player1_id INTEGER NOT NULL,
+	player2_id INTEGER NOT NULL,
+	max_games INTEGER NOT NULL,
+	score_player1 INTEGER DEFAULT 0,
+	score_player2 INTEGER DEFAULT 0,
+	time_started TEXT NOT NULL,
+	time_ended TEXT,
+	winner_id INTEGER,
+	match_duration INTEGER DEFAULT 0,
+	date_played TEXT DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (player1_id) REFERENCES users(id),
+	FOREIGN KEY (player2_id) REFERENCES users(id),
+	FOREIGN KEY (winner_id) REFERENCES users(id)
+	)
+`);
+});
+
 export default db;
