@@ -1,7 +1,7 @@
 export type User = {
-  id: number;
-  name: string;
-  username: string;
-  team: string;
-  password: string;
+	id: number;
+	name: string;
+	username: string;
+	team: string;
+	password: string;
 };

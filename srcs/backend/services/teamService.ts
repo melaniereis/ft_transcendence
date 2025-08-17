@@ -2,39 +2,38 @@ import db from '../db/database.js';
 import { TeamStats } from '../types/team.js';
 
 function runAsync(query: string, params: any[] = []): Promise<void> {
-return new Promise((resolve, reject) => {
-	db.run(query, params, function (err) {
-	if (err) 
-		reject(err);
-	else 
-		resolve();
+	return new Promise((resolve, reject) => {
+		db.run(query, params, function (err) {
+		if (err) 
+			reject(err);
+		else 
+			resolve();
+		});
 	});
-});
 }
 
 function getAsync<T = any>(query: string, params: any[] = []): Promise<T | undefined> {
-return new Promise((resolve, reject) => {
-	db.get(query, params, (err, row) => {
-	if (err) 
-		reject(err);
-	else 
-		resolve(row as T);
+	return new Promise((resolve, reject) => {
+		db.get(query, params, (err, row) => {
+		if (err) 
+			reject(err);
+		else 
+			resolve(row as T);
+		});
 	});
-});
 }
 
 function allAsync<T = any>(query: string, params: any[] = []): Promise<T[]> {
-return new Promise((resolve, reject) => {
-	db.all(query, params, (err, rows) => {
-	if (err) 
-		reject(err);
-	else 
-		resolve(rows as T[]);
+	return new Promise((resolve, reject) => {
+		db.all(query, params, (err, rows) => {
+		if (err) 
+			reject(err);
+		else 
+			resolve(rows as T[]);
+		});
 	});
-});
 }
 
-// CRUD for team table
 export function createTeamMember(table: string, members: string): Promise<void> {
 	const query = `INSERT INTO ${table} (members) VALUES (?)`;
 	return runAsync(query, [members]);

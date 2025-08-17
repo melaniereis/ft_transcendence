@@ -28,28 +28,25 @@ export async function renderPlayerSelection(container: HTMLElement) {
 	const startGameBtn = document.getElementById('start-game-btn') as HTMLButtonElement;
 	const errorDiv = document.getElementById('selection-error') as HTMLDivElement;
 	const difficulty = (document.getElementById('difficulty-select') as HTMLSelectElement).value as
-	| 'easy'
-	| 'normal'
-	| 'hard'
-	| 'crazy';
-
+	| 'easy' | 'normal' | 'hard' | 'crazy';
 
 	try {
 		const response = await fetch('/users');
 		const users = await response.json();
 
 		users.forEach((user: any) => {
-		const option1 = document.createElement('option');
-		option1.value = user.id;
-		option1.textContent = user.username;
-		player1Select.appendChild(option1);
+			const option1 = document.createElement('option');
+			option1.value = user.id;
+			option1.textContent = user.username;
+			player1Select.appendChild(option1);
 
-		const option2 = document.createElement('option');
-		option2.value = user.id;
-		option2.textContent = user.username;
-		player2Select.appendChild(option2);
+			const option2 = document.createElement('option');
+			option2.value = user.id;
+			option2.textContent = user.username;
+			player2Select.appendChild(option2);
 		});
-	} catch (err) {
+	} 
+	catch (err) {
 		errorDiv.textContent = 'Failed to load users.';
 		return;
 	}
@@ -67,29 +64,30 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		}
 
 	try {
-	const response = await fetch('/games', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-		player1_id: player1Id,
-		player2_id: player2Id,
-		max_games: maxGames,
-		time_started: new Date().toISOString()
-		})
-	});
+		const response = await fetch('/games', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+			player1_id: player1Id,
+			player2_id: player2Id,
+			max_games: maxGames,
+			time_started: new Date().toISOString()
+			})
+		});
 
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.error || 'Failed to create game');
-	}
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.error || 'Failed to create game');
+		}
 
-	const data = await response.json();
-	const gameId = data.game_id;
+		const data = await response.json();
+		const gameId = data.game_id;
 
-	container.innerHTML = '';
-	renderGame(container, player1Name, player2Name, gameId, maxGames, difficulty); // Pass gameId to renderGame
-	} catch (err: any) {
-	errorDiv.textContent = `Error starting game: ${err.message}`;
+		container.innerHTML = '';
+		renderGame(container, player1Name, player2Name, gameId, maxGames, difficulty); 
+	} 
+	catch (err: any) {
+		errorDiv.textContent = `Error starting game: ${err.message}`;
 	}
 	});
 }

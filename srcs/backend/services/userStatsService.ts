@@ -1,8 +1,7 @@
 import db from '../db/database.js';
 import { UserMatch } from '../types/userStats.js';
 
-export function insertUserMatch(userId: string | number, match: UserMatch): 
-void {
+export function insertUserMatch(userId: string | number, match: UserMatch): void {
 	const tableName = `stats_user_${userId}`;
 	const query = `
 		INSERT INTO ${tableName} (result, match_duration, goals_scored, goals_conceded, date_played)
@@ -11,12 +10,10 @@ void {
 	const { result, match_duration, goals_scored, goals_conceded, date_played } = match;
 
 	db.run(query, [result, match_duration, goals_scored, goals_conceded, date_played], (err) => {
-		if (err) {
-		console.error(`❌ Failed to insert match for user ${userId}:`, err.message);
-		} 
-		else {
-		console.log(`✅ Match inserted for user ${userId}`);
-		}
+		if (err)
+			console.error(`Failed to insert match for user ${userId}:`, err.message);
+		else
+			console.log(`Match inserted for user ${userId}`);
 	});
 }
 

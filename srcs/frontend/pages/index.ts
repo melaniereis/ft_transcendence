@@ -15,25 +15,25 @@ const appDiv = document.getElementById('app') as HTMLDivElement;
 console.log('appDiv:', appDiv);
 
 playBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderPlayMenu(appDiv);
+	appDiv.innerHTML = '';
+	renderPlayMenu(appDiv);
 });
 
 console.log('settingsBtn:', settingsBtn);
 settingsBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderSettingsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderSettingsPage(appDiv);
 });
 
 console.log('tournamentsBtn:', tournamentsBtn);
 tournamentsBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderTournamentsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderTournamentsPage(appDiv);
 });
 
 
 console.log('teamsBtn:', teamsBtn);
 teamsBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderTeamsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderTeamsPage(appDiv);
 });
