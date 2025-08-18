@@ -67,6 +67,15 @@ export async function syncUserStatsToTeam(id: number): Promise<void> {
 
     const stats = await getUserStatsById(user.id);
     const winRate = stats.matches_played > 0 ? (stats.matches_won / stats.matches_played) * 100 : 0;
+	
+	console.log(
+  'teamTable:', teamTable,
+  '| user.id:', user.id,
+  '| user.username:', user.username,
+  '| stats.matches_won:', stats.matches_won,
+  '| stats.tournaments_won:', stats.tournaments_won,
+  '| stats.matches_lost:', stats.matches_lost,
+  '| winRate:', winRate,);
 
     await updateTeamMember(teamTable, user.id, user.username, stats.matches_won,
     stats.tournaments_won, stats.matches_lost, winRate
