@@ -8,6 +8,8 @@ import { tournamentRoutes } from './routes/tournamentRoutes.js';
 import { registerTeamRoutes } from './routes/teamRoutes.js';
 import { gameRoutes } from './routes/gameRoutes.js';
 import { statsRoutes } from './routes/statsRoutes.js';
+import { authRoutes } from './routes/authRoutes.js';
+
 
 import '../backend/db/database.js';
 
@@ -31,6 +33,7 @@ fastify.register(tournamentRoutes);
 fastify.register(registerTeamRoutes);
 fastify.register(gameRoutes);
 fastify.register(statsRoutes);
+fastify.register(authRoutes);
 
 const start = async () => {
 	try {
