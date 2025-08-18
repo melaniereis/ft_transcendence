@@ -66,6 +66,7 @@ db.serialize(() => {
 	win_rate REAL DEFAULT 0.0, FOREIGN KEY (user_id) REFERENCES users(id))`);
 });
 
+// Game table
 db.serialize(() => {
 	db.run(`CREATE TABLE IF NOT EXISTS games (game_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	player1_id INTEGER NOT NULL, player2_id INTEGER NOT NULL, max_games INTEGER NOT NULL,

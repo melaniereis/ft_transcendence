@@ -66,7 +66,7 @@ export async function endGame(gameId: number,score1: number,score2: number,
     menuBtn.onclick = () => {
         restartBtn.remove();
         menuBtn.remove();
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // 👈 Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         location.reload();
     };
 }

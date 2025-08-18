@@ -7,6 +7,7 @@ import { userRoutes } from './routes/user.js';
 import { tournamentRoutes } from './routes/tournamentRoutes.js';
 import { registerTeamRoutes } from './routes/teamRoutes.js';
 import { gameRoutes } from './routes/gameRoutes.js';
+import { statsRoutes } from './routes/statsRoutes.js';
 
 import '../backend/db/database.js';
 
@@ -14,7 +15,7 @@ const fastify = Fastify({ logger: true });
 
 // Enable CORS for all origins
 fastify.register(fastifyCors, {
-origin: true,
+	origin: true,
 });
 
 const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
@@ -28,7 +29,8 @@ fastify.register(fastifyStatic, {
 fastify.register(userRoutes);
 fastify.register(tournamentRoutes);
 fastify.register(registerTeamRoutes);
-fastify.register(gameRoutes); 
+fastify.register(gameRoutes);
+fastify.register(statsRoutes);
 
 const start = async () => {
 	try {
