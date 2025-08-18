@@ -41,7 +41,7 @@ const validTeams = {
 	'HACKTIVISTS': 'hacktivists',
 	'BUG BUSTERS': 'bug_busters',
 	'LOGIC LEAGUE': 'logic_league',
-	'CODE ALLIANCE': 'code_allience'
+	'CODE ALLIANCE': 'code_alliance'
 };
 
 export async function createUser(name: string, username: string, team: string, password: string): Promise<void> {
@@ -69,6 +69,12 @@ export async function createUser(name: string, username: string, team: string, p
 export async function getAllUsers(): Promise<User[]> {
 	const query = `SELECT * FROM users`;
 	return await allAsync<User>(query);
+}
+
+
+export async function getUserById(userId: number): Promise<User | undefined> {
+    const query = `SELECT * FROM users WHERE id = ?`;
+    return await getAsync<User>(query, [userId]);
 }
 
 export async function getUserByUsername(username: string): Promise<User | undefined> {

@@ -50,8 +50,7 @@ export function getTeamMemberById(table: string, id: number): Promise<TeamStats 
 }
 
 export function updateTeamMember( table: string, id: number, members: string,
-victories: number, tournaments_won: number, defeats: number, win_rate: number
-): Promise<void> {
+victories: number, tournaments_won: number, defeats: number, win_rate: number): Promise<void> {
 	const query = `UPDATE ${table} SET members = ?, victories = ?, tournaments_won = ?, defeats = ?, win_rate = ? WHERE id = ?`;
 	return runAsync(query, [members, victories, tournaments_won, defeats, win_rate, id]);
 }

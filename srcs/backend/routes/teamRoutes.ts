@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import * as TeamService from '../services/teamService.js';
 
-const validTeams = ['hacktivists', 'logic_league', 'bug_busters', 'code_allience'];
+const validTeams = ['hacktivists', 'logic_league', 'bug_busters', 'code_alliance'];
 
 export async function registerTeamRoutes(fastify: FastifyInstance) {
 

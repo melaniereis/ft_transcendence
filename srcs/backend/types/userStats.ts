@@ -8,7 +8,6 @@ export interface UserMatch {
 	date_played: string;     
 }
 
-
 export type UserStats = {
     user_id: number;
     matches_played: number;
@@ -16,5 +15,8 @@ export type UserStats = {
     matches_lost: number;
     points_scored: number;
     points_conceded: number;
+    total_play_time: number;
     win_rate: number;
+    tournaments_played: number;
+    tournaments_won: number;
 };
