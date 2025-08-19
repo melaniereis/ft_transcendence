@@ -8,4 +8,77 @@ services:
     ports:
       - "3000:3000"
     command: npm run dev
+    environment:
+      - VAULT_ADDR=http://vault:8200
+    depends_on:
+      - db
+      - vault
+    networks:
+      - transcendence
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
+
+  nginx:
+    image: owasp/modsecurity-crs:nginx
+    ports:
+      - "80-80"
+      - "433:433"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/modsec:/etc/nginx/modsec:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - web
+    networks:
+      - transcendence
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  vault:
+    image: vault:latest
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=root
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - transcendence
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  db:
+    image: nouchika/sqlite3:latest
+    volumes:
+      - db-data:/data
+    networks:
+      - transcendence
+    healthcheck:
+      test: ["CMD", "splite3", "/data/database.db", ".tables"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  networks:
+    transcendence:
+      driver: bridge
+
+  volumes:
+    db-data:
+    vault-data:
