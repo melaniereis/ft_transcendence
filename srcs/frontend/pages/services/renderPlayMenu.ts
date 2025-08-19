@@ -1,4 +1,4 @@
-import { renderRegistrationForm } from './registrationFrom.js';
+import { renderRegistrationForm } from './renderRegistrationForm.js';
 import { renderPlayerSelection } from './renderPlayerSelection.js';
 
 export function renderPlayMenu(container: HTMLElement) {

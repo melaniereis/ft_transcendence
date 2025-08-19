@@ -7,5 +7,10 @@ services:
     image: ft_transcendence
     ports:
       - "3000:3000"
+    volumes:
+      - ./data:/usr/src/app/data
+      - ./certs:/usr/src/app/certs
+    environment:
+      - DB_PATH=/usr/src/app/data/database.db
     command: npm run dev
     restart: unless-stopped

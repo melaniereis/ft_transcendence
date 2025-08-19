@@ -1,6 +1,6 @@
 export async function renderTeamStats(container: HTMLElement, team: string) {
     try {
-        const response = await fetch(`/api/teams/${team}`);
+        const response = await fetch(`https://localhost:3000/api/teams/${team}`);
         if (!response.ok) 
             throw new Error('Failed to load team stats');
 
