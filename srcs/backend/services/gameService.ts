@@ -56,3 +56,12 @@ export function getPlayersFromGame(gameId: number): Promise<GamePlayers> {
         );
     });
 }
+
+export function getGameById(gameId: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT * FROM games WHERE game_id = ?', [gameId], (err, row) => {
+            if (err) return reject(err);
+            resolve(row);
+        });
+    });
+}

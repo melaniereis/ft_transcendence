@@ -1,6 +1,6 @@
 import { renderPlayMenu } from './services/renderPlayMenu.js';
 import { renderSettingsPage } from './services/settings.js';
-import { renderTournamentsPage } from './services/tournaments.js';
+import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
 import { renderLoginForm } from './services/renderLoginForm.js';

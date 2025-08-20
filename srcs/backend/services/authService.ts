@@ -26,27 +26,35 @@ export async function registerUser({ username, password, name, team }: {
 export async function loginUser(username: string, password: string): Promise<{ token: string } | null> {
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, userRaw) => {
-      if (err || !userRaw) return resolve(null);
+      if (err || !userRaw)
+        return resolve(null);
 
       const user = userRaw as User;
       const match = await bcrypt.compare(password, user.password);
-      if (!match) return resolve(null);
+      if (!match) 
+        return resolve(null);
 
       const token = uuidv4();
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-      db.run(
-        `INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
-        [user.id, token, expiresAt],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ token });
-        }
-      );
+      db.run(`DELETE FROM sessions WHERE user_id = ?`, [user.id], function (deleteErr) {
+        if (deleteErr) 
+          return reject(deleteErr);
+
+        db.run(
+          `INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
+          [user.id, token, expiresAt],
+          function (insertErr) {
+            if (insertErr) 
+              reject(insertErr);
+            else 
+              resolve({ token });
+          }
+        );
+      });
     });
   });
 }
-
 
 export async function verifyToken(token: string): Promise<number | null> {
   return new Promise((resolve, reject) => {

@@ -30,10 +30,21 @@ db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS tournaments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        team_winner TEXT NOT NULL,
-        team_victories INTEGER NOT NULL,
+        player1_id INTEGER,
+        player2_id INTEGER,
+        player3_id INTEGER,
+        player4_id INTEGER,
+        semifinal1_player1_id INTEGER,
+        semifinal1_player2_id INTEGER,
+        semifinal1_winner_id INTEGER,
+        semifinal2_player1_id INTEGER,
+        semifinal2_player2_id INTEGER,
+        semifinal2_winner_id INTEGER,
+        final_player1_id INTEGER,
+        final_player2_id INTEGER,
+        winner_id INTEGER,
         size INTEGER NOT NULL,
-        date_created TEXT DEFAULT CURRENT_TIMESTAMP)`);
+        date_created TEXT DEFAULT CURRENT_TIMESTAMP);`);
 //HACKTI
     db.run(`CREATE TABLE IF NOT EXISTS hacktivists (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
