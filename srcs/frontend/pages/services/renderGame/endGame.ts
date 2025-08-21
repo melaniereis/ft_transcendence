@@ -53,6 +53,7 @@ export async function endGame(
   restartBtn.style.cursor = 'pointer';
   buttonContainer.appendChild(restartBtn);
 
+  
   // 🏠 Menu button (only in single mode)
   if (mode !== 'tournament') {
     const menuBtn = document.createElement('button');

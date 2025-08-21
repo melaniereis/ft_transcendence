@@ -1,6 +1,5 @@
 import { Paddle, Ball } from './types';
-import { updateBall, updatePaddle } from './gameLogic.js';
-import { resetBall } from './gameLogic.js';
+import { updateBall, updatePaddle, resetBall } from './gameLogic.js';
 import { endGame } from './endGame.js';
 import { renderFrame } from './renderFrame.js';
 
@@ -14,8 +13,8 @@ export function startGameLoop(
   ball: Ball,
   gameId: number,
   maxGames: number,
-  onRestart: () => void,
-  mode: GameMode = 'single' // default to single mode
+  onGameEnd: (score1: number, score2: number) => void,
+  mode: GameMode = 'single'
 ) {
   let gameEnded = false;
   let animationId: number;
@@ -34,9 +33,12 @@ export function startGameLoop(
     updateBall(ball, left, right, canvas, maxGames, gameId, () => {
       stopGameLoop();
 
+      const score1 = left.score;
+      const score2 = right.score;
+
       if (mode === 'single') {
         // Restart same game
-        endGame(gameId, left.score, right.score, canvas, () => {
+        endGame(gameId, score1, score2, canvas, () => {
           left.score = 0;
           right.score = 0;
           resetBall(ball, canvas, ball.initialSpeed);
@@ -44,8 +46,8 @@ export function startGameLoop(
           loop();
         }, left.nickname, right.nickname, mode);
       } else {
-        // Tournament mode: advance to next match
-        endGame(gameId, left.score, right.score, canvas, onRestart, left.nickname, right.nickname, mode);
+        // Tournament mode: pass scores to parent callback
+        onGameEnd(score1, score2);
       }
     });
 

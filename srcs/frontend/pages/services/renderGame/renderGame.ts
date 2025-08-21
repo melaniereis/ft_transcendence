@@ -9,8 +9,8 @@ export function renderGame(
   gameId: number,
   maxGames: number,
   difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal',
-  onGameEnd?: () => void,
-  mode: 'single' | 'tournament' = 'single' // NEW PARAMETER
+  onGameEnd?: (canvas: HTMLCanvasElement, score1: number, score2: number) => void,
+  mode: 'single' | 'tournament' = 'single'
 ) {
   container.innerHTML = `
     <canvas id="pong" width="800" height="400"></canvas>
@@ -40,9 +40,11 @@ export function renderGame(
     ball,
     gameId,
     maxGames,
-    () => {
-      if (onGameEnd) onGameEnd();
+    (score1: number, score2: number) => {
+      if (onGameEnd) {
+        onGameEnd(canvas, score1, score2);
+      }
     },
-    mode // ✅ pass mode to game loop
+    mode
   );
 }

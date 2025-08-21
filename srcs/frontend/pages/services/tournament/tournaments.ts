@@ -88,7 +88,8 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
       `;
 
       document.getElementById('start-btn')?.addEventListener('click', async () => {
-    await startTournament(container, tournament, users);
+      const selectedPlayerObjects = users.filter(u => selectedPlayers.includes(u.id));
+      await startTournament(container, tournament, selectedPlayerObjects);
   });
 
     } else {
