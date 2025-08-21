@@ -7,78 +7,69 @@ services:
     image: ft_transcendence
     ports:
       - "3000:3000"
-    command: npm run dev
+    volumes:
+      - ./data:/usr/src/app/data
+      - ./certs:/usr/src/app/certs
     environment:
-      - VAULT_ADDR=http://vault:8200
-    depends_on:
-      - db
-      - vault
+      - DB_PATH=/usr/src/app/data/database.db
+    command: npm run dev
     networks:
       - transcendence
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     restart: unless-stopped
 
   nginx:
-    image: owasp/modsecurity-crs:nginx
+    user: "0:0"
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
     ports:
-      - "80-80"
-      - "433:433"
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/modsec:/etc/nginx/modsec:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/conf.d/custom.conf:/etc/nginx/conf.d/custom.conf
+      #- ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      #- ./nginx/modsec/modsecurity.conf:/etc/modsecurity.d/modsecurity.conf
+      #- ./nginx/modsec/setup.conf:/etc/modsecurity.d/setup.conf
+      #- ./nginx/modsec/custom_rules.conf:/etc/modsecurity.d/custom_rules.conf
+      #- ./nginx/modsec/owasp-crs:/etc/modsecurity.d/owasp-crs
+      - ./nginx/modsec:/etc/modsecurity.d
+      - ./nginx/certs:/etc/nginx/certs
       - ./nginx/logs:/var/log/nginx
+     # - ./nginx/custom-entrypoint.sh:/docker-entrypoint.sh
+     # - ./nginx/includes:/etc/nginx/includes
     depends_on:
       - web
     networks:
       - transcendence
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-
-  vault:
-    image: vault:latest
-    environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=root
-    ports:
-      - "8200:8200"
-    volumes:
-      - ./vault/data:/vault/data
-    cap_add:
-      - IPC_LOCK
-    networks:
-      - transcendence
-    healthcheck:
-      test: ["CMD", "vault", "status"]
+      test: ["CMD", "curl", "-f", "--insecure", "https://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
     restart: unless-stopped
 
   db:
-    image: nouchika/sqlite3:latest
+    image: alpine:latest
     volumes:
-      - db-data:/data
+      - ./data:/usr/src/app/data
     networks:
       - transcendence
+    command: sh -c "apk add --no-cache sqlite && touch /usr/src/app/data/database.db && sqlite3 /usr/src/app/data/database.db 'CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY);' && tail -f /dev/null"
     healthcheck:
-      test: ["CMD", "splite3", "/data/database.db", ".tables"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD", "sqlite3", "/usr/src/app/data/database.db", ".tables"]
+      interval: 10s
+      timeout: 5s
       retries: 3
     restart: unless-stopped
 
-  networks:
-    transcendence:
-      driver: bridge
+networks:
+  transcendence:
+    driver: bridge
 
-  volumes:
-    db-data:
-    vault-data:
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data
