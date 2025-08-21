@@ -157,7 +157,8 @@ deleteForm.addEventListener('submit', async (e) => {
   if (res.ok) {
     alert(result.message);
     renderTournamentsPage(container); // refresh view
-  } else {
+  } 
+  else {
     alert(`Error: ${result.error}`);
   }
 });
