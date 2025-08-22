@@ -1,3 +1,4 @@
+//services/statsService.ts
 import db from '../db/database.js';
 
 import {UserStats} from '../types/userStats.js';

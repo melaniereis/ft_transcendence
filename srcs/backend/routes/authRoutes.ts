@@ -1,3 +1,4 @@
+//routes/authRoutes.ts
 import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
 import { registerUser, loginUser, verifyToken } from '../services/authService.js';
 

@@ -1,3 +1,4 @@
+//routes/tournamentRoutes.ts
 import { FastifyInstance } from 'fastify';
 import {createTournament, getAllTournaments, getTournamentById,
 updateTournament, deleteTournament} from '../services/tournamentsService.js';

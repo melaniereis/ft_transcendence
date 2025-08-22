@@ -1,3 +1,4 @@
+//server.ts
 import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';

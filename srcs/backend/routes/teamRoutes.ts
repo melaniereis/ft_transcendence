@@ -1,3 +1,4 @@
+//routes/teamRoutes.ts
 import { FastifyInstance } from 'fastify';
 import * as TeamService from '../services/teamService.js';
 

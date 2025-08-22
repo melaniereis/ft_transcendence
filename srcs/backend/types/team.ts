@@ -1,3 +1,4 @@
+//types/team.ts
 export interface TeamStats {
 	id: number;
 	members: string;

@@ -1,3 +1,4 @@
+//routes/gameRoutes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { createGame, endGame, getPlayersFromGame } from '../services/gameService.js';
 import { updateUserStatsAfterGame, getUserStatsById } from '../services/statsService.js';
