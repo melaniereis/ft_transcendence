@@ -2,6 +2,23 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
 import { registerUser, loginUser, verifyToken } from '../services/authService.js';
 
 export async function authRoutes(fastify: FastifyInstance) {
+	fastify.get('/api/protected', async (req: FastifyRequest, reply: FastifyReply) => {
+		const authHeader = req.headers.authorization;
+	
+		if (!authHeader)
+			return reply.status(401).send({ error: 'Authorization header missing' });
+	
+		const token = authHeader.split(' ')[1];
+		if (!token)
+			return reply.status(401).send({ error: 'Token missing from header' });
+	
+		const userId = await verifyToken(token);
+		if (!userId) 
+			return reply.status(401).send({ error: 'Unauthorized' });
+		
+		reply.send({ message: `Hello user ${userId}` });
+	});
+
 	fastify.post('/api/register', async (req: FastifyRequest, reply: FastifyReply) => {
 		try {
 			const { username, password, name, team } = req.body as {
@@ -27,22 +44,5 @@ export async function authRoutes(fastify: FastifyInstance) {
 			return reply.status(401).send({ error: 'Invalid credentials' });
 
 		reply.send({ token: result.token });
-	});
-
-	fastify.get('/api/protected', async (req: FastifyRequest, reply: FastifyReply) => {
-		const authHeader = req.headers.authorization;
-
-		if (!authHeader)
-			return reply.status(401).send({ error: 'Authorization header missing' });
-
-		const token = authHeader.split(' ')[1];
-		if (!token)
-			return reply.status(401).send({ error: 'Token missing from header' });
-	
-		const userId = await verifyToken(token);
-		if (!userId) 
-			return reply.status(401).send({ error: 'Unauthorized' });
-		
-		reply.send({ message: `Hello user ${userId}` });
 	});
 }

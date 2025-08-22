@@ -5,70 +5,71 @@ import { User } from '../types/user.js';
 import { Session } from '../types/session.js';
 
 export async function registerUser({ username, password, name, team }: {
-  username: string;
-  password: string;
-  name: string;
-  team: string;
+username: string;
+password: string;
+name: string;
+team: string;
 }): Promise<{ id: number }> {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  return new Promise((resolve, reject) => {
-    db.run(
-      `INSERT INTO users (username, password, name, team) VALUES (?, ?, ?, ?)`,
-      [username, hashedPassword, name, team],
-      function (err) {
-        if (err) reject(err);
-        else resolve({ id: this.lastID });
-      }
-    );
-  });
+	const hashedPassword = await bcrypt.hash(password, 10);
+	return new Promise((resolve, reject) => {
+		db.run(
+			`INSERT INTO users (username, password, name, team) VALUES (?, ?, ?, ?)`,
+			[username, hashedPassword, name, team],
+			function (err) {
+				if (err) 
+					reject(err);
+				else 
+					resolve({ id: this.lastID });
+		});
+	});
 }
 
 export async function loginUser(username: string, password: string): Promise<{ token: string } | null> {
-  return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, userRaw) => {
-      if (err || !userRaw)
-        return resolve(null);
+	return new Promise((resolve, reject) => {
+		db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, userRaw) => {
+			if (err || !userRaw)
+				return resolve(null);
 
-      const user = userRaw as User;
-      const match = await bcrypt.compare(password, user.password);
-      if (!match) 
-        return resolve(null);
+			const user = userRaw as User;
+			const match = await bcrypt.compare(password, user.password);
+			if (!match) 
+				return resolve(null);
 
-      const token = uuidv4();
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+			const token = uuidv4();
+			const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-      db.run(`DELETE FROM sessions WHERE user_id = ?`, [user.id], function (deleteErr) {
-        if (deleteErr) 
-          return reject(deleteErr);
+			db.run(`DELETE FROM sessions WHERE user_id = ?`, [user.id], function (deleteErr) {
+				if (deleteErr) 
+					return reject(deleteErr);
 
-        db.run(
-          `INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
-          [user.id, token, expiresAt],
-          function (insertErr) {
-            if (insertErr) 
-              reject(insertErr);
-            else 
-              resolve({ token });
-          }
-        );
-      });
-    });
-  });
+				db.run(
+					`INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
+					[user.id, token, expiresAt],
+					function (insertErr) {
+						if (insertErr) 
+							reject(insertErr);
+						else 
+							resolve({ token });
+					}
+				);
+			});
+		});
+	});
 }
 
 export async function verifyToken(token: string): Promise<number | null> {
-  return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM sessions WHERE token = ?`, [token], (err, sessionRaw) => {
-      if (err || !sessionRaw)
-        return resolve(null);
+	return new Promise((resolve, reject) => {
+		db.get(`SELECT * FROM sessions WHERE token = ?`, [token], (err, sessionRaw) => {
+			if (err || !sessionRaw)
+				return resolve(null);
 
-      const session = sessionRaw as Session;
+			const session = sessionRaw as Session;
 
-      const isExpired = new Date(session.expires_at) < new Date();
-      if (isExpired)
-        return resolve(null);
+			const isExpired = new Date(session.expires_at) < new Date();
+			if (isExpired)
+				return resolve(null);
 
-      resolve(session.user_id);
-    });
-  });
+			resolve(session.user_id);
+		});
+	});
 }
