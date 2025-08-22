@@ -4,12 +4,8 @@ import fastifyStatic from '@fastify/static';
 import path from 'path';
 import fs from 'fs';
 
-import { userRoutes } from './routes/user.js';
-import { tournamentRoutes } from './routes/tournamentRoutes.js';
-import { registerTeamRoutes } from './routes/teamRoutes.js';
-import { gameRoutes } from './routes/gameRoutes.js';
-import { statsRoutes } from './routes/statsRoutes.js';
-import { authRoutes } from './routes/authRoutes.js';
+import { userRoutes, tournamentRoutes, registerTeamRoutes, gameRoutes,
+statsRoutes, authRoutes} from './routes/routes.js';
 
 import '../backend/db/database.js';
 
