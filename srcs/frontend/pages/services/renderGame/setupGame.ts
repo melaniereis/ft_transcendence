@@ -30,9 +30,9 @@ export function createPaddles(canvas: HTMLCanvasElement, player1: string, player
 export function createBall(canvas: HTMLCanvasElement, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): Ball {
     const baseSpeed = {
         easy: 1,
-        normal: 3,
-        hard: 5,
-        crazy: 8
+        normal: 8,
+        hard: 15,
+        crazy: 25
     }[difficulty];
 
     return {
