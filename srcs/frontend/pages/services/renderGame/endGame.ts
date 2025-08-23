@@ -69,13 +69,13 @@ mode: 'single' | 'tournament' = 'single'
 		buttonContainer.remove();
 		window.location.href = '/';
 		};
+		document.body.appendChild(buttonContainer);
+
+		restartBtn.onclick = () => {
+			buttonContainer.remove();
+			onRestart(winnerId);
+		};
 	}
-
-	// document.body.appendChild(buttonContainer);
-
-	// restartBtn.onclick = () => {
-	// 	buttonContainer.remove();
-	// 	onRestart(winnerId);
-	// };
-  onRestart(winnerId);
+	else
+		onRestart(winnerId);
 }
