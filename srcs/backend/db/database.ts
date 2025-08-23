@@ -25,6 +25,11 @@ db.serialize(() => {
         name TEXT NOT NULL,
         username TEXT NOT NULL UNIQUE,
         team TEXT NOT NULL,
+        display_name TEXT,
+        email TEXT,
+        avatar_url TEXT,
+        online_status INTEGER DEFAULT 0,
+        last_seen TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
 //TOURN
     db.run(`CREATE TABLE IF NOT EXISTS tournaments (
