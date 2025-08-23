@@ -21,15 +21,14 @@ db.serialize(() => {
 //USERS
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         name TEXT NOT NULL,
-        username TEXT NOT NULL UNIQUE,
-        team TEXT NOT NULL,
         display_name TEXT,
-        email TEXT,
-        avatar_url TEXT,
+        email TEXT UNIQUE,
+        avatar_url TEXT DEFAULT '/assets/default-avatar.png',
         online_status INTEGER DEFAULT 0,
-        last_seen TEXT,
+        last_seen TEXT DEFAULT CURRENT_TIMESTAMP,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
 //TOURN
     db.run(`CREATE TABLE IF NOT EXISTS tournaments (
@@ -113,6 +112,30 @@ db.serialize(() => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         expires_at TEXT,
         FOREIGN KEY(user_id) REFERENCES users(id))`);
+//FRIENDSHIPS
+    db.run(`CREATE TABLE IF NOT EXISTS friendships (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        friend_id INTEGER NOT NULL,
+        status TEXT CHECK(status IN ('pending','accepted','blocked')) DEFAULT 'pending',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, friend_id),
+        FOREIGN KEY(user_id) REFERENCES users(id),
+        FOREIGN KEY(friend_id) REFERENCES users(id)
+  )`);
+//MATH HISTORY
+    db.run(`CREATE TABLE IF NOT EXISTS match_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        game_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        opponent_id INTEGER NOT NULL,
+        user_score INTEGER NOT NULL,
+        opponent_score INTEGER NOT NULL,
+        result TEXT CHECK(result IN ('win','loss')) NOT NULL,
+        duration INTEGER DEFAULT 0,
+        date_played TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
+
 });
 
 export default db;
