@@ -5,17 +5,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from '../types/user.js';
 import { Session } from '../types/session.js';
 
-export async function registerUser({ username, password, name, team }: {
+export async function registerUser({ username, password, name, team, display_name, email }: {
   username: string;
   password: string;
   name: string;
   team: string;
+  display_name?: string;
+  email?: string;
 }): Promise<{ id: number }> {
   const hashedPassword = await bcrypt.hash(password, 10);
   return new Promise((resolve, reject) => {
     db.run(
       `INSERT INTO users (username, password, name, team) VALUES (?, ?, ?, ?)`,
-      [username, hashedPassword, name, team],
+      [username, hashedPassword, name, team, display_name || null, email || null],
       function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
