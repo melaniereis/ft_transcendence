@@ -10,9 +10,10 @@ export async function authRoutes(fastify: FastifyInstance) {
 				password: string;
 				name: string;
 				team: string;
+				avatar_url: string;
 			};
 
-			const result = await registerUser({ username, password, name, team });
+			const result = await registerUser({ username, password, name, team});
 			reply.send({ success: true, userId: result.id });
 		} 
 		catch (err: any) {

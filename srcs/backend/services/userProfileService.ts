@@ -1,7 +1,7 @@
 import db from ../db/database.js;
 import { User } from '../types/user.js';
 
-export async function getUserPRofile(userId: number)
+export async function getUserProfile(userId: number)
 : Promise<Omit<User, 'password'> | null> {
   return new Promise((resolve, reject) => {
     return new Promise (resolve => {
