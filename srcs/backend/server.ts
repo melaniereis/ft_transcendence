@@ -11,7 +11,9 @@ import { registerTeamRoutes } from './routes/teamRoutes.js';
 import { gameRoutes } from './routes/gameRoutes.js';
 import { statsRoutes } from './routes/statsRoutes.js';
 import { authRoutes } from './routes/authRoutes.js';
-import { WebSocketPlugin} from './routes/websockets.js';
+import { matchHistoryRoutes } from './routes/matchHistoryRoutes.js';
+import { userProfileRoutes } from './routes/userProfileRoutes.js';
+import { friendsRoutes } from './routes/friendsRoutes.js';
 
 import '../backend/db/database.js';
 
@@ -45,9 +47,9 @@ fastify.register(registerTeamRoutes);
 fastify.register(gameRoutes);
 fastify.register(statsRoutes);
 fastify.register(authRoutes);
-
-// register websocket route/plugin
-fastify.register(WebSocketPlugin);
+fastify.register(matchHistoryRoutes);
+fastify.register(userProfileRoutes);
+fastify.register(friendsRoutes);
 
 const start = async () => {
 try {
