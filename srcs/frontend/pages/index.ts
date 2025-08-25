@@ -28,6 +28,7 @@ function updateUIBasedOnAuth(): void {
   tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
   teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
   logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+  profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 
   loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
   registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';

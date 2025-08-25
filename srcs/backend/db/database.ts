@@ -18,7 +18,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 db.serialize(() => {
-    // USERS - Schema corrigido
+    // USERS - Com campo TEAM corrigido
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
@@ -30,6 +30,57 @@ db.serialize(() => {
         avatar_url TEXT DEFAULT '/assets/default-avatar.png',
         online_status INTEGER DEFAULT 0,
         last_seen TEXT DEFAULT CURRENT_TIMESTAMP,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // TOURNAMENTS
+    db.run(`CREATE TABLE IF NOT EXISTS tournaments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        team_winner TEXT NOT NULL,
+        team_victories INTEGER NOT NULL,
+        size INTEGER NOT NULL,
+        date_created TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // TEAM TABLES
+    db.run(`CREATE TABLE IF NOT EXISTS hacktivists (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        members TEXT NOT NULL UNIQUE,
+        victories INTEGER DEFAULT 0,
+        tournaments_won INTEGER DEFAULT 0,
+        defeats INTEGER DEFAULT 0,
+        win_rate REAL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS bug_busters (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        members TEXT NOT NULL UNIQUE,
+        victories INTEGER DEFAULT 0,
+        tournaments_won INTEGER DEFAULT 0,
+        defeats INTEGER DEFAULT 0,
+        win_rate REAL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS logic_league (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        members TEXT NOT NULL UNIQUE,
+        victories INTEGER DEFAULT 0,
+        tournaments_won INTEGER DEFAULT 0,
+        defeats INTEGER DEFAULT 0,
+        win_rate REAL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS code_alliance (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        members TEXT NOT NULL UNIQUE,
+        victories INTEGER DEFAULT 0,
+        tournaments_won INTEGER DEFAULT 0,
+        defeats INTEGER DEFAULT 0,
+        win_rate REAL DEFAULT 0,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
@@ -47,18 +98,6 @@ db.serialize(() => {
         tournaments_won INTEGER DEFAULT 0,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id)
-    )`);
-
-    // FRIENDSHIPS - Simplificado
-    db.run(`CREATE TABLE IF NOT EXISTS friendships (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        friend_id INTEGER NOT NULL,
-        status TEXT CHECK(status IN ('pending','accepted','blocked')) DEFAULT 'pending',
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, friend_id),
-        FOREIGN KEY(user_id) REFERENCES users(id),
-        FOREIGN KEY(friend_id) REFERENCES users(id)
     )`);
 
     // GAMES
@@ -89,60 +128,32 @@ db.serialize(() => {
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 
-    // TOURNAMENTS
-    db.run(`CREATE TABLE IF NOT EXISTS tournaments (
+    // FRIENDSHIPS
+    db.run(`CREATE TABLE IF NOT EXISTS friendships (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        team_winner TEXT NOT NULL,
-        team_victories INTEGER NOT NULL,
-        size INTEGER NOT NULL,
-        date_created TEXT DEFAULT CURRENT_TIMESTAMP
+        user_id INTEGER NOT NULL,
+        friend_id INTEGER NOT NULL,
+        status TEXT CHECK(status IN ('pending','accepted','blocked')) DEFAULT 'pending',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, friend_id),
+        FOREIGN KEY(user_id) REFERENCES users(id),
+        FOREIGN KEY(friend_id) REFERENCES users(id)
     )`);
 
-    // TEAM TABLES
-    //HACK
-    db.run(`CREATE TABLE IF NOT EXISTS hacktivists (
+    // MATCH HISTORY
+    db.run(`CREATE TABLE IF NOT EXISTS match_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        members TEXT NOT NULL UNIQUE,
-        victories INTEGER DEFAULT 0,
-        tournaments_won INTEGER DEFAULT 0,
-        defeats INTEGER DEFAULT 0,
-        win_rate REAL DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        game_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        opponent_id INTEGER NOT NULL,
+        user_score INTEGER NOT NULL,
+        opponent_score INTEGER NOT NULL,
+        result TEXT CHECK(result IN ('win','loss')) NOT NULL,
+        duration INTEGER DEFAULT 0,
+        date_played TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    //BUG B
-    db.run(`CREATE TABLE IF NOT EXISTS bug_busters (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        members TEXT NOT NULL UNIQUE,
-        victories INTEGER DEFAULT 0,
-        tournaments_won INTEGER DEFAULT 0,
-        defeats INTEGER DEFAULT 0,
-        win_rate REAL DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )`);
-
-    //LOGIC L
-    db.run(`CREATE TABLE IF NOT EXISTS logic_league (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        members TEXT NOT NULL UNIQUE,
-        victories INTEGER DEFAULT 0,
-        tournaments_won INTEGER DEFAULT 0,
-        defeats INTEGER DEFAULT 0,
-        win_rate REAL DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )`);
-
-    //CODE A
-    db.run(`CREATE TABLE IF NOT EXISTS code_alliance (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        members TEXT NOT NULL UNIQUE,
-        victories INTEGER DEFAULT 0,
-        tournaments_won INTEGER DEFAULT 0,
-        defeats INTEGER DEFAULT 0,
-        win_rate REAL DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )`);
+    console.log('📋 Database tables created successfully');
 });
 
 export default db;

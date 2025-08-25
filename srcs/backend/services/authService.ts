@@ -33,6 +33,7 @@ export async function registerUser({
                   console.error('Erro ao inserir utilizador:', err);
                   reject(err);
               } else {
+                  console.log('Novo utilizador criado com sucesso');
                   resolve({ id: this.lastID });
               }
           }
@@ -49,6 +50,7 @@ export async function loginUser(username: string, password: string): Promise<{ t
           }
           
           if (!userRaw) {
+              console.log('Utilizador nao encontrado');
               return resolve(null);
           }
 
