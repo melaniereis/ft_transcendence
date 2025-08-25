@@ -2,24 +2,20 @@
 import db from '../db/database.js';
 import { User } from '../types/user.js';
 
-// Function to get user profile by ID
-export async function getUserProfile(userId: number): Promise<Omit<User, 'password'> | null> {
-    return new Promise((resolve, reject) => {
-        db.get(
-            `SELECT id, username, name, team, display_name, email, avatar_url, 
-                    online_status, last_seen, created_at 
-             FROM users WHERE id = ?`, 
-            [userId], 
-            (err, row) => {
-                if (err) {
-                    console.error('Erro ao buscar perfil:', err);
-                    reject(err);
-                } else {
-                    resolve(row ? (row as Omit<User, 'password'>) : null);
-                }
-            }
-        );
+// Function to get user profile by IDexport async function getUserProfile(userId: number)
+export async function getUserProfile(userId: number)
+: Promise<Omit<User, 'password'> | null> {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT id, username, name, team, display_name, email, avatar_url, online_status, last_seen, created_at FROM users WHERE id = ?`, [userId], (err, row) => {
+      if (err) {
+        console.error('❌ Erro ao buscar perfil:', err);
+        reject(err);
+      } else {
+        console.log('✅ Perfil encontrado:', row);
+        resolve(row ? (row as Omit<User, 'password'>) : null);
+      }
     });
+  });
 }
 
 // Function to update user profile

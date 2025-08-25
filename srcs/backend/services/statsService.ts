@@ -26,52 +26,77 @@ export function updateUserStatsAfterGame(
     score1: number,
     score2: number
 ): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         console.log(`Starting updateUserStatsAfterGame for game ${gameId}`);
-        db.serialize(() => {
-            let completed = 0;
+        
+        try {
+            await ensureUserStatsExist(player1Id);
+            await ensureUserStatsExist(player2Id);
 
-            const updateStats = (
-                userId: number,
-                scored: number,
-                conceded: number,
-                won: boolean
-            ) => {
-                console.log(`Updating stats for user ${userId}: scored=${scored}, conceded=${conceded}, won=${won}`);
-                const winInc = won ? 1 : 0;
-                const lossInc = won ? 0 : 1;
+            db.serialize(() => {
+                let completed = 0;
 
-                db.run(
-                    `UPDATE user_stats
-                     SET matches_played = matches_played + 1,
-                         matches_won = matches_won + ?,
-                         matches_lost = matches_lost + ?,
-                         points_scored = points_scored + ?,
-                         points_conceded = points_conceded + ?,
-                         win_rate = CAST(matches_won + ? AS REAL) / CAST(matches_played + 1 AS REAL)
-                     WHERE user_id = ?`,
-                    [winInc, lossInc, scored, conceded, winInc, userId],
-                    (err) => {
-                        if (err) {
-                            console.error(`Error updating stats for user ${userId}:`, err);
-                            return reject(err);
+                const updateStats = (
+                    userId: number,
+                    scored: number,
+                    conceded: number,
+                    won: boolean
+                ) => {
+                    console.log(`Updating stats for user ${userId}: scored=${scored}, conceded=${conceded}, won=${won}`);
+                    const winInc = won ? 1 : 0;
+                    const lossInc = won ? 0 : 1;
+
+                    db.run(
+                        `UPDATE user_stats
+                        SET matches_played = matches_played + 1,
+                            matches_won = matches_won + ?,
+                            matches_lost = matches_lost + ?,
+                            points_scored = points_scored + ?,
+                            points_conceded = points_conceded + ?,
+                            win_rate = CAST(matches_won + ? AS REAL) / CAST(matches_played + 1 AS REAL)
+                        WHERE user_id = ?`,
+                        [winInc, lossInc, scored, conceded, winInc, userId],
+                        (err) => {
+                            if (err) {
+                                console.error(`Error updating stats for user ${userId}:`, err);
+                                return reject(err);
+                            }
+                            console.log(`Successfully updated stats for user ${userId}`);
+                            completed++;
+                            if (completed === 2) {
+                                console.log(`Finished updating stats for game ${gameId}`);
+                                resolve();
+                            }
                         }
-                        console.log(`Successfully updated stats for user ${userId}`);
-                        completed++;
-                        if (completed === 2) {
-                            console.log(`Finished updating stats for game ${gameId}`);
-                            resolve();
-                        }
-                    }
-                );
-            };
+                    );
+                };
 
-            updateStats(player1Id, score1, score2, score1 > score2);
-            updateStats(player2Id, score2, score1, score2 > score1);
-        });
+                updateStats(player1Id, score1, score2, score1 > score2);
+                updateStats(player2Id, score2, score1, score2 > score1);
+            });
+        } 
+        catch (err) {
+            console.error(`Error updating stats for game ${gameId}:`, err);
+            reject(err);
+        }
     });
 }
 
+export function ensureUserStatsExist(userId: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+        // Verify if stats exist
+        db.get(`SELECT user_id FROM user_stats WHERE user_id = ?`, [userId], (err, row) => {
+            if (err) return reject(err);
+            
+            if (!row) {
+                // Create stats if they do not exist
+                createUserStats(userId).then(resolve).catch(reject);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
 
 export function getAllUserStats(): Promise<UserStats[]> {
     return new Promise((resolve, reject) => {

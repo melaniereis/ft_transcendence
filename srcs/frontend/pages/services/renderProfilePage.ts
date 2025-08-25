@@ -44,6 +44,11 @@ export async function renderProfilePage(container: HTMLElement) {
             <div id="history" style="margin: 10px 0;">
                 <p>Loading match history...</p>
             </div>
+
+            <h3>👥 Friends</h3>
+            <div id="friends" style="margin: 10px 0;">
+                <p>Loading friends...</p>
+            </div>
         `;
 
         // 🔥 Buscar estatísticas do utilizador (URL corrigida)
@@ -110,6 +115,35 @@ export async function renderProfilePage(container: HTMLElement) {
             }
         } else {
             document.getElementById('history')!.innerHTML = '<p>Failed to load match history.</p>';
+        }
+
+        const friendsResponse = await fetch('/api/friends', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (friendsResponse.ok) {
+            const friendsData = await friendsResponse.json();
+            const friendsList = friendsData.friends || []; // ✅ Access the friends array
+            
+            if (friendsList.length > 0) {
+                document.getElementById('friends')!.innerHTML = `
+                    <ul style="list-style: none; padding: 0;">
+                        ${friendsList.map((friend: any) => `
+                            <li style="padding: 10px; border: 1px solid #ddd; margin: 5px 0; border-radius: 5px;">
+                                <strong>${friend.display_name || friend.name}</strong> (@${friend.username})
+                                <br><small>Team: ${friend.team}</small>
+                                <br><small>Status: ${friend.online_status ? '🟢 Online' : '🔴 Offline'}</small>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            } else {
+                document.getElementById('friends')!.innerHTML = '<p>No friends added yet.</p>';
+            }
+        } else {
+            document.getElementById('friends')!.innerHTML = '<p>Failed to load friends list.</p>';
         }
 
     } catch (error) {

@@ -4,6 +4,7 @@ import { createGame, endGame, getPlayersFromGame } from '../services/gameService
 import { updateUserStatsAfterGame, getUserStatsById } from '../services/statsService.js';
 import { updateTeamMember } from '../services/teamService.js';
 import { getUserById } from '../services/usersService.js';
+import { createMatchHistoryRecord } from '../services/matchHistoryService.js';
 
 export async function gameRoutes(fastify: FastifyInstance) {
 	fastify.post('/games', async (req: FastifyRequest, reply: FastifyReply) => {
@@ -40,6 +41,10 @@ export async function gameRoutes(fastify: FastifyInstance) {
 
 			await syncUserStatsToTeam(player1Id);
 			await syncUserStatsToTeam(player2Id);
+
+			await createMatchHistoryRecord(gameIdNum, player1Id, player2Id, score_player1, score_player2, 0);
+			await createMatchHistoryRecord(gameIdNum, player2Id, player1Id, score_player2, score_player1, 0);
+
 			reply.status(200).send({ message: 'Game ended successfully' });
 		} 
 		catch (err) {
