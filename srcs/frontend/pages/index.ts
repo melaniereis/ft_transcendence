@@ -4,6 +4,7 @@ import { renderTournamentsPage } from './services/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
 import { renderLoginForm } from './services/renderLoginForm.js';
+import { renderProfilePage } from './services/renderProfilePage.js';
 
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
@@ -13,6 +14,7 @@ const teamsBtn = document.getElementById('teams-btn') as HTMLButtonElement;
 const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
 const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
 const registerBtn = document.getElementById('register-btn') as HTMLButtonElement;
+const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
 
 const appDiv = document.getElementById('app') as HTMLDivElement;
 
@@ -66,6 +68,11 @@ logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('authToken');
   appDiv.innerHTML = '<p>You have been logged out.</p>';
   updateUIBasedOnAuth();
+});
+
+profileBtn.addEventListener('click', () => {
+  appDiv.innerHTML = '';
+  renderProfilePage(appDiv);
 });
 
 // 🚀 Initialize UI
