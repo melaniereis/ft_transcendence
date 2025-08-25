@@ -1,3 +1,4 @@
+//types/matchHistory.ts
 export interface MatchHistoryRecord {
     id: number;
     game_id: number;

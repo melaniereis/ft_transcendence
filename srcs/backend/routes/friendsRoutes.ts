@@ -1,106 +1,172 @@
 import { FastifyInstance } from 'fastify';
-import { sendFriendRequest, acceptFriendRequest, getPendingRequests, getFriends, removeFriend } from '../services/friendsService';
+import { sendFriendRequest, acceptFriendRequest, getFriends, removeFriend, getUserByUsername } from '../services/friendsService.js';
 import { verifyToken } from '../services/authService.js';
 
+interface FriendRequestBody {
+    friendUsername: string; // username of the friend to add
+}
+
+interface AcceptRequestBody {
+    friendId: number;
+}
+
 export async function friendsRoutes(fastify: FastifyInstance) {
-    fastify.post('/api/friends', async (req, reply) => {
+
+    // Send friend request by username
+    fastify.post('/api/friends/request', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader)
-            return reply.status(401).send({ error: 'Authorization header missing' });
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
 
         const token = authHeader.split(' ')[1];
-        const userId = await verifyToken(token);
-        if (!userId)
-            return reply.status(401).send({ error: 'Invalid token' });
-
-        const { friendId } = req.body as { friendId: number };
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
 
         try {
-            await sendFriendRequest(userId, friendId);
-            reply.status(201).send({ message: 'Friend request sent' });
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            const { friendUsername } = req.body as FriendRequestBody;
+            
+            if (!friendUsername) {
+                return reply.status(400).send({ error: 'Username do amigo é obrigatório' });
+            }
+
+            // Check if friend exists
+            const friend = await getUserByUsername(friendUsername);
+            if (!friend) {
+                return reply.status(404).send({ error: 'Utilizador não encontrado' });
+            }
+
+            if (friend.id === userId) {
+                return reply.status(400).send({ error: 'Não podes adicionar-te a ti próprio' });
+            }
+
+            await sendFriendRequest(userId, friend.id);
+            reply.status(201).send({ 
+                success: true, 
+                message: `Pedido de amizade enviado para ${friendUsername}` 
+            });
         } 
-        catch (err) {
-            reply.status(500).send({ error: 'Failed to send friend request' });
+        catch (err: any) {
+            console.error('Erro ao enviar pedido:', err);
+            if (err.message.includes('already exists')) {
+                reply.status(409).send({ error: 'Pedido já existe ou já são amigos' });
+            } else {
+                reply.status(500).send({ error: 'Erro interno do servidor' });
+            }
         }
     });
 
+    // Accept friend request
     fastify.post('/api/friends/accept', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader)
-            return reply.status(401).send({ error: 'Authorization header missing' });
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
 
         const token = authHeader.split(' ')[1];
-        const userId = await verifyToken(token);
-        if (!userId)
-            return reply.status(401).send({ error: 'Invalid token' });
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
 
-        const { friendId } = req.body as { friendId: number };
         try {
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            const { friendId } = req.body as AcceptRequestBody;
+            
+            if (!friendId || typeof friendId !== 'number') {
+                return reply.status(400).send({ error: 'ID do amigo é obrigatório e deve ser número' });
+            }
+
             await acceptFriendRequest(userId, friendId);
-            reply.send({ message: 'Friend request accepted' });
+            reply.send({ 
+                success: true, 
+                message: 'Pedido de amizade aceite' 
+            });
         } 
-        catch (err) {
-            reply.status(500).send({ error: 'Failed to accept friend request' });
+        catch (err: any) {
+            console.error('Erro ao aceitar pedido:', err);
+            if (err.message.includes('No pending')) {
+                reply.status(404).send({ error: 'Pedido pendente não encontrado' });
+            } else {
+                reply.status(500).send({ error: 'Erro interno do servidor' });
+            }
         }
     });
 
-    fastify.get('/api/friends/requests', async (req, reply) => {
+    // List friends
+    fastify.get('/api/friends', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader)
-            return reply.status(401).send({ error: 'Authorization header missing' });
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
 
         const token = authHeader.split(' ')[1];
-        const userId = await verifyToken(token);
-        if (!userId)
-            return reply.status(401).send({ error: 'Invalid token' });
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
 
         try {
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
             const friends = await getFriends(userId);
-            reply.send(friends);
+            reply.send({ friends });
         } 
-        catch (err) {
-            reply.status(500).send({ error: 'Failed to fetch friends' });
+        catch (err: any) {
+            console.error('Erro ao buscar amigos:', err);
+            reply.status(500).send({ error: 'Erro interno do servidor' });
         }
     });
 
-    fastify.post('/api/friends/requests', async (req, reply) => {
-        const authHeader = req.headers.authorization;
-        if (!authHeader)
-            return reply.status(401).send({ error: 'Authorization header missing' });
-
-        const token = authHeader.split(' ')[1];
-        const userId = await verifyToken(token);
-        if (!userId)
-            return reply.status(401).send({ error: 'Invalid token' });
-
-        try {
-            const requests = await getPendingRequests(userId);
-            reply.send(requests);
-        } 
-        catch (err) {
-            reply.status(500).send({ error: 'Failed to fetch pending requests' });
-        }
-    }
-    );
-
+    // Remove friend
     fastify.delete('/api/friends/:friendId', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader)
-            return reply.status(401).send({ error: 'Authorization header missing' });
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
         
         const token = authHeader.split(' ')[1];
-        const userId = await verifyToken(token);
-        if (!userId)
-            return reply.status(401).send({ error: 'Invalid token' });
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
 
-        const { friendId } = req.params as { friendId: string };
         try {
-            await removeFriend(userId, Number(friendId));
-            reply.send({ message: 'Friend removed' });
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            const { friendId } = req.params as { friendId: string };
+            const friendIdNum = parseInt(friendId);
+            
+            if (isNaN(friendIdNum)) {
+                return reply.status(400).send({ error: 'ID do amigo inválido' });
+            }
+
+            await removeFriend(userId, friendIdNum);
+            reply.send({ 
+                success: true, 
+                message: 'Amigo removido com sucesso' 
+            });
         } 
-        catch (err) {
-            reply.status(500).send({ error: 'Failed to remove friend' });
+        catch (err: any) {
+            console.error('Erro ao remover amigo:', err);
+            if (err.message.includes('No friendship found')) {
+                reply.status(404).send({ error: 'Amizade não encontrada' });
+            } else {
+                reply.status(500).send({ error: 'Erro interno do servidor' });
+            }
         }
     });
-    
 }
