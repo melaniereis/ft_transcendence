@@ -1,6 +1,7 @@
 //services/userProfileService.ts
 import db from '../db/database.js';
 import { User } from '../types/user.js';
+import * as bcrypt from 'bcrypt';
 
 // Function to get user profile by IDexport async function getUserProfile(userId: number)
 export async function getUserProfile(userId: number)
@@ -99,6 +100,59 @@ export async function getUserWithStats(userId: number): Promise<any> {
                 reject(err);
             } else {
                 resolve(row || null);
+            }
+        });
+    });
+}
+
+// Function to change user password
+export async function changeUserPassword(
+    userId: number, 
+    currentPassword: string, 
+    newPassword: string
+): Promise<void> {
+    return new Promise((resolve, reject) => {
+        // First get current user data
+        db.get(`SELECT password FROM users WHERE id = ?`, [userId], async (err, row) => {
+            if (err) {
+                console.error('Erro ao buscar utilizador:', err);
+                return reject(err);
+            }
+            
+            if (!row) {
+                return reject(new Error('Utilizador não encontrado'));
+            }
+
+            const user = row as { password: string };
+            
+            try {
+                // Verify current password
+                const match = await bcrypt.compare(currentPassword, user.password);
+                if (!match) {
+                    return reject(new Error('Password atual incorreta'));
+                }
+
+                // Hash new password
+                const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+                
+                // Update password in database
+                db.run(
+                    `UPDATE users SET password = ? WHERE id = ?`,
+                    [hashedNewPassword, userId],
+                    function (err) {
+                        if (err) {
+                            console.error('Erro ao atualizar password:', err);
+                            reject(err);
+                        } else if (this.changes === 0) {
+                            reject(new Error('Utilizador não encontrado'));
+                        } else {
+                            resolve();
+                        }
+                    }
+                );
+            } catch (bcryptErr) {
+                console.error('Erro na comparação de password:', bcryptErr);
+                reject(bcryptErr);
             }
         });
     });

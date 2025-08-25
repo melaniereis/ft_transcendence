@@ -4,7 +4,8 @@ import {
     getUserProfile, 
     updateUserProfile, 
     updateOnlineStatus, 
-    getUserWithStats 
+    getUserWithStats, 
+    changeUserPassword
 } from '../services/userProfileService.js';
 import { verifyToken } from '../services/authService.js';
 
@@ -158,6 +159,53 @@ export async function userProfileRoutes(fastify: FastifyInstance) {
         catch (err: any) {
             console.error('Erro ao atualizar status:', err);
             reply.status(500).send({ error: err.message || 'Erro interno do servidor' });
+        }
+    });
+
+    // Change password
+    fastify.post('/api/profile/change-password', async (req, reply) => {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
+
+        try {
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            const { currentPassword, newPassword } = req.body as { 
+                currentPassword: string; 
+                newPassword: string;
+            };
+            
+            if (!currentPassword || !newPassword) {
+                return reply.status(400).send({ error: 'Password atual e nova são obrigatórias' });
+            }
+
+            if (newPassword.length < 6) {
+                return reply.status(400).send({ error: 'Nova password deve ter pelo menos 6 caracteres' });
+            }
+
+            await changeUserPassword(userId, currentPassword, newPassword);
+            reply.send({ 
+                success: true, 
+                message: 'Password alterada com sucesso' 
+            });
+        } 
+        catch (err: any) {
+            console.error('Erro ao alterar password:', err);
+            if (err.message.includes('Password atual incorreta')) {
+                reply.status(400).send({ error: 'Password atual incorreta' });
+            } else {
+                reply.status(500).send({ error: 'Erro interno do servidor' });
+            }
         }
     });
 }

@@ -57,8 +57,8 @@ async function loadPendingRequests(token: string) {
                             <div class="pending-request" style="display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
                                 <div>
                                     <strong>${request.display_name || request.name}</strong> (@${request.username})
-                                    <br><small>Team: ${request.team}</small>
-                                    <br><small>Sent: ${new Date(request.created_at).toLocaleDateString()}</small>
+                                    <pt><small>Team: ${request.team}</small>
+                                    <pt><small>Sent: ${new Date(request.created_at).toLocaleDateString()}</small>
                                 </div>
                                 <div style="display: flex; gap: 10px;">
                                     <button class="accept-btn" data-friend-id="${request.user_id}" data-friend-name="${request.display_name || request.name}" 
