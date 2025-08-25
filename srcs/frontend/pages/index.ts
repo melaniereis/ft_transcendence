@@ -5,6 +5,7 @@ import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
 import { renderLoginForm } from './services/renderLoginForm.js';
 import { renderProfilePage } from './services/renderProfilePage.js';
+import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
@@ -15,6 +16,8 @@ const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
 const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
 const registerBtn = document.getElementById('register-btn') as HTMLButtonElement;
 const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
+const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
+const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
 
 const appDiv = document.getElementById('app') as HTMLDivElement;
 
@@ -32,6 +35,11 @@ function updateUIBasedOnAuth(): void {
 
   loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
   registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+
+  friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+  if (isLoggedIn) {
+      updateFriendRequestsBadge();
+  }
 }
 
 // 🧠 Event Listeners
@@ -74,6 +82,38 @@ logoutBtn.addEventListener('click', () => {
 profileBtn.addEventListener('click', () => {
   appDiv.innerHTML = '';
   renderProfilePage(appDiv);
+});
+
+// Update friend requests badge
+export async function updateFriendRequestsBadge() {
+  const token = localStorage.getItem('authToken');
+  if (!token) return;
+  
+  try {
+      const response = await fetch('/api/friends/pending', {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+          const data = await response.json();
+          const pendingCount = data.pending?.length || 0;
+          
+          if (pendingCount > 0) {
+              friendRequestsBadge.textContent = pendingCount.toString();
+              friendRequestsBadge.style.display = 'block';
+          } else {
+              friendRequestsBadge.style.display = 'none';
+          }
+      }
+  } catch (error) {
+      console.error('Error updating friend requests badge:', error);
+  }
+}
+
+// Friend requests button event listener
+friendRequestsBtn.addEventListener('click', () => {
+  appDiv.innerHTML = '';
+  renderFriendRequestsPage(appDiv);
 });
 
 // 🚀 Initialize UI

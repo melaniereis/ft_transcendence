@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { sendFriendRequest, acceptFriendRequest, getFriends, removeFriend, getUserByUsername } from '../services/friendsService.js';
+import { sendFriendRequest, acceptFriendRequest, getFriends, removeFriend, getUserByUsername, getPendingRequests, rejectFriendRequest } from '../services/friendsService.js';
 import { verifyToken } from '../services/authService.js';
 
 interface FriendRequestBody {
@@ -126,6 +126,74 @@ export async function friendsRoutes(fastify: FastifyInstance) {
         catch (err: any) {
             console.error('Erro ao buscar amigos:', err);
             reply.status(500).send({ error: 'Erro interno do servidor' });
+        }
+    });
+
+    
+    // Get pending friend requests
+    fastify.get('/api/friends/pending', async (req, reply) => {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
+
+        try {
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            const pendingRequests = await getPendingRequests(userId);
+            reply.send({ pending: pendingRequests });
+        } 
+        catch (err: any) {
+            console.error('Erro ao buscar pedidos pendentes:', err);
+            reply.status(500).send({ error: 'Erro interno do servidor' });
+        }
+    });
+
+    // Reject friend request
+    fastify.post('/api/friends/reject', async (req, reply) => {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
+
+        try {
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            const { friendId } = req.body as { friendId: number };
+            
+            if (!friendId || typeof friendId !== 'number') {
+                return reply.status(400).send({ error: 'ID do amigo é obrigatório e deve ser número' });
+            }
+
+            await rejectFriendRequest(userId, friendId);
+            reply.send({ 
+                success: true, 
+                message: 'Pedido de amizade rejeitado' 
+            });
+        } 
+        catch (err: any) {
+            console.error('Erro ao rejeitar pedido:', err);
+            if (err.message.includes('No pending')) {
+                reply.status(404).send({ error: 'Pedido pendente não encontrado' });
+            } else {
+                reply.status(500).send({ error: 'Erro interno do servidor' });
+            }
         }
     });
 
