@@ -27,7 +27,7 @@ db.serialize(() => {
         team TEXT NOT NULL,
         display_name TEXT,
         email TEXT UNIQUE,
-        avatar_url TEXT DEFAULT '/assets/default-avatar.png',
+        avatar_url TEXT DEFAULT '/assets/avatar/default.png',
         online_status INTEGER DEFAULT 0,
         last_seen TEXT DEFAULT CURRENT_TIMESTAMP,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
