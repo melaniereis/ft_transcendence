@@ -66,19 +66,36 @@ export async function loginUser(username: string, password: string): Promise<{ t
               const token = uuidv4();
               const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
 
-              // Insert session into DB
-              db.run(
-                  `INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
-                  [user.id, token, expiresAt],
-                  function (err) {
-                      if (err) {
-                          console.error('Erro ao criar sessão:', err);
-                          reject(err);
-                      } else {
-                          resolve({ token });
-                      }
-                  }
-              );
+              // Use serialize to ensure sequential execution
+              db.serialize(() => {                    
+                // Insert session into 
+                db.run(
+                    `INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
+                    [user.id, token, expiresAt],
+                    function (err) {
+                        if (err) {
+                            console.error('Erro ao criar sessão:', err);
+                            reject(err);
+                        } else {
+                            resolve({ token });
+                        }
+                        // Update user status to online
+                        db.run(
+                            `UPDATE users SET online_status = 1, last_seen = CURRENT_TIMESTAMP WHERE id = ?`,
+                            [user.id],
+                            function (err) {
+                                if (err) {
+                                    console.error('Erro ao atualizar status online:', err);
+                                    reject(err);
+                                } else {
+                                    console.log(`User ${user.id} set to online`);
+                                    resolve({ token });
+                                }
+                            }
+                        );
+                    }
+                );
+             });
           } catch (bcryptErr) {
               console.error('Erro na comparação de password:', bcryptErr);
               reject(bcryptErr);

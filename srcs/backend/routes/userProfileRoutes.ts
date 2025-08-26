@@ -8,6 +8,7 @@ import {
     changeUserPassword
 } from '../services/userProfileService.js';
 import { verifyToken } from '../services/authService.js';
+import db from '../db/database.js';
 
 interface UpdateProfileRequest {
     username?: string;
@@ -206,6 +207,41 @@ export async function userProfileRoutes(fastify: FastifyInstance) {
             } else {
                 reply.status(500).send({ error: 'Erro interno do servidor' });
             }
+        }
+    });
+
+    // Update last seen
+    fastify.post('/api/profile/update-last-seen', async (req, reply) => {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return reply.status(401).send({ error: 'Header de autorização em falta' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return reply.status(401).send({ error: 'Token em falta' });
+        }
+
+        try {
+            const userId = await verifyToken(token);
+            if (!userId) {
+                return reply.status(401).send({ error: 'Token inválido' });
+            }
+
+            db.run(
+                `UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?`,
+                [userId],
+                function (err) {
+                    if (err) {
+                        console.error('Erro ao atualizar last_seen:', err);
+                        return reply.status(500).send({ error: 'Erro interno' });
+                    }
+                    reply.send({ success: true });
+                }
+            );
+        } catch (err: any) {
+            console.error('Erro:', err);
+            reply.status(500).send({ error: 'Erro interno do servidor' });
         }
     });
 }
