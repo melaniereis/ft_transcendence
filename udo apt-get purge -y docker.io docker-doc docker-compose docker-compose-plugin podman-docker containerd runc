@@ -1,0 +1,453 @@
+Aug 26 16:11:06 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.511346045+01:00" level=info msg="Starting up"
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.517176962+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.519153920+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.519166628+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.520430920+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.737150712+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:11:06 melmel dockerd[1432]: time="2025-08-26T16:11:06.826626378+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:11:07 melmel dockerd[1432]: time="2025-08-26T16:11:07.335213879+01:00" level=info msg="Loading containers: start."
+Aug 26 16:11:07 melmel dockerd[1432]: time="2025-08-26T16:11:07.934179671+01:00" level=info msg="Removing stale sandbox" cid=c66585d1e11d isRestore=false sid=0aac49d2683c
+Aug 26 16:11:07 melmel dockerd[1432]: time="2025-08-26T16:11:07.989327379+01:00" level=warning msg="Failed deleting service host entries to the running container: open : no such file or directory"
+Aug 26 16:11:07 melmel dockerd[1432]: time="2025-08-26T16:11:07.989379837+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f 2c61f51ddafe6b74c11b5f22e13e5973786e544bfcecc73514156a8ea03b965b], retrying...."
+Aug 26 16:11:08 melmel dockerd[1432]: time="2025-08-26T16:11:08.122111379+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count 21a2e3bae2904a4b94b8178bc58a05d5684a55dfc2bd2727a0c97cc0388094ed], retrying...."
+Aug 26 16:11:08 melmel dockerd[1432]: time="2025-08-26T16:11:08.176504504+01:00" level=warning msg="error locating sandbox id 0aac49d2683c771cc8ddf1b25b52bf792b60f40a9f9de5ccabc2a85202246e47: sandbox 0aac49d2683c771cc8ddf1b25b52bf792b60f40a9f9de5ccabc2a85202246e47 not found"
+Aug 26 16:11:08 melmel dockerd[1432]: time="2025-08-26T16:11:08.578566338+01:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 26 16:11:08 melmel dockerd[1432]: time="2025-08-26T16:11:08.747499504+01:00" level=info msg="Loading containers: done."
+Aug 26 16:11:08 melmel dockerd[1432]: time="2025-08-26T16:11:08.855357546+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:11:08 melmel dockerd[1432]: time="2025-08-26T16:11:08.856534213+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:11:09 melmel dockerd[1432]: time="2025-08-26T16:11:09.331675338+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:11:09 melmel dockerd[1432]: time="2025-08-26T16:11:09.364265671+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:11:09 melmel dockerd[1432]: time="2025-08-26T16:11:09.364311546+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:11:09 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:14:57 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:14:57 melmel dockerd[1432]: time="2025-08-26T16:14:57.795572488+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:14:57 melmel dockerd[1432]: time="2025-08-26T16:14:57.876803941+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:14:57 melmel dockerd[1432]: time="2025-08-26T16:14:57.899630489+01:00" level=warning msg="ShouldRestart failed, container will not be restarted" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 daemonShuttingDown=true error="restart canceled" execDuration=3m49.666090902s exitStatus="{1 2025-08-26 15:14:57.841444044 +0000 UTC}" hasBeenManuallyStopped=false restartCount=0
+Aug 26 16:14:58 melmel dockerd[1432]: time="2025-08-26T16:14:58.016339173+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:14:58 melmel dockerd[1432]: time="2025-08-26T16:14:58.017063681+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:14:58 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:14:58 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:14:58 melmel systemd[1]: docker.service: Consumed 1.394s CPU time, 115.9M memory peak.
+[0;38;5;245m░░ [0m[0;32mSubject: Ressources consommées durant l'éxécution de l'unité (unit)[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service s'est arrêtée et a consommé les ressources indiquées.[0m
+Aug 26 16:14:58 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.082462742+01:00" level=info msg="Starting up"
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.085298315+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.086317035+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.086333118+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.086409661+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.100286690+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.133300891+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.138153361+01:00" level=info msg="Loading containers: start."
+Aug 26 16:14:58 melmel dockerd[6842]: time="2025-08-26T16:14:58.963662462+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count b973db304c72087d8c47b3c6cb5b9e319656f321f1a906c869785ef3f7733c7f], retrying...."
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.183705642+01:00" level=info msg="No non-localhost DNS nameservers are left in resolv.conf. Using default external servers"
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.263205519+01:00" level=info msg="Loading containers: done."
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.299306084+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.299381668+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.503657212+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.511564675+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:14:59 melmel dockerd[6842]: time="2025-08-26T16:14:59.511610258+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:14:59 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:17:02 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:17:02 melmel dockerd[6842]: time="2025-08-26T16:17:02.609128653+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:17:02 melmel dockerd[6842]: time="2025-08-26T16:17:02.667238790+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:17:02 melmel dockerd[6842]: time="2025-08-26T16:17:02.687374014+01:00" level=warning msg="ShouldRestart failed, container will not be restarted" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 daemonShuttingDown=true error="restart canceled" execDuration=2m3.632060163s exitStatus="{1 2025-08-26 15:17:02.639327926 +0000 UTC}" hasBeenManuallyStopped=false restartCount=0
+Aug 26 16:17:02 melmel dockerd[6842]: time="2025-08-26T16:17:02.834059019+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:17:02 melmel dockerd[6842]: time="2025-08-26T16:17:02.835674263+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:17:02 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:17:02 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:17:02 melmel systemd[1]: docker.service: Consumed 1.000s CPU time, 32.5M memory peak.
+[0;38;5;245m░░ [0m[0;32mSubject: Ressources consommées durant l'éxécution de l'unité (unit)[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service s'est arrêtée et a consommé les ressources indiquées.[0m
+Aug 26 16:17:02 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.950309585+01:00" level=info msg="Starting up"
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.951730163+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.951780080+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.951786955+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.952486536+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.968490523+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:17:02 melmel dockerd[7920]: time="2025-08-26T16:17:02.995641765+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.001738286+01:00" level=info msg="Loading containers: start."
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.743688618+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.804112046+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.804416962+01:00" level=info msg="Loading containers: done."
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.828154926+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.828398175+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.965822394+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.975411279+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:17:03 melmel dockerd[7920]: time="2025-08-26T16:17:03.975718445+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:17:03 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:18:29 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:18:29 melmel dockerd[7920]: time="2025-08-26T16:18:29.383373032+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:18:29 melmel dockerd[7920]: time="2025-08-26T16:18:29.386024538+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:18:29 melmel dockerd[7920]: time="2025-08-26T16:18:29.386203622+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:18:29 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:18:29 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:18:29 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.495153319+01:00" level=info msg="Starting up"
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.497572449+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.497699408+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.497707199+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.497761491+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.515173446+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.556732662+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:18:29 melmel dockerd[8333]: time="2025-08-26T16:18:29.562661883+01:00" level=info msg="Loading containers: start."
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.272275111+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count 5ec3772baa2320ca424274464a40025639300a267bf89387a0c0a6c98ff06016], retrying...."
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.327537275+01:00" level=warning msg="error locating sandbox id f2b5f6a2cfb18f43413c95a4b4704921330fb2682d519eb78fcf8edc751e5ccd: sandbox f2b5f6a2cfb18f43413c95a4b4704921330fb2682d519eb78fcf8edc751e5ccd not found"
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.522221957+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.561796170+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.562464880+01:00" level=info msg="Loading containers: done."
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.595456411+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.595593078+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.720619064+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.730523003+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:18:30 melmel dockerd[8333]: time="2025-08-26T16:18:30.730876045+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:18:30 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:21:42 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:21:42 melmel dockerd[8333]: time="2025-08-26T16:21:42.641797849+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:21:42 melmel dockerd[8333]: time="2025-08-26T16:21:42.645463727+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:21:42 melmel dockerd[8333]: time="2025-08-26T16:21:42.646675506+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:21:42 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:21:42 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:23:22 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.864802505+01:00" level=info msg="Starting up"
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.867255327+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.867370327+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.867377660+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.867431285+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.883762296+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.913421541+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:23:22 melmel dockerd[9525]: time="2025-08-26T16:23:22.919428848+01:00" level=info msg="Loading containers: start."
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.510570566+01:00" level=warning msg="error locating sandbox id d2197f65c8f5c864283aabe82b93666fd03078da0a72d15c74ee929281f2977b: sandbox d2197f65c8f5c864283aabe82b93666fd03078da0a72d15c74ee929281f2977b not found"
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.687789629+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.736626625+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.737210164+01:00" level=info msg="Loading containers: done."
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.756451247+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.756615622+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.886503807+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.897420884+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:23:23 melmel dockerd[9525]: time="2025-08-26T16:23:23.897525717+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:23:23 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:27:09 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:27:09 melmel dockerd[9525]: time="2025-08-26T16:27:09.921363972+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:27:09 melmel dockerd[9525]: time="2025-08-26T16:27:09.923595305+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:27:09 melmel dockerd[9525]: time="2025-08-26T16:27:09.925027180+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:27:09 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:27:09 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:27:09 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.004615040+01:00" level=info msg="Starting up"
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.006612540+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.006721498+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.006728956+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.006778456+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.026219870+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.083125610+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.090647692+01:00" level=info msg="Loading containers: start."
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.695589044+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count 51b2bd4ca36a180b1aa461560e096aecf11c963af5afbddfc4eae0c150182b0a], retrying...."
+Aug 26 16:27:10 melmel dockerd[10219]: time="2025-08-26T16:27:10.768908989+01:00" level=warning msg="error locating sandbox id 37f4a412b2743340a7e9ad3fe4c21d9573d6c2b78e8eb2e52fa621d87c3cfd1d: sandbox 37f4a412b2743340a7e9ad3fe4c21d9573d6c2b78e8eb2e52fa621d87c3cfd1d not found"
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.006238323+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.052606107+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.053220440+01:00" level=info msg="Loading containers: done."
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.074781811+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.075093728+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.206382206+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.218050370+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:27:11 melmel dockerd[10219]: time="2025-08-26T16:27:11.220115870+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:27:11 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:28:32 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:28:32 melmel dockerd[10219]: time="2025-08-26T16:28:32.876243783+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:28:32 melmel dockerd[10219]: time="2025-08-26T16:28:32.882105477+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:28:32 melmel dockerd[10219]: time="2025-08-26T16:28:32.887196989+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:28:32 melmel dockerd[10219]: time="2025-08-26T16:28:32.888533306+01:00" level=info msg="stopping event stream following graceful shutdown" error="context canceled" module=libcontainerd namespace=plugins.moby
+Aug 26 16:28:32 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:28:32 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:30:27 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:30:27 melmel dockerd[10845]: time="2025-08-26T16:30:27.972069419+01:00" level=info msg="Starting up"
+Aug 26 16:30:27 melmel dockerd[10845]: time="2025-08-26T16:30:27.978509836+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:30:27 melmel dockerd[10845]: time="2025-08-26T16:30:27.978688380+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:30:27 melmel dockerd[10845]: time="2025-08-26T16:30:27.978697422+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:30:27 melmel dockerd[10845]: time="2025-08-26T16:30:27.978789048+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:30:27 melmel dockerd[10845]: time="2025-08-26T16:30:27.999080562+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:30:28 melmel dockerd[10845]: time="2025-08-26T16:30:28.114021179+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:30:28 melmel dockerd[10845]: time="2025-08-26T16:30:28.119397582+01:00" level=info msg="Loading containers: start."
+Aug 26 16:30:28 melmel dockerd[10845]: time="2025-08-26T16:30:28.729615294+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count dc772fa011ee06c8febc62428e969257eea6def77e3a98173b257c2831ab6d03], retrying...."
+Aug 26 16:30:28 melmel dockerd[10845]: time="2025-08-26T16:30:28.878801356+01:00" level=warning msg="error locating sandbox id 2ccfe3a8d237b1ee79074859969992caa330506a4f296406e697147d06e0628e: sandbox 2ccfe3a8d237b1ee79074859969992caa330506a4f296406e697147d06e0628e not found"
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.163750006+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.210755531+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.211206453+01:00" level=info msg="Loading containers: done."
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.231714844+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.231787678+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.364363352+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.376510467+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:30:29 melmel dockerd[10845]: time="2025-08-26T16:30:29.376627344+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:30:29 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:35:49 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:35:49 melmel dockerd[10845]: time="2025-08-26T16:35:49.059607033+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:35:49 melmel dockerd[10845]: time="2025-08-26T16:35:49.061208459+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:35:49 melmel dockerd[10845]: time="2025-08-26T16:35:49.062572925+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:35:49 melmel dockerd[10845]: time="2025-08-26T16:35:49.062668176+01:00" level=info msg="stopping event stream following graceful shutdown" error="context canceled" module=libcontainerd namespace=plugins.moby
+Aug 26 16:35:49 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:35:49 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:35:49 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.139080902+01:00" level=info msg="Starting up"
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.141267331+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.143462593+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.143584927+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.143709220+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.156149332+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.218303477+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.223458965+01:00" level=info msg="Loading containers: start."
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.844087993+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count 39f735bdb0f6c42a8fbb860ebd93b2b76e4a0f1bba6d743a3926270b65c27221], retrying...."
+Aug 26 16:35:49 melmel dockerd[13729]: time="2025-08-26T16:35:49.904156835+01:00" level=warning msg="error locating sandbox id 5a6f0e17784f7aa776f5e8b14217ef67edde2e85dfc499cc9d20a10cd6baa2a4: sandbox 5a6f0e17784f7aa776f5e8b14217ef67edde2e85dfc499cc9d20a10cd6baa2a4 not found"
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.107486615+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.146330669+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.148329180+01:00" level=info msg="Loading containers: done."
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.168092042+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.170337721+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.289809858+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.297743319+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:35:50 melmel dockerd[13729]: time="2025-08-26T16:35:50.298130280+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:35:50 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
+Aug 26 16:47:07 melmel systemd[1]: Stopping docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à s'arrêter[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à s'arrêter.[0m
+Aug 26 16:47:07 melmel dockerd[13729]: time="2025-08-26T16:47:07.201789872+01:00" level=info msg="Processing signal 'terminated'"
+Aug 26 16:47:07 melmel dockerd[13729]: time="2025-08-26T16:47:07.206586462+01:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Aug 26 16:47:07 melmel dockerd[13729]: time="2025-08-26T16:47:07.207543588+01:00" level=info msg="Daemon shutdown complete"
+Aug 26 16:47:07 melmel systemd[1]: docker.service: Deactivated successfully.
+[0;38;5;245m░░ [0m[0;32mSubject: Unit succeeded[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit docker.service has successfully entered the 'dead' state.[0m
+Aug 26 16:47:07 melmel systemd[1]: Stopped docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son arrêt[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son arrêt.[0m
+Aug 26 16:47:07 melmel systemd[1]: Starting docker.service - Docker Application Container Engine...
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a commencé à démarrer[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a commencé à démarrer.[0m
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.293470121+01:00" level=info msg="Starting up"
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.299135587+01:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.299456046+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.299543463+01:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.299711921+01:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.321729284+01:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.364447342+01:00" level=info msg="[graphdriver] using prior storage driver: overlay2"
+Aug 26 16:47:07 melmel dockerd[14278]: time="2025-08-26T16:47:07.378280903+01:00" level=info msg="Loading containers: start."
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.067580420+01:00" level=warning msg="Error (Unable to complete atomic operation, key modified) deleting object [endpoint_count dde838e53f252fb6dc96b46f101b200f8c6e8a83ad1e88abccd2774c32cacb6d], retrying...."
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.127410584+01:00" level=warning msg="error locating sandbox id 6a0d274068052af9e6d8b457dc1e4cf30bc6514bf67fcadabb434facbfa32de0: sandbox 6a0d274068052af9e6d8b457dc1e4cf30bc6514bf67fcadabb434facbfa32de0 not found"
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.330509777+01:00" level=info msg="ignoring event" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.363762364+01:00" level=error msg="failed to start container" container=c66585d1e11d78f2114b4c78fbd76ec908033dad3e068c70390998ef8eba6ae5 error="failed to set up container networking: network 4dd36cedfc258c5b737a5105db8d03c783db1328e06dcc240c05739b2aa7dc8f not found"
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.365400782+01:00" level=info msg="Loading containers: done."
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.406489921+01:00" level=info msg="Docker daemon" commit=bea959c containerd-snapshotter=false storage-driver=overlay2 version=28.3.3
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.406700463+01:00" level=info msg="Initializing buildkit"
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.532135884+01:00" level=info msg="Completed buildkit initialization"
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.541447146+01:00" level=info msg="Daemon has completed initialization"
+Aug 26 16:47:08 melmel dockerd[14278]: time="2025-08-26T16:47:08.541622063+01:00" level=info msg="API listen on /run/docker.sock"
+Aug 26 16:47:08 melmel systemd[1]: Started docker.service - Docker Application Container Engine.
+[0;38;5;245m░░ [0m[0;32mSubject: L'unité (unit) docker.service a terminé son démarrage[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: http://www.ubuntu.com/support[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mL'unité (unit) docker.service a terminé son démarrage, avec le résultat done.[0m
