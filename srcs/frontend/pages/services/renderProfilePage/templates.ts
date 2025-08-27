@@ -97,17 +97,29 @@ export function friendsList(friends: Friend[]): string {
   if (!friends.length) {
     return '<div style="padding:20px;text-align:center;color:#666;background:#f8f9fa;border-radius:8px;font-size:14px">No friends added yet. Add some friends to see them here!</div>';
   }
+  
   return friends.map(f => `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:8px;margin-bottom:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1)">
-      <img src="${f.avatar_url || '/assets/avatar/default.png'}" width="40" height="40" style="border-radius:50%;object-fit:cover" alt="Avatar"/>
+    <div class="friend-item" data-friend-id="${f.friend_id || f.id}" data-friend-name="${f.display_name || f.name || f.username}"
+         style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;
+                border-radius:8px;margin-bottom:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);
+                position:relative;transition:all 0.2s;cursor:pointer">
+      <img src="${f.avatar_url || '/assets/avatar/default.png'}" width="40" height="40" 
+           style="border-radius:50%;object-fit:cover;border:2px solid ${f.online_status ? '#28a745' : '#6c757d'}" alt="Avatar"/>
       <div style="flex:1">
-        <div style="font-weight:bold;color:#333">${f.display_name || f.username}</div>
-        <div style="font-size:12px;color:#666">@${f.username}</div>
+        <div style="font-weight:bold;color:#333">${f.display_name || f.name || f.username}</div>
+        <div style="font-size:12px;color:#666">@${f.username} • ${f.team || 'No team'}</div>
+        <div style="font-size:11px;color:${f.online_status ? '#28a745' : '#6c757d'}">
+          ${f.online_status ? '🟢 Online' : '🔴 Offline'}
+        </div>
       </div>
-      <div style="text-align:right">
-        <div style="font-size:10px;color:${f.online_status ? '#28a745' : '#666'}">${f.online_status ? 'Online' : 'Offline'}</div>
-        <button data-action="remove-friend" data-id="${f.id}" style="background:#dc3545;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;margin-top:4px">Remove</button>
-      </div>
+      <button class="remove-friend-btn" data-friend-id="${f.friend_id || f.id}" 
+              data-friend-name="${f.display_name || f.name || f.username}"
+              title="Remove friend"
+              style="display:none;background:#dc3545;color:#fff;border:none;border-radius:50%;
+                     width:24px;height:24px;cursor:pointer;font-size:12px;position:absolute;
+                     top:8px;right:8px">
+        ×
+      </button>
     </div>
   `).join('');
 }

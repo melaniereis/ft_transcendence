@@ -21,9 +21,13 @@ export type Match = {
 
 export type Friend = {
   id: string;
+  friend_id?: number; // In case the API returns friend_id instead of id
+  name?: string;
   username: string;
   display_name: string;
   avatar_url: string;
+  team: string;
+  last_seen?: string;
   online_status: boolean;
 };
 

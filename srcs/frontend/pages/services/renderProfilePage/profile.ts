@@ -39,6 +39,13 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
       '<div style="padding:40px;text-align:center;color:#666;background:#f8f9fa;border-radius:8px"><div style="font-size:48px;margin-bottom:15px">🎮</div><h4 style="margin:0 0 10px 0">No Match History</h4><p style="margin:0;color:#999">Your game history will appear here once you start playing!</p></div>';
 
     setupEvents(container);
+
+    setTimeout(async () => {
+      const { setupFriendHoverEffects, setupRemoveFriendEvents } = await import('./events.js');
+      setupFriendHoverEffects();
+      setupRemoveFriendEvents();
+    }, 100);
+    
     renderAllCharts();
 
     try { onBadgeUpdate?.(); } catch { /* ignore */ }

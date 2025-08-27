@@ -44,7 +44,7 @@ export function renderLoginForm(container: HTMLElement, onLoginSuccess: () => vo
 }
 
 // Activity monitoring system
-let activityTimer: NodeJS.Timeout;
+let activityTimer: ReturnType<typeof setTimeout>;
 let isUserActive = true;
 
 export function startActivityMonitoring() {

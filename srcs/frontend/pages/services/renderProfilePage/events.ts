@@ -1,5 +1,5 @@
 // renderProfilePage/events.ts
-import { changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile } from './api.js';
+import { loadFriends, changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile } from './api.js';
 import { renderAllCharts } from './charts.js';
 import { state } from './state.js';
 import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
@@ -23,6 +23,30 @@ function showInlineMessage(id: string, message: string, color: string) {
   el.textContent = message;
   el.style.color = color;
   setTimeout(() => { el.textContent = ''; }, 3000);
+}
+
+export function setupFriendHoverEffects() {
+  const friendItems = document.querySelectorAll('.friend-item');
+  
+  friendItems.forEach(item => {
+    const removeBtn = item.querySelector('.remove-friend-btn') as HTMLElement;
+    
+    // Mouse enter
+    item.addEventListener('mouseenter', () => {
+      if (removeBtn) {
+        removeBtn.style.display = 'block';
+        (item as HTMLElement).style.backgroundColor = '#f8f9fa';
+      }
+    });
+    
+    // Mouse leave 
+    item.addEventListener('mouseleave', () => {
+      if (removeBtn) {
+        removeBtn.style.display = 'none';
+        (item as HTMLElement).style.backgroundColor = '#fff';
+      }
+    });
+  });
 }
 
 export function render(container: HTMLElement) {
@@ -49,6 +73,35 @@ export function render(container: HTMLElement) {
   if (state.activeHistoryView === 'detailed') histEl.innerHTML = historyDetailed(state.history);
   if (state.activeHistoryView === 'analysis') histEl.innerHTML = historyAnalysis(state.history);
   renderAllCharts();
+}
+
+export function setupRemoveFriendEvents() {
+  document.querySelectorAll('.remove-friend-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation(); // Prevent triggering parent click
+      
+      const target = e.target as HTMLElement;
+      const friendId = target.dataset.friendId;
+      const friendName = target.dataset.friendName;
+      
+      if (!friendId || !friendName) return;
+      
+      // Confirmation dialog
+      if (confirm(`Are you sure you want to remove ${friendName} from your friends?`)) {
+        try {
+          await removeFriendApi(friendId);
+          showNotification(`${friendName} removed from friends list`, '#28a745');
+          
+          // Reload friends list and re-render
+          const friends = await loadFriends();
+          state.friends = friends;
+          rerenderFriends();
+        } catch (err) {
+          showNotification('Error while removing friend', '#dc3545');
+        }
+      }
+    });
+  });
 }
 
 export function setupEvents(container: HTMLElement) {
@@ -109,15 +162,38 @@ export function setupEvents(container: HTMLElement) {
     if (id === 'friend-add') {
       const input = document.getElementById('friend-input') as HTMLInputElement;
       const username = input.value.trim();
-      if (!username) return;
+      
+      if (!username) {
+        showInlineMessage('friend-msg', 'Por favor, insira um username', '#dc3545');
+        return;
+      }
+      
+      const addBtn = t as HTMLButtonElement;
+      addBtn.disabled = true;
+      addBtn.textContent = '⏳ A adicionar...';
+      
       try {
         await addFriendApi(username);
         input.value = '';
-        // reload friends externally (caller should do it); but update UI quickly
-        showInlineMessage('friend-msg', 'Friend added successfully!', '#28a745');
-        // Let outer orchestrator reload and re-render
+        showInlineMessage('friend-msg', `Pedido de amizade enviado para ${username}!`, '#28a745');
+        
+        // Reload friends list and re-render after a short delay to allow backend processing
+        setTimeout(async () => {
+          try {
+            const friends = await loadFriends();
+            state.friends = friends;
+            rerenderFriends();
+          } catch (err) {
+            console.error('Erro ao recarregar amigos:', err);
+          }
+        }, 1000);
+        
       } catch (err: any) {
-        showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
+        const errorMsg = err?.message || 'Erro ao adicionar amigo';
+        showInlineMessage('friend-msg', errorMsg, '#dc3545');
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = '➕ Add';
       }
       return;
     }
@@ -179,9 +255,17 @@ export function setupEvents(container: HTMLElement) {
       }
     }
   });
+  // Initial friend hover and remove setup
+  setTimeout(() => {
+    setupFriendHoverEffects();
+    setupRemoveFriendEvents();
+  }, 100);
 }
 
 export function rerenderFriends() {
   const fc = document.getElementById('friends-container');
   if (fc) setHTML(fc, friendsList(state.friends));
+  // Re-setup hover and remove events
+  setupFriendHoverEffects();
+  setupRemoveFriendEvents();
 }

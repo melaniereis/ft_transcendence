@@ -77,7 +77,7 @@ export async function changePassword(current_password: string, new_password: str
 }
 
 export async function addFriendApi(username: string): Promise<void> {
-  await apiSend<void>('/api/friends', 'POST', { username });
+  await apiSend<void>('/api/friends/request', 'POST', { friendUsername: username });
 }
 
 export async function removeFriendApi(friendId: string): Promise<void> {
