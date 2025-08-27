@@ -68,8 +68,8 @@ export async function updateProfile(payload: {
   display_name?: string;
   email?: string;
   avatar_url?: string;
-}): Promise<Profile> {
-  return apiSend<Profile>('/api/profile', 'PUT', payload);
+}): Promise<Partial<Profile>> {
+  return apiSend<Partial<Profile>>('/api/profile', 'PUT', payload);
 }
 
 export async function changePassword(current_password: string, new_password: string): Promise<void> {

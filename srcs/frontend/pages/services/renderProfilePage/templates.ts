@@ -27,6 +27,8 @@ export function header(profile: Profile, isEdit: boolean): string {
       <img src="${profile.avatar_url}" width="100" height="100" style="border-radius:50%;border:3px solid #ddd;object-fit:cover" alt="Avatar"/>
     </div>`;
 
+  const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
+
   return isEdit
     ? `
     <div style="background:#f8f9fa;padding:20px;border-radius:8px;margin:15px 0">
@@ -61,7 +63,7 @@ export function header(profile: Profile, isEdit: boolean): string {
       <div style="margin-top:15px;padding-top:15px;border-top:1px solid #ddd">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;font-size:14px">
           <div><strong>Team:</strong> ${profile.team || '—'}</div>
-          <div><strong>Member since:</strong> ${new Date(profile.created_at).toLocaleDateString()}</div>
+          <div><strong>Member since:</strong> ${createdAtText}</div>
           <div><strong>Last seen:</strong> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString() : '—'}</div>
           <div><strong>Status:</strong> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
         </div>
@@ -80,7 +82,7 @@ export function header(profile: Profile, isEdit: boolean): string {
             <div><strong>Display Name:</strong> ${profile.display_name || profile.name || '—'}</div>
             <div><strong>Email:</strong> ${profile.email || 'Not provided'}</div>
             <div><strong>Team:</strong> ${profile.team || '—'}</div>
-            <div><strong>Member since:</strong> ${new Date(profile.created_at).toLocaleDateString()}</div>
+            <div><strong>Member since:</strong> ${createdAtText}</div>
           </div>
           <div style="font-size:12px;color:#666">
             <strong>Status:</strong> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} • 

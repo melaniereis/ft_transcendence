@@ -1,9 +1,10 @@
 // renderProfilePage/events.ts
-import { changePassword, addFriendApi, removeFriendApi, updateProfile } from './api.js';
+import { changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile } from './api.js';
 import { renderAllCharts } from './charts.js';
 import { state } from './state.js';
 import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
 import { gamesThisWeek } from './metrics.js';
+import { Profile } from './types.js';
 
 function setHTML(el: HTMLElement, html: string) { el.innerHTML = html; }
 
@@ -74,8 +75,16 @@ export function setupEvents(container: HTMLElement) {
         return;
       }
       try {
-        const updated = await updateProfile({ username, display_name, email, avatar_url });
-        state.profile = updated;
+        // Send patch
+        const patch = await updateProfile({ username, display_name, email, avatar_url });
+
+        // Prefer a fresh full profile from the server to avoid missing fields
+        let full: Profile | null = null;
+        try { full = await loadProfile(); } catch { /* ignore */ }
+
+        // Merge as fallback if backend doesn't return full profile
+        state.profile = full ? full : { ...(state.profile || {}), ...(patch as any) };
+
         state.editMode = false;
         render(container);
         showNotification('Profile updated successfully!', '#28a745');
