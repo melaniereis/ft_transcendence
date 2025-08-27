@@ -4,7 +4,7 @@ import { renderTournamentsPage } from './services/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
 import { renderLoginForm, startActivityMonitoring } from './services/renderLoginForm.js';
-import { renderProfilePage } from './services/renderProfilePage.js';
+import { renderProfilePage } from './services/renderProfilePage/profile.js';
 import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 
 // Button references

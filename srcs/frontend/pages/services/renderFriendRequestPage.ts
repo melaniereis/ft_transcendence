@@ -30,7 +30,7 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 
     // 🔥 Setup back button
     document.getElementById('back-to-profile')!.addEventListener('click', async () => {
-        const { renderProfilePage } = await import('./renderProfilePage.js');
+        const { renderProfilePage } = await import('./renderProfilePage/profile.js');
         container.innerHTML = '';
         renderProfilePage(container);
     });
