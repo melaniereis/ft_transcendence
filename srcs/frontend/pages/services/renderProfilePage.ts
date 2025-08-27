@@ -9,11 +9,52 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
     return;
   }
 
+  // Types
+  type Stats = {
+    matches_played: number;
+    matches_won: number;
+    matches_lost: number;
+    win_rate: number;
+    points_scored: number;
+    points_conceded: number;
+    tournaments_won: number;
+  };
+
+  type Match = {
+    id: string;
+    date_played: string;
+    opponent_id: string;
+    user_score: number;
+    opponent_score: number;
+    result: 'win' | 'loss';
+    duration?: string;
+  };
+
+  type Friend = {
+    id: string;
+    username: string;
+    display_name: string;
+    avatar_url: string;
+    online_status: boolean;
+  };
+
+  function getDefaultStats(): Stats {
+    return {
+      matches_played: 0,
+      win_rate: 0,
+      points_scored: 0,
+      points_conceded: 0,
+      matches_won: 0,
+      matches_lost: 0,
+      tournaments_won: 0
+    };
+  }
+
   let editMode = false;
   let originalProfile: any = {};
-  let currentStats: any = {};
-  let currentHistory: any[] = [];
-  let currentFriends: any[] = [];
+  let currentStats: Stats = getDefaultStats();
+  let currentHistory: Match[] = [];
+  let currentFriends: Friend[] = [];
   let activeStatsTab = 'overview'; // overview, performance, trends
   let activeHistoryView = 'list'; // list, detailed, analysis
 
@@ -54,7 +95,7 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
     return streak;
   }
 
-  function getBestPerformance(): { score: string, match?: any } {
+  function getBestPerformance(): { score: string, match?: Match } {
     if (!currentHistory.length) return { score: 'N/A' };
     const bestMatch = currentHistory.reduce((best, current) => {
       return current.user_score > best.user_score ? current : best;
@@ -126,67 +167,69 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
         value: getDominanceRating().toString(),
         description: 'Overall game control',
         color: '#6f42c1',
-        icon: '👑',
-        trend: Math.random() > 0.5 ? Math.floor(Math.random() * 15) : -Math.floor(Math.random() * 10)
+        icon: '👑'
+        // Remove fake trend
       },
       {
         label: 'Comeback Wins',
         value: getComebackWins().toString(),
         description: 'Wins from behind',
         color: '#fd7e14',
-        icon: '🔄',
-        trend: Math.random() > 0.5 ? Math.floor(Math.random() * 20) : -Math.floor(Math.random() * 8)
+        icon: '🔄'
+        // Remove fake trend
       },
       {
         label: 'Peak Performance',
         value: getBestPerformance().score,
         description: 'Highest single score',
         color: '#17a2b8',
-        icon: '🏔️',
-        trend: Math.random() > 0.3 ? Math.floor(Math.random() * 25) : -Math.floor(Math.random() * 12)
+        icon: '🏔️'
+        // Remove fake trend
       },
       {
         label: 'Efficiency Score',
         value: getEfficiencyScore().toFixed(1),
-        description: 'Points per minute',
+        description: 'Performance per match',
         color: '#e83e8c',
-        icon: '⚡',
-        trend: Math.random() > 0.4 ? Math.floor(Math.random() * 18) : -Math.floor(Math.random() * 15)
+        icon: '⚡'
+        // Remove fake trend
       }
     ];
   }
 
   function getTrendMetrics(): Array<{label: string, value: string, period: string, change: number, color: string, icon: string}> {
+    const avgScore = currentStats.matches_played > 0 ? (currentStats.points_scored / currentStats.matches_played).toFixed(1) : '0';
+    
     return [
       {
         label: 'Win Rate',
         value: `${(currentStats.win_rate * 100).toFixed(1)}%`,
-        period: 'vs last month',
-        change: Math.random() > 0.5 ? Math.floor(Math.random() * 15) : -Math.floor(Math.random() * 10),
+        period: 'current stats',
+        change: 0, // Remove fake trend data
         color: '#28a745',
         icon: '🏆'
       },
       {
         label: 'Avg Score',
-        value: currentStats.matches_played ? (currentStats.points_scored / currentStats.matches_played).toFixed(1) : '0',
-        period: 'vs last month',
-        change: Math.random() > 0.6 ? Math.floor(Math.random() * 20) : -Math.floor(Math.random() * 8),
+        value: avgScore,
+        period: 'per match',
+        change: 0, // Remove fake trend data
         color: '#007bff',
         icon: '📊'
       },
       {
         label: 'Games/Week',
-        value: (getGamesThisWeek() * 4).toString(),
-        period: 'monthly average',
-        change: Math.random() > 0.4 ? Math.floor(Math.random() * 30) : -Math.floor(Math.random() * 20),
+        value: getGamesThisWeek().toString(),
+        period: 'this week',
+        change: 0, // Remove fake trend data
         color: '#17a2b8',
         icon: '🎮'
       },
       {
-        label: 'Improvement',
-        value: `+${Math.floor(Math.random() * 25 + 5)}%`,
-        period: 'skill progression',
-        change: Math.floor(Math.random() * 40 + 10),
+        label: 'Total Matches',
+        value: currentStats.matches_played.toString(),
+        period: 'all time',
+        change: 0, // Remove fake trend data
         color: '#6f42c1',
         icon: '📈'
       }
@@ -251,7 +294,7 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
     return {label: 'DOMINANT', color: '#28a745'};
   }
 
-  function getPerformanceIndicators(match: any): Array<{label: string, color: string}> {
+  function getPerformanceIndicators(match: Match): Array<{label: string, color: string}> {
     const indicators = [];
     const scoreDiff = Math.abs(match.user_score - match.opponent_score);
     
@@ -266,7 +309,8 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
   function getConsistencyScore(): number {
     if (!currentHistory.length) return 0;
     const scores = currentHistory.map(m => m.user_score);
-    const avg = scores.reduce((a, b) => a + b) / scores.length;
+    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+    if (avg <= 0) return 0; // Proteção contra divisão por zero
     const variance = scores.reduce((sum, score) => sum + Math.pow(score - avg, 2), 0) / scores.length;
     const stdDev = Math.sqrt(variance);
     return Math.max(0, Math.floor(100 - (stdDev / avg) * 100));
@@ -288,8 +332,10 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
   }
 
   function getComebackWins(): number {
-    // Simulated - in real implementation, this would analyze match progression data
-    return Math.floor(currentHistory.filter(m => m.result === 'win').length * 0.2);
+    // Simplified calculation based on available data
+    return currentHistory.filter(m => 
+      m.result === 'win' && m.user_score > m.opponent_score && m.opponent_score > m.user_score * 0.7
+    ).length;
   }
 
   function getEfficiencyScore(): number {
@@ -483,16 +529,29 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw trend line for win rate over time
+    // Draw trend line based on real match history
     const padding = 40;
     const chartWidth = canvas.width - 2 * padding;
     const chartHeight = canvas.height - 2 * padding;
     
-    // Sample trend data (in real app, calculate from historical data)
-    const trendData = Array.from({length: 30}, (_, i) => ({
-      day: i + 1,
-      winRate: 45 + Math.sin(i * 0.2) * 15 + Math.random() * 10
-    }));
+    if (currentHistory.length < 2) {
+      // Not enough data for trends
+      ctx.fillStyle = '#666';
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Not enough data for trend analysis', canvas.width / 2, canvas.height / 2);
+      return;
+    }
+    
+    // Calculate win rate over time from real data
+    const trendData: Array<{match: number, winRate: number}> = [];
+    let wins = 0;
+    
+    currentHistory.forEach((match, i) => {
+      if (match.result === 'win') wins++;
+      const winRate = (wins / (i + 1)) * 100;
+      trendData.push({ match: i + 1, winRate });
+    });
     
     ctx.strokeStyle = '#007bff';
     ctx.lineWidth = 2;
@@ -515,8 +574,8 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
     ctx.fillText('100%', 5, padding + 10);
     ctx.fillText('0%', 5, padding + chartHeight);
     ctx.textAlign = 'center';
-    ctx.fillText('30 Days Ago', padding, canvas.height - 5);
-    ctx.fillText('Today', padding + chartWidth, canvas.height - 5);
+    ctx.fillText('First Match', padding, canvas.height - 5);
+    ctx.fillText('Latest Match', padding + chartWidth, canvas.height - 5);
   }
 
   function renderActivityHeatmap() {
@@ -650,16 +709,40 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Weekly performance over last 4 weeks
-    const weekData = [
-      { week: 'Week 1', games: 8, wins: 5 },
-      { week: 'Week 2', games: 12, wins: 8 },
-      { week: 'Week 3', games: 6, wins: 2 },
-      { week: 'Week 4', games: 10, wins: 7 }
-    ];
+    // Calculate real weekly data from match history
+    const weekData: Array<{week: string, games: number, wins: number}> = [];
+    const now = new Date();
+    
+    for (let i = 3; i >= 0; i--) {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - (i + 1) * 7);
+      const weekEnd = new Date(now);
+      weekEnd.setDate(now.getDate() - i * 7);
+      
+      const weekMatches = currentHistory.filter(match => {
+        const matchDate = new Date(match.date_played);
+        return matchDate >= weekStart && matchDate < weekEnd;
+      });
+      
+      const weekWins = weekMatches.filter(match => match.result === 'win').length;
+      
+      weekData.push({
+        week: `Week ${4 - i}`,
+        games: weekMatches.length,
+        wins: weekWins
+      });
+    }
+    
+    if (weekData.every(week => week.games === 0)) {
+      ctx.fillStyle = '#666';
+      ctx.font = '14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('No matches in last 4 weeks', canvas.width / 2, canvas.height / 2);
+      return;
+    }
     
     const barWidth = canvas.width / weekData.length - 10;
-    const maxGames = Math.max(...weekData.map(w => w.games));
+    const maxGames = Math.max(...weekData.map(w => w.games), 1);
     
     weekData.forEach((week, i) => {
       const barHeight = (week.games / maxGames) * (canvas.height - 40);
@@ -686,37 +769,68 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 
   // Main load and render function
   async function loadAndRender() {
+    console.log('🔍 Starting loadAndRender...');
+    console.log('🎫 Token found:', token);
+    
     try {
+      console.log('📡 Fetching profile from /api/profile...');
       const res = await fetch('/api/profile', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch profile');
+      
+      console.log('📊 Response status:', res.status);
+      console.log('✅ Response ok:', res.ok);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('❌ API Error Response:', errorText);
+        throw new Error(`Failed to fetch profile: ${res.status} - ${errorText}`);
+      }
+      
       const profile = await res.json();
+      console.log('👤 Profile loaded successfully:', profile);
       originalProfile = { ...profile };
 
-      // Load all data concurrently
+      console.log('📊 Loading additional data for user ID:', profile.id);
       await Promise.all([
         loadStats(profile.id),
         loadHistory(),
         loadFriends()
       ]);
 
+      console.log('✅ All data loaded successfully!');
+      console.log('📊 Current stats:', currentStats);
+      console.log('🎮 Current history:', currentHistory.length, 'matches');
+      console.log('👥 Current friends:', currentFriends.length, 'friends');
+
+      console.log('🎨 Starting to render content...');
       renderContent(profile, editMode);
+      console.log('🎨 Content rendered successfully!');
+
+      console.log('🔧 Setting up event listeners...');
       setupEventListeners();
-      // call onBadgeUpdate after we have friends loaded (defensive)
+      console.log('🔧 Event listeners set up!');
+
       try { onBadgeUpdate?.(); } catch { /* ignore */ }
-    } catch {
-      container.innerHTML = '<p>Error loading profile. Please try again.</p>';
+      console.log('✨ Profile page loaded completely!');
+    } catch (error: unknown) {
+      console.error('💥 Full error details:', error);
+      const message = error instanceof Error ? error.message : 'Error loading profile. Please try again.';
+      container.innerHTML = `<p>${message}</p>`;
     }
   }
 
   // Data loading functions
   async function loadStats(userId: number) {
+    console.log('📈 Loading stats for user:', userId);
     try {
-      const res = await fetch(`/stats/${userId}`);
+      const res = await fetch(`/stats/${userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      console.log('📈 Stats response status:', res.status);
       if (res.ok) {
         const json = await res.json();
-        // normalize and assure all fields exist
+        console.log('📈 Stats loaded:', json);
         currentStats = {
           matches_played: json.matches_played ?? 0,
           matches_won: json.matches_won ?? 0,
@@ -727,42 +841,68 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
           tournaments_won: json.tournaments_won ?? 0
         };
       } else {
-        currentStats = {
-          matches_played: 0, matches_won: 0, matches_lost: 0,
-          win_rate: 0, points_scored: 0, points_conceded: 0, tournaments_won: 0
-        };
+        const errorText = await res.text();
+        console.warn('📈 Stats failed:', res.status, errorText);
+        currentStats = getDefaultStats();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load stats:', error);
-      currentStats = {
-        matches_played: 0, matches_won: 0, matches_lost: 0,
-        win_rate: 0, points_scored: 0, points_conceded: 0, tournaments_won: 0
-      };
+      currentStats = getDefaultStats();
     }
   }
 
   async function loadHistory() {
+    console.log('🎮 Loading match history...');
     try {
       const res = await fetch('/api/match-history', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      console.log('🎮 History response status:', res.status);
       if (res.ok) {
         currentHistory = await res.json();
+        console.log('🎮 History loaded:', currentHistory.length, 'matches');
+      } else {
+        const errorText = await res.text();
+        console.warn('🎮 History failed:', res.status, errorText);
+        currentHistory = [];
       }
-    } catch {
+    } catch (error: unknown) {
+      console.error('Failed to load match history:', error);
       currentHistory = [];
     }
   }
 
   async function loadFriends() {
+    console.log('👥 Loading friends...');
     try {
       const res = await fetch('/api/friends', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      console.log('👥 Friends response status:', res.status);
       if (res.ok) {
-        currentFriends = await res.json();
+        const friendsData = await res.json();
+        console.log('👥 Friends response data:', friendsData);
+        
+        // Verificar se é array ou tem array aninhado
+        if (Array.isArray(friendsData)) {
+          currentFriends = friendsData;
+        } else if (friendsData.friends && Array.isArray(friendsData.friends)) {
+          currentFriends = friendsData.friends;
+        } else if (friendsData.data && Array.isArray(friendsData.data)) {
+          currentFriends = friendsData.data;
+        } else {
+          console.warn('👥 Friends data is not an array:', friendsData);
+          currentFriends = [];
+        }
+        
+        console.log('👥 Friends loaded:', currentFriends.length, 'friends');
+      } else {
+        const errorText = await res.text();
+        console.warn('👥 Friends failed:', res.status, errorText);
+        currentFriends = [];
       }
-    } catch {
+    } catch (error: unknown) {
+      console.error('Failed to load friends:', error);
       currentFriends = [];
     }
   }
@@ -1322,9 +1462,6 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
                 <span style="font-size:20px">${trend.icon}</span>
                 <div style="text-align:right">
                   <div style="font-size:16px;font-weight:bold;color:${trend.color}">${trend.value}</div>
-                  <div style="font-size:12px;color:${trend.change > 0 ? '#28a745' : '#dc3545'}">
-                    ${trend.change > 0 ? '↗' : '↘'} ${Math.abs(trend.change)}%
-                  </div>
                 </div>
               </div>
               <div style="font-size:14px;font-weight:bold;color:#333">${trend.label}</div>
@@ -1335,7 +1472,7 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 
         <!-- Performance Trends Chart -->
         <div style="background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:30px">
-          <h4 style="margin:0 0 15px 0;color:#333">📈 Performance Trends (Last 30 Days)</h4>
+          <h4 style="margin:0 0 15px 0;color:#333">📈 Win Rate Progression</h4>
           <canvas id="trendsChart" width="800" height="300" style="width:100%;height:300px;background:#fff;border-radius:8px"></canvas>
         </div>
 
@@ -1347,18 +1484,37 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
           </div>
 
           <div style="background:#f8f9fa;padding:20px;border-radius:12px">
-            <h4 style="margin:0 0 15px 0;color:#333">🎯 Goal Progress</h4>
+            <h4 style="margin:0 0 15px 0;color:#333">🎯 Real Statistics</h4>
             <div style="space-y:15px">
-              ${getGoalProgress().map(goal => `
+              ${[
+                {
+                  label: 'Total Points',
+                  current: currentStats.points_scored || 0,
+                  target: Math.max(currentStats.points_scored * 1.5, 100),
+                  color: '#28a745'
+                },
+                {
+                  label: 'Matches Played',
+                  current: currentStats.matches_played || 0,
+                  target: Math.max(currentStats.matches_played * 1.5, 20),
+                  color: '#007bff'
+                },
+                {
+                  label: 'Tournament Wins',
+                  current: currentStats.tournaments_won || 0,
+                  target: Math.max(currentStats.tournaments_won + 2, 3),
+                  color: '#dc3545'
+                }
+              ].map(goal => `
                 <div style="margin-bottom:20px">
                   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
                     <span style="font-weight:bold;color:#333">${goal.label}</span>
                     <span style="color:${goal.color};font-weight:bold">${goal.current}/${goal.target}</span>
                   </div>
                   <div style="background:#e9ecef;border-radius:10px;height:8px;overflow:hidden">
-                    <div style="background:${goal.color};height:100%;width:${(goal.current/goal.target*100).toFixed(1)}%;transition:width 0.3s"></div>
+                    <div style="background:${goal.color};height:100%;width:${Math.min((goal.current/goal.target*100), 100).toFixed(1)}%;transition:width 0.3s"></div>
                   </div>
-                  <div style="font-size:12px;color:#666;margin-top:4px">${((goal.current/goal.target)*100).toFixed(1)}% complete</div>
+                  <div style="font-size:12px;color:#666;margin-top:4px">${Math.min(((goal.current/goal.target)*100), 100).toFixed(1)}% progress</div>
                 </div>
               `).join('')}
             </div>
@@ -1486,7 +1642,7 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:30px">
           <!-- Performance Chart -->
           <div style="background:#f8f9fa;padding:20px;border-radius:12px">
-            <h4 style="margin:0 0 15px 0;color:#333">📊 Score Performance</h4>
+            <h4 style="margin:0 0 15px 0;color:#333">📊 Recent Match Scores</h4>
             <canvas id="performanceChart" width="300" height="200" style="width:100%;height:200px;background:#fff;border-radius:8px"></canvas>
           </div>
 
@@ -1520,11 +1676,6 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
                 </div>
                 <div style="font-size:14px;font-weight:bold;color:#333">${metric.label}</div>
                 <div style="font-size:12px;color:#666">${metric.description}</div>
-                ${metric.trend ? `
-                  <div style="margin-top:8px;font-size:12px;color:${metric.trend > 0 ? '#28a745' : '#dc3545'}">
-                    ${metric.trend > 0 ? '↗' : '↘'} ${Math.abs(metric.trend)}% vs last period
-                  </div>
-                ` : ''}
               </div>
             `).join('')}
           </div>
