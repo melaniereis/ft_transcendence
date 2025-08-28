@@ -9,6 +9,7 @@ import { registerTeamRoutes } from './routes/teamRoutes.js';
 import { gameRoutes } from './routes/gameRoutes.js';
 import { statsRoutes } from './routes/statsRoutes.js';
 import { authRoutes } from './routes/authRoutes.js';
+import { getSecrets } from './utils/vaultUtils.js';
 
 
 import '../backend/db/database.js';
@@ -37,6 +38,7 @@ fastify.register(authRoutes);
 
 const start = async () => {
 	try {
+		await getSecrets();
 		await fastify.listen({ port: 3000, host: '0.0.0.0' });
 		console.log('Server running at http://localhost:3000');
 	} 
