@@ -14,8 +14,6 @@ services:
       - DB_PATH=/usr/src/app/data/database.db
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=root  # For development only
-      - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=root  # For development only
     command: npm run dev
     depends_on:
       db:
@@ -35,15 +33,6 @@ services:
       - "443:443"
     depends_on:
       - web
-    environment:
-      - MODSEC_RULE_ENGINE=on
-      - BACKEND=http://web:3000
-      - MODSEC_AUDIT_LOG_PARTS=ABCFHZ
-      - MODSEC_AUDIT_LOG_TYPE=Concurrent
-      - MODSEC_AUDIT_LOG=/var/log/modsec_audit.log
-    volumes:
-      - ./nginx/ssl:/etc/nginx/conf
-      - ./nginx/modsec/custom_rules.conf:/opt/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
     environment:
       - MODSEC_RULE_ENGINE=on
       - BACKEND=http://web:3000
