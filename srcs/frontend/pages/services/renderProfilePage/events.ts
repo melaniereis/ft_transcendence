@@ -1,5 +1,5 @@
 // renderProfilePage/events.ts - FIXED VERSION
-import { loadFriends, changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile } from './api.js';
+import { loadFriends, changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile, loadMatchesWithPagination } from './api.js';
 import { renderAllCharts } from './charts.js';
 import { state } from './state.js';
 import { layout, statsOverview, statsPerformance, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';

@@ -129,7 +129,7 @@ export function header(profile: Profile, isEdit: boolean): string {
             </div>
           </div>
           <div><span style="font-weight:600;color:${GRIS_COLORS.primary}">Member since:</span> ${createdAtText}</div>
-          <div><span style="font-weight:600;color:${GRIS_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString() : '—'}</div>
+          <div><span style="font-weight:600;color:${GRIS_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0,10) : '—'}</div>
           <div><span style="font-weight:600;color:${GRIS_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
         </div>
       </div>
@@ -156,7 +156,6 @@ export function header(profile: Profile, isEdit: boolean): string {
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-weight:600;color:${GRIS_COLORS.primary}">Team:</span> 
               <div style="display:flex;align-items:center;gap:8px">
-                ${teamLogo ? `<img src="${teamLogo}" width="24" height="24" style="border-radius:50%" alt="Team"/>` : ''}
                 <span style="color:${GRIS_COLORS.muted}">${profile.team || '—'}</span>
               </div>
             </div>
@@ -164,7 +163,7 @@ export function header(profile: Profile, isEdit: boolean): string {
           </div>
           <div style="font-size:14px;color:${GRIS_COLORS.muted};padding:12px;background:rgba(236,240,241,0.5);border-radius:8px">
             <span style="font-weight:600;color:${GRIS_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} • 
-            <span style="font-weight:600;color:${GRIS_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString() : '—'}
+            <span style="font-weight:600;color:${GRIS_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}
           </div>
         </div>
       </div>
