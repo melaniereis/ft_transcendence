@@ -1,202 +1,689 @@
 // renderProfilePage/charts.ts
 import { state } from './state.js';
 
+/**
+ * GRIS-inspired responsive charts with:
+ * - HTML legends (accessible, copyable)
+ * - Subtle entry animations (bar grow, donut fill, line draw)
+ * - Injected custom webfonts (Playfair Display + Inter)
+ *
+ * Usage: keep canvas elements in your markup with the IDs used below,
+ * and optionally provide <div id="${canvasId}-legend"></div> containers
+ * (if not present, they will be created and appended after the canvas).
+ */
+
+/* ----------------------- Fonts & CSS injection ----------------------- */
+function ensureFontsAndStyles() {
+  if (!document.getElementById('gris-chart-fonts')) {
+    const link = document.createElement('link');
+    link.id = 'gris-chart-fonts';
+    link.rel = 'stylesheet';
+    // Playfair Display (for titles) and Inter (for UI/labels)
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap';
+    document.head.appendChild(link);
+  }
+
+  if (!document.getElementById('gris-chart-styles')) {
+    const style = document.createElement('style');
+    style.id = 'gris-chart-styles';
+    style.innerHTML = `
+      .chart-legend {
+        font-family: Inter, Arial, sans-serif;
+        font-size: 13px;
+        color: #2f4f4f;
+        display: inline-block;
+        background: rgba(250,250,250,0.92);
+        border-radius: 8px;
+        border: 1px solid rgba(105,105,105,0.18);
+        padding: 8px;
+        box-shadow: 0 6px 20px rgba(112,128,144,0.06);
+        max-width: 95%;
+        line-height: 1.2;
+      }
+      .chart-legend ul { list-style: none; padding: 0; margin: 0; display:block; }
+      .chart-legend li { display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; }
+      .chart-legend .swatch { width:14px; height:14px; border-radius:3px; flex: 0 0 14px; border:1px solid rgba(80,80,80,0.12); box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset; }
+      .chart-legend .label { flex: 1 1 auto; word-break: break-word; }
+      .chart-legend .muted { color: #6b6f72; font-size: 12px; }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+/* ----------------------- Canvas helpers ----------------------- */
+
+/** Ensure canvas is scaled for DPR and return context + css sizes. */
+function setupCanvas(canvas: HTMLCanvasElement) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const cssWidth = Math.max(1, Math.floor(rect.width));
+  const cssHeight = Math.max(1, Math.floor(rect.height));
+
+  canvas.width = Math.round(cssWidth * dpr);
+  canvas.height = Math.round(cssHeight * dpr);
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D context not available');
+
+  // Reset transform, scale to CSS pixels (so drawing coordinates = CSS px)
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+  return { ctx, cssWidth, cssHeight, dpr };
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 6) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/* ----------------------- HTML Legend (external) ----------------------- */
+
+function renderLegendHTML(canvasId: string, items: Array<{ label: string; swatch?: string }>) {
+  ensureFontsAndStyles();
+
+  const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
+  if (!canvas) return;
+  const existing = document.getElementById(`${canvasId}-legend`) as HTMLElement | null;
+
+  let container: HTMLElement;
+  if (existing) {
+    container = existing;
+  } else {
+    container = document.createElement('div');
+    container.id = `${canvasId}-legend`;
+    container.className = 'chart-legend';
+    // place after canvas
+    canvas.parentNode?.insertBefore(container, canvas.nextSibling);
+  }
+
+  // Build legend list
+  const ul = document.createElement('ul');
+  items.forEach(it => {
+    const li = document.createElement('li');
+    const sw = document.createElement('span');
+    sw.className = 'swatch';
+    // allow simple gradient definitions: if contains 'gradient:' use CSS gradient string after colon
+    if (it.swatch && it.swatch.startsWith('gradient:')) {
+      sw.style.background = it.swatch.replace(/^gradient:/, '');
+    } else {
+      sw.style.background = it.swatch ?? '#ccc';
+    }
+    sw.setAttribute('aria-hidden', 'true');
+
+    const lbl = document.createElement('div');
+    lbl.className = 'label';
+    lbl.innerText = it.label;
+
+    li.appendChild(sw);
+    li.appendChild(lbl);
+    ul.appendChild(li);
+  });
+
+  // replace content
+  container.innerHTML = '';
+  container.appendChild(ul);
+}
+
+/* ----------------------- Animation manager ----------------------- */
+const animHandles = new Map<string, number>();
+
+function cancelAnim(id: string) {
+  const h = animHandles.get(id);
+  if (h) {
+    cancelAnimationFrame(h);
+    animHandles.delete(id);
+  }
+}
+
+function animate(id: string, drawFrame: (progress: number) => void, duration = 700) {
+  cancelAnim(id);
+  const start = performance.now();
+  function frame(t: number) {
+    const elapsed = t - start;
+    const progress = Math.min(1, Math.max(0, elapsed / duration));
+    // ease-out cubic for gentle finish
+    const p = 1 - Math.pow(1 - progress, 3);
+    drawFrame(p);
+    if (progress < 1) {
+      animHandles.set(id, requestAnimationFrame(frame));
+    } else {
+      animHandles.delete(id);
+    }
+  }
+  animHandles.set(id, requestAnimationFrame(frame));
+}
+
+/* ----------------------- Chart renderers (with animations) ----------------------- */
+
 export function renderWinRateChart() {
   const canvas = document.getElementById('winRateChart') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const winRate = (state.stats.win_rate || 0) * 100;
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
+    return;
+  }
 
-  const cx = canvas.width / 2, cy = canvas.height / 2, r = 60, ir = 35;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, (winRate / 100) * 2 * Math.PI);
-  ctx.arc(cx, cy, ir, (winRate / 100) * 2 * Math.PI, 0, true);
-  ctx.fillStyle = '#28a745'; ctx.fill();
+  const winRate = Math.max(0, Math.min(1, (state.stats.win_rate ?? 0)));
+  const cx = cssWidth / 2;
+  const cy = cssHeight / 2;
+  const r = Math.max(20, Math.min(cssWidth, cssHeight) / 2 - 12);
+  const ir = Math.max(8, r - 30);
 
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, (winRate / 100) * 2 * Math.PI, 2 * Math.PI);
-  ctx.arc(cx, cy, ir, 2 * Math.PI, (winRate / 100) * 2 * Math.PI, true);
-  ctx.fillStyle = '#dc3545'; ctx.fill();
+  // Prepare gradients (CSS-like)
+  const winGradient = ctx.createRadialGradient(cx, cy, ir / 2, cx, cy, r);
+  winGradient.addColorStop(0, '#dbeaf3');
+  winGradient.addColorStop(1, '#7b93a4');
 
-  ctx.fillStyle = '#333'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
-  ctx.fillText(`${winRate.toFixed(1)}%`, cx, cy + 5);
+  const lossGradient = ctx.createRadialGradient(cx, cy, ir / 2, cx, cy, r);
+  lossGradient.addColorStop(0, '#ffdfee');
+  lossGradient.addColorStop(1, '#b1715a');
+
+  const id = 'winRateChart';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+    const animatedWin = winRate * progress;
+    const start = -Math.PI / 2;
+    const mid = start + animatedWin * 2 * Math.PI;
+
+    // win arc
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, mid, false);
+    ctx.arc(cx, cy, ir, mid, start, true);
+    ctx.closePath();
+    ctx.fillStyle = winGradient;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(80,80,80,0.42)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // loss arc
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, mid, start + 2 * Math.PI, false);
+    ctx.arc(cx, cy, ir, start + 2 * Math.PI, mid, true);
+    ctx.closePath();
+    ctx.fillStyle = lossGradient;
+    ctx.fill();
+    ctx.stroke();
+
+    // center text
+    ctx.shadowColor = 'rgba(60,60,60,0.28)';
+    ctx.shadowBlur = 5 * progress;
+    ctx.fillStyle = '#2f4f4f';
+    ctx.font = `bold ${Math.max(14, Math.round(cssWidth / 18))}px "Playfair Display", serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(`${(animatedWin * 100).toFixed(1)}%`, cx, cy + 6);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
+  // animate donut fill
+  animate(id, draw, 800);
+
+  // HTML legend
+  renderLegendHTML('winRateChart', [
+    { label: 'Wins — soft blue (donut portion)', swatch: '#7b93a4' },
+    { label: 'Losses — warm pink (complementary portion)', swatch: '#b1715a' }
+  ]);
 }
 
 export function renderPerformanceChart() {
   const canvas = document.getElementById('performanceChart') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
+    return;
+  }
+
   const matches = state.history.slice(-10).reverse();
-  if (!matches.length) return;
-  const barW = canvas.width / matches.length - 5;
+  const paddingBottom = Math.max(22, Math.round(cssHeight * 0.12));
+  const availableH = cssHeight - paddingBottom - 12;
+  const barW = Math.max(8, cssWidth / Math.max(1, matches.length) - 10);
   const maxScore = Math.max(...matches.map(m => m.user_score), 20);
-  matches.forEach((m, i) => {
-    const h = (m.user_score / maxScore) * (canvas.height - 40);
-    const x = i * (barW + 5), y = canvas.height - h - 20;
-    ctx.fillStyle = m.result === 'win' ? '#28a745' : '#dc3545';
-    ctx.fillRect(x, y, barW, h);
-    ctx.fillStyle = '#333'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
-    ctx.fillText(String(m.user_score), x + barW / 2, canvas.height - 5);
-  });
+
+  const id = 'performanceChart';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+    if (!matches.length) {
+      ctx.fillStyle = '#696969';
+      ctx.font = '14px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No recent matches', cssWidth / 2, cssHeight / 2);
+      return;
+    }
+
+    matches.forEach((m, i) => {
+      const rawH = (m.user_score / maxScore) * (availableH - 8);
+      const h = rawH * progress;
+      const x = i * (barW + 10) + 8;
+      const y = cssHeight - paddingBottom - h;
+
+      const gradient = ctx.createLinearGradient(x, y, x, y + Math.max(6, h));
+      if (m.result === 'win') {
+        gradient.addColorStop(0, '#cfeff6');
+        gradient.addColorStop(1, '#7b93a4');
+      } else {
+        gradient.addColorStop(0, '#fff0d6');
+        gradient.addColorStop(1, '#b1715a');
+      }
+
+      roundRect(ctx, x, y, barW, h, Math.min(6, barW / 2));
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80,80,80,0.22)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // label
+      ctx.fillStyle = '#2f4f4f';
+      ctx.font = '12px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(m.user_score), x + barW / 2, cssHeight - 6);
+    });
+  }
+
+  animate(id, draw, 700);
+
+  renderLegendHTML('performanceChart', [
+    { label: 'Soft blue — wins (higher is better)', swatch: '#7b93a4' },
+    { label: 'Warm beige/pink — losses', swatch: '#b1715a' }
+  ]);
 }
 
 export function renderScoreDistribution() {
   const canvas = document.getElementById('scoreDistribution') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
+    return;
+  }
+
   const scores = state.history.map(m => m.user_score);
-  if (!scores.length) return;
   const buckets = Array(6).fill(0);
   for (const s of scores) buckets[Math.min(Math.floor(s / 4), 5)]++;
   const maxCount = Math.max(...buckets, 1);
-  const barW = canvas.width / buckets.length - 5;
-  buckets.forEach((count, i) => {
-    const h = (count / maxCount) * (canvas.height - 40);
-    const x = i * (barW + 5), y = canvas.height - h - 20;
-    ctx.fillStyle = '#17a2b8'; ctx.fillRect(x, y, barW, h);
-    ctx.fillStyle = '#333'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
-    const label = i === 5 ? '20+' : `${i * 4}-${i * 4 + 3}`; ctx.fillText(label, x + barW / 2, canvas.height - 5);
-  });
+  const barW = Math.max(12, cssWidth / buckets.length - 8);
+
+  const id = 'scoreDistribution';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    buckets.forEach((count, i) => {
+      const rawH = (count / maxCount) * (cssHeight - 36);
+      const h = rawH * progress;
+      const x = i * (barW + 8) + 8;
+      const y = cssHeight - 26 - h;
+
+      const grad = ctx.createLinearGradient(x, y, x, y + Math.max(6, h));
+      grad.addColorStop(0, '#e6e6e8');
+      grad.addColorStop(1, '#72818a');
+
+      roundRect(ctx, x, y, barW, h, 4);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80,80,80,0.18)';
+      ctx.stroke();
+
+      ctx.fillStyle = '#2f4f4f';
+      ctx.font = '12px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      const label = i === 5 ? '20+' : `${i * 4}-${i * 4 + 3}`;
+      ctx.fillText(label, x + barW / 2, cssHeight - 6);
+    });
+  }
+
+  animate(id, draw, 650);
+
+  renderLegendHTML('scoreDistribution', [
+    { label: 'Gray-blue — score frequency (how common each range is)', swatch: '#72818a' }
+  ]);
 }
 
 export function renderTimeAnalysisChart() {
   const canvas = document.getElementById('timeAnalysisChart') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
+    return;
+  }
 
   const hourly = Array(24).fill(0);
   const wins = Array(24).fill(0);
   for (const m of state.history) {
     const h = new Date(m.date_played).getHours();
-    hourly[h]++; if (m.result === 'win') wins[h]++;
+    hourly[h]++;
+    if (m.result === 'win') wins[h]++;
   }
   const max = Math.max(...hourly, 1);
-  const barW = canvas.width / 24 - 1;
-  for (let h = 0; h < 24; h++) {
-    const games = hourly[h]; const rate = games ? wins[h] / games : 0;
-    const bh = (games / max) * (canvas.height - 30);
-    const x = h * (barW + 1), y = canvas.height - bh - 20;
-    const g = Math.floor(rate * 255), r = Math.floor((1 - rate) * 255);
-    ctx.fillStyle = `rgb(${r},${g},0)`; ctx.fillRect(x, y, barW, bh);
-    if (h % 4 === 0) {
-      ctx.fillStyle = '#666'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
-      ctx.fillText(`${h}h`, x + barW / 2, canvas.height - 5);
+  const barW = Math.max(3, cssWidth / 24 - 2);
+
+  const id = 'timeAnalysisChart';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    for (let h = 0; h < 24; h++) {
+      const games = hourly[h];
+      const rate = games ? wins[h] / games : 0;
+      const rawH = (games / max) * (cssHeight - 32);
+      const hNow = rawH * progress;
+      const x = h * (barW + 2) + 4;
+      const y = cssHeight - 26 - hNow;
+
+      const gVal = Math.floor(rate * 180) + 60;
+      const rVal = Math.floor((1 - rate) * 180) + 60;
+      ctx.fillStyle = `rgb(${rVal},${gVal},130)`;
+      roundRect(ctx, x, y, barW, hNow, 3);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80,80,80,0.18)';
+      ctx.stroke();
+
+      if (h % 4 === 0) {
+        ctx.fillStyle = '#6b6f72';
+        ctx.font = '11px Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${h}h`, x + barW / 2, cssHeight - 6);
+      }
     }
   }
+
+  animate(id, draw, 700);
+
+  renderLegendHTML('timeAnalysisChart', [
+    { label: 'Color intensity = win rate (greenish = high, reddish = low)', swatch: 'gradient:linear-gradient(90deg,#91c27f,#9aa7b2)' },
+    { label: 'Bar height = number of games played', swatch: '#9aa7b2' }
+  ]);
 }
 
 export function renderTrendsChart() {
   const canvas = document.getElementById('trendsChart') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const padding = 40, cw = canvas.width - 2 * padding, ch = canvas.height - 2 * padding;
-  if (state.history.length < 2) {
-    ctx.fillStyle = '#666'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
-    ctx.fillText('Not enough data for trend analysis', canvas.width / 2, canvas.height / 2);
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
     return;
   }
+
+  const padding = 36;
+  const cw = cssWidth - padding * 2;
+  const ch = cssHeight - padding * 2;
+  if (state.history.length < 2) {
+    ctx.fillStyle = '#696969';
+    ctx.font = '16px Inter, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Not enough data for trend analysis', cssWidth / 2, cssHeight / 2);
+    return;
+  }
+
+  let winsCount = 0;
   const trend: Array<{ x: number; y: number }> = [];
-  let wins = 0;
   state.history.forEach((m, i) => {
-    if (m.result === 'win') wins++;
-    const wr = (wins / (i + 1)) * 100;
-    trend.push({ x: padding + (i / (state.history.length - 1)) * cw, y: padding + (1 - wr / 100) * ch });
+    if (m.result === 'win') winsCount++;
+    const wr = (winsCount / (i + 1)) * 100;
+    trend.push({
+      x: padding + (i / (state.history.length - 1)) * cw,
+      y: padding + (1 - wr / 100) * ch
+    });
   });
-  ctx.strokeStyle = '#007bff'; ctx.lineWidth = 2; ctx.beginPath();
-  trend.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
-  ctx.stroke();
-  ctx.fillStyle = '#666'; ctx.font = '12px Arial'; ctx.textAlign = 'left';
-  ctx.fillText('100%', 5, padding + 10); ctx.fillText('0%', 5, padding + ch);
+
+  // compute total path length to animate stroke using line dash
+  let totalLen = 0;
+  for (let i = 1; i < trend.length; i++) {
+    const a = trend[i - 1], b = trend[i];
+    const dx = b.x - a.x, dy = b.y - a.y;
+    totalLen += Math.hypot(dx, dy);
+  }
+  if (totalLen <= 0) totalLen = 1;
+
+  const id = 'trendsChart';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    // draw area fill + stroke but make stroke draw progressively
+    ctx.save();
+    // AREA
+    ctx.beginPath();
+    trend.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    ctx.lineTo(padding + cw, padding + ch);
+    ctx.lineTo(padding, padding + ch);
+    ctx.closePath();
+    const areaGrad = ctx.createLinearGradient(0, padding, 0, padding + ch);
+    areaGrad.addColorStop(0, 'rgba(160,200,215,0.28)');
+    areaGrad.addColorStop(1, 'rgba(160,200,215,0.04)');
+    ctx.fillStyle = areaGrad;
+    ctx.fill();
+
+    // LINE progressive draw via dash offset
+    ctx.beginPath();
+    trend.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    ctx.strokeStyle = '#89a9b7';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([totalLen]);
+    ctx.lineDashOffset = totalLen * (1 - progress);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // axes labels
+    ctx.fillStyle = '#696969';
+    ctx.font = '12px Inter, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('100%', 6, padding + 6);
+    ctx.fillText('0%', 6, padding + ch);
+  }
+
+  animate(id, draw, 900);
+
+  renderLegendHTML('trendsChart', [
+    { label: 'Win-rate trend (cumulative over games)', swatch: '#89a9b7' }
+  ]);
 }
 
 export function renderWeeklyChart() {
   const canvas = document.getElementById('weeklyChart') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
+    return;
+  }
 
   const now = new Date();
   const weeks = Array.from({ length: 4 }, (_, idx) => {
     const i = 3 - idx;
-    const start = new Date(now); start.setDate(now.getDate() - (i + 1) * 7);
-    const end = new Date(now); end.setDate(now.getDate() - i * 7);
+    const start = new Date(now);
+    start.setDate(now.getDate() - (i + 1) * 7);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setDate(now.getDate() - i * 7);
+    end.setHours(0, 0, 0, 0);
     const matches = state.history.filter(m => {
       const d = new Date(m.date_played);
       return d >= start && d < end;
     });
-    const wins = matches.filter(m => m.result === 'win').length;
-    return { label: `Week ${idx + 1}`, games: matches.length, wins };
+    const winsCount = matches.filter(m => m.result === 'win').length;
+    return { label: `Week ${idx + 1}`, games: matches.length, wins: winsCount };
   });
 
   if (weeks.every(w => w.games === 0)) {
-    ctx.fillStyle = '#666'; ctx.font = '14px Arial'; ctx.textAlign = 'center';
-    ctx.fillText('No matches in last 4 weeks', canvas.width / 2, canvas.height / 2);
+    ctx.fillStyle = '#696969';
+    ctx.font = '14px Inter, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('No matches in last 4 weeks', cssWidth / 2, cssHeight / 2);
+    // still render an empty legend
+    renderLegendHTML('weeklyChart', [
+      { label: 'Gray: Total games', swatch: '#72818a' },
+      { label: 'Soft blue: Wins', swatch: '#7b93a4' }
+    ]);
     return;
   }
 
-  const barW = canvas.width / weeks.length - 10;
-  const max = Math.max(...weeks.map(w => w.games), 1);
-  weeks.forEach((w, i) => {
-    const h = (w.games / max) * (canvas.height - 40);
-    const x = i * (barW + 10) + 5, y = canvas.height - h - 20;
-    ctx.fillStyle = '#007bff'; ctx.fillRect(x, y, barW * 0.6, h);
-    const wh = (w.wins / max) * (canvas.height - 40);
-    ctx.fillStyle = '#28a745'; ctx.fillRect(x + barW * 0.4, canvas.height - wh - 20, barW * 0.6, wh);
-    ctx.fillStyle = '#333'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
-    ctx.fillText(w.label, x + barW / 2, canvas.height - 5);
-  });
+  const barW = Math.max(18, cssWidth / weeks.length - 22);
+  const maxGames = Math.max(...weeks.map(w => w.games), 1);
+
+  const id = 'weeklyChart';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    weeks.forEach((w, i) => {
+      const totalH = (w.games / maxGames) * (cssHeight - 40) * progress;
+      const winH = (w.wins / maxGames) * (cssHeight - 40) * progress;
+      const x = i * (barW + 22) + 8;
+      const yTotal = cssHeight - 24 - totalH;
+      const yWin = cssHeight - 24 - winH;
+
+      // total
+      const gGrad = ctx.createLinearGradient(x, yTotal, x, yTotal + Math.max(6, totalH));
+      gGrad.addColorStop(0, '#e6e6e6');
+      gGrad.addColorStop(1, '#72818a');
+      roundRect(ctx, x, yTotal, barW * 0.6, totalH, 6);
+      ctx.fillStyle = gGrad;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80,80,80,0.18)';
+      ctx.stroke();
+
+      // wins overlay
+      const wX = x + barW * 0.4;
+      const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 24);
+      winsGrad.addColorStop(0, '#dff6fb');
+      winsGrad.addColorStop(1, '#7b93a4');
+      roundRect(ctx, wX, yWin, barW * 0.6, winH, 6);
+      ctx.fillStyle = winsGrad;
+      ctx.fill();
+      ctx.strokeRect(wX, yWin, barW * 0.6, winH);
+
+      ctx.fillStyle = '#2f4f4f';
+      ctx.font = '12px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(w.label, x + barW / 2, cssHeight - 6);
+    });
+  }
+
+  animate(id, draw, 700);
+
+  renderLegendHTML('weeklyChart', [
+    { label: 'Gray — total games', swatch: '#72818a' },
+    { label: 'Soft blue — wins', swatch: '#7b93a4' }
+  ]);
 }
 
 export function renderActivityHeatmap() {
   const canvas = document.getElementById('activityHeatmap') as HTMLCanvasElement | null;
   if (!canvas) return;
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+  try {
+    ({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+  } catch {
+    return;
+  }
 
-  // Real activity based on matches in last 7 days
   const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - (6 - i));
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - (6 - i));
     return d;
   });
   const counts = days.map(day => {
-    const next = new Date(day); next.setDate(day.getDate() + 1);
+    const next = new Date(day);
+    next.setDate(day.getDate() + 1);
     return state.history.filter(m => {
       const d = new Date(m.date_played);
       return d >= day && d < next;
     }).length;
   });
   const max = Math.max(...counts, 1);
-  const cw = canvas.width / 7, ch = canvas.height;
+  const cw = Math.max(24, Math.floor(cssWidth / 7));
 
-  counts.forEach((c, i) => {
-    const alpha = c ? (0.2 + 0.8 * (c / max)) : 0.1;
-    ctx.fillStyle = `rgba(40,167,69,${alpha})`;
-    ctx.fillRect(i * cw, 0, cw - 2, ch - 18);
-    const label = days[i].toLocaleDateString(undefined, { weekday: 'short' });
-    ctx.fillStyle = '#333'; ctx.font = '12px Arial'; ctx.textAlign = 'center';
-    ctx.fillText(label, i * cw + cw / 2, ch - 4);
-  });
+  const id = 'activityHeatmap';
+  cancelAnim(id);
+
+  function draw(progress: number) {
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+    counts.forEach((c, i) => {
+      const alpha = c ? (0.2 + 0.8 * (c / max)) : 0.08;
+      const animatedAlpha = alpha * progress;
+      ctx.fillStyle = `rgba(176,196,222,${animatedAlpha})`;
+      roundRect(ctx, i * cw + 6, 6, cw - 12, cssHeight - 32, 4);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80,80,80,0.14)';
+      ctx.strokeRect(i * cw + 6, 6, cw - 12, cssHeight - 32);
+
+      const label = days[i].toLocaleDateString(undefined, { weekday: 'short' });
+      ctx.fillStyle = '#2f4f4f';
+      ctx.font = '12px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, i * cw + cw / 2 + 6, cssHeight - 8);
+    });
+  }
+
+  animate(id, draw, 650);
+
+  renderLegendHTML('activityHeatmap', [
+    { label: 'Blue intensity: activity level (darker = more games)', swatch: '#b0cde6' }
+  ]);
 }
 
+/* ----------------------- Render all + resize handling ----------------------- */
+let resizeAttached = false;
+const debouncedResize = (function () {
+  let t: number | null = null;
+  return () => {
+    if (t) clearTimeout(t);
+    t = window.setTimeout(() => {
+      renderAllCharts(); // re-run whole suite
+      t = null;
+    }, 160);
+  };
+})();
+
 export function renderAllCharts() {
-  // Delay to let DOM mount
-  setTimeout(() => {
-    try {
-      renderWinRateChart();
-      renderPerformanceChart();
-      renderScoreDistribution();
-      renderTimeAnalysisChart();
-      renderTrendsChart();
-      renderWeeklyChart();
-      renderActivityHeatmap();
-    } catch (e) {
-      console.log('Chart error', e);
-    }
-  }, 50);
+  // make sure fonts/styles present
+  ensureFontsAndStyles();
+
+  // draw each with animations
+  try {
+    renderWinRateChart();
+    renderPerformanceChart();
+    renderScoreDistribution();
+    renderTimeAnalysisChart();
+    renderTrendsChart();
+    renderWeeklyChart();
+    renderActivityHeatmap();
+  } catch (e) {
+    // prevent crash if any one chart fails
+    // console.error('chart render error', e);
+  }
+
+  if (!resizeAttached) {
+    window.addEventListener('resize', debouncedResize);
+    resizeAttached = true;
+  }
 }
