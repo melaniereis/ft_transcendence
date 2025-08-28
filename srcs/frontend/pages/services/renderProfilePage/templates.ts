@@ -242,8 +242,9 @@ export function historyList(history: Match[]): string {
         </div>
         <div style="background:linear-gradient(135deg, ${GRIS_COLORS.cool}15, ${GRIS_COLORS.cool}05);
                     padding:20px;border-radius:15px;border-left:4px solid ${GRIS_COLORS.cool};text-align:center">
-          <div style="font-size:24px;font-weight:700;color:${GRIS_COLORS.cool}">${averageScore(history).toFixed(1)}</div>
-          <div style="font-size:12px;color:${GRIS_COLORS.muted};font-weight:600">Avg Score</div>
+          <div style="font-size:24px;font-weight:700;color:${GRIS_COLORS.cool}">${(history.filter(m => m.result === 'win').length + (history.filter(m => m.result === 'loss').length))}</div>
+          <div style="font-size:12px;color:${GRIS_COLORS.muted};font-weight:600">Total Matches</div>
+        
         </div>
         <div style="background:linear-gradient(135deg, ${GRIS_COLORS.warm}15, ${GRIS_COLORS.warm}05);
                     padding:20px;border-radius:15px;border-left:4px solid ${GRIS_COLORS.warm};text-align:center">
@@ -269,7 +270,7 @@ export function historyList(history: Match[]): string {
               </div>
               <div style="flex:1">
                 <div style="font-weight:700;color:${GRIS_COLORS.primary};font-size:16px">
-                  ${m.result === 'win' ? 'Victory' : 'Defeat'} vs ${m.opponent_name || `Player ${m.opponent_id}`}
+                  vs ${m.opponent_name || `Player ${m.opponent_id}`}
                 </div>
                 <div style="color:${GRIS_COLORS.muted};font-size:14px;margin-top:2px">
                   ${new Date(m.date_played).toLocaleDateString()} • ${m.user_score} - ${m.opponent_score}
@@ -337,14 +338,6 @@ export function historyDetailed(history: Match[]): string {
                 <div style="font-weight:bold;color:#333">Player ${m.opponent_id}</div>
               </div>
               <div style="background:#f8f9fa;padding:12px;border-radius:8px">
-                <div style="font-size:12px;color:#666;margin-bottom:4px">DURATION</div>
-                <div style="font-weight:bold;color:#333">${m.duration || 'Unknown'}</div>
-              </div>
-              <div style="background:#f8f9fa;padding:12px;border-radius:8px">
-                <div style="font-size:12px;color:#666;margin-bottom:4px">SCORE DIFF</div>
-                <div style="font-weight:bold;color:${Math.abs(m.user_score - m.opponent_score) > 5 ? '#dc3545' : '#28a745'}">${Math.abs(m.user_score - m.opponent_score)} pts</div>
-              </div>
-              <div style="background:#f8f9fa;padding:12px;border-radius:8px">
                 <div style="font-size:12px;color:#666;margin-bottom:4px">MATCH TYPE</div>
                 <div style="font-weight:bold;color:#333">${
                   Math.abs(m.user_score - m.opponent_score) <= 2 ? 'NAIL-BITER' :
@@ -352,12 +345,10 @@ export function historyDetailed(history: Match[]): string {
                   Math.abs(m.user_score - m.opponent_score) <= 10 ? 'COMPETITIVE' : 'DOMINANT'
                 }</div>
               </div>
-            </div>
-
-            <div style="display:flex;gap:10px">
-              <button data-action="view-replay" data-id="${m.id}" style="background:#007bff;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">📽️ View Replay</button>
-              <button data-action="share-match" data-id="${m.id}" style="background:#28a745;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">📤 Share</button>
-              <button data-action="analyze-match" data-id="${m.id}" style="background:#ffc107;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">📊 Analyze</button>
+              <div style="background:#f8f9fa;padding:12px;border-radius:8px">
+                <div style="font-size:12px;color:#666;margin-bottom:4px">SCORE DIFF</div>
+                <div style="font-weight:bold;color:${Math.abs(m.user_score - m.opponent_score) > 5 ? '#dc3545' : '#28a745'}">${Math.abs(m.user_score - m.opponent_score)} pts</div>
+              </div>
             </div>
           </div>
         `).join('')}
@@ -427,11 +418,6 @@ export function statsOverview(stats: Stats, history: Match[]): string {
           </div>
         </div>
       </div>
-
-      <div style="background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:20px">
-        <h4 style="margin:0 0 15px 0;color:#333;display:flex;align-items:center;gap:8px"><span>📈</span> Win Rate</h4>
-        <canvas id="winRateChart" width="400" height="200" style="width:100%;height:200px;background:#fff;border-radius:8px"></canvas>
-      </div>
     </div>
   `;
 }
@@ -452,7 +438,6 @@ export function statsPerformance(stats: Stats, history: Match[]): string {
         <div style="background:#f8f9fa;padding:20px;border-radius:12px">
           <h4 style="margin:0 0 15px 0;color:#333">🏆 Performance Rankings</h4>
           ${[
-            { label: 'Average Score', value: avg, desc: 'Points per match', color: parseFloat(avg) >= 10 ? '#28a745' : '#ffc107', icon: '⚡' },
             { label: 'Consistency', value: `${cons}%`, desc: 'Performance stability', color: cons >= 70 ? '#28a745' : cons >= 50 ? '#ffc107' : '#dc3545', icon: '🎯' },
             { label: 'Clutch Factor', value: `${clutch}%`, desc: 'Close game wins', color: clutch >= 60 ? '#28a745' : '#ffc107', icon: '🔥' },
             { label: 'Dominance', value: `${dom}%`, desc: 'Big-margin wins', color: '#6f42c1', icon: '👑' },
@@ -485,7 +470,6 @@ export function statsTrends(stats: Stats): string {
           { label: 'Win Rate', value: `${(stats.win_rate * 100).toFixed(1)}%`, color: '#28a745', icon: '🏆', period: 'current' },
           { label: 'Avg Score', value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: '#007bff', icon: '📊', period: 'per match' },
           { label: 'Games/Week', value: String(gamesThisWeek([])), color: '#17a2b8', icon: '🎮', period: 'this week' }, /* updated at runtime in index */
-          { label: 'Total Matches', value: String(stats.matches_played), color: '#6f42c1', icon: '📈', period: 'all time' },
         ].map(t => `
           <div style="background:linear-gradient(135deg, ${t.color}15, ${t.color}05);padding:18px;border-radius:12px;border-left:4px solid ${t.color}">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -560,11 +544,6 @@ export function historyAnalysis(history: Match[]): string {
           `).join('')}
         </div>
       </div>
-
-      <div style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1)">
-        <h4 style="margin:0 0 15px 0;color:#333">⏰ Time-based Performance</h4>
-        <canvas id="timeAnalysisChart" width="800" height="250" style="width:100%;height:250px;background:#f8f9fa;border-radius:8px"></canvas>
-      </div>
     </div>
   `;
 }
@@ -591,7 +570,6 @@ export function modals(): string {
         </div>
       </div>
     </div>
-
     <div id="pass-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:2000">
       <div style="background:#fff;padding:30px;border-radius:10px;width:400px;max-width:90%;box-shadow:0 10px 30px rgba(0,0,0,0.3)">
         <h3 style="margin:0 0 20px 0;color:#333">🔒 Change Password</h3>
