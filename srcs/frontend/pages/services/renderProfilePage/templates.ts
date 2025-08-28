@@ -180,9 +180,9 @@ export function friendsList(friends: Friend[]): string {
             </div>`;
   }
   
-  const displayedFriends = friends.slice(0, 15);
-  const hasMore = friends.length > 15;
-  
+  const displayedFriends = friends.slice(0, 10);
+  const hasMore = friends.length > 10;
+    
   return `
     <div>
       ${displayedFriends.map(f => `
