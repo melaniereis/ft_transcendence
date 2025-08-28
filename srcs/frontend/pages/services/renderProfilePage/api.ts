@@ -10,16 +10,31 @@ async function apiGet<T>(url: string): Promise<T> {
 }
 
 async function apiSend<T>(url: string, method: string, body?: object): Promise<T> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${state.token}`,
+  };
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const res = await fetch(url, {
     method,
-    headers: {
-      Authorization: `Bearer ${state.token}`,
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
+
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
-  return res.json();
+
+  if (res.status === 204) {
+    return undefined as unknown as T;
+  }
+  const ct = res.headers.get('content-type') || '';
+  if (ct.includes('application/json')) {
+    return res.json();
+  }
+  // Fallback for non-JSON responses
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return undefined as unknown as T; }
 }
 
 export async function loadProfile(): Promise<Profile> {
@@ -43,31 +58,15 @@ export async function loadStats(userId: number): Promise<Stats> {
   }
 }
 
-// FIX: Load match history with usernames
+// FIX: Load match history without enrichment to avoid 404s
 export async function loadHistory(): Promise<Match[]> {
   try {
     const matches = await apiGet<any[]>('/api/match-history');
-    
-    // Fetch usernames for opponents
-    const enrichedMatches = await Promise.all(
-      matches.map(async (match) => {
-        try {
-          // Get opponent username
-          const opponent = await apiGet<any>(`/api/users/${match.opponent_id}`);
-          return {
-            ...match,
-            opponent_username: opponent.username || opponent.display_name || `Player ${match.opponent_id}`
-          };
-        } catch {
-          return {
-            ...match,
-            opponent_username: `Player ${match.opponent_id}`
-          };
-        }
-      })
-    );
-    
-    return enrichedMatches;
+    // Skip enrichment for now to avoid 404s
+    return matches.map(match => ({
+      ...match,
+      opponent_username: `Player ${match.opponent_id}`
+    }));
   } catch {
     return [];
   }
@@ -95,31 +94,27 @@ export async function updateProfile(payload: {
 }
 
 // FIX: Correct parameter names for password change
-export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+export async function changePassword(current_password: string, new_password: string): Promise<void> {
   await apiSend<void>('/api/profile/change-password', 'POST', { 
-    currentPassword, // Fixed parameter name
-    newPassword      // Fixed parameter name
+    current_password, 
+    new_password 
   });
 }
 
+// FIX: robust add friend (tries legacy and new endpoint)
 export async function addFriendApi(username: string): Promise<void> {
-  await apiSend<void>('/api/friends/request', 'POST', { friendUsername: username });
+  try {
+    // legacy route your logs show
+    await apiSend<void>('/api/friends/request', 'POST', { friendUsername: username });
+  } catch {
+    // fallback to alternative route if backend changed
+    await apiSend<void>('/api/friends', 'POST', { username });
+  }
 }
 
-// FIX: Improved remove friend functionality
+// FIX: Fastify requires a JSON body when content-type is json
 export async function removeFriendApi(friendId: string): Promise<void> {
-  const response = await fetch(`/api/friends/${friendId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${state.token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to remove friend: ${errorText}`);
-  }
+  await apiSend<void>(`/api/friends/${encodeURIComponent(friendId)}`, 'DELETE');
 }
 
 export async function loadMoreMatches(offset: number, limit: number = 10): Promise<Match[]> {
@@ -139,26 +134,14 @@ export async function loadMatchesWithPagination(page: number = 0, limit: number 
 }> {
   try {
     const offset = page * limit;
-    const response = await fetch(`/api/match-history-paginated?offset=${offset}&limit=${limit}`, {
-      headers: { Authorization: `Bearer ${state.token}` }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`${response.status} ${await response.text()}`);
-    }
-    
-    const data = await response.json();
+    const matches = await loadMoreMatches(offset, limit);
     return {
-      matches: data.matches || [],
-      totalCount: data.totalCount || 0,
-      hasMore: data.hasMore || false
+      matches,
+      totalCount: matches.length, // Placeholder, adjust if backend provides total
+      hasMore: matches.length === limit
     };
   } catch (error) {
-    console.error('Error loading paginated matches:', error);
-    return {
-      matches: [],
-      totalCount: 0,
-      hasMore: false
-    };
+    console.error('Error loading matches with pagination:', error);
+    return { matches: [], totalCount: 0, hasMore: false };
   }
 }

@@ -1,3 +1,4 @@
+// types/friendship.ts
 export interface Friendship {
   id: number;
   user_id: number;

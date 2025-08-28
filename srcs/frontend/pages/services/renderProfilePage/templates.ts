@@ -170,53 +170,44 @@ export function header(profile: Profile, isEdit: boolean): string {
     </div>`;
 }
 
-// FIX: Friends list with pagination (max 15 + show all modal)
+// renderProfilePage/templates.ts - FIXED VERSION
+
 export function friendsList(friends: Friend[]): string {
-  if (!friends.length) {
-    return `<div style="padding:20px;text-align:center;color:${GRIS_COLORS.muted};
-                       background:${GRIS_COLORS.soft};border-radius:12px;font-size:14px">
-              <div style="font-size:48px;margin-bottom:15px">👥</div>
-              <p style="margin:0">No friends added yet.<br>Add some friends to see them here!</p>
-            </div>`;
+  if (!friends || friends.length === 0) {
+    return '<div style="padding:15px;text-align:center;color:#666;font-size:14px">No friends added yet</div>';
   }
-  
-  const displayedFriends = friends.slice(0, 10);
-  const hasMore = friends.length > 10;
-    
   return `
     <div>
-      ${displayedFriends.map(f => `
-        <div class="friend-item" data-friend-id="${f.friend_id || f.id}" 
-             data-friend-name="${f.display_name || f.name || f.username}"
-             style="display:flex;align-items:center;gap:12px;padding:15px;background:white;
-                    border-radius:12px;margin-bottom:12px;box-shadow:0 4px 12px rgba(44,62,80,0.08);
-                    position:relative;transition:all 0.3s;cursor:pointer;border:1px solid ${GRIS_COLORS.soft}">
-          <img src="${f.avatar_url || '/assets/avatar/default.png'}" width="48" height="48" 
-               style="border-radius:50%;object-fit:cover;border:3px solid ${f.online_status ? GRIS_COLORS.success : GRIS_COLORS.muted}" alt="Avatar"/>
-          <div style="flex:1">
-            <div style="font-weight:600;color:${GRIS_COLORS.primary};font-size:16px">${f.display_name || f.name || f.username}</div>
-            <div style="font-size:13px;color:${GRIS_COLORS.muted}">@${f.username} • ${f.team || 'No team'}</div>
-            <div style="font-size:12px;color:${f.online_status ? GRIS_COLORS.success : GRIS_COLORS.muted};font-weight:500">
-              ${f.online_status ? '🟢 Online' : '🔴 Offline'}
+      ${friends.map((f: any) => {
+        const id = f.friend_id ?? f.id ?? f.userId ?? '';
+        const displayName = f.display_name || f.name || f.username || 'Unknown';
+        const username = f.username || '';
+        const avatar = f.avatar_url || '/assets/avatar/default.png';
+        const online = !!f.online_status;
+        return `
+          <div class="friend-item" 
+               data-id="${id}" data-name="${displayName}"
+               style="background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);position:relative;display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <img src="${avatar}" width="35" height="35" style="border-radius:50%;object-fit:cover;border:2px solid ${online ? '#28a745' : '#6c757d'}" alt="Avatar"/>
+            <div style="flex:1">
+              <div style="font-weight:bold;font-size:14px;color:#333">${displayName}</div>
+              <div style="font-size:12px;color:#666">@${username}</div>
+              <div style="font-size:11px;color:${online ? '#28a745' : '#6c757d'}">${online ? '🟢 Online' : '🔴 Offline'}</div>
             </div>
+            <button
+              class="remove-friend-btn"
+              data-action="remove-friend"
+              data-id="${id}"
+              data-friend-id="${id}"
+              data-name="${displayName}"
+              data-friend-name="${displayName}"
+              title="Remove friend"
+              style="background:#dc3545;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px">
+              ×
+            </button>
           </div>
-          <button class="remove-friend-btn" data-friend-id="${f.friend_id || f.id}" 
-                  data-friend-name="${f.display_name || f.name || f.username}"
-                  title="Remove friend"
-                  style="display:none;background:${GRIS_COLORS.accent};color:#fff;border:none;border-radius:50%;
-                         width:28px;height:28px;cursor:pointer;font-size:14px;position:absolute;
-                         top:12px;right:12px;transition:all 0.3s">×</button>
-        </div>
-      `).join('')}
-      
-      ${hasMore ? `
-        <button id="show-all-friends" 
-                style="width:100%;padding:15px;background:${GRIS_COLORS.cool};color:white;border:none;
-                       border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;
-                       transition:all 0.3s;box-shadow:0 4px 12px rgba(52,152,219,0.3)">
-          ••• View All Friends (${friends.length})
-        </button>
-      ` : ''}
+        `;
+      }).join('')}
     </div>
   `;
 }
@@ -268,43 +259,30 @@ export function historyList(history: Match[]): string {
           <p style="margin:5px 0 0 0;color:${GRIS_COLORS.muted};font-size:14px">Your 5 most recent games</p>
         </div>
         <div>
-          ${recent.map((m, index) => {
-            const isWin = m.result === 'win';
-            const diff = Math.abs(m.user_score - m.opponent_score);
-            const type = diff <= 2 ? { label: 'CLOSE', color: GRIS_COLORS.warm }
-              : diff <= 5 ? { label: 'TIGHT', color: GRIS_COLORS.cool }
-              : { label: 'DECISIVE', color: GRIS_COLORS.success };
-            
-            return `
-              <div style="padding:20px;border-bottom:${index < recent.length - 1 ? `1px solid ${GRIS_COLORS.soft}` : 'none'};
-                          display:flex;align-items:center;gap:20px">
-                <div style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;
-                           justify-content:center;background:${isWin ? GRIS_COLORS.success : GRIS_COLORS.accent};
-                           color:#fff;font-weight:700;font-size:20px;box-shadow:0 4px 12px rgba(44,62,80,0.2)">
-                  ${isWin ? '🏆' : '❌'}
+          ${recent.map((m, index) => `
+            <div style="padding:20px;border-bottom:1px solid ${GRIS_COLORS.soft};display:flex;align-items:center;gap:15px;
+                        background:${index % 2 === 0 ? 'white' : GRIS_COLORS.soft}05">
+              <div style="flex-shrink:0;width:50px;height:50px;border-radius:50%;
+                          background:${m.result === 'win' ? GRIS_COLORS.success : GRIS_COLORS.accent};
+                          display:flex;align-items:center;justify-content:center;font-size:20px;color:white">
+                ${m.result === 'win' ? '🏆' : '❌'}
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700;color:${GRIS_COLORS.primary};font-size:16px">
+                  ${m.result === 'win' ? 'Victory' : 'Defeat'} vs ${m.opponent_name || `Player ${m.opponent_id}`}
                 </div>
-                <div style="flex:1">
-                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-                    <span style="font-weight:700;color:${GRIS_COLORS.primary};font-size:16px">
-                      vs ${(m as any).opponent_username || `Player ${m.opponent_id}`}
-                    </span>
-                    <span style="background:${type.color};color:#fff;padding:4px 12px;border-radius:20px;
-                               font-size:11px;font-weight:700">${type.label}</span>
-                  </div>
-                  <div style="font-size:13px;color:${GRIS_COLORS.muted}">
-                    ${new Date(m.date_played).toLocaleDateString()}
-                  </div>
+                <div style="color:${GRIS_COLORS.muted};font-size:14px;margin-top:2px">
+                  ${new Date(m.date_played).toLocaleDateString()} • ${m.user_score} - ${m.opponent_score}
                 </div>
-                <div style="text-align:right">
-                  <div style="font-family:monospace;font-size:20px;font-weight:700;color:${GRIS_COLORS.primary}">
-                    ${m.user_score} - ${m.opponent_score}
-                  </div>
-                  <div style="font-size:12px;color:${isWin ? GRIS_COLORS.success : GRIS_COLORS.accent};font-weight:700">
-                    ${isWin ? 'VICTORY' : 'DEFEAT'}
-                  </div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:18px;font-weight:700;color:${m.result === 'win' ? GRIS_COLORS.success : GRIS_COLORS.accent}">
+                  ${m.result === 'win' ? '+' : '-'}${Math.abs(m.user_score - m.opponent_score)}
                 </div>
-              </div>`;
-          }).join('')}
+                <div style="color:${GRIS_COLORS.muted};font-size:12px">Score Diff</div>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     </div>

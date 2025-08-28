@@ -13,6 +13,7 @@ export type Match = {
   id: string;
   date_played: string; // ISO
   opponent_id: string;
+  opponent_name?: string;
   user_score: number;
   opponent_score: number;
   result: 'win' | 'loss';

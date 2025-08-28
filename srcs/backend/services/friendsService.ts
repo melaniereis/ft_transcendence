@@ -160,9 +160,8 @@ export async function removeFriend(userId: number, friendId: number): Promise<vo
                 if (err) {
                     console.error('Erro ao remover amigo:', err);
                     reject(err);
-                } else if (this.changes === 0) {
-                    reject(new Error('Amizade não encontrada'));
                 } else {
+                    // Resolve even if no rows affected (friendship may not exist)
                     resolve();
                 }
             }

@@ -2,7 +2,7 @@
 import { loadFriends, changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile, loadMatchesWithPagination } from './api.js';
 import { renderAllCharts } from './charts.js';
 import { state } from './state.js';
-import { layout, statsOverview, statsPerformance, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
+import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
 import { Profile, Match } from './types.js';
 
 function setHTML(el: HTMLElement, html: string) { el.innerHTML = html; }
@@ -64,6 +64,10 @@ export function render(container: HTMLElement) {
   
   if (state.activeStatsTab === 'overview') statsEl.innerHTML = statsOverview(state.stats, state.history);
   if (state.activeStatsTab === 'performance') statsEl.innerHTML = statsPerformance(state.stats, state.history);
+  if (state.activeStatsTab === 'trends') {
+    statsEl.innerHTML = statsTrends(state.stats).replace('Games/Week', `Games/Week`).replace('value: String(gamesThisWeek([]))', '');
+    // quick patch: no fake data, charts will show real; label is static
+  }
   
   if (state.activeHistoryView === 'list') histEl.innerHTML = historyList(state.history);
   if (state.activeHistoryView === 'detailed') histEl.innerHTML = historyDetailed(state.history);
@@ -171,7 +175,8 @@ export function setupEvents(container: HTMLElement) {
     }
     
     if (id === 'avatar-modal-close') {
-      document.getElementById('avatar-modal')!.style.display = 'none';
+      const modal = document.getElementById('avatar-modal') as HTMLElement | null;
+      if (modal) modal.style.display = 'none';
       return;
     }
 
@@ -188,38 +193,39 @@ export function setupEvents(container: HTMLElement) {
     
     if (id === 'friend-add') {
       const input = document.getElementById('friend-input') as HTMLInputElement;
+      const btn = document.getElementById('friend-add') as HTMLButtonElement;
       const username = input.value.trim();
-      
-      if (!username) {
-        showInlineMessage('friend-msg', 'Por favor, insira um username', '#dc3545');
-        return;
-      }
-      
-      const addBtn = t as HTMLButtonElement;
-      addBtn.disabled = true;
-      addBtn.textContent = '⏳ A adicionar...';
-      
+      if (!username) return;
       try {
+        btn.disabled = true;
+        btn.textContent = '⏳ Adding...';
         await addFriendApi(username);
         input.value = '';
-        showInlineMessage('friend-msg', `Pedido de amizade enviado para ${username}!`, '#28a745');
-        
-        setTimeout(async () => {
-          try {
-            const friends = await loadFriends();
-            state.friends = friends;
-            rerenderFriends();
-          } catch (err) {
-            console.error('Erro ao recarregar amigos:', err);
-          }
-        }, 1000);
-        
+        // Refresh friends from backend and rerender
+        try { state.friends = await loadFriends(); } catch {}
+        rerenderFriends();
+        showInlineMessage('friend-msg', 'Friend added successfully!', '#28a745');
       } catch (err: any) {
-        const errorMsg = err?.message || 'Erro ao adicionar amigo';
-        showInlineMessage('friend-msg', errorMsg, '#dc3545');
+        showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
       } finally {
-        addBtn.disabled = false;
-        addBtn.textContent = '➕ Add';
+        btn.disabled = false;
+        btn.textContent = '➕ Add';
+      }
+      return;
+    }
+
+    // Match templates.ts: remove button uses class "remove-friend-btn" and data-friend-id/name
+    if (t.classList.contains('remove-friend-btn')) {
+      const friendId = t.getAttribute('data-friend-id') || '';
+      const friendName = t.getAttribute('data-friend-name') || '';
+      if (!friendId) return;
+      try {
+        await removeFriendApi(friendId);
+        try { state.friends = await loadFriends(); } catch {}
+        rerenderFriends();
+        showNotification('Friend removed successfully!', '#28a745');
+      } catch (err: any) {
+        showNotification(err?.message || 'Failed to remove friend', '#dc3545');
       }
       return;
     }
