@@ -12,5 +12,88 @@ services:
       - ./certs:/usr/src/app/certs
     environment:
       - DB_PATH=/usr/src/app/data/database.db
+      - VAULT_ADDR=http://vault:8200
+      - VAULT_TOKEN=root  # For development only
     command: npm run dev
+    depends_on:
+      - db
+      - vault
+    networks:
+      - transcendence
     restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: src-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+    environment:
+      - MODSEC_RULE_ENGINE=on
+      - BACKEND=http://web:3000
+      - MODSEC_AUDIT_LOG_PARTS=ABCFHZ
+      - MODSEC_AUDIT_LOG_TYPE=Concurrent
+      - MODSEC_AUDIT_LOG=/var/log/modsec_audit.log
+    volumes:
+      - ./nginx/ssl:/etc/nginx/conf
+      - ./nginx/modsec/custom_rules.conf:/opt/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
+    networks:
+      - transcendence
+    healthcheck:
+      test: ["CMD", "curl", "-f", "--insecure", "https://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  db:
+    image: alpine:latest
+    volumes:
+      - ./data:/usr/src/app/data
+    networks:
+      - transcendence
+    command: sh -c "apk add --no-cache sqlite && touch /usr/src/app/data/database.db && sqlite3 /usr/src/app/data/database.db 'CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY);' && tail -f /dev/null"
+    healthcheck:
+      test: ["CMD", "sqlite3", "/usr/src/app/data/database.db", ".tables"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  vault:
+    image: hashicorp/vault:1.20.2
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=root
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data
+      - ./vault/logs:/vault/logs
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - transcendence
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+networks:
+  transcendence:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data
