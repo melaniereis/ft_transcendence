@@ -1,5 +1,4 @@
-// renderProfilePage/state.ts
-
+// renderProfilePage/state.ts - FIXED VERSION
 import { DEFAULT_STATS, Friend, HistoryView, Match, Profile, Stats, StatsTab } from './types.js';
 
 export const state: {
@@ -11,8 +10,15 @@ export const state: {
   editMode: boolean;
   activeStatsTab: StatsTab;
   activeHistoryView: HistoryView;
+  historyPage?: number; // FIX: Add pagination support
   onBadgeUpdate?: () => void;
   container?: HTMLElement;
+  matchPagination: {
+    currentPage: number;
+    totalMatches: number;
+    hasMoreMatches: boolean;
+    isLoadingMore: boolean;
+  };
 } = {
   token: '',
   stats: DEFAULT_STATS,
@@ -21,4 +27,11 @@ export const state: {
   editMode: false,
   activeStatsTab: 'overview',
   activeHistoryView: 'list',
+  historyPage: 1,
+  matchPagination: {
+    currentPage: 0,
+    totalMatches: 0,
+    hasMoreMatches: true,
+    isLoadingMore: false
+  }
 };

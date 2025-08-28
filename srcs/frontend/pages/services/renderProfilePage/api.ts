@@ -1,4 +1,4 @@
-// renderProfilePage/api.ts
+// renderProfilePage/api.ts - FIXED VERSION
 import { Friend, Match, Profile, Stats } from './types.js';
 import { state } from './state.js';
 import { DEFAULT_STATS } from './types.js';
@@ -43,9 +43,31 @@ export async function loadStats(userId: number): Promise<Stats> {
   }
 }
 
+// FIX: Load match history with usernames
 export async function loadHistory(): Promise<Match[]> {
   try {
-    return await apiGet<Match[]>('/api/match-history');
+    const matches = await apiGet<any[]>('/api/match-history');
+    
+    // Fetch usernames for opponents
+    const enrichedMatches = await Promise.all(
+      matches.map(async (match) => {
+        try {
+          // Get opponent username
+          const opponent = await apiGet<any>(`/api/users/${match.opponent_id}`);
+          return {
+            ...match,
+            opponent_username: opponent.username || opponent.display_name || `Player ${match.opponent_id}`
+          };
+        } catch {
+          return {
+            ...match,
+            opponent_username: `Player ${match.opponent_id}`
+          };
+        }
+      })
+    );
+    
+    return enrichedMatches;
   } catch {
     return [];
   }
@@ -72,14 +94,71 @@ export async function updateProfile(payload: {
   return apiSend<Partial<Profile>>('/api/profile', 'PUT', payload);
 }
 
-export async function changePassword(current_password: string, new_password: string): Promise<void> {
-  await apiSend<void>('/api/change-password', 'POST', { current_password, new_password });
+// FIX: Correct parameter names for password change
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await apiSend<void>('/api/profile/change-password', 'POST', { 
+    currentPassword, // Fixed parameter name
+    newPassword      // Fixed parameter name
+  });
 }
 
 export async function addFriendApi(username: string): Promise<void> {
   await apiSend<void>('/api/friends/request', 'POST', { friendUsername: username });
 }
 
+// FIX: Improved remove friend functionality
 export async function removeFriendApi(friendId: string): Promise<void> {
-  await apiSend<void>(`/api/friends/${friendId}`, 'DELETE');
+  const response = await fetch(`/api/friends/${friendId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${state.token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to remove friend: ${errorText}`);
+  }
+}
+
+export async function loadMoreMatches(offset: number, limit: number = 10): Promise<Match[]> {
+  try {
+    const response = await apiGet<Match[]>(`/api/match-history?offset=${offset}&limit=${limit}`);
+    return response;
+  } catch (error) {
+    console.error('Error loading more matches:', error);
+    return [];
+  }
+}
+
+export async function loadMatchesWithPagination(page: number = 0, limit: number = 10): Promise<{
+  matches: Match[];
+  totalCount: number;
+  hasMore: boolean;
+}> {
+  try {
+    const offset = page * limit;
+    const response = await fetch(`/api/match-history-paginated?offset=${offset}&limit=${limit}`, {
+      headers: { Authorization: `Bearer ${state.token}` }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`${response.status} ${await response.text()}`);
+    }
+    
+    const data = await response.json();
+    return {
+      matches: data.matches || [],
+      totalCount: data.totalCount || 0,
+      hasMore: data.hasMore || false
+    };
+  } catch (error) {
+    console.error('Error loading paginated matches:', error);
+    return {
+      matches: [],
+      totalCount: 0,
+      hasMore: false
+    };
+  }
 }

@@ -27,8 +27,11 @@ export async function createMatchHistoryRecord(
 export async function getMatchHistory(userId: number): Promise<MatchHistoryRecord[]> {
     return new Promise((resolve, reject) => {
         db.all(
-            `SELECT * FROM match_history WHERE user_id = ? ORDER BY date_played DESC LIMIT 20`,
-            [userId],
+            `SELECT mh.*, u.username AS opponentUsername, u.display_name AS opponentDisplayName
+             FROM match_history mh
+             LEFT JOIN users u ON u.id = mh.opponent_id
+             WHERE mh.user_id = ? ORDER BY date_played DESC LIMIT 20`,
+             [userId],
             (err, rows) => {
                 if (err) {
                     reject(err);
@@ -39,3 +42,36 @@ export async function getMatchHistory(userId: number): Promise<MatchHistoryRecor
         );
     });
 }
+
+export async function getMatchHistoryPaginated(userId: number, offset: number, limit: number): Promise<MatchHistoryRecord[]> {
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT * FROM match_history WHERE user_id = ? ORDER BY date_played DESC LIMIT ? OFFSET ?`,
+        [userId, limit, offset],
+        (err, rows) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(rows as MatchHistoryRecord[]);
+          }
+        }
+      );
+    });
+  }
+  
+  export async function getMatchHistoryCount(userId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT COUNT(*) as count FROM match_history WHERE user_id = ?`,
+        [userId],
+        (err, row: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(row?.count || 0);
+          }
+        }
+      );
+    });
+  }
+  
