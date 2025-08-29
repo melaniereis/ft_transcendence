@@ -37,12 +37,13 @@ export async function authRoutes(fastify: FastifyInstance) {
 	});
 
 	fastify.post('/api/login', async (req: FastifyRequest, reply: FastifyReply) => {
-		const { username, password } = req.body as { username: string; password: string };
+	const { username, password } = req.body as { username: string; password: string };
 
-		const result = await loginUser(username, password);
-		if (!result)
-			return reply.status(401).send({ error: 'Invalid credentials' });
+	const result = await loginUser(username, password);
+	if (!result)
+		return reply.status(401).send({ error: 'Invalid credentials' });
 
-		reply.send({ token: result.token });
+	reply.send({ token: result.token, user: result.user });
 	});
+
 }

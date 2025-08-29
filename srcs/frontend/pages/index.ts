@@ -4,6 +4,7 @@ import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
 import { renderLoginForm } from './services/renderLoginForm.js';
+import { startMatchmaking } from './services/matchmaking.js';
 
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
@@ -13,59 +14,78 @@ const teamsBtn = document.getElementById('teams-btn') as HTMLButtonElement;
 const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
 const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
 const registerBtn = document.getElementById('register-btn') as HTMLButtonElement;
-
 const appDiv = document.getElementById('app') as HTMLDivElement;
 
 // 🔄 Update UI based on login state
 function updateUIBasedOnAuth(): void {
-  const token = localStorage.getItem('authToken');
-  const isLoggedIn = !!token;
+	const token = localStorage.getItem('authToken');
+	const isLoggedIn = !!token;
 
-  playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-  settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-  tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-  teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-  logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 
-  loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
-  registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+	loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+	registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+
+	// 🧩 Matchmaking button logic
+	const existingBtn = document.getElementById('matchmaking-btn');
+	if (existingBtn) {
+		existingBtn.remove(); // Remove old button if it exists
+	}
+
+	if (isLoggedIn) {
+		const matchmakingBtn = document.createElement('button');
+		matchmakingBtn.id = 'matchmaking-btn';
+		matchmakingBtn.textContent = 'Join Matchmaking';
+		appDiv.appendChild(matchmakingBtn);
+
+		matchmakingBtn.addEventListener('click', () => {
+			const playerId = Number(localStorage.getItem('playerId'));
+			const playerName = localStorage.getItem('playerName') || 'Unknown';
+			const difficulty = 'normal';
+			startMatchmaking(appDiv, playerId, playerName, difficulty);
+		});
+	}
 }
 
 // 🧠 Event Listeners
 playBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderPlayMenu(appDiv);
+	appDiv.innerHTML = '';
+	renderPlayMenu(appDiv);
 });
 
 settingsBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderSettingsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderSettingsPage(appDiv);
 });
 
 tournamentsBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderTournamentsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderTournamentsPage(appDiv);
 });
 
 teamsBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderTeamsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderTeamsPage(appDiv);
 });
 
 loginBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderLoginForm(appDiv, updateUIBasedOnAuth);
+	appDiv.innerHTML = '';
+	renderLoginForm(appDiv, updateUIBasedOnAuth);
 });
 
 registerBtn.addEventListener('click', () => {
-  appDiv.innerHTML = '';
-  renderRegistrationForm(appDiv);
+	appDiv.innerHTML = '';
+	renderRegistrationForm(appDiv);
 });
 
 logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('authToken');
-  appDiv.innerHTML = '<p>You have been logged out.</p>';
-  updateUIBasedOnAuth();
+	localStorage.removeItem('authToken');
+	appDiv.innerHTML = '<p>You have been logged out.</p>';
+	updateUIBasedOnAuth();
 });
 
 // 🚀 Initialize UI
