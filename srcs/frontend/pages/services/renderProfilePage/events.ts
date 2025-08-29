@@ -1,428 +1,459 @@
-// renderProfilePage/events.ts - FIXED VERSION
+// renderProfilePage/events.ts
 import { loadFriends, changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile, loadMatchesWithPagination } from './api.js';
-import { renderAllCharts } from './charts.js';
 import { state } from './state.js';
+import { renderAllCharts } from './charts.js';
 import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
 import { Profile, Match } from './types.js';
+
+// Fetch outgoing friend requests from backend and update state
+export async function loadOutgoingFriendRequests() {
+	if (!state.token) return;
+	try {
+		const res = await fetch('/api/friends/outgoing', {
+			headers: { 'Authorization': `Bearer ${state.token}` }
+		});
+		if (res.ok) {
+			const data = await res.json();
+			// Assume data.outgoing is an array of { username: string }
+			state.outgoingFriendRequests = data.outgoing || [];
+		}
+	} catch (e) {
+		// ignore
+	}
+}
 
 function setHTML(el: HTMLElement, html: string) { el.innerHTML = html; }
 
 function showNotification(message: string, color: string) {
-  const el = document.getElementById('notification');
-  if (!el) return;
-  el.textContent = message;
-  (el as HTMLElement).style.backgroundColor = color;
-  (el as HTMLElement).style.display = 'block';
-  setTimeout(() => ((el as HTMLElement).style.display = 'none'), 3000);
+	const el = document.getElementById('notification');
+	if (!el) return;
+	el.textContent = message;
+	(el as HTMLElement).style.backgroundColor = color;
+	(el as HTMLElement).style.display = 'block';
+	setTimeout(() => ((el as HTMLElement).style.display = 'none'), 3000);
 }
 
 function showInlineMessage(id: string, message: string, color: string) {
-  const el = document.getElementById(id) as HTMLElement | null;
-  if (!el) return;
-  el.textContent = message;
-  el.style.color = color;
-  setTimeout(() => { el.textContent = ''; }, 3000);
+	const el = document.getElementById(id) as HTMLElement | null;
+	if (!el) return;
+	el.textContent = message;
+	el.style.color = color;
+	setTimeout(() => { el.textContent = ''; }, 3000);
 }
 
 export function setupFriendHoverEffects() {
-  const friendItems = document.querySelectorAll('.friend-item');
-  
-  friendItems.forEach(item => {
-    const removeBtn = item.querySelector('.remove-friend-btn') as HTMLElement;
-    
-    item.addEventListener('mouseenter', () => {
-      if (removeBtn) {
-        removeBtn.style.display = 'block';
-        (item as HTMLElement).style.backgroundColor = '#f8f9fa';
-      }
-    });
-    
-    item.addEventListener('mouseleave', () => {
-      if (removeBtn) {
-        removeBtn.style.display = 'none';
-        (item as HTMLElement).style.backgroundColor = '#fff';
-      }
-    });
-  });
+	const friendItems = document.querySelectorAll('.friend-item');
+
+	friendItems.forEach(item => {
+		const removeBtn = item.querySelector('.remove-friend-btn') as HTMLElement;
+
+		item.addEventListener('mouseenter', () => {
+			if (removeBtn) {
+				removeBtn.style.display = 'block';
+				(item as HTMLElement).style.backgroundColor = '#f8f9fa';
+			}
+		});
+
+		item.addEventListener('mouseleave', () => {
+			if (removeBtn) {
+				removeBtn.style.display = 'none';
+				(item as HTMLElement).style.backgroundColor = '#fff';
+			}
+		});
+	});
 }
 
 export function render(container: HTMLElement) {
-  if (!state.profile) return;
-  container.innerHTML = layout(
-    state.profile,
-    state.stats,
-    state.history,
-    state.friends,
-    state.activeStatsTab,
-    state.activeHistoryView,
-    state.editMode
-  );
-  
-  // Inject tab content after layout renders
-  const statsEl = document.getElementById('stats-content')!;
-  const histEl = document.getElementById('history-content')!;
-  
-  if (state.activeStatsTab === 'overview') statsEl.innerHTML = statsOverview(state.stats, state.history);
-  if (state.activeStatsTab === 'performance') statsEl.innerHTML = statsPerformance(state.stats, state.history);
-  if (state.activeStatsTab === 'trends') {
-    statsEl.innerHTML = statsTrends(state.stats).replace('Games/Week', `Games/Week`).replace('value: String(gamesThisWeek([]))', '');
-    // quick patch: no fake data, charts will show real; label is static
-  }
-  
-  if (state.activeHistoryView === 'list') histEl.innerHTML = historyList(state.history);
-  if (state.activeHistoryView === 'detailed') histEl.innerHTML = historyDetailed(state.history);
-  if (state.activeHistoryView === 'analysis') histEl.innerHTML = historyAnalysis(state.history);
-  
-  renderAllCharts();
+	if (!state.profile) return;
+	container.innerHTML = layout(
+		state.profile,
+		state.stats,
+		state.history,
+		state.friends,
+		state.activeStatsTab,
+		state.activeHistoryView,
+		state.editMode
+	);
+
+	// Inject tab content after layout renders
+	const statsEl = document.getElementById('stats-content')!;
+	const histEl = document.getElementById('history-content')!;
+
+	if (state.activeStatsTab === 'overview') statsEl.innerHTML = statsOverview(state.stats, state.history);
+	if (state.activeStatsTab === 'performance') statsEl.innerHTML = statsPerformance(state.stats, state.history);
+	if (state.activeStatsTab === 'trends') {
+		statsEl.innerHTML = statsTrends(state.stats).replace('Games/Week', `Games/Week`).replace('value: String(gamesThisWeek([]))', '');
+		// quick patch: no fake data, charts will show real; label is static
+	}
+
+	if (state.activeHistoryView === 'list') histEl.innerHTML = historyList(state.history);
+	if (state.activeHistoryView === 'detailed') histEl.innerHTML = historyDetailed(state.history);
+	if (state.activeHistoryView === 'analysis') histEl.innerHTML = historyAnalysis(state.history);
+
+	renderAllCharts();
 }
 
 // FIX: Improved remove friend functionality
 export function setupRemoveFriendEvents() {
-  document.querySelectorAll('.remove-friend-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      
-      const target = e.target as HTMLElement;
-      const friendId = target.dataset.friendId;
-      const friendName = target.dataset.friendName;
-      
-      if (!friendId || !friendName) {
-        console.error('Missing friend data:', { friendId, friendName });
-        return;
-      }
-      
-      if (confirm(`Are you sure you want to remove ${friendName} from your friends?`)) {
-        try {
-          await removeFriendApi(friendId);
-          showNotification(`${friendName} removed from friends list`, '#28a745');
-          
-          // Reload friends list and re-render
-          const friends = await loadFriends();
-          state.friends = friends;
-          rerenderFriends();
-        } catch (err: any) {
-          console.error('Error removing friend:', err);
-          showNotification('Error while removing friend: ' + (err.message || 'Unknown error'), '#dc3545');
-        }
-      }
-    });
-  });
+	document.querySelectorAll('.remove-friend-btn').forEach(btn => {
+		btn.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			e.preventDefault();
+
+			const target = e.target as HTMLElement;
+			const friendId = target.dataset.friendId;
+			const friendName = target.dataset.friendName;
+
+			if (!friendId || !friendName) {
+				console.error('Missing friend data:', { friendId, friendName });
+				return;
+			}
+
+			if (confirm(`Are you sure you want to remove ${friendName} from your friends?`)) {
+				try {
+					await removeFriendApi(friendId);
+					showNotification(`${friendName} removed from friends list`, '#28a745');
+
+					// Reload friends list and re-render
+					const friends = await loadFriends();
+					state.friends = friends;
+					rerenderFriends();
+				} catch (err: any) {
+					console.error('Error removing friend:', err);
+					showNotification('Error while removing friend: ' + (err.message || 'Unknown error'), '#dc3545');
+				}
+			}
+		});
+	});
 }
 
 export function setupEvents(container: HTMLElement) {
-  container.addEventListener('click', async (e) => {
-    const t = e.target as HTMLElement;
-    const id = t.id;
-    const action = t.dataset.action;
+	container.addEventListener('click', async (e) => {
+		const t = e.target as HTMLElement;
+		const id = t.id;
+		const action = t.dataset.action;
 
-    if (id === 'edit-btn') {
-      state.editMode = true; 
-      render(container);
-      return;
-    }
-    
-    if (id === 'cancel-btn') {
-      state.editMode = false; 
-      render(container);
-      return;
-    }
-    
-    if (id === 'save-btn') {
-      const username = (document.getElementById('username-input') as HTMLInputElement)?.value?.trim();
-      const display_name = (document.getElementById('display-input') as HTMLInputElement)?.value?.trim();
-      const email = (document.getElementById('email-input') as HTMLInputElement)?.value?.trim();
-      const avatar_url = (document.getElementById('avatar-preview') as HTMLImageElement)?.src;
-      
-      if (!username || username.length < 3) {
-        const err = document.getElementById('save-error'); 
-        if (err) err.textContent = 'Username must be at least 3 characters';
-        return;
-      }
-      
-      try {
-        const patch = await updateProfile({ username, display_name, email, avatar_url });
-        
-        let full: Profile | null = null;
-        try { 
-          full = await loadProfile(); 
-        } catch { /* ignore */ }
+		if (id === 'edit-btn') {
+			state.editMode = true;
+			render(container);
+			return;
+		}
 
-        state.profile = full ? full : { ...(state.profile || {}), ...(patch as any) };
-        state.editMode = false;
-        render(container);
-        showNotification('Profile updated successfully!', '#28a745');
-      } catch (err: any) {
-        const errEl = document.getElementById('save-error');
-        if (errEl) errEl.textContent = err?.message || 'Failed to save profile';
-      }
-      return;
-    }
+		if (id === 'cancel-btn') {
+			state.editMode = false;
+			render(container);
+			return;
+		}
 
-    if (id === 'load-more-btn') {
-      await loadMoreMatches();
-      return;
-    }
-    
-    if (id === 'pass-btn') {
-      document.getElementById('pass-modal')!.style.display = 'flex';
-      return;
-    }
-    
-    if (id === 'avatar-btn') {
-      document.getElementById('avatar-modal')!.style.display = 'flex';
-      return;
-    }
-    
-    if (id === 'avatar-modal-close') {
-      const modal = document.getElementById('avatar-modal') as HTMLElement | null;
-      if (modal) modal.style.display = 'none';
-      return;
-    }
+		if (id === 'save-btn') {
+			const username = (document.getElementById('username-input') as HTMLInputElement)?.value?.trim();
+			const display_name = (document.getElementById('display-input') as HTMLInputElement)?.value?.trim();
+			const email = (document.getElementById('email-input') as HTMLInputElement)?.value?.trim();
+			const avatar_url = (document.getElementById('avatar-preview') as HTMLImageElement)?.src;
 
-    // FIX: Show all friends modal
-    if (id === 'show-all-friends') {
-      document.getElementById('friends-modal')!.style.display = 'flex';
-      return;
-    }
-    
-    if (id === 'friends-modal-close') {
-      document.getElementById('friends-modal')!.style.display = 'none';
-      return;
-    }
-    
-    if (id === 'friend-add') {
-      const input = document.getElementById('friend-input') as HTMLInputElement;
-      const btn = document.getElementById('friend-add') as HTMLButtonElement;
-      const username = input.value.trim();
-      if (!username) return;
-      if (friendsList(state.friends).toLowerCase().includes(username.toLowerCase()) || (state.profile && state.profile.username.toLowerCase() === username.toLowerCase())) {
-        showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
-        return;
-      }
-      try {
-        btn.disabled = true;
-        btn.textContent = '⏳ Adding...';
-        await addFriendApi(username);
-        input.value = '';
-        // Refresh friends from backend and rerender
-        try { state.friends = await loadFriends(); } catch {}
-        rerenderFriends();
-        showInlineMessage('friend-msg', 'Friend added successfully!', '#28a745');
-      } catch (err: any) {
-        showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '➕ Add';
-      }
-      return;
-    }
+			if (!username || username.length < 3) {
+				const err = document.getElementById('save-error');
+				if (err) err.textContent = 'Username must be at least 3 characters';
+				return;
+			}
 
-    // Match templates.ts: remove button uses class "remove-friend-btn" and data-friend-id/name
-    if (t.classList.contains('remove-friend-btn')) {
-      const friendId = t.getAttribute('data-friend-id') || '';
-      const friendName = t.getAttribute('data-friend-name') || '';
-      if (!friendId) return;
-      try {
-        await removeFriendApi(friendId);
-        try { state.friends = await loadFriends(); } catch {}
-        rerenderFriends();
-        showNotification('Friend removed successfully!', '#28a745');
-      } catch (err: any) {
-        showNotification(err?.message || 'Failed to remove friend', '#dc3545');
-      }
-      return;
-    }
+			try {
+				const patch = await updateProfile({ username, display_name, email, avatar_url });
 
-    // Avatar grid selection
-    if (t.closest('.avatar-option')) {
-      const option = t.closest('.avatar-option') as HTMLElement;
-      document.querySelectorAll('.avatar-option').forEach(o => (o as HTMLElement).style.borderColor = 'transparent');
-      option.style.borderColor = '#007bff';
-      const confirm = document.getElementById('avatar-confirm') as HTMLButtonElement;
-      confirm.disabled = false; 
-      confirm.style.opacity = '1';
-      confirm.onclick = () => {
-        const selected = option.getAttribute('data-avatar');
-        const preview = document.getElementById('avatar-preview') as HTMLImageElement;
-        if (selected && preview) preview.src = selected;
-        document.getElementById('avatar-modal')!.style.display = 'none';
-      };
-    }
+				let full: Profile | null = null;
+				try {
+					full = await loadProfile();
+				} catch { /* ignore */ }
 
-    // Tabs - FIX: Merged stats tabs
-    if (t.classList.contains('stats-tab')) {
-      state.activeStatsTab = (t.dataset.tab as any) ?? 'overview';
-      render(container);
-      return;
-    }
-    
-    if (t.classList.contains('history-tab')) {
-      state.activeHistoryView = (t.dataset.view as any) ?? 'list';
-      render(container);
-      return;
-    }
+				state.profile = full ? full : { ...(state.profile || {}), ...(patch as any) };
+				state.editMode = false;
+				render(container);
+				showNotification('Profile updated successfully!', '#28a745');
+			} catch (err: any) {
+				const errEl = document.getElementById('save-error');
+				if (errEl) errEl.textContent = err?.message || 'Failed to save profile';
+			}
+			return;
+		}
 
-    // FIX: History pagination
-    if (id === 'load-more-matches') {
-      state.historyPage = (state.historyPage || 1) + 1;
-      const moreMatches = await loadMoreMatches();
-      appendMatches(moreMatches);
-      return;
-    }
-  });
+		if (id === 'load-more-btn') {
+			await loadMoreMatches();
+			return;
+		}
 
-  container.addEventListener('submit', async (e) => {
-    const form = e.target as HTMLFormElement;
-    if (form.id === 'pass-form') {
-      e.preventDefault();
-      const cur = (document.getElementById('pass-cur') as HTMLInputElement).value;
-      const np = (document.getElementById('pass-new') as HTMLInputElement).value;
-      const cf = (document.getElementById('pass-conf') as HTMLInputElement).value;
-      
-      if (np !== cf) {
-        const err = document.getElementById('pass-error'); 
-        if (err) err.textContent = 'Passwords do not match';
-        return;
-      }
-      
-      try {
-        await changePassword(cur, np); // FIX: Correct parameter names
-        document.getElementById('pass-modal')!.style.display = 'none';
-        (document.getElementById('pass-form') as HTMLFormElement).reset();
-        showNotification('Password updated successfully!', '#28a745');
-      } catch (err: any) {
-        const el = document.getElementById('pass-error'); 
-        if (el) el.textContent = err?.message || 'Failed to update password';
-      }
-    }
-  });
+		if (id === 'pass-btn') {
+			document.getElementById('pass-modal')!.style.display = 'flex';
+			return;
+		}
 
-  // Initial friend hover and remove setup
-  setTimeout(() => {
-    setupFriendHoverEffects();
-    setupRemoveFriendEvents();
-  }, 100);
+		if (id === 'avatar-btn') {
+			document.getElementById('avatar-modal')!.style.display = 'flex';
+			return;
+		}
+
+		if (id === 'avatar-modal-close') {
+			const modal = document.getElementById('avatar-modal') as HTMLElement | null;
+			if (modal) modal.style.display = 'none';
+			return;
+		}
+
+		// FIX: Show all friends modal
+		if (id === 'show-all-friends') {
+			document.getElementById('friends-modal')!.style.display = 'flex';
+			return;
+		}
+
+		if (id === 'friends-modal-close') {
+			document.getElementById('friends-modal')!.style.display = 'none';
+			return;
+		}
+
+		if (id === 'friend-add') {
+			const input = document.getElementById('friend-input') as HTMLInputElement;
+			const btn = document.getElementById('friend-add') as HTMLButtonElement;
+			const username = input.value.trim();
+			if (!username) return;
+			// Check if already a friend or self
+			if (friendsList(state.friends).toLowerCase().includes(username.toLowerCase()) || (state.profile && state.profile.username.toLowerCase() === username.toLowerCase())) {
+				showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
+				return;
+			}
+			// Check if a friend request has already been made (outgoing)
+			await loadOutgoingFriendRequests();
+			if (state.outgoingFriendRequests && Array.isArray(state.outgoingFriendRequests)) {
+				const alreadyRequested = state.outgoingFriendRequests.some((req: any) => {
+					return (req.username && req.username.toLowerCase() === username.toLowerCase()) ||
+						(req.targetUsername && req.targetUsername.toLowerCase() === username.toLowerCase());
+				});
+				if (alreadyRequested) {
+					showInlineMessage('friend-msg', 'Friend request already sent to this user', '#ffc107');
+					return;
+				}
+			}
+			try {
+				btn.disabled = true;
+				btn.textContent = '⏳ Adding...';
+				await addFriendApi(username);
+				input.value = '';
+				// Refresh friends and outgoing requests from backend and rerender
+				try { state.friends = await loadFriends(); } catch { }
+				await loadOutgoingFriendRequests();
+				rerenderFriends();
+				showInlineMessage('friend-msg', 'Friend added successfully!', '#28a745');
+			} catch (err: any) {
+				showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
+			} finally {
+				btn.disabled = false;
+				btn.textContent = '➕ Add';
+			}
+			return;
+		}
+
+		// Match templates.ts: remove button uses class "remove-friend-btn" and data-friend-id/name
+		if (t.classList.contains('remove-friend-btn')) {
+			const friendId = t.getAttribute('data-friend-id') || '';
+			const friendName = t.getAttribute('data-friend-name') || '';
+			if (!friendId) return;
+			try {
+				await removeFriendApi(friendId);
+				try { state.friends = await loadFriends(); } catch { }
+				rerenderFriends();
+				showNotification('Friend removed successfully!', '#28a745');
+			} catch (err: any) {
+				showNotification(err?.message || 'Failed to remove friend', '#dc3545');
+			}
+			return;
+		}
+
+		// Avatar grid selection
+		if (t.closest('.avatar-option')) {
+			const option = t.closest('.avatar-option') as HTMLElement;
+			document.querySelectorAll('.avatar-option').forEach(o => (o as HTMLElement).style.borderColor = 'transparent');
+			option.style.borderColor = '#007bff';
+			const confirm = document.getElementById('avatar-confirm') as HTMLButtonElement;
+			confirm.disabled = false;
+			confirm.style.opacity = '1';
+			confirm.onclick = () => {
+				const selected = option.getAttribute('data-avatar');
+				const preview = document.getElementById('avatar-preview') as HTMLImageElement;
+				if (selected && preview) preview.src = selected;
+				document.getElementById('avatar-modal')!.style.display = 'none';
+			};
+		}
+
+		// Tabs - FIX: Merged stats tabs
+		if (t.classList.contains('stats-tab')) {
+			state.activeStatsTab = (t.dataset.tab as any) ?? 'overview';
+			render(container);
+			return;
+		}
+
+		if (t.classList.contains('history-tab')) {
+			state.activeHistoryView = (t.dataset.view as any) ?? 'list';
+			render(container);
+			return;
+		}
+
+		// FIX: History pagination
+		if (id === 'load-more-matches') {
+			state.historyPage = (state.historyPage || 1) + 1;
+			const moreMatches = await loadMoreMatches();
+			appendMatches(moreMatches);
+			return;
+		}
+	});
+
+	container.addEventListener('submit', async (e) => {
+		const form = e.target as HTMLFormElement;
+		if (form.id === 'pass-form') {
+			e.preventDefault();
+			const cur = (document.getElementById('pass-cur') as HTMLInputElement).value;
+			const np = (document.getElementById('pass-new') as HTMLInputElement).value;
+			const cf = (document.getElementById('pass-conf') as HTMLInputElement).value;
+
+			if (np !== cf) {
+				const err = document.getElementById('pass-error');
+				if (err) err.textContent = 'Passwords do not match';
+				return;
+			}
+
+			try {
+				await changePassword(cur, np); // FIX: Correct parameter names
+				document.getElementById('pass-modal')!.style.display = 'none';
+				(document.getElementById('pass-form') as HTMLFormElement).reset();
+				showNotification('Password updated successfully!', '#28a745');
+			} catch (err: any) {
+				const el = document.getElementById('pass-error');
+				if (el) el.textContent = err?.message || 'Failed to update password';
+			}
+		}
+	});
+
+	// Initial friend hover and remove setup
+	setTimeout(() => {
+		setupFriendHoverEffects();
+		setupRemoveFriendEvents();
+	}, 100);
 }
 
 export function rerenderFriends() {
-  const fc = document.getElementById('friends-container');
-  if (fc) setHTML(fc, friendsList(state.friends));
-  setupFriendHoverEffects();
-  setupRemoveFriendEvents();
+	const fc = document.getElementById('friends-container');
+	if (fc) setHTML(fc, friendsList(state.friends));
+	setupFriendHoverEffects();
+	setupRemoveFriendEvents();
 }
 
 // Add these functions to your existing events.ts file
 
 export async function loadMoreMatches(): Promise<Match[]> {
-  if (state.matchPagination.isLoadingMore || !state.matchPagination.hasMoreMatches) {
-    return [];
-  }
+	if (state.matchPagination.isLoadingMore || !state.matchPagination.hasMoreMatches) {
+		return [];
+	}
 
-  state.matchPagination.isLoadingMore = true;
-  
-  // Update load more button to show loading state
-  const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
-  if (loadMoreBtn) {
-    loadMoreBtn.disabled = true;
-    loadMoreBtn.textContent = '⏳ Loading more matches...';
-  }
+	state.matchPagination.isLoadingMore = true;
 
-  try {
-    const nextPage = state.matchPagination.currentPage + 1;
-    const result = await loadMatchesWithPagination(nextPage, 10);
-    
-    if (result.matches.length > 0) {
-      state.matchPagination.currentPage = nextPage;
-      state.matchPagination.hasMoreMatches = result.hasMore;
-      state.matchPagination.totalMatches = result.totalCount;
-      
-      // Append new matches to existing history
-      appendMatches(result.matches);
-      
-      return result.matches;
-    }
-    
-    // No more matches
-    state.matchPagination.hasMoreMatches = false;
-    return [];
-  } catch (error) {
-    console.error('Error loading more matches:', error);
-    return [];
-  } finally {
-    state.matchPagination.isLoadingMore = false;
-    
-    // Reset button state
-    if (loadMoreBtn) {
-      loadMoreBtn.disabled = false;
-      if (state.matchPagination.hasMoreMatches) {
-        loadMoreBtn.textContent = '📄 Load More Matches';
-      } else {
-        loadMoreBtn.textContent = '✅ All matches loaded';
-        loadMoreBtn.disabled = true;
-      }
-    }
-  }
+	// Update load more button to show loading state
+	const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
+	if (loadMoreBtn) {
+		loadMoreBtn.disabled = true;
+		loadMoreBtn.textContent = '⏳ Loading more matches...';
+	}
+
+	try {
+		const nextPage = state.matchPagination.currentPage + 1;
+		const result = await loadMatchesWithPagination(nextPage, 10);
+
+		if (result.matches.length > 0) {
+			state.matchPagination.currentPage = nextPage;
+			state.matchPagination.hasMoreMatches = result.hasMore;
+			state.matchPagination.totalMatches = result.totalCount;
+
+			// Append new matches to existing history
+			appendMatches(result.matches);
+
+			return result.matches;
+		}
+
+		// No more matches
+		state.matchPagination.hasMoreMatches = false;
+		return [];
+	} catch (error) {
+		console.error('Error loading more matches:', error);
+		return [];
+	} finally {
+		state.matchPagination.isLoadingMore = false;
+
+		// Reset button state
+		if (loadMoreBtn) {
+			loadMoreBtn.disabled = false;
+			if (state.matchPagination.hasMoreMatches) {
+				loadMoreBtn.textContent = '📄 Load More Matches';
+			} else {
+				loadMoreBtn.textContent = '✅ All matches loaded';
+				loadMoreBtn.disabled = true;
+			}
+		}
+	}
 }
 
 export function appendMatches(newMatches: Match[]): void {
-  if (!newMatches || newMatches.length === 0) return;
+	if (!newMatches || newMatches.length === 0) return;
 
-  // Add new matches to the state
-  state.history = [...state.history, ...newMatches];
-  
-  // Get the current active history view
-  const currentView = state.activeHistoryView;
-  const historyContentEl = document.getElementById('history-content');
-  
-  if (!historyContentEl) return;
+	// Add new matches to the state
+	state.history = [...state.history, ...newMatches];
 
-  // Update the display based on current view
-  switch (currentView) {
-    case 'list':
-      appendToHistoryList(newMatches);
-      break;
-    case 'detailed':
-      appendToHistoryDetailed(newMatches);
-      break;
-    case 'analysis':
-      // For analysis view, re-render the entire view since it's chart-based
-      rerenderAnalysisView();
-      break;
-  }
-  
-  // Update any charts that depend on the full history
-  setTimeout(() => {
-    try {
-      renderAllCharts();
-    } catch (e) {
-      console.log('Chart update error', e);
-    }
-  }, 100);
+	// Get the current active history view
+	const currentView = state.activeHistoryView;
+	const historyContentEl = document.getElementById('history-content');
+
+	if (!historyContentEl) return;
+
+	// Update the display based on current view
+	switch (currentView) {
+		case 'list':
+			appendToHistoryList(newMatches);
+			break;
+		case 'detailed':
+			appendToHistoryDetailed(newMatches);
+			break;
+		case 'analysis':
+			// For analysis view, re-render the entire view since it's chart-based
+			rerenderAnalysisView();
+			break;
+	}
+
+	// Update any charts that depend on the full history
+	setTimeout(() => {
+		try {
+			renderAllCharts();
+		} catch (e) {
+			console.log('Chart update error', e);
+		}
+	}, 100);
 }
 
 function appendToHistoryList(newMatches: Match[]): void {
-  const historyContentEl = document.getElementById('history-content');
-  if (!historyContentEl) return;
+	const historyContentEl = document.getElementById('history-content');
+	if (!historyContentEl) return;
 
-  // Find the matches container or create one
-  let matchesContainer = historyContentEl.querySelector('.matches-container');
-  if (!matchesContainer) {
-    // If no container exists, re-render the entire list
-    historyContentEl.innerHTML = historyList(state.history);
-    return;
-  }
+	// Find the matches container or create one
+	let matchesContainer = historyContentEl.querySelector('.matches-container');
+	if (!matchesContainer) {
+		// If no container exists, re-render the entire list
+		historyContentEl.innerHTML = historyList(state.history);
+		return;
+	}
 
-  // Create HTML for new matches
-  const newMatchesHtml = newMatches.map(m => {
-    const isWin = m.result === 'win';
-    const diff = Math.abs(m.user_score - m.opponent_score);
-    const type = diff <= 2 ? { label: 'NAIL-BITER', color: '#dc3545' }
-      : diff <= 5 ? { label: 'CLOSE', color: '#ffc107' }
-      : diff <= 10 ? { label: 'COMPETITIVE', color: '#17a2b8' }
-      : { label: 'DOMINANT', color: '#28a745' };
+	// Create HTML for new matches
+	const newMatchesHtml = newMatches.map(m => {
+		const isWin = m.result === 'win';
+		const diff = Math.abs(m.user_score - m.opponent_score);
+		const type = diff <= 2 ? { label: 'NAIL-BITER', color: '#dc3545' }
+			: diff <= 5 ? { label: 'CLOSE', color: '#ffc107' }
+				: diff <= 10 ? { label: 'COMPETITIVE', color: '#17a2b8' }
+					: { label: 'DOMINANT', color: '#28a745' };
 
-    return `
+		return `
       <div style="padding:15px;border-bottom:1px solid #f1f3f4;display:flex;align-items:center;gap:15px">
         <div style="width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${isWin ? '#28a745' : '#dc3545'};color:#fff;font-weight:bold;font-size:18px">
           ${isWin ? '🏆' : '❌'}
@@ -443,26 +474,26 @@ function appendToHistoryList(newMatches: Match[]): void {
           <div style="font-size:12px;color:#666">${m.duration || 'N/A'}</div>
         </div>
       </div>`;
-  }).join('');
+	}).join('');
 
-  // Append new matches
-  matchesContainer.insertAdjacentHTML('beforeend', newMatchesHtml);
+	// Append new matches
+	matchesContainer.insertAdjacentHTML('beforeend', newMatchesHtml);
 }
 
 function appendToHistoryDetailed(newMatches: Match[]): void {
-  const historyContentEl = document.getElementById('history-content');
-  if (!historyContentEl) return;
+	const historyContentEl = document.getElementById('history-content');
+	if (!historyContentEl) return;
 
-  let filteredMatches = historyContentEl.querySelector('#filtered-matches');
-  if (!filteredMatches) {
-    // Re-render the entire detailed view
-    historyContentEl.innerHTML = historyDetailed(state.history);
-    return;
-  }
+	let filteredMatches = historyContentEl.querySelector('#filtered-matches');
+	if (!filteredMatches) {
+		// Re-render the entire detailed view
+		historyContentEl.innerHTML = historyDetailed(state.history);
+		return;
+	}
 
-  // Create detailed HTML for new matches
-  const startIndex = state.history.length - newMatches.length;
-  const newMatchesHtml = newMatches.map((m, idx) => `
+	// Create detailed HTML for new matches
+	const startIndex = state.history.length - newMatches.length;
+	const newMatchesHtml = newMatches.map((m, idx) => `
     <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-left:5px solid ${m.result === 'win' ? '#28a745' : '#dc3545'}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
         <div style="display:flex;align-items:center;gap:12px">
@@ -483,16 +514,16 @@ function appendToHistoryDetailed(newMatches: Match[]): void {
     </div>
   `).join('');
 
-  filteredMatches.insertAdjacentHTML('beforeend', newMatchesHtml);
+	filteredMatches.insertAdjacentHTML('beforeend', newMatchesHtml);
 }
 
 function rerenderAnalysisView(): void {
-  const historyContentEl = document.getElementById('history-content');
-  if (!historyContentEl) return;
-  
-  // Re-render the entire analysis view with updated data
-  historyContentEl.innerHTML = historyAnalysis(state.history);
-  
-  // Re-render charts with new data
-  renderAllCharts();
+	const historyContentEl = document.getElementById('history-content');
+	if (!historyContentEl) return;
+
+	// Re-render the entire analysis view with updated data
+	historyContentEl.innerHTML = historyAnalysis(state.history);
+
+	// Re-render charts with new data
+	renderAllCharts();
 }

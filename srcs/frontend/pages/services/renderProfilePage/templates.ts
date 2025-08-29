@@ -1,34 +1,31 @@
-// renderProfilePage/templates.ts - FIXED VERSION with working LeafFall animation
+// renderProfilePage/templates.ts - FIXED VERSION with working PetalFall animation
 import { AVAILABLE_AVATARS, Friend, Match, Profile, Stats } from './types.js';
 import {
-averageScore, bestPerformance, consistencyScore, bestPlayingDay, clutchFactor, currentMomentum,
-dominanceRating, efficiencyScore, gamesThisWeek, longestWinStreak, mostActiveTime, opponentAnalysis
+	averageScore, bestPerformance, consistencyScore, bestPlayingDay, clutchFactor, currentMomentum,
+	dominanceRating, efficiencyScore, gamesThisWeek, longestWinStreak, mostActiveTime, opponentAnalysis
 } from './metrics.js';
-
 // GRID-inspired color palette (updated pink & purple)
 const GRID_COLORS = {
-primary: '#8c8e91', // Silver
-secondary: '#f8f9f8', // Light gray
-accent: '#e84393', // Magical pink (was neon yellow)
-warm: '#9b59b6', // Enchanted purple (was racing orange)
-cool: '#00aeef', // Circuit blue
-success: '#00d563', // Performance green
-muted: '#f8f9f7', // Gray
-bg: '#12181c' // Dark background
+	primary: '#8c8e91', // Silver
+	secondary: '#f8f9f8', // Light gray
+	accent: '#e84393', // Magical pink (was neon yellow)
+	warm: '#9b59b6', // Enchanted purple (was racing orange)
+	cool: '#00aeef', // Circuit blue
+	success: '#00d563', // Performance green
+	muted: '#f8f9f7', // Gray
+	bg: '#12181c' // Dark background
 };
-
 // Team logo mapping
 const TEAM_LOGOS = {
-'HACKTIVISTS': '/assets/hacktivists.png',
-'BUG BUSTERS': '/assets/bugbusters.png',
-'LOGIC LEAGUE': '/assets/logicleague.png',
-'CODE ALLIANCE': '/assets/codealliance.png'
+	'HACKTIVISTS': '/assets/hacktivists.png',
+	'BUG BUSTERS': '/assets/bugbusters.png',
+	'LOGIC LEAGUE': '/assets/logicleague.png',
+	'CODE ALLIANCE': '/assets/codealliance.png'
 };
-
 export function header(profile: Profile, isEdit: boolean): string {
-const teamLogo = TEAM_LOGOS[profile.team?.toUpperCase() as keyof typeof TEAM_LOGOS] || '';
-const avatar = isEdit
-? `
+	const teamLogo = TEAM_LOGOS[profile.team?.toUpperCase() as keyof typeof TEAM_LOGOS] || '';
+	const avatar = isEdit
+		? `
     <div style="text-align:center;margin-bottom:20px">
       <div style="position:relative;display:inline-block">
         <img id="avatar-preview" src="${profile.avatar_url}" width="120" height="120"
@@ -48,7 +45,7 @@ const avatar = isEdit
         </button>
       </div>
     </div>`
-: `
+		: `
     <div style="text-align:center;margin-bottom:20px">
       <div style="position:relative;display:inline-block">
         <img src="${profile.avatar_url}" width="120" height="120"
@@ -61,11 +58,9 @@ ${teamLogo ? `
         ` : ''}
       </div>
     </div>`;
-
-const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
-
-return isEdit
-? `
+	const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
+	return isEdit
+		? `
     <div class="header-edit" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
                 padding:30px;border-radius:20px;margin:20px 0;
                 box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
@@ -128,12 +123,12 @@ ${teamLogo ? `<img src="${teamLogo}" width="24" height="24" style="border-radius
             </div>
           </div>
           <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> ${createdAtText}</div>
-          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).getDate.toLocaleString().substring(0,10) : '—'}</div>
+          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}</div>
           <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
         </div>
       </div>
     </div>`
-: `
+		: `
     <div class="header-view" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
                 padding:30px;border-radius:20px;margin:20px 0;
                 box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
@@ -162,28 +157,25 @@ ${avatar}
           </div>
           <div style="font-size:14px;color:${GRID_COLORS.muted};padding:12px;background:rgba(0,174,239,0.1);border-radius:8px">
             <span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} •
-            <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).getDate.toLocaleString().substring(0, 10) : '—'}
+            <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}
           </div>
         </div>
       </div>
     </div>`;
 }
-
 export function friendsList(friends: Friend[]): string {
-if (!friends || friends.length === 0) {
-return '<div style="padding:15px;text-align:center;color:#666;font-size:14px">No friends added yet</div>';
-  }
-
-return `
+	if (!friends || friends.length === 0) {
+		return '<div style="padding:15px;text-align:center;color:#666;font-size:14px">No friends added yet</div>';
+	}
+	return `
     <div>
 ${friends.map((f: any) => {
-const id = f.friend_id ?? f.id ?? f.userId ?? '';
-const displayName = f.display_name || f.name || f.username || 'Unknown';
-const username = f.username || '';
-const avatar = f.avatar_url || '/assets/avatar/default.png';
-const online = !!f.online_status;
-
-return `
+		const id = f.friend_id ?? f.id ?? f.userId ?? '';
+		const displayName = f.display_name || f.name || f.username || 'Unknown';
+		const username = f.username || '';
+		const avatar = f.avatar_url || '/assets/avatar/default.png';
+		const online = !!f.online_status;
+		return `
           <div class="friend-item"
                data-id="${id}" data-name="${displayName}"
                style="background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,174,239,0.1);position:relative;display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -206,16 +198,14 @@ return `
             </button>
           </div>
         `;
-      }).join('')}
+	}).join('')}
     </div>
   `;
 }
-
 export function historyList(history: Match[]): string {
-const recent = history.slice(0, 5);
-
-if (!recent.length) {
-return `
+	const recent = history.slice(0, 5);
+	if (!recent.length) {
+		return `
       <div style="padding:40px;text-align:center;color:${GRID_COLORS.muted};
                   background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);border-radius:12px;">
         <div style="font-size:48px;margin-bottom:15px">🎮</div>
@@ -223,9 +213,8 @@ return `
         <p style="margin:0">Your game history will appear here once you start playing!</p>
       </div>
     `;
-  }
-
-return `
+	}
+	return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-bottom:25px">
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.success} 0%, ${GRID_COLORS.bg} 100%);
@@ -285,9 +274,8 @@ ${m.result === 'win' ? '+' : '-'}${Math.abs(m.user_score - m.opponent_score)}
     </div>
   `;
 }
-
 export function historyDetailed(history: Match[]): string {
-return `
+	return `
     <div>
       <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:15px;border-radius:8px;margin-bottom:20px;">
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -333,11 +321,10 @@ ${m.result === 'win' ? '🏆' : '❌'}
               </div>
               <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:12px;border-radius:8px;">
                 <div style="font-size:12px;color:${GRID_COLORS.muted};margin-bottom:4px">MATCH TYPE</div>
-                <div style="font-weight:bold;color:${GRID_COLORS.primary}">${
-Math.abs(m.user_score - m.opponent_score) <= 2 ? 'NAIL-BITER' :
-Math.abs(m.user_score - m.opponent_score) <= 5 ? 'CLOSE' :
-Math.abs(m.user_score - m.opponent_score) <= 10 ? 'COMPETITIVE' : 'DOMINANT'
-}</div>
+                <div style="font-weight:bold;color:${GRID_COLORS.primary}">${Math.abs(m.user_score - m.opponent_score) <= 2 ? 'NAIL-BITER' :
+			Math.abs(m.user_score - m.opponent_score) <= 5 ? 'CLOSE' :
+				Math.abs(m.user_score - m.opponent_score) <= 10 ? 'COMPETITIVE' : 'DOMINANT'
+		}</div>
               </div>
               <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:12px;border-radius:8px;">
                 <div style="font-size:12px;color:${GRID_COLORS.muted};margin-bottom:4px">SCORE DIFF</div>
@@ -350,24 +337,22 @@ Math.abs(m.user_score - m.opponent_score) <= 10 ? 'COMPETITIVE' : 'DOMINANT'
     </div>
   `;
 }
-
 export function statsOverview(stats: Stats, history: Match[]): string {
-const wr = (stats.win_rate * 100).toFixed(1);
-const kd = stats.points_conceded ? (stats.points_scored / stats.points_conceded).toFixed(2) : String(stats.points_scored);
-const avgP = stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0';
-const avgC = stats.matches_played ? (stats.points_conceded / stats.matches_played).toFixed(1) : '0';
-const ws = longestWinStreak(history);
-const best = bestPerformance(history);
-
-return `
+	const wr = (stats.win_rate * 100).toFixed(1);
+	const kd = stats.points_conceded ? (stats.points_scored / stats.points_conceded).toFixed(2) : String(stats.points_scored);
+	const avgP = stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0';
+	const avgC = stats.matches_played ? (stats.points_conceded / stats.matches_played).toFixed(1) : '0';
+	const ws = longestWinStreak(history);
+	const best = bestPerformance(history);
+	return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin-bottom:30px">
 ${[
-          { label: 'Total Matches', value: stats.matches_played, color: GRID_COLORS.cool, icon: '🎮', sub: 'Games played' },
-          { label: 'Win Rate', value: `${wr}%`, color: parseFloat(wr) >= 50 ? GRID_COLORS.success : GRID_COLORS.accent, icon: '🏆', sub: `${stats.matches_won}W / ${stats.matches_lost}L` },
-          { label: 'Score Ratio', value: kd, color: parseFloat(kd) >= 1 ? GRID_COLORS.success : GRID_COLORS.warm, icon: '⚡', sub: 'Scored / Conceded' },
-          { label: 'Tournaments Won', value: stats.tournaments_won || 0, color: GRID_COLORS.warm, icon: '🏅', sub: 'Titles' }
-        ].map(s => `
+			{ label: 'Total Matches', value: stats.matches_played, color: GRID_COLORS.cool, icon: '🎮', sub: 'Games played' },
+			{ label: 'Win Rate', value: `${wr}%`, color: parseFloat(wr) >= 50 ? GRID_COLORS.success : GRID_COLORS.accent, icon: '🏆', sub: `${stats.matches_won}W / ${stats.matches_lost}L` },
+			{ label: 'Score Ratio', value: kd, color: parseFloat(kd) >= 1 ? GRID_COLORS.success : GRID_COLORS.warm, icon: '⚡', sub: 'Scored / Conceded' },
+			{ label: 'Tournaments Won', value: stats.tournaments_won || 0, color: GRID_COLORS.warm, icon: '🏅', sub: 'Titles' }
+		].map(s => `
           <div style="background:linear-gradient(135deg, ${s.color}15, ${s.color}05);padding:20px;border-radius:12px;border-left:4px solid ${s.color};">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <div style="font-size:28px;font-weight:bold;color:${s.color}">${s.value}</div>
@@ -383,11 +368,11 @@ ${[
           <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary};display:flex;align-items:center;gap:8px"><span>📊</span> Scoring Statistics</h4>
           <div>
 ${[
-              ['Total Points Scored', `<strong style="color:${GRID_COLORS.success}">${stats.points_scored}</strong>`],
-              ['Total Points Conceded', `<strong style="color:${GRID_COLORS.accent}">${stats.points_conceded}</strong>`],
-              ['Avg Points per Match', `<strong style="color:${GRID_COLORS.cool}">${avgP}</strong>`],
-              ['Avg Conceded per Match', `<strong style="color:${GRID_COLORS.warm}">${avgC}</strong>`],
-            ].map(([l, v], i, arr) => `
+			['Total Points Scored', `<strong style="color:${GRID_COLORS.success}">${stats.points_scored}</strong>`],
+			['Total Points Conceded', `<strong style="color:${GRID_COLORS.accent}">${stats.points_conceded}</strong>`],
+			['Avg Points per Match', `<strong style="color:${GRID_COLORS.cool}">${avgP}</strong>`],
+			['Avg Conceded per Match', `<strong style="color:${GRID_COLORS.warm}">${avgC}</strong>`],
+		].map(([l, v], i, arr) => `
               <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;${i < arr.length - 1 ? 'border-bottom:1px solid rgba(0,174,239,0.2)' : ''}">
                 <span style="color:${GRID_COLORS.muted}">${l}</span>${v}
               </div>
@@ -398,11 +383,11 @@ ${[
           <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary};display:flex;align-items:center;gap:8px"><span>🎯</span> Performance Metrics</h4>
           <div>
 ${[
-              ['Current Win Streak', `<strong style="color:${ws > 0 ? GRID_COLORS.success : GRID_COLORS.accent}">${ws}</strong>`],
-              ['Best Match Score', `<strong style="color:${GRID_COLORS.cool}">${best.score ?? 'N/A'}</strong>`],
-              ['Games This Week', `<strong style="color:${GRID_COLORS.cool}">${gamesThisWeek(history)}</strong>`],
-              ['Favorite Time', `<strong style="color:${GRID_COLORS.cool}">${mostActiveTime(history)}</strong>`],
-            ].map(([l, v], i, arr) => `
+			['Current Win Streak', `<strong style="color:${ws > 0 ? GRID_COLORS.success : GRID_COLORS.accent}">${ws}</strong>`],
+			['Best Match Score', `<strong style="color:${GRID_COLORS.cool}">${best.score ?? 'N/A'}</strong>`],
+			['Games This Week', `<strong style="color:${GRID_COLORS.cool}">${gamesThisWeek(history)}</strong>`],
+			['Favorite Time', `<strong style="color:${GRID_COLORS.cool}">${mostActiveTime(history)}</strong>`],
+		].map(([l, v], i, arr) => `
               <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;${i < arr.length - 1 ? 'border-bottom:1px solid rgba(0,174,239,0.2)' : ''}">
                 <span style="color:${GRID_COLORS.muted}">${l}</span>${v}
               </div>
@@ -413,15 +398,13 @@ ${[
     </div>
   `;
 }
-
 export function statsPerformance(stats: Stats, history: Match[]): string {
-const avg = averageScore(history).toFixed(1);
-const cons = consistencyScore(history);
-const clutch = clutchFactor(history);
-const dom = dominanceRating(history);
-const eff = efficiencyScore(stats).toFixed(1);
-
-return `
+	const avg = averageScore(history).toFixed(1);
+	const cons = consistencyScore(history);
+	const clutch = clutchFactor(history);
+	const dom = dominanceRating(history);
+	const eff = efficiencyScore(stats).toFixed(1);
+	return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px">
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
@@ -431,11 +414,11 @@ return `
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
           <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">🏆 Performance Rankings</h4>
 ${[
-            { label: 'Consistency', value: `${cons}%`, desc: 'Performance stability', color: cons >= 70 ? GRID_COLORS.success : cons >= 50 ? GRID_COLORS.warm : GRID_COLORS.accent, icon: '🎯' },
-            { label: 'Clutch Factor', value: `${clutch}%`, desc: 'Close game wins', color: clutch >= 60 ? GRID_COLORS.success : GRID_COLORS.warm, icon: '🔥' },
-            { label: 'Dominance', value: `${dom}%`, desc: 'Big-margin wins', color: GRID_COLORS.cool, icon: '👑' },
-            { label: 'Efficiency', value: eff, desc: 'Performance per match', color: GRID_COLORS.accent, icon: '⚡' },
-          ].map(r => `
+			{ label: 'Consistency', value: `${cons}%`, desc: 'Performance stability', color: cons >= 70 ? GRID_COLORS.success : cons >= 50 ? GRID_COLORS.warm : GRID_COLORS.accent, icon: '🎯' },
+			{ label: 'Clutch Factor', value: `${clutch}%`, desc: 'Close game wins', color: clutch >= 60 ? GRID_COLORS.success : GRID_COLORS.warm, icon: '🔥' },
+			{ label: 'Dominance', value: `${dom}%`, desc: 'Big-margin wins', color: GRID_COLORS.cool, icon: '👑' },
+			{ label: 'Efficiency', value: eff, desc: 'Performance per match', color: GRID_COLORS.accent, icon: '⚡' },
+		].map(r => `
             <div style="display:flex;align-items:center;gap:12px;padding:10px;background:${GRID_COLORS.bg};border-radius:8px;border-left:4px solid ${r.color};margin-bottom:10px;">
               <div style="font-size:20px">${r.icon}</div>
               <div style="flex:1">
@@ -453,16 +436,15 @@ ${[
     </div>
   `;
 }
-
 export function statsTrends(stats: Stats): string {
-return `
+	return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:30px">
 ${[
-          { label: 'Win Rate', value: `${(stats.win_rate * 100).toFixed(1)}%`, color: GRID_COLORS.success, icon: '🏆', period: 'current' },
-          { label: 'Avg Score', value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: GRID_COLORS.cool, icon: '📊', period: 'per match' },
-          { label: 'Games/Week', value: String(gamesThisWeek([])), color: GRID_COLORS.cool, icon: '🎮', period: 'this week' }, /* updated at runtime in index */
-        ].map(t => `
+			{ label: 'Win Rate', value: `${(stats.win_rate * 100).toFixed(1)}%`, color: GRID_COLORS.success, icon: '🏆', period: 'current' },
+			{ label: 'Avg Score', value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: GRID_COLORS.cool, icon: '📊', period: 'per match' },
+			{ label: 'Games/Week', value: String(gamesThisWeek([])), color: GRID_COLORS.cool, icon: '🎮', period: 'this week' }, /* updated at runtime in index */
+		].map(t => `
           <div style="background:linear-gradient(135deg, ${t.color}15, ${t.color}05);padding:18px;border-radius:12px;border-left:4px solid ${t.color};">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <span style="font-size:20px">${t.icon}</span>
@@ -490,9 +472,8 @@ ${[
     </div>
   `;
 }
-
 export function historyAnalysis(history: Match[]): string {
-return `
+	return `
     <div>
       <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;margin-bottom:25px;">
         <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">📈 Match Performance Analysis</h4>
@@ -505,10 +486,10 @@ return `
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);padding:20px;border-radius:12px;box-shadow:0 2px 10px rgba(0,174,239,0.1);">
           <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">🎯 Performance Patterns</h4>
 ${[
-            { label: 'Best Day', value: bestPlayingDay(history), desc: 'Highest win rate', color: GRID_COLORS.success },
-            { label: 'Preferred Time', value: mostActiveTime(history), desc: 'Most active period', color: GRID_COLORS.cool },
-            { label: 'Momentum', value: currentMomentum(history), desc: 'Recent trend', color: GRID_COLORS.cool },
-          ].map(p => `
+			{ label: 'Best Day', value: bestPlayingDay(history), desc: 'Highest win rate', color: GRID_COLORS.success },
+			{ label: 'Preferred Time', value: mostActiveTime(history), desc: 'Most active period', color: GRID_COLORS.cool },
+			{ label: 'Momentum', value: currentMomentum(history), desc: 'Recent trend', color: GRID_COLORS.cool },
+		].map(p => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);border-radius:8px;margin-bottom:10px;">
               <div><div style="font-weight:bold;color:${GRID_COLORS.primary}">${p.label}</div><div style="font-size:12px;color:${GRID_COLORS.muted}">${p.desc}</div></div>
               <div style="font-weight:bold;color:${p.color}">${p.value}</div>
@@ -535,9 +516,8 @@ ${opponentAnalysis(history).map((o, i) => `
     </div>
   `;
 }
-
 export function modals(): string {
-return `
+	return `
     <div id="notification" style="display:none;position:fixed;top:20px;right:20px;background:${GRID_COLORS.success};color:#fff;padding:15px 20px;border-radius:5px;z-index:1000;max-width:300px"></div>
     <div id="avatar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;z-index:2000">
       <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:30px;border-radius:15px;width:600px;max-width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,174,239,0.2);">
@@ -549,7 +529,7 @@ return `
         <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px">
 ${AVAILABLE_AVATARS.map((a, i) => `
             <div class="avatar-option" data-avatar="${a}" style="cursor:pointer;border:3px solid transparent;border-radius:12px;padding:8px;transition:all 0.3s;background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);">
-              <img src="${a}" width="64" height="64" style="border-radius:50%;object-fit:cover;display:block;width:100%" alt="Avatar ${i+1}"/>
+              <img src="${a}" width="64" height="64" style="border-radius:50%;object-fit:cover;display:block;width:100%" alt="Avatar ${i + 1}"/>
             </div>
           `).join('')}
         </div>
@@ -587,7 +567,7 @@ ${AVAILABLE_AVATARS.map((a, i) => `
 }
 
 export function layout(profile: Profile, stats: Stats, history: Match[], friends: Friend[], statsTab: string, historyView: string, editMode: boolean): string {
-  const responsiveStyles = `
+	const responsiveStyles = `
   <style>
     /* Use a system serif font (no external import) */
     body {
@@ -602,116 +582,151 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
       border-radius: 16px;
       padding: 20px;
     }
+    .petal {
+    position: relative;
+    width: 100%;
+    top: -340px;
+    text-align: left;
+	}
 
-    /* Leaf animation styles - required for LeafFall */
-    .leaf {
-      position: absolute;
-      pointer-events: none;
-      z-index: 1;
-      will-change: transform, opacity;
+	.petal span {
+		display: inline-block;
+		overflow: hidden;
+		width: 5px;
+		height: 5px;
+		border-radius: 200px 10px 200px 200px;
+		background: linear-gradient(to bottom, #faaca8, #ddd6f3);
+		z-index: 1;
+		transform: skewX(30deg);
+		backface-visibility: visible;
+		-webkit-animation: fallingSakura1 8s ease infinite;
+	}
+
+	.petal span:nth-of-type(3n+2) {
+		-webkit-animation: fallingSakura2 8s ease infinite;
+	}
+
+	.petal span:nth-of-type(3n+1) {
+		-webkit-animation: fallingSakura3 8s ease infinite;
+	}
+
+
+	.petal span:nth-of-type(n)   { -webkit-animation-delay: -1.9s;}
+	.petal span:nth-of-type(2n)  { -webkit-animation-delay: 3.9s;}
+	.petal span:nth-of-type(3n)  { -webkit-animation-delay: 2.3s;}
+	.petal span:nth-of-type(4n)  { -webkit-animation-delay: 4.4s;}
+	.petal span:nth-of-type(5n)  { -webkit-animation-delay: 5s;  }
+	.petal span:nth-of-type(6n)  { -webkit-animation-delay: 3.5s;}
+	.petal span:nth-of-type(7n)  { -webkit-animation-delay: 2.8s;}
+	.petal span:nth-of-type(8n)  { -webkit-animation-delay: 1.5s;}
+	.petal span:nth-of-type(9n)  { -webkit-animation-delay: 3.3s;}
+	.petal span:nth-of-type(10n) { -webkit-animation-delay: 2.5s;}
+	.petal span:nth-of-type(11n) { -webkit-animation-delay: 1.2s;}
+	.petal span:nth-of-type(12n) { -webkit-animation-delay: 4.1s;}
+	.petal span:nth-of-type(13n) { -webkit-animation-delay: 5.8s;}
+	.petal span:nth-of-type(14n) { -webkit-animation-delay: -0.1s;}
+	.petal span:nth-of-type(15n) { -webkit-animation-delay: 6.3s;}
+	.petal span:nth-of-type(16n) { -webkit-animation-delay: -1s;}
+	.petal span:nth-of-type(17n) { -webkit-animation-delay: 7.4s;}
+	.petal span:nth-of-type(18n) { -webkit-animation-delay: -0.3s;}
+	.petal span:nth-of-type(19n) { -webkit-animation-delay: 8.3s;}
+	.petal span:nth-of-type(20n) { -webkit-animation-delay: -0.6s;}
+	.petal span:nth-of-type(21n) { -webkit-animation-delay: 7.7s;}
+
+	.petal span:nth-of-type(2n+2) {
+		background: linear-gradient(to right, #fffbd5, #F15F79);
+	}
+
+	.petal span:nth-of-type(3n+1) {
+		background: linear-gradient(to right, #DD5E89, #F7BB97);
+	}
+
+	.petal span:nth-of-type(3n+2) {
+		border-radius: 20px 1px;
+	}
+	.petal span:nth-of-type(3n+3) {
+		transform: rotateX(-180deg);
+	}
+
+	.petal span:nth-of-type(3n+2) {
+		animation-duration: 12sec;
+	}
+
+	.petal span:nth-of-type(4n+2) {
+		animation-duration: 9sec;
+	}
+
+	.petal span:nth-of-type(5n+2) {
+		width: 12px;
+		height: 12px;
+		box-shadow: 1.5px 1.5px 8px #fc7bd1;
+	}
+
+	.petal span:nth-of-type(4n+3) {
+		width: 10px;
+		height: 10px;
+		box-shadow: 1px 1px 6px #fc7bd1;
+	}
+	.petal span:nth-of-type(n)    { height:23px; width:30px; }
+
+	.petal span:nth-of-type(2n+1)    { height:11px; width:16px; }
+
+	.petal span:nth-of-type(3n+2)  { height:17px; width:23px; }
+
+	@-webkit-keyframes fallingSakura1 {
+		0% {
+			-webkit-transform:
+				translate3d(0,0,0)
+				rotateX(0deg);
+			opacity: 1;
+		}
+
+		100% {
+			-webkit-transform:
+				translate3d(400px,1200px,0px)
+				rotateX(-290deg);
+			opacity: 0.3;
+		}
+	}
+
+	@-webkit-keyframes fallingSakura2 {
+		0% {
+			-webkit-transform:
+				translate3d(0,0,0)
+				rotateX(-20deg);
+		opacity: 1;
+		}
+
+		100% {
+			-webkit-transform:
+				translate3d(200px,1200px,0px)
+				rotateX(-70deg);
+				opacity: 0.2;
+		}
+	}
+
+	@-webkit-keyframes fallingSakura3 {
+		0% {
+			-webkit-transform:
+				translate3d(0,0,0)
+				rotateX(90deg);
+		opacity: 1;
+		}
+
+		100% {
+			-webkit-transform:
+				translate3d(500px,1200px,0px)
+				rotateX(290deg);
+			opacity: 0;
+		}
+	}
+
+	/* tabs hover & active states */
+	.stats-tab:hover, .history-tab:hover { color: ${GRID_COLORS.accent}; }
+	.stats-tab.active, .history-tab.active {
+  color: ${GRID_COLORS.accent};
+  border-bottom-color: ${GRID_COLORS.accent};
     }
-
-    /* Fall animation */
-    @keyframes fall {
-      0% { transform: translateY(-100vh) rotateZ(0deg); }
-      100% { transform: translateY(100vh) rotateZ(360deg); }
-    }
-
-    /* Blow animations */
-    @keyframes blow-soft-left {
-      0% { transform: translateX(0px); }
-      25% { transform: translateX(-50px); }
-      50% { transform: translateX(-25px); }
-      75% { transform: translateX(-50px); }
-      100% { transform: translateX(0px); }
-    }
-
-    @keyframes blow-medium-left {
-      0% { transform: translateX(0px); }
-      25% { transform: translateX(-100px); }
-      50% { transform: translateX(-50px); }
-      75% { transform: translateX(-100px); }
-      100% { transform: translateX(0px); }
-    }
-
-    @keyframes blow-soft-right {
-      0% { transform: translateX(0px); }
-      25% { transform: translateX(50px); }
-      50% { transform: translateX(25px); }
-      75% { transform: translateX(50px); }
-      100% { transform: translateX(0px); }
-    }
-
-    @keyframes blow-medium-right {
-      0% { transform: translateX(0px); }
-      25% { transform: translateX(100px); }
-      50% { transform: translateX(50px); }
-      75% { transform: translateX(100px); }
-      100% { transform: translateX(0px); }
-    }
-
-    /* Sway animations */
-    @keyframes sway-0 {
-      0%, 100% { transform: rotateZ(0deg); }
-      50% { transform: rotateZ(10deg); }
-    }
-
-    @keyframes sway-1 {
-      0%, 100% { transform: rotateZ(0deg); }
-      50% { transform: rotateZ(-10deg); }
-    }
-
-    @keyframes sway-2 {
-      0%, 100% { transform: rotateZ(0deg); }
-      33% { transform: rotateZ(8deg); }
-      66% { transform: rotateZ(-8deg); }
-    }
-
-    @keyframes sway-3 {
-      0%, 100% { transform: rotateZ(0deg); }
-      25% { transform: rotateZ(5deg); }
-      50% { transform: rotateZ(-12deg); }
-      75% { transform: rotateZ(5deg); }
-    }
-
-    @keyframes sway-4 {
-      0%, 100% { transform: rotateZ(0deg); }
-      20% { transform: rotateZ(-15deg); }
-      40% { transform: rotateZ(8deg); }
-      60% { transform: rotateZ(-15deg); }
-      80% { transform: rotateZ(8deg); }
-    }
-
-    @keyframes sway-5 {
-      0%, 100% { transform: rotateZ(0deg); }
-      50% { transform: rotateZ(15deg); }
-    }
-
-    @keyframes sway-6 {
-      0%, 100% { transform: rotateZ(0deg); }
-      50% { transform: rotateZ(-15deg); }
-    }
-
-    @keyframes sway-7 {
-      0%, 100% { transform: rotateZ(0deg); }
-      33% { transform: rotateZ(12deg); }
-      66% { transform: rotateZ(-12deg); }
-    }
-
-    @keyframes sway-8 {
-      0%, 100% { transform: rotateZ(0deg); }
-      25% { transform: rotateZ(-8deg); }
-      50% { transform: rotateZ(15deg); }
-      75% { transform: rotateZ(-8deg); }
-    }
-
-    /* tabs hover & active states */
-    .stats-tab:hover, .history-tab:hover { color: ${GRID_COLORS.accent}; }
-    .stats-tab.active, .history-tab.active {
-      color: ${GRID_COLORS.accent};
-      border-bottom-color: ${GRID_COLORS.accent};
-    }
-
     @media (max-width: 1024px) {
       .profile-layout {
         grid-template-columns: 1fr !important;
@@ -761,206 +776,33 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
   </style>
 `;
 
-  const leafFallScript = `
-  <script>
-    // LeafFall JavaScript Class
-    const LeafFall = function(selector, options) {
-      if (typeof selector === 'undefined') {
-        throw new Error('No selector present. Define an element.');
-      }
-      this.el = document.querySelector(selector);
-      if (!this.el) throw new Error('Selector did not match any element.');
-
-      const defaults = {
-        className: 'leaf',
-        fallSpeed: 1,
-        maxSize: 14,
-        minSize: 10,
-        delay: 300,
-        colors: [
-          {
-            gradientColorStart: 'rgba(255, 165, 0, 0.9)',
-            gradientColorEnd: 'rgba(255, 99, 71, 0.9)',
-            gradientColorDegree: 120,
-          },
-        ],
-        lifeTime: 0,
-        zIndex: 1,
-      };
-
-      this.settings = Object.assign({}, defaults, options || {});
-      this._spawnInterval = null;
-      this.leavesMap = new Map();
-      this.el.style.overflowX = 'hidden';
-      this.el.style.position = this.el.style.position || 'relative';
-
-      const randomArrayElem = arr => arr[Math.floor(Math.random() * arr.length)];
-      const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-      const prefixes = ['webkit', 'moz', 'MS', 'o', ''];
-      function PrefixedEvent(element, type, callback) {
-        for (let p = 0; p < prefixes.length; p += 1) {
-          let animType = type;
-          if (!prefixes[p]) animType = type.toLowerCase();
-          element.addEventListener(prefixes[p] + animType, callback, false);
-        }
-      }
-
-      function elementInViewport(el) {
-        const rect = el.getBoundingClientRect();
-        const vh = (window.innerHeight || document.documentElement.clientHeight);
-        const vw = (window.innerWidth || document.documentElement.clientWidth);
-        return !(rect.bottom < 0 || rect.top > vh || rect.right < 0 || rect.left > vw);
-      }
-
-      this.createLeaf = () => {
-        try {
-          const animationNames = {
-            blowAnimations: ['blow-soft-left','blow-medium-left','blow-soft-right','blow-medium-right'],
-            swayAnimations: ['sway-0','sway-1','sway-2','sway-3','sway-4','sway-5','sway-6','sway-7','sway-8'],
-          };
-          const blowAnim = randomArrayElem(animationNames.blowAnimations);
-          const swayAnim = randomArrayElem(animationNames.swayAnimations);
-          const fallTime = (document.documentElement.clientHeight * 0.007 + Math.round(Math.random() * 5)) * this.settings.fallSpeed;
-
-          const animationsArr = [
-            \`fall \${fallTime}s linear 0s 1\`,
-            \`\${blowAnim} \${Math.max(10, (fallTime > 30 ? fallTime : 30) - 20 + randomInt(0,20))}s linear 0s infinite\`,
-            \`\${swayAnim} \${randomInt(2,4)}s linear 0s infinite\`,
-          ];
-          const animations = animationsArr.join(', ');
-
-          const leaf = document.createElement('div');
-          leaf.classList.add(this.settings.className);
-
-          const height = randomInt(this.settings.minSize, this.settings.maxSize);
-          const width = Math.max(4, height - Math.floor(randomInt(0, this.settings.minSize) / 3));
-
-          const color = randomArrayElem(this.settings.colors || defaults.colors);
-          leaf.style.background = \`linear-gradient(\${color.gradientColorDegree}deg, \${color.gradientColorStart}, \${color.gradientColorEnd})\`;
-          leaf.style.webkitAnimation = animations;
-          leaf.style.MozAnimation = animations;
-          leaf.style.animation = animations;
-          leaf.style.borderRadius = \`\${randomInt(this.settings.maxSize, this.settings.maxSize + Math.floor(Math.random() * 10))}px \${randomInt(1, Math.floor(width / 4))}px\`;
-          leaf.style.height = \`\${height}px\`;
-          leaf.style.width = \`\${width}px\`;
-          const left = Math.random() * Math.max(0, document.documentElement.clientWidth - 100);
-          leaf.style.left = \`\${Math.round(left)}px\`;
-          leaf.style.marginTop = \`\${-(Math.floor(Math.random() * 20) + 15)}px\`;
-          leaf.style.position = 'absolute';
-          leaf.style.pointerEvents = 'none';
-          leaf.style.zIndex = String(this.settings.zIndex);
-          leaf.style.willChange = 'transform, opacity';
-
-          PrefixedEvent(leaf, 'AnimationEnd', () => {
-            if (!elementInViewport(leaf)) {
-              leaf.remove();
-            }
-          });
-          PrefixedEvent(leaf, 'AnimationIteration', () => {
-            if (!elementInViewport(leaf)) {
-              leaf.remove();
-            }
-          });
-
-          const key = Date.now() + Math.random();
-          this.leavesMap.set(key, leaf);
-          this.el.appendChild(leaf);
-
-          if (this.settings.lifeTime && this.settings.lifeTime > 0) {
-            setTimeout(() => {
-              if (leaf && leaf.parentNode) leaf.remove();
-              this.leavesMap.delete(key);
-            }, this.settings.lifeTime);
-          }
-        } catch (err) {
-          console.error('LeafFall createLeaf error:', err);
-        }
-      };
-
-      this._startSpawn = () => {
-        if (this._spawnInterval) return;
-        this.createLeaf();
-        this._spawnInterval = setInterval(() => {
-          window.requestAnimationFrame(() => this.createLeaf());
-        }, Math.max(40, this.settings.delay));
-        this.el.setAttribute('data-leaf-anim-id', String(this._spawnInterval));
-      };
-
-      this._stopSpawn = (graceful = false) => {
-        if (this._spawnInterval) {
-          clearInterval(this._spawnInterval);
-          this._spawnInterval = null;
-          this.el.setAttribute('data-leaf-anim-id', '');
-        }
-        if (!graceful) {
-          setTimeout(() => {
-            const leaves = Array.from(this.el.getElementsByClassName(this.settings.className));
-            leaves.forEach(l => l.parentNode && l.parentNode.removeChild(l));
-            this.leavesMap.clear();
-          }, this.settings.delay + 50);
-        }
-      };
-
-      this._startSpawn();
-    };
-
-    LeafFall.prototype.start = function() {
-      if (this._spawnInterval) {
-        throw new Error('LeafFall is already running.');
-      }
-      this._startSpawn();
-    };
-
-    LeafFall.prototype.stop = function(graceful = false) {
-      this._stopSpawn(graceful);
-    };
-
-    // Initialize LeafFall when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      try {
-        const leafFall = new LeafFall('body', {
-          className: 'leaf',
-          fallSpeed: 1.2,
-          maxSize: 16,
-          minSize: 8,
-          delay: 400,
-          colors: [
-            {
-              gradientColorStart: '${GRID_COLORS.accent}',
-              gradientColorEnd: '${GRID_COLORS.warm}',
-              gradientColorDegree: 135
-            },
-            {
-              gradientColorStart: '${GRID_COLORS.cool}',
-              gradientColorEnd: '${GRID_COLORS.success}',
-              gradientColorDegree: 90
-            },
-            {
-              gradientColorStart: '${GRID_COLORS.warm}',
-              gradientColorEnd: '${GRID_COLORS.accent}',
-              gradientColorDegree: 45
-            },
-            {
-              gradientColorStart: '${GRID_COLORS.success}',
-              gradientColorEnd: '${GRID_COLORS.cool}',
-              gradientColorDegree: 180
-            }
-          ],
-          lifeTime: 15000
-        });
-        console.log('LeafFall initialized successfully');
-      } catch (error) {
-        console.error('LeafFall initialization failed:', error);
-      }
-    });
-  </script>
-  `;
-
-return `${responsiveStyles}
-      ${leafFallScript}
+	return `${responsiveStyles}
+      <div class="petal">
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+	  </div>
       <div class="profile-container" style="max-width:1400px;margin:0 auto;">
-        ${header(profile, editMode)}
+${header(profile, editMode)}
         <div class="profile-layout" style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:30px">
           <div>
             <div style="background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);border-radius:12px;box-shadow:0 4px 20px rgba(0,174,239,0.1);margin-bottom:30px;">
@@ -969,7 +811,7 @@ return `${responsiveStyles}
                 <p style="margin:5px 0 0 0;opacity:0.9;font-size:14px">Comprehensive view of your gaming performance</p>
               </div>
               <div style="display:flex;border-bottom:1px solid rgba(0,174,239,0.2);background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%)">
-${['overview','performance','trends'].map(tab => `
+${['overview', 'performance', 'trends'].map(tab => `
                   <button class="stats-tab ${statsTab === tab ? 'active' : ''}" data-tab="${tab}"
                           style="flex:1;padding:12px 20px;border:none;background:${statsTab === tab ? GRID_COLORS.bg : 'transparent'};
                                  border-bottom:3px solid ${statsTab === tab ? GRID_COLORS.cool : 'transparent'};
@@ -986,7 +828,7 @@ ${tab === 'overview' ? '📈 Overview' : tab === 'performance' ? '🎯 Performan
                 <p style="margin:5px 0 0 0;opacity:0.9;font-size:14px">Detailed analysis of your game sessions</p>
               </div>
               <div style="display:flex;border-bottom:1px solid rgba(0,174,239,0.2);background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%)">
-${['list','detailed','analysis'].map(view => `
+${['list', 'detailed', 'analysis'].map(view => `
                   <button class="history-tab ${historyView === view ? 'active' : ''}" data-view="${view}"
                           style="flex:1;padding:12px 20px;border:none;background:${historyView === view ? GRID_COLORS.bg : 'transparent'};
                                  border-bottom:3px solid ${historyView === view ? GRID_COLORS.accent : 'transparent'};
@@ -1014,4 +856,4 @@ ${view === 'list' ? '📋 Match List' : view === 'detailed' ? '🔍 Detailed Vie
 ${modals()}
       </div>
     `;
-  }
+}
