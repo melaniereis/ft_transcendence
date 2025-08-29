@@ -26,25 +26,44 @@ team: string;
 
 export async function loginUser(username: string, password: string): Promise<{ token: string; user: { id: number; username: string } } | null> {
 return new Promise((resolve, reject) => {
+	console.log(`Login attempt for username: ${username}`);  // Log username
+
 	db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, userRaw) => {
-	if (err || !userRaw) return resolve(null);
+	if (err || !userRaw) {
+		console.log('No user found or database error:', err);
+		return resolve(null);
+	}
 
 	const user = userRaw as User;
+	console.log(`User found: ${user.username}`);  // Log found user
+
 	const match = await bcrypt.compare(password, user.password);
-	if (!match) return resolve(null);
+	console.log(`Password match result: ${match}`);  // Log the result of password comparison
+
+	if (!match) {
+		console.log('Password does not match');
+		return resolve(null);
+	}
 
 	const token = uuidv4();
 	const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
 	db.run(`DELETE FROM sessions WHERE user_id = ?`, [user.id], function (deleteErr) {
-		if (deleteErr) return reject(deleteErr);
+		if (deleteErr) {
+		console.log('Error deleting old sessions:', deleteErr);
+		return reject(deleteErr);
+		}
 
 		db.run(
 		`INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`,
 		[user.id, token, expiresAt],
 		function (insertErr) {
-			if (insertErr) return reject(insertErr);
-			else
+			if (insertErr) {
+			console.log('Error inserting session:', insertErr);
+			return reject(insertErr);
+			} 
+			else {
+				console.log('Login successful, token generated');
 			resolve({
 				token,
 				user: {
@@ -52,12 +71,14 @@ return new Promise((resolve, reject) => {
 				username: user.username,
 				},
 			});
+			}
 		}
 		);
 	});
 	});
 });
 }
+
 
 
 export async function verifyToken(token: string): Promise<number | null> {
