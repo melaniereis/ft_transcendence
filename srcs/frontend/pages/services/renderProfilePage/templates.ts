@@ -1,20 +1,22 @@
-// renderProfilePage/templates.ts - FIXED VERSION with GRIS-inspired design
+// renderProfilePage/templates.ts - FIXED VERSION with working LeafFall animation
 import { AVAILABLE_AVATARS, Friend, Match, Profile, Stats } from './types.js';
 import {
 averageScore, bestPerformance, consistencyScore, bestPlayingDay, clutchFactor, currentMomentum,
 dominanceRating, efficiencyScore, gamesThisWeek, longestWinStreak, mostActiveTime, opponentAnalysis
 } from './metrics.js';
+
 // GRID-inspired color palette (updated pink & purple)
 const GRID_COLORS = {
-primary: '#1c2126', // Gunmetal
+primary: '#8c8e91', // Silver
 secondary: '#f8f9f8', // Light gray
 accent: '#e84393', // Magical pink (was neon yellow)
 warm: '#9b59b6', // Enchanted purple (was racing orange)
 cool: '#00aeef', // Circuit blue
 success: '#00d563', // Performance green
-muted: '#888888', // Neutral gray
+muted: '#f8f9f7', // Gray
 bg: '#12181c' // Dark background
 };
+
 // Team logo mapping
 const TEAM_LOGOS = {
 'HACKTIVISTS': '/assets/hacktivists.png',
@@ -22,6 +24,7 @@ const TEAM_LOGOS = {
 'LOGIC LEAGUE': '/assets/logicleague.png',
 'CODE ALLIANCE': '/assets/codealliance.png'
 };
+
 export function header(profile: Profile, isEdit: boolean): string {
 const teamLogo = TEAM_LOGOS[profile.team?.toUpperCase() as keyof typeof TEAM_LOGOS] || '';
 const avatar = isEdit
@@ -58,7 +61,9 @@ ${teamLogo ? `
         ` : ''}
       </div>
     </div>`;
+
 const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
+
 return isEdit
 ? `
     <div class="header-edit" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
@@ -71,14 +76,14 @@ ${avatar}
             <div>
               <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Username:</label>
               <input id="username-input" type="text" value="${profile.username}" required minlength="3"
-                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.cool};border-radius:12px;
+                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
                             font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
               <small style="color:${GRID_COLORS.muted}">Min 3 characters</small>
             </div>
             <div>
               <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Display Name:</label>
               <input id="display-input" type="text" value="${profile.display_name || profile.name || ''}" required
-                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.cool};border-radius:12px;
+                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
                             font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
               <small style="color:${GRID_COLORS.muted}">Public name shown in games</small>
             </div>
@@ -86,7 +91,7 @@ ${avatar}
           <div style="margin-bottom:20px">
             <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Email:</label>
             <input id="email-input" type="email" value="${profile.email || ''}"
-                   style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.cool};border-radius:12px;
+                   style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
                           font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
             <small style="color:${GRID_COLORS.muted}">Optional - for account recovery</small>
           </div>
@@ -98,7 +103,7 @@ ${avatar}
               💾 Save Changes
             </button>
             <button id="cancel-btn"
-                    style="background:${GRID_COLORS.muted};color:#fff;border:none;padding:12px 24px;
+                    style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
                            border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
                            transition:all 0.3s">
               ❌ Cancel
@@ -123,7 +128,7 @@ ${teamLogo ? `<img src="${teamLogo}" width="24" height="24" style="border-radius
             </div>
           </div>
           <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> ${createdAtText}</div>
-          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0,10) : '—'}</div>
+          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).getDate.toLocaleString().substring(0,10) : '—'}</div>
           <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
         </div>
       </div>
@@ -157,17 +162,18 @@ ${avatar}
           </div>
           <div style="font-size:14px;color:${GRID_COLORS.muted};padding:12px;background:rgba(0,174,239,0.1);border-radius:8px">
             <span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} •
-            <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}
+            <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).getDate.toLocaleString().substring(0, 10) : '—'}
           </div>
         </div>
       </div>
     </div>`;
 }
-// renderProfilePage/templates.ts - FIXED VERSION
+
 export function friendsList(friends: Friend[]): string {
 if (!friends || friends.length === 0) {
 return '<div style="padding:15px;text-align:center;color:#666;font-size:14px">No friends added yet</div>';
   }
+
 return `
     <div>
 ${friends.map((f: any) => {
@@ -176,6 +182,7 @@ const displayName = f.display_name || f.name || f.username || 'Unknown';
 const username = f.username || '';
 const avatar = f.avatar_url || '/assets/avatar/default.png';
 const online = !!f.online_status;
+
 return `
           <div class="friend-item"
                data-id="${id}" data-name="${displayName}"
@@ -203,9 +210,10 @@ return `
     </div>
   `;
 }
-// FIX: Improved match list - only 5 recent matches, simplified
+
 export function historyList(history: Match[]): string {
 const recent = history.slice(0, 5);
+
 if (!recent.length) {
 return `
       <div style="padding:40px;text-align:center;color:${GRID_COLORS.muted};
@@ -216,6 +224,7 @@ return `
       </div>
     `;
   }
+
 return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-bottom:25px">
@@ -276,6 +285,7 @@ ${m.result === 'win' ? '+' : '-'}${Math.abs(m.user_score - m.opponent_score)}
     </div>
   `;
 }
+
 export function historyDetailed(history: Match[]): string {
 return `
     <div>
@@ -340,6 +350,7 @@ Math.abs(m.user_score - m.opponent_score) <= 10 ? 'COMPETITIVE' : 'DOMINANT'
     </div>
   `;
 }
+
 export function statsOverview(stats: Stats, history: Match[]): string {
 const wr = (stats.win_rate * 100).toFixed(1);
 const kd = stats.points_conceded ? (stats.points_scored / stats.points_conceded).toFixed(2) : String(stats.points_scored);
@@ -347,6 +358,7 @@ const avgP = stats.matches_played ? (stats.points_scored / stats.matches_played)
 const avgC = stats.matches_played ? (stats.points_conceded / stats.matches_played).toFixed(1) : '0';
 const ws = longestWinStreak(history);
 const best = bestPerformance(history);
+
 return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin-bottom:30px">
@@ -401,12 +413,14 @@ ${[
     </div>
   `;
 }
+
 export function statsPerformance(stats: Stats, history: Match[]): string {
 const avg = averageScore(history).toFixed(1);
 const cons = consistencyScore(history);
 const clutch = clutchFactor(history);
 const dom = dominanceRating(history);
 const eff = efficiencyScore(stats).toFixed(1);
+
 return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px">
@@ -439,6 +453,7 @@ ${[
     </div>
   `;
 }
+
 export function statsTrends(stats: Stats): string {
 return `
     <div>
@@ -475,6 +490,7 @@ ${[
     </div>
   `;
 }
+
 export function historyAnalysis(history: Match[]): string {
 return `
     <div>
@@ -519,6 +535,7 @@ ${opponentAnalysis(history).map((o, i) => `
     </div>
   `;
 }
+
 export function modals(): string {
 return `
     <div id="notification" style="display:none;position:fixed;top:20px;right:20px;background:${GRID_COLORS.success};color:#fff;padding:15px 20px;border-radius:5px;z-index:1000;max-width:300px"></div>
@@ -568,16 +585,15 @@ ${AVAILABLE_AVATARS.map((a, i) => `
     </div>
   `;
 }
-// SUBSTITUA a sua função layout por esta versão completa:
 
 export function layout(profile: Profile, stats: Stats, history: Match[], friends: Friend[], statsTab: string, historyView: string, editMode: boolean): string {
   const responsiveStyles = `
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    /* Use a system serif font (no external import) */
     body {
       margin:0; padding:0;
       background: url('/assets/Background.png') no-repeat center/cover;
-      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Georgia, 'Times New Roman', Times, serif;
       color: ${GRID_COLORS.secondary};
       overflow-x: hidden;
     }
@@ -586,108 +602,116 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
       border-radius: 16px;
       padding: 20px;
     }
-    
-    /* Realistic falling petals animation */
-    @keyframes fallPetals {
-      0% {
-        transform: translateY(-100vh) rotateZ(0deg);
-        opacity: 0.8;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotateZ(720deg);
-        opacity: 0;
-      }
-    }
-    
-    @keyframes swayLeft {
-      0%, 100% { transform: translateX(0px) rotateX(0deg); }
-      25% { transform: translateX(-15px) rotateX(10deg); }
-      75% { transform: translateX(-30px) rotateX(-5deg); }
-    }
-    
-    @keyframes swayRight {
-      0%, 100% { transform: translateX(0px) rotateX(0deg); }
-      25% { transform: translateX(15px) rotateX(-10deg); }
-      75% { transform: translateX(30px) rotateX(5deg); }
-    }
-    
-    @keyframes flutter {
-      0%, 100% { transform: rotateY(0deg); }
-      50% { transform: rotateY(180deg); }
-    }
-    
-    .petal {
-      position: fixed;
-      border-radius: 50% 10px 50% 10px;
+
+    /* Leaf animation styles - required for LeafFall */
+    .leaf {
+      position: absolute;
       pointer-events: none;
       z-index: 1;
-      background: linear-gradient(45deg, #e84393, #9b59b6);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      animation: fallPetals linear infinite, flutter ease-in-out infinite;
+      will-change: transform, opacity;
     }
-    
-    .petal.pink {
-      background: linear-gradient(135deg, #e84393 0%, #ff6b9d 50%, #e84393 100%);
-      width: 8px;
-      height: 12px;
-      animation-duration: 8s, 2s;
+
+    /* Fall animation */
+    @keyframes fall {
+      0% { transform: translateY(-100vh) rotateZ(0deg); }
+      100% { transform: translateY(100vh) rotateZ(360deg); }
     }
-    
-    .petal.purple {
-      background: linear-gradient(135deg, #9b59b6 0%, #c44569 50%, #9b59b6 100%);
-      width: 6px;
-      height: 10px;
-      animation-duration: 12s, 3s;
+
+    /* Blow animations */
+    @keyframes blow-soft-left {
+      0% { transform: translateX(0px); }
+      25% { transform: translateX(-50px); }
+      50% { transform: translateX(-25px); }
+      75% { transform: translateX(-50px); }
+      100% { transform: translateX(0px); }
     }
-    
-    .petal.blue {
-      background: linear-gradient(135deg, #00aeef 0%, #4fc3f7 50%, #00aeef 100%);
-      width: 7px;
-      height: 11px;
-      animation-duration: 10s, 2.5s;
+
+    @keyframes blow-medium-left {
+      0% { transform: translateX(0px); }
+      25% { transform: translateX(-100px); }
+      50% { transform: translateX(-50px); }
+      75% { transform: translateX(-100px); }
+      100% { transform: translateX(0px); }
     }
-    
-    .petal.green {
-      background: linear-gradient(135deg, #00d563 0%, #26de81 50%, #00d563 100%);
-      width: 9px;
-      height: 13px;
-      animation-duration: 9s, 3.5s;
+
+    @keyframes blow-soft-right {
+      0% { transform: translateX(0px); }
+      25% { transform: translateX(50px); }
+      50% { transform: translateX(25px); }
+      75% { transform: translateX(50px); }
+      100% { transform: translateX(0px); }
     }
-    
-    .petal.small {
-      width: 4px;
-      height: 6px;
-      animation-duration: 15s, 4s;
+
+    @keyframes blow-medium-right {
+      0% { transform: translateX(0px); }
+      25% { transform: translateX(100px); }
+      50% { transform: translateX(50px); }
+      75% { transform: translateX(100px); }
+      100% { transform: translateX(0px); }
     }
-    
-    .petal.large {
-      width: 12px;
-      height: 18px;
-      animation-duration: 6s, 1.5s;
+
+    /* Sway animations */
+    @keyframes sway-0 {
+      0%, 100% { transform: rotateZ(0deg); }
+      50% { transform: rotateZ(10deg); }
     }
-    
-    .petal.sway-left {
-      animation-name: fallPetals, swayLeft, flutter;
-      animation-duration: inherit, 4s, inherit;
+
+    @keyframes sway-1 {
+      0%, 100% { transform: rotateZ(0deg); }
+      50% { transform: rotateZ(-10deg); }
     }
-    
-    .petal.sway-right {
-      animation-name: fallPetals, swayRight, flutter;
-      animation-duration: inherit, 3s, inherit;
+
+    @keyframes sway-2 {
+      0%, 100% { transform: rotateZ(0deg); }
+      33% { transform: rotateZ(8deg); }
+      66% { transform: rotateZ(-8deg); }
     }
-    
+
+    @keyframes sway-3 {
+      0%, 100% { transform: rotateZ(0deg); }
+      25% { transform: rotateZ(5deg); }
+      50% { transform: rotateZ(-12deg); }
+      75% { transform: rotateZ(5deg); }
+    }
+
+    @keyframes sway-4 {
+      0%, 100% { transform: rotateZ(0deg); }
+      20% { transform: rotateZ(-15deg); }
+      40% { transform: rotateZ(8deg); }
+      60% { transform: rotateZ(-15deg); }
+      80% { transform: rotateZ(8deg); }
+    }
+
+    @keyframes sway-5 {
+      0%, 100% { transform: rotateZ(0deg); }
+      50% { transform: rotateZ(15deg); }
+    }
+
+    @keyframes sway-6 {
+      0%, 100% { transform: rotateZ(0deg); }
+      50% { transform: rotateZ(-15deg); }
+    }
+
+    @keyframes sway-7 {
+      0%, 100% { transform: rotateZ(0deg); }
+      33% { transform: rotateZ(12deg); }
+      66% { transform: rotateZ(-12deg); }
+    }
+
+    @keyframes sway-8 {
+      0%, 100% { transform: rotateZ(0deg); }
+      25% { transform: rotateZ(-8deg); }
+      50% { transform: rotateZ(15deg); }
+      75% { transform: rotateZ(-8deg); }
+    }
+
     /* tabs hover & active states */
     .stats-tab:hover, .history-tab:hover { color: ${GRID_COLORS.accent}; }
     .stats-tab.active, .history-tab.active {
       color: ${GRID_COLORS.accent};
       border-bottom-color: ${GRID_COLORS.accent};
     }
+
     @media (max-width: 1024px) {
       .profile-layout {
         grid-template-columns: 1fr !important;
@@ -733,39 +757,208 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
       canvas {
         height: 150px !important;
       }
-      /* Reduzir pétalas em mobile */
-      .petal:nth-child(n+26) {
-        display: none;
-      }
     }
   </style>
 `;
 
-// Criar muitas pétalas com movimento realístico
-const createPetals = () => {
+  const leafFallScript = `
+  <script>
+    // LeafFall JavaScript Class
+    const LeafFall = function(selector, options) {
+      if (typeof selector === 'undefined') {
+        throw new Error('No selector present. Define an element.');
+      }
+      this.el = document.querySelector(selector);
+      if (!this.el) throw new Error('Selector did not match any element.');
 
-  const petalsHtml: string[] = [];
-  const colors = ['pink', 'purple', 'blue', 'green'];
-  const sizes = ['small', '', 'large']; // '' = tamanho normal
-  const swayTypes = ['sway-left', 'sway-right', ''];
+      const defaults = {
+        className: 'leaf',
+        fallSpeed: 1,
+        maxSize: 14,
+        minSize: 10,
+        delay: 300,
+        colors: [
+          {
+            gradientColorStart: 'rgba(255, 165, 0, 0.9)',
+            gradientColorEnd: 'rgba(255, 99, 71, 0.9)',
+            gradientColorDegree: 120,
+          },
+        ],
+        lifeTime: 0,
+        zIndex: 1,
+      };
 
-  for(let i = 0; i < 50; i++) { // 50 pétalas!
-    const leftPos = Math.random() * 110; // Espalha além da tela
-    const delay = Math.random() * 12; // Delay mais variado
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const size = sizes[Math.floor(Math.random() * sizes.length)];
-    const sway = swayTypes[Math.floor(Math.random() * swayTypes.length)];
-    
-    petalsHtml.push(`<div class="petal ${color} ${size} ${sway}" 
-                          style="left:${leftPos}%;
-                                animation-delay:${delay}s, ${delay * 0.5}s, ${delay * 0.3}s;">
-                    </div>`);
-  }
-  return petalsHtml.join('');
-};
-  
-  return `${responsiveStyles}
-      ${createPetals()}
+      this.settings = Object.assign({}, defaults, options || {});
+      this._spawnInterval = null;
+      this.leavesMap = new Map();
+      this.el.style.overflowX = 'hidden';
+      this.el.style.position = this.el.style.position || 'relative';
+
+      const randomArrayElem = arr => arr[Math.floor(Math.random() * arr.length)];
+      const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+      const prefixes = ['webkit', 'moz', 'MS', 'o', ''];
+      function PrefixedEvent(element, type, callback) {
+        for (let p = 0; p < prefixes.length; p += 1) {
+          let animType = type;
+          if (!prefixes[p]) animType = type.toLowerCase();
+          element.addEventListener(prefixes[p] + animType, callback, false);
+        }
+      }
+
+      function elementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        const vh = (window.innerHeight || document.documentElement.clientHeight);
+        const vw = (window.innerWidth || document.documentElement.clientWidth);
+        return !(rect.bottom < 0 || rect.top > vh || rect.right < 0 || rect.left > vw);
+      }
+
+      this.createLeaf = () => {
+        try {
+          const animationNames = {
+            blowAnimations: ['blow-soft-left','blow-medium-left','blow-soft-right','blow-medium-right'],
+            swayAnimations: ['sway-0','sway-1','sway-2','sway-3','sway-4','sway-5','sway-6','sway-7','sway-8'],
+          };
+          const blowAnim = randomArrayElem(animationNames.blowAnimations);
+          const swayAnim = randomArrayElem(animationNames.swayAnimations);
+          const fallTime = (document.documentElement.clientHeight * 0.007 + Math.round(Math.random() * 5)) * this.settings.fallSpeed;
+
+          const animationsArr = [
+            \`fall \${fallTime}s linear 0s 1\`,
+            \`\${blowAnim} \${Math.max(10, (fallTime > 30 ? fallTime : 30) - 20 + randomInt(0,20))}s linear 0s infinite\`,
+            \`\${swayAnim} \${randomInt(2,4)}s linear 0s infinite\`,
+          ];
+          const animations = animationsArr.join(', ');
+
+          const leaf = document.createElement('div');
+          leaf.classList.add(this.settings.className);
+
+          const height = randomInt(this.settings.minSize, this.settings.maxSize);
+          const width = Math.max(4, height - Math.floor(randomInt(0, this.settings.minSize) / 3));
+
+          const color = randomArrayElem(this.settings.colors || defaults.colors);
+          leaf.style.background = \`linear-gradient(\${color.gradientColorDegree}deg, \${color.gradientColorStart}, \${color.gradientColorEnd})\`;
+          leaf.style.webkitAnimation = animations;
+          leaf.style.MozAnimation = animations;
+          leaf.style.animation = animations;
+          leaf.style.borderRadius = \`\${randomInt(this.settings.maxSize, this.settings.maxSize + Math.floor(Math.random() * 10))}px \${randomInt(1, Math.floor(width / 4))}px\`;
+          leaf.style.height = \`\${height}px\`;
+          leaf.style.width = \`\${width}px\`;
+          const left = Math.random() * Math.max(0, document.documentElement.clientWidth - 100);
+          leaf.style.left = \`\${Math.round(left)}px\`;
+          leaf.style.marginTop = \`\${-(Math.floor(Math.random() * 20) + 15)}px\`;
+          leaf.style.position = 'absolute';
+          leaf.style.pointerEvents = 'none';
+          leaf.style.zIndex = String(this.settings.zIndex);
+          leaf.style.willChange = 'transform, opacity';
+
+          PrefixedEvent(leaf, 'AnimationEnd', () => {
+            if (!elementInViewport(leaf)) {
+              leaf.remove();
+            }
+          });
+          PrefixedEvent(leaf, 'AnimationIteration', () => {
+            if (!elementInViewport(leaf)) {
+              leaf.remove();
+            }
+          });
+
+          const key = Date.now() + Math.random();
+          this.leavesMap.set(key, leaf);
+          this.el.appendChild(leaf);
+
+          if (this.settings.lifeTime && this.settings.lifeTime > 0) {
+            setTimeout(() => {
+              if (leaf && leaf.parentNode) leaf.remove();
+              this.leavesMap.delete(key);
+            }, this.settings.lifeTime);
+          }
+        } catch (err) {
+          console.error('LeafFall createLeaf error:', err);
+        }
+      };
+
+      this._startSpawn = () => {
+        if (this._spawnInterval) return;
+        this.createLeaf();
+        this._spawnInterval = setInterval(() => {
+          window.requestAnimationFrame(() => this.createLeaf());
+        }, Math.max(40, this.settings.delay));
+        this.el.setAttribute('data-leaf-anim-id', String(this._spawnInterval));
+      };
+
+      this._stopSpawn = (graceful = false) => {
+        if (this._spawnInterval) {
+          clearInterval(this._spawnInterval);
+          this._spawnInterval = null;
+          this.el.setAttribute('data-leaf-anim-id', '');
+        }
+        if (!graceful) {
+          setTimeout(() => {
+            const leaves = Array.from(this.el.getElementsByClassName(this.settings.className));
+            leaves.forEach(l => l.parentNode && l.parentNode.removeChild(l));
+            this.leavesMap.clear();
+          }, this.settings.delay + 50);
+        }
+      };
+
+      this._startSpawn();
+    };
+
+    LeafFall.prototype.start = function() {
+      if (this._spawnInterval) {
+        throw new Error('LeafFall is already running.');
+      }
+      this._startSpawn();
+    };
+
+    LeafFall.prototype.stop = function(graceful = false) {
+      this._stopSpawn(graceful);
+    };
+
+    // Initialize LeafFall when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const leafFall = new LeafFall('body', {
+          className: 'leaf',
+          fallSpeed: 1.2,
+          maxSize: 16,
+          minSize: 8,
+          delay: 400,
+          colors: [
+            {
+              gradientColorStart: '${GRID_COLORS.accent}',
+              gradientColorEnd: '${GRID_COLORS.warm}',
+              gradientColorDegree: 135
+            },
+            {
+              gradientColorStart: '${GRID_COLORS.cool}',
+              gradientColorEnd: '${GRID_COLORS.success}',
+              gradientColorDegree: 90
+            },
+            {
+              gradientColorStart: '${GRID_COLORS.warm}',
+              gradientColorEnd: '${GRID_COLORS.accent}',
+              gradientColorDegree: 45
+            },
+            {
+              gradientColorStart: '${GRID_COLORS.success}',
+              gradientColorEnd: '${GRID_COLORS.cool}',
+              gradientColorDegree: 180
+            }
+          ],
+          lifeTime: 15000
+        });
+        console.log('LeafFall initialized successfully');
+      } catch (error) {
+        console.error('LeafFall initialization failed:', error);
+      }
+    });
+  </script>
+  `;
+
+return `${responsiveStyles}
+      ${leafFallScript}
       <div class="profile-container" style="max-width:1400px;margin:0 auto;">
         ${header(profile, editMode)}
         <div class="profile-layout" style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:30px">
@@ -776,12 +969,12 @@ const createPetals = () => {
                 <p style="margin:5px 0 0 0;opacity:0.9;font-size:14px">Comprehensive view of your gaming performance</p>
               </div>
               <div style="display:flex;border-bottom:1px solid rgba(0,174,239,0.2);background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%)">
-  ${['overview','performance','trends'].map(tab => `
+${['overview','performance','trends'].map(tab => `
                   <button class="stats-tab ${statsTab === tab ? 'active' : ''}" data-tab="${tab}"
                           style="flex:1;padding:12px 20px;border:none;background:${statsTab === tab ? GRID_COLORS.bg : 'transparent'};
                                  border-bottom:3px solid ${statsTab === tab ? GRID_COLORS.cool : 'transparent'};
                                  cursor:pointer;font-weight:${statsTab === tab ? 'bold' : 'normal'};color:${GRID_COLORS.primary}">
-  ${tab === 'overview' ? '📈 Overview' : tab === 'performance' ? '🎯 Performance' : '📊 Trends'}
+${tab === 'overview' ? '📈 Overview' : tab === 'performance' ? '🎯 Performance' : '📊 Trends'}
                   </button>
                 `).join('')}
               </div>
@@ -793,12 +986,12 @@ const createPetals = () => {
                 <p style="margin:5px 0 0 0;opacity:0.9;font-size:14px">Detailed analysis of your game sessions</p>
               </div>
               <div style="display:flex;border-bottom:1px solid rgba(0,174,239,0.2);background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%)">
-  ${['list','detailed','analysis'].map(view => `
+${['list','detailed','analysis'].map(view => `
                   <button class="history-tab ${historyView === view ? 'active' : ''}" data-view="${view}"
                           style="flex:1;padding:12px 20px;border:none;background:${historyView === view ? GRID_COLORS.bg : 'transparent'};
                                  border-bottom:3px solid ${historyView === view ? GRID_COLORS.accent : 'transparent'};
                                  cursor:pointer;font-weight:${historyView === view ? 'bold' : 'normal'};color:${GRID_COLORS.primary}">
-  ${view === 'list' ? '📋 Match List' : view === 'detailed' ? '🔍 Detailed View' : '📈 Analysis'}
+${view === 'list' ? '📋 Match List' : view === 'detailed' ? '🔍 Detailed View' : '📈 Analysis'}
                   </button>
                 `).join('')}
               </div>
@@ -818,7 +1011,7 @@ const createPetals = () => {
             <div id="friends-container">${friendsList(friends)}</div>
           </div>
         </div>
-  ${modals()}
+${modals()}
       </div>
     `;
   }

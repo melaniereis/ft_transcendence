@@ -196,6 +196,10 @@ export function setupEvents(container: HTMLElement) {
       const btn = document.getElementById('friend-add') as HTMLButtonElement;
       const username = input.value.trim();
       if (!username) return;
+      if (friendsList(state.friends).toLowerCase().includes(username.toLowerCase()) || (state.profile && state.profile.username.toLowerCase() === username.toLowerCase())) {
+        showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
+        return;
+      }
       try {
         btn.disabled = true;
         btn.textContent = '⏳ Adding...';
