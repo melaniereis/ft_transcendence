@@ -846,8 +846,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                   <button class="history-tab gris-action-btn" data-view="list" type="button" style="background:${historyView === 'list' ? '#7fc7d9' : '#b6a6ca'}">List</button>
                   <button class="history-tab gris-action-btn" data-view="detailed" type="button" style="background:${historyView === 'detailed' ? '#7fc7d9' : '#b6a6ca'}">Detailed</button>
                   <button class="history-tab gris-action-btn" data-view="analysis" type="button" style="background:${historyView === 'analysis' ? '#7fc7d9' : '#b6a6ca'}">Analysis</button>
-                  <button class="gris-action-btn" id="open-history-modal" type="button" style="background:#b6a6ca;">Open Full History</button>
-                </div>
+                 </div>
                 <div id="history-content-inner">Loading history...</div>
               </div>
             </div>
@@ -860,6 +859,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                   <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
                   <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
                 </form>
+                <div id="friend-msg" style="margin-top:8px;font-size:12px"></div>
                 <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
               </div>
             </div>

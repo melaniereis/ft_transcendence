@@ -84,6 +84,7 @@ export function render(container: HTMLElement) {
 	const activePanel = document.getElementById(mainTab + '-panel');
 	if (activePanel) (activePanel as HTMLElement).style.display = 'block';
 
+
 	// Preencher conteúdo das sub-abas SÓ se a tab principal correspondente estiver ativa
 	if (mainTab === 'stats') {
 		const statsInner = document.getElementById('stats-content-inner');
@@ -100,6 +101,10 @@ export function render(container: HTMLElement) {
 			if (state.activeHistoryView === 'detailed') histInner.innerHTML = historyDetailed(state.history);
 			if (state.activeHistoryView === 'analysis') histInner.innerHTML = historyAnalysis(state.history);
 		}
+	}
+	if (mainTab === 'friends') {
+		const friendsContainer = document.getElementById('friends-container');
+		if (friendsContainer) friendsContainer.innerHTML = friendsList(state.friends);
 	}
 
 	// Listeners para tabs principais (corrigido para .main-tab e data-main-tab)
@@ -182,9 +187,10 @@ export function setupRemoveFriendEvents() {
 }
 
 export function setupEvents(container: HTMLElement) {
-	// Main Tabs
+	// Main Tabs e Secondary Tabs (delegation)
 	container.addEventListener('click', (e) => {
 		const t = e.target as HTMLElement;
+		// Main Tabs
 		if (t.classList && t.classList.contains('main-tab')) {
 			const tab = t.dataset.mainTab as any;
 			if (!tab) return;
@@ -193,6 +199,26 @@ export function setupEvents(container: HTMLElement) {
 				// Reset subtabs ao trocar de main tab
 				if (tab === 'stats') state.activeStatsTab = 'overview';
 				if (tab === 'history') state.activeHistoryView = 'list';
+				render(container);
+			}
+			return;
+		}
+		// Stats Tabs
+		if (t.classList && t.classList.contains('stats-tab')) {
+			const tab = t.dataset.tab as any;
+			if (!tab) return;
+			if (state.activeStatsTab !== tab) {
+				state.activeStatsTab = tab;
+				render(container);
+			}
+			return;
+		}
+		// History Tabs
+		if (t.classList && t.classList.contains('history-tab')) {
+			const view = t.dataset.view as any;
+			if (!view) return;
+			if (state.activeHistoryView !== view) {
+				state.activeHistoryView = view;
 				render(container);
 			}
 			return;
@@ -307,8 +333,14 @@ export function setupEvents(container: HTMLElement) {
 				return;
 			}
 
-			// Check if already a friend or self
-			if (friendsList(state.friends).toLowerCase().includes(username.toLowerCase()) || (state.profile && state.profile.username.toLowerCase() === username.toLowerCase())) {
+			// Check if already a friend or self (robust: check array, not HTML)
+			const isFriend = Array.isArray(state.friends) && state.friends.some((f: any) => {
+				// Ajuste conforme estrutura do objeto amigo
+				return (f.username && f.username.toLowerCase() === username.toLowerCase()) ||
+					(f.name && f.name.toLowerCase() === username.toLowerCase());
+			});
+			const isSelf = state.profile && state.profile.username.toLowerCase() === username.toLowerCase();
+			if (isFriend || isSelf) {
 				showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
 				return;
 			}
@@ -416,6 +448,65 @@ export function setupEvents(container: HTMLElement) {
 				const el = document.getElementById('pass-error');
 				if (el) el.textContent = err?.message || 'Failed to update password';
 			}
+			return;
+		}
+		if (form.id === 'friend-form') {
+			e.preventDefault();
+			const input = document.getElementById('friend-input') as HTMLInputElement;
+			const btn = document.getElementById('friend-add') as HTMLButtonElement;
+			const username = input.value.trim();
+			if (!username) return;
+			// 1. Verificar se username existe
+			try {
+				const res = await fetch(`/api/users/${encodeURIComponent(username)}`);
+				if (!res.ok) {
+					showInlineMessage('friend-msg', 'User does not exist', '#dc3545');
+					return;
+				}
+			} catch (e) {
+				showInlineMessage('friend-msg', 'Error checking user', '#dc3545');
+				return;
+			}
+			// 2. Verificar se já é amigo ou é o próprio user (robust: check array, not HTML)
+			const isFriend = Array.isArray(state.friends) && state.friends.some((f: any) => {
+				return (f.username && f.username.toLowerCase() === username.toLowerCase()) ||
+					(f.name && f.name.toLowerCase() === username.toLowerCase());
+			});
+			const isSelf = state.profile && state.profile.username.toLowerCase() === username.toLowerCase();
+			if (isFriend || isSelf) {
+				showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
+				return;
+			}
+			// 3. Verificar se já foi enviado pedido
+			await loadOutgoingFriendRequests();
+			if (state.outgoingFriendRequests && Array.isArray(state.outgoingFriendRequests)) {
+				const alreadyRequested = state.outgoingFriendRequests.some((req: any) => {
+					return (req.username && req.username.toLowerCase() === username.toLowerCase()) ||
+						(req.targetUsername && req.targetUsername.toLowerCase() === username.toLowerCase());
+				});
+				if (alreadyRequested) {
+					showInlineMessage('friend-msg', 'Friend request already sent to this user', '#ffc107');
+					return;
+				}
+			}
+			// 4. Enviar pedido
+			try {
+				btn.disabled = true;
+				btn.textContent = '⏳ Adding...';
+				await addFriendApi(username);
+				input.value = '';
+				// Refresh friends and outgoing requests from backend and rerender
+				try { state.friends = await loadFriends(); } catch { }
+				await loadOutgoingFriendRequests();
+				render(container);
+				showInlineMessage('friend-msg', 'Friend request sent!', '#28a745');
+			} catch (err: any) {
+				showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
+			} finally {
+				btn.disabled = false;
+				btn.textContent = '➕ Add';
+			}
+			return;
 		}
 	});
 
