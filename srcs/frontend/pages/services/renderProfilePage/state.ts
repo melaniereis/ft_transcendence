@@ -10,6 +10,7 @@ export const state: {
 	editMode: boolean;
 	activeStatsTab: StatsTab;
 	activeHistoryView: HistoryView;
+	activeMainTab: 'profile' | 'stats' | 'history' | 'friends';
 	historyPage?: number; // FIX: Add pagination support
 	onBadgeUpdate?: () => void;
 	container?: HTMLElement;
@@ -28,6 +29,7 @@ export const state: {
 	editMode: false,
 	activeStatsTab: 'overview',
 	activeHistoryView: 'list',
+	activeMainTab: 'profile',
 	historyPage: 1,
 	matchPagination: {
 		currentPage: 0,

@@ -567,7 +567,7 @@ ${AVAILABLE_AVATARS.map((a, i) => `
   `;
 }
 
-export function layout(profile: Profile, stats: Stats, history: Match[], friends: Friend[], statsTab: string, historyView: string, editMode: boolean): string {
+export function layout(profile: Profile, stats: Stats, history: Match[], friends: Friend[], statsTab: string, historyView: string, editMode: boolean, mainTab: string): string {
 	const responsiveStyles = `
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -801,47 +801,67 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
             <button id="pass-btn" class="gris-action-btn" title="Change Password" type="button">Change Password</button>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:32px;padding:48px 32px 32px 32px;">
-          <div class="gris-section collapsible open" id="profile-section">
-            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="profile-content">Profile <span class="toggle-arrow">▼</span></div>
-            <div class="gris-section-content collapsible-content" id="profile-content" style="display:block;">
-              <div><b>Name:</b> ${profile.display_name || profile.name}</div>
-              <div><b>Email:</b> ${profile.email || 'Not provided'}</div>
-              <div><b>Team:</b> ${profile.team || '—'}</div>
-              <div><b>Member since:</b> ${profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</div>
-            </div>
+        <div style="display:flex;flex-direction:column;gap:0;padding:48px 32px 32px 32px;">
+          <!-- Main Tabs -->
+          <div style="display:flex;gap:0;margin-bottom:32px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px #b6a6ca22;">
+            ${['profile', 'stats', 'history', 'friends'].map(tab => `
+              <button class="main-tab${tab === mainTab ? ' active' : ''}" data-main-tab="${tab}"
+                style="flex:1;padding:18px 0;border:none;background:${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'};
+                       color:${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted};font-size:1.15rem;font-weight:700;
+                       border-bottom:4px solid ${tab === mainTab ? GRID_COLORS.cool : 'transparent'};cursor:pointer;transition:all 0.2s">
+                ${tab === 'profile' ? '👤 Profile' : tab === 'stats' ? '📊 Statistics' : tab === 'history' ? '🏆 Match History' : '👥 Friends'}
+              </button>
+            `).join('')}
           </div>
-          <div class="gris-section collapsible" id="stats-section">
-            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="stats-content">Statistics <span class="toggle-arrow">▶</span></div>
-            <div class="gris-section-content collapsible-content" id="stats-content" style="display:none;">
-              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
-                <button class="stats-tab gris-action-btn" data-tab="overview" type="button" style="background:${statsTab === 'overview' ? '#7fc7d9' : '#b6a6ca'}">Overview</button>
-                <button class="stats-tab gris-action-btn" data-tab="performance" type="button" style="background:${statsTab === 'performance' ? '#7fc7d9' : '#b6a6ca'}">Performance</button>
-                <button class="stats-tab gris-action-btn" data-tab="trends" type="button" style="background:${statsTab === 'trends' ? '#7fc7d9' : '#b6a6ca'}">Trends</button>
+          <!-- Tab Panels -->
+          <div class="tab-panel" id="profile-panel" style="display:${mainTab === 'profile' ? 'block' : 'none'}">
+            <div class="gris-section" id="profile-section">
+              <div class="gris-section-title">Profile</div>
+              <div class="gris-section-content" id="profile-content">
+                <div><b>Name:</b> ${profile.display_name || profile.name}</div>
+                <div><b>Email:</b> ${profile.email || 'Not provided'}</div>
+                <div><b>Team:</b> ${profile.team || '—'}</div>
+                <div><b>Member since:</b> ${profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</div>
               </div>
-              <div id="stats-content-inner">Loading stats...</div>
             </div>
           </div>
-          <div class="gris-section collapsible" id="history-section">
-            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="history-content">Match History <span class="toggle-arrow">▶</span></div>
-            <div class="gris-section-content collapsible-content" id="history-content" style="display:none;">
-              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
-                <button class="history-tab gris-action-btn" data-view="list" type="button" style="background:${historyView === 'list' ? '#7fc7d9' : '#b6a6ca'}">List</button>
-                <button class="history-tab gris-action-btn" data-view="detailed" type="button" style="background:${historyView === 'detailed' ? '#7fc7d9' : '#b6a6ca'}">Detailed</button>
-                <button class="history-tab gris-action-btn" data-view="analysis" type="button" style="background:${historyView === 'analysis' ? '#7fc7d9' : '#b6a6ca'}">Analysis</button>
-                <button class="gris-action-btn" id="open-history-modal" type="button" style="background:#b6a6ca;">Open Full History</button>
+          <div class="tab-panel" id="stats-panel" style="display:${mainTab === 'stats' ? 'block' : 'none'}">
+            <div class="gris-section" id="stats-section">
+              <div class="gris-section-title">Statistics</div>
+              <div class="gris-section-content" id="stats-content">
+                <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+                  <button class="stats-tab gris-action-btn" data-tab="overview" type="button" style="background:${statsTab === 'overview' ? '#7fc7d9' : '#b6a6ca'}">Overview</button>
+                  <button class="stats-tab gris-action-btn" data-tab="performance" type="button" style="background:${statsTab === 'performance' ? '#7fc7d9' : '#b6a6ca'}">Performance</button>
+                  <button class="stats-tab gris-action-btn" data-tab="trends" type="button" style="background:${statsTab === 'trends' ? '#7fc7d9' : '#b6a6ca'}">Trends</button>
+                </div>
+                <div id="stats-content-inner">Loading stats...</div>
               </div>
-              <div id="history-content-inner">Loading history...</div>
             </div>
           </div>
-          <div class="gris-section collapsible" id="friends-section">
-            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="friends-content">Friends <span class="toggle-arrow">▶</span></div>
-            <div class="gris-section-content collapsible-content" id="friends-content" style="display:none;">
-              <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
-                <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
-                <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
-              </form>
-              <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
+          <div class="tab-panel" id="history-panel" style="display:${mainTab === 'history' ? 'block' : 'none'}">
+            <div class="gris-section" id="history-section">
+              <div class="gris-section-title">Match History</div>
+              <div class="gris-section-content" id="history-content">
+                <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+                  <button class="history-tab gris-action-btn" data-view="list" type="button" style="background:${historyView === 'list' ? '#7fc7d9' : '#b6a6ca'}">List</button>
+                  <button class="history-tab gris-action-btn" data-view="detailed" type="button" style="background:${historyView === 'detailed' ? '#7fc7d9' : '#b6a6ca'}">Detailed</button>
+                  <button class="history-tab gris-action-btn" data-view="analysis" type="button" style="background:${historyView === 'analysis' ? '#7fc7d9' : '#b6a6ca'}">Analysis</button>
+                  <button class="gris-action-btn" id="open-history-modal" type="button" style="background:#b6a6ca;">Open Full History</button>
+                </div>
+                <div id="history-content-inner">Loading history...</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" id="friends-panel" style="display:${mainTab === 'friends' ? 'block' : 'none'}">
+            <div class="gris-section" id="friends-section">
+              <div class="gris-section-title">Friends</div>
+              <div class="gris-section-content" id="friends-content">
+                <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
+                  <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+                  <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
+                </form>
+                <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
+              </div>
             </div>
           </div>
         </div>
@@ -854,54 +874,33 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
           s.style.animationDuration = (14+Math.random()*8)+'s';
         });
       })();
-      // Collapsible sections, modal, and button event fixes
-      function safeGet(id) {
-        return document.getElementById(id) || null;
-      }
-      function setupCollapsibles() {
-        document.querySelectorAll('.collapsible-toggle').forEach(function(toggle) {
-          // Mouse click
-          toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            var targetId = toggle.getAttribute('data-target');
-            var content = safeGet(targetId);
-            var arrow = toggle.querySelector('.toggle-arrow');
-            if (content) {
-              var isOpen = content.style.display === 'block';
-              // Hide all other sections if not friends
-              if (targetId !== 'friends-content') {
-                document.querySelectorAll('.collapsible-content').forEach(function(c) {
-                  if (c.id !== targetId) {
-                    c.style.display = 'none';
-                    var t = document.querySelector('.collapsible-toggle[data-target="'+c.id+'"] .toggle-arrow');
-                    if (t) t.textContent = '▶';
-                  }
-                });
+      // Main tab navigation
+      function setupMainTabs() {
+        document.querySelectorAll('.main-tab').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            var tab = btn.getAttribute('data-main-tab');
+            if (!tab) return;
+            if (window.state && window.state.activeMainTab !== tab) {
+              window.state.activeMainTab = tab;
+              if (window.render && typeof window.render === 'function') {
+                window.render(document.querySelector('.profile-container'));
               }
-              content.style.display = isOpen ? 'none' : 'block';
-              if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
             }
-          });
-          // Keyboard: Enter or Space
-          toggle.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              toggle.click();
-            }
+            // Atualiza visibilidade dos painéis
+            document.querySelectorAll('.tab-panel').forEach(function(panel) {
+              panel.style.display = 'none';
+            });
+            var activePanel = document.getElementById(tab+'-panel');
+            if (activePanel) activePanel.style.display = 'block';
           });
         });
-        // Set initial state: only profile open
-        document.querySelectorAll('.collapsible-content').forEach(function(c) {
-          if (c.id === 'profile-content') {
-            c.style.display = 'block';
-            var t = document.querySelector('.collapsible-toggle[data-target="'+c.id+'"] .toggle-arrow');
-            if (t) t.textContent = '▼';
-          } else {
-            c.style.display = 'none';
-            var t = document.querySelector('.collapsible-toggle[data-target="'+c.id+'"] .toggle-arrow');
-            if (t) t.textContent = '▶';
-          }
+        // Inicializa visibilidade correta
+        var mainTab = window.state ? window.state.activeMainTab : 'profile';
+        document.querySelectorAll('.tab-panel').forEach(function(panel) {
+          panel.style.display = 'none';
         });
+        var activePanel = document.getElementById(mainTab+'-panel');
+        if (activePanel) activePanel.style.display = 'block';
       }
       function setupFriendForm() {
         var friendForm = safeGet('friend-form');
@@ -960,11 +959,40 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
         var historyEl = safeGet('history-content-inner');
         if (historyEl && !historyEl.innerHTML) historyEl.innerHTML = 'No history';
       }
+      function setupTabStateSync() {
+        // Sub-tabs: Statistics
+        document.querySelectorAll('.stats-tab').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            var tab = btn.getAttribute('data-tab');
+            if (!tab) return;
+            if (window.state && window.state.activeStatsTab !== tab) {
+              window.state.activeStatsTab = tab;
+              if (window.render && typeof window.render === 'function') {
+                window.render(document.querySelector('.profile-container'));
+              }
+            }
+          });
+        });
+        // Sub-tabs: History
+        document.querySelectorAll('.history-tab').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            var view = btn.getAttribute('data-view');
+            if (!view) return;
+            if (window.state && window.state.activeHistoryView !== view) {
+              window.state.activeHistoryView = view;
+              if (window.render && typeof window.render === 'function') {
+                window.render(document.querySelector('.profile-container'));
+              }
+            }
+          });
+        });
+      }
       function setupAll() {
-        setupCollapsibles();
+        setupMainTabs();
         setupFriendForm();
         setupButtons();
         setupFallbacks();
+        setupTabStateSync();
       }
       // Run setup on DOMContentLoaded and after dynamic updates
       if (document.readyState === 'loading') {

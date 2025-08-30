@@ -72,23 +72,77 @@ export function render(container: HTMLElement) {
 		state.friends,
 		state.activeStatsTab,
 		state.activeHistoryView,
-		state.editMode
+		state.editMode,
+		state.activeMainTab || 'profile'
 	);
 
-	// Inject tab content after layout renders
-	const statsEl = document.getElementById('stats-content')!;
-	const histEl = document.getElementById('history-content')!;
+	// Controle de visibilidade dos painéis das tabs principais
+	const mainTab = state.activeMainTab || 'profile';
+	document.querySelectorAll('.tab-panel').forEach(panel => {
+		(panel as HTMLElement).style.display = 'none';
+	});
+	const activePanel = document.getElementById(mainTab + '-panel');
+	if (activePanel) (activePanel as HTMLElement).style.display = 'block';
 
-	if (state.activeStatsTab === 'overview') statsEl.innerHTML = statsOverview(state.stats, state.history);
-	if (state.activeStatsTab === 'performance') statsEl.innerHTML = statsPerformance(state.stats, state.history);
-	if (state.activeStatsTab === 'trends') {
-		statsEl.innerHTML = statsTrends(state.stats).replace('Games/Week', `Games/Week`).replace('value: String(gamesThisWeek([]))', '');
-		// quick patch: no fake data, charts will show real; label is static
+	// Preencher conteúdo das sub-abas SÓ se a tab principal correspondente estiver ativa
+	if (mainTab === 'stats') {
+		const statsInner = document.getElementById('stats-content-inner');
+		if (statsInner) {
+			if (state.activeStatsTab === 'overview') statsInner.innerHTML = statsOverview(state.stats, state.history);
+			if (state.activeStatsTab === 'performance') statsInner.innerHTML = statsPerformance(state.stats, state.history);
+			if (state.activeStatsTab === 'trends') statsInner.innerHTML = statsTrends(state.stats);
+		}
+	}
+	if (mainTab === 'history') {
+		const histInner = document.getElementById('history-content-inner');
+		if (histInner) {
+			if (state.activeHistoryView === 'list') histInner.innerHTML = historyList(state.history);
+			if (state.activeHistoryView === 'detailed') histInner.innerHTML = historyDetailed(state.history);
+			if (state.activeHistoryView === 'analysis') histInner.innerHTML = historyAnalysis(state.history);
+		}
 	}
 
-	if (state.activeHistoryView === 'list') histEl.innerHTML = historyList(state.history);
-	if (state.activeHistoryView === 'detailed') histEl.innerHTML = historyDetailed(state.history);
-	if (state.activeHistoryView === 'analysis') histEl.innerHTML = historyAnalysis(state.history);
+	// Listeners para tabs principais (corrigido para .main-tab e data-main-tab)
+	document.querySelectorAll('.main-tab').forEach(btn => {
+		btn.addEventListener('click', (e) => {
+			const tab = (e.currentTarget as HTMLElement).dataset.mainTab;
+			if (!tab) return;
+			if (state.activeMainTab !== tab) {
+				state.activeMainTab = tab as 'profile' | 'stats' | 'history' | 'friends';
+				// Reset sub-tab ao trocar de tab principal
+				if (tab === 'stats') state.activeStatsTab = 'overview';
+				if (tab === 'history') state.activeHistoryView = 'list';
+				render(container);
+			}
+		});
+	});
+
+	// Listeners para sub-tabs de stats
+	if (mainTab === 'stats') {
+		document.querySelectorAll('.stats-tab-btn').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const tab = (e.currentTarget as HTMLElement).dataset.tab;
+				if (!tab) return;
+				if (state.activeStatsTab !== tab) {
+					state.activeStatsTab = tab as typeof state.activeStatsTab;
+					render(container);
+				}
+			});
+		});
+	}
+	// Listeners para sub-tabs de history
+	if (mainTab === 'history') {
+		document.querySelectorAll('.history-tab-btn').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				const tab = (e.currentTarget as HTMLElement).dataset.tab;
+				if (!tab) return;
+				if (state.activeHistoryView !== tab) {
+					state.activeHistoryView = tab as typeof state.activeHistoryView;
+					render(container);
+				}
+			});
+		});
+	}
 
 	renderAllCharts();
 }
@@ -128,6 +182,22 @@ export function setupRemoveFriendEvents() {
 }
 
 export function setupEvents(container: HTMLElement) {
+	// Main Tabs
+	container.addEventListener('click', (e) => {
+		const t = e.target as HTMLElement;
+		if (t.classList && t.classList.contains('main-tab')) {
+			const tab = t.dataset.mainTab as any;
+			if (!tab) return;
+			if (state.activeMainTab !== tab) {
+				state.activeMainTab = tab;
+				// Reset subtabs ao trocar de main tab
+				if (tab === 'stats') state.activeStatsTab = 'overview';
+				if (tab === 'history') state.activeHistoryView = 'list';
+				render(container);
+			}
+			return;
+		}
+	}, true);
 
 	container.addEventListener('click', async (e) => {
 		const t = e.target as HTMLElement;
@@ -312,18 +382,7 @@ export function setupEvents(container: HTMLElement) {
 			};
 		}
 
-		// Tabs - FIX: Merged stats tabs
-		if (t.classList.contains('stats-tab')) {
-			state.activeStatsTab = (t.dataset.tab as any) ?? 'overview';
-			render(container);
-			return;
-		}
-
-		if (t.classList.contains('history-tab')) {
-			state.activeHistoryView = (t.dataset.view as any) ?? 'list';
-			render(container);
-			return;
-		}
+		// Tabs agora são tratados pelo setupTabNavigation do template
 
 		// FIX: History pagination
 		if (id === 'load-more-matches') {
