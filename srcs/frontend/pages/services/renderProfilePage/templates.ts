@@ -4,16 +4,16 @@ import {
 	averageScore, bestPerformance, consistencyScore, bestPlayingDay, clutchFactor, currentMomentum,
 	dominanceRating, efficiencyScore, gamesThisWeek, longestWinStreak, mostActiveTime, opponentAnalysis
 } from './metrics.js';
-// GRID-inspired color palette (updated pink & purple)
+// GRIS-inspired color palette: soft blues, lavenders, greys, muted golds, gentle pinks
 const GRID_COLORS = {
-	primary: '#8c8e91', // Silver
+	primary: '#6b7a8f', // Soft blue-grey
 	secondary: '#f8f9f8', // Light gray
-	accent: '#e84393', // Magical pink (was neon yellow)
-	warm: '#9b59b6', // Enchanted purple (was racing orange)
-	cool: '#00aeef', // Circuit blue
-	success: '#00d563', // Performance green
-	muted: '#f8f9f7', // Gray
-	bg: '#12181c' // Dark background
+	accent: '#b6a6ca', // Muted lavender
+	warm: '#e6c79c', // Muted gold
+	cool: '#7fc7d9', // Soft blue
+	success: '#a3d9b1', // Gentle green
+	muted: '#eaeaea', // Pale gray
+	bg: '#f4f6fa' // Very light blue/gray
 };
 // Team logo mapping
 const TEAM_LOGOS = {
@@ -24,144 +24,78 @@ const TEAM_LOGOS = {
 };
 export function header(profile: Profile, isEdit: boolean): string {
 	const teamLogo = TEAM_LOGOS[profile.team?.toUpperCase() as keyof typeof TEAM_LOGOS] || '';
-	const avatar = isEdit
-		? `
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="position:relative;display:inline-block">
-        <img id="avatar-preview" src="${profile.avatar_url}" width="120" height="120"
-             style="border-radius:50%;border:4px solid ${GRID_COLORS.cool};object-fit:cover;cursor:pointer;
-                    box-shadow:0 8px 32px rgba(0,174,239,0.2);" alt="Avatar"/>
-        <div id="avatar-overlay" style="position:absolute;inset:0;background:rgba(28,33,38,0.7);border-radius:50%;
-                    display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer">
-          <span style="color:white;font-size:14px;font-weight:600">📷 Change</span>
+	const avatar = `
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+      <div style="background:radial-gradient(ellipse at 60% 40%, #f4f6fa 60%, #b6a6ca 100%, #7fc7d9 120%);border-radius:50%;padding:10px;box-shadow:0 8px 40px 0 #b6a6ca33, 0 2px 16px 0 #7fc7d933;">
+        <img
+          ${isEdit ? 'id="avatar-preview"' : ''}
+          src="${profile.avatar_url}"
+          width="120" height="120"
+          style="border-radius:50%;border:2.5px solid #fff;object-fit:cover;background:rgba(255,255,255,0.7);box-shadow:0 2px 16px 0 #b6a6ca33;${isEdit ? 'cursor:pointer;' : ''}font-family:'Cormorant Garamond',serif;"
+          alt="Avatar"
+        />
+        ${teamLogo ? `<img src="${teamLogo}" width="34" height="34" style="position:absolute;bottom:0;right:0;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:contain;box-shadow:0 2px 8px #b6a6ca22;" alt="Team Logo"/>` : ''}
+        ${isEdit ? `<div id="avatar-overlay" style="position:absolute;inset:0;background:rgba(127,199,217,0.13);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer"><span style="color:#6b7a8f;font-size:15px;font-weight:600;font-family:'Cormorant Garamond',serif;">Change</span></div>` : ''}
+      </div>
+      ${isEdit ? `<div style="margin-top:14px;text-align:center"><button id="avatar-btn" type="button" style="background:linear-gradient(90deg,#b6a6ca,#7fc7d9);color:#fff;border:none;padding:8px 20px;border-radius:18px;cursor:pointer;font-size:14px;font-weight:500;box-shadow:0 2px 8px #b6a6ca33;font-family:'Cormorant Garamond',serif;">Choose Avatar</button></div>` : ''}
+    </div>
+  `;
+	const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
+	return `
+    <div class="header-gris" style="background:linear-gradient(120deg, #f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);padding:40px 32px 32px 32px;border-radius:32px;margin:32px 0 36px 0;box-shadow:0 10px 48px 0 #b6a6ca33, 0 2px 16px 0 #7fc7d933;display:flex;align-items:center;gap:44px;flex-wrap:wrap;backdrop-filter:blur(2.5px);">
+      <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;">
+        ${avatar}
+        <div style="margin-top:10px;font-size:1.1rem;color:#7fc7d9;font-weight:600;letter-spacing:0.5px;text-shadow:0 2px 8px #fff8;font-family:'Cormorant Garamond',serif;">“The world is painted in gentle hues.”</div>
+      </div>
+      <div style="flex:1;min-width:260px;max-width:600px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+          <h2 style="margin:0;color:#6b7a8f;font-size:2.2rem;font-weight:700;letter-spacing:-1.5px;line-height:1.1;text-shadow:0 2px 8px #fff8;font-family:'Cormorant Garamond',serif;">@${profile.username}</h2>
+          ${!isEdit ? `<button id="edit-btn" title="Edit profile" style="background:none;border:none;cursor:pointer;font-size:1.5rem;color:#b6a6ca;padding:8px;border-radius:50%;transition:all 0.3s"><span class='icon-edit'></span>Edit</button>` : ''}
         </div>
-      </div>
-      <div style="margin-top:15px">
-        <button id="avatar-btn" type="button"
-                style="background:${GRID_COLORS.cool};color:#fff;border:none;padding:8px 16px;
-                       border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;
-                       transition:all 0.3s;box-shadow:0 4px 12px rgba(0,174,239,0.3)">
-          📷 Choose Avatar
-        </button>
-      </div>
-    </div>`
-		: `
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="position:relative;display:inline-block">
-        <img src="${profile.avatar_url}" width="120" height="120"
-             style="border-radius:50%;border:4px solid ${GRID_COLORS.cool};object-fit:cover;
-                    box-shadow:0 8px 32px rgba(0,174,239,0.2);" alt="Avatar"/>
-${teamLogo ? `
-          <img src="${teamLogo}" width="40" height="40"
-               style="position:absolute;bottom:-5px;right:-5px;border-radius:50%;
-                      border:3px solid white;background:white;object-fit:contain" alt="Team Logo"/>
+        <div style="color:#6b7a8f;font-size:1.15rem;font-weight:500;margin-bottom:2px;text-shadow:0 1px 4px #fff6;font-family:'Cormorant Garamond',serif;">${profile.display_name || profile.name || ''}</div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-size:1rem;">
+          <span style="color:#7fc7d9;font-weight:600;font-family:'Cormorant Garamond',serif;">${profile.email || 'No email'}</span>
+          <span style="color:#b6a6ca;font-weight:600;font-family:'Cormorant Garamond',serif;">${profile.team ? `Team: <span style='color:#7fc7d9;font-weight:700;font-family:'Cormorant Garamond',serif;'>${profile.team}</span>` : 'No team'}</span>
+          <span style="color:#6b7a8f;font-weight:600;font-family:'Cormorant Garamond',serif;">Since: <span style="color:#b6a6ca;font-weight:500;font-family:'Cormorant Garamond',serif;">${createdAtText}</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-size:1rem;">
+          <span style="color:#b6a6ca;font-weight:600;font-family:'Cormorant Garamond',serif;">Status: ${profile.online_status ? '<span style=\'color:#a3d9b1\'>Online</span>' : '<span style=\'color:#b6a6ca\'>Offline</span>'}</span>
+          <span style="color:#6b7a8f;font-weight:600;font-family:'Cormorant Garamond',serif;">Last seen: <span style="color:#b6a6ca;font-weight:500;font-family:'Cormorant Garamond',serif;">${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}</span></span>
+        </div>
+        ${isEdit ? `
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-top:18px;">
+            <div>
+              <label style="display:block;margin-bottom:8px;font-weight:600;color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Username:</label>
+              <input id="username-input" type="text" value="${profile.username}" required minlength="3"
+                     style="width:100%;padding:12px;border:2px solid #b6a6ca;border-radius:12px;font-size:14px;transition:border-color 0.3s;background:#f4f6fa;font-family:'Cormorant Garamond',serif;"/>
+              <small style="color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Min 3 characters</small>
+            </div>
+            <div>
+              <label style="display:block;margin-bottom:8px;font-weight:600;color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Display Name:</label>
+              <input id="display-input" type="text" value="${profile.display_name || profile.name || ''}" required
+                     style="width:100%;padding:12px;border:2px solid #b6a6ca;border-radius:12px;font-size:14px;transition:border-color 0.3s;background:#f4f6fa;font-family:'Cormorant Garamond',serif;"/>
+              <small style="color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Public name shown in games</small>
+            </div>
+          </div>
+          <div style="margin:18px 0 0 0">
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:#9b59b6">Email:</label>
+            <input id="email-input" type="email" value="${profile.email || ''}"
+                   style="width:100%;padding:12px;border:2px solid #e84393;border-radius:12px;font-size:14px;transition:border-color 0.3s;background:#f8f9f8"/>
+            <small style="color:#e84393">Optional - for account recovery</small>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+      <button id="save-btn"
+        style="background:linear-gradient(90deg,#00d563,#9b59b6);color:#fff;border:none;padding:12px 24px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 4px 12px #9b59b633">Save Changes</button>
+      <button id="cancel-btn"
+        style="background:linear-gradient(90deg,#e84393,#9b59b6);color:#fff;border:none;padding:12px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s">Cancel</button>
+      <button id="pass-btn"
+        style="background:linear-gradient(90deg,#e84393,#9b59b6);color:#fff;border:none;padding:12px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s;box-shadow:0 4px 12px #e8439333">Change Password</button>
+          </div>
+          <div id="save-error" style="color:#e84393;margin-top:15px;font-size:14px;font-weight:500"></div>
         ` : ''}
       </div>
-    </div>`;
-	const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
-	return isEdit
-		? `
-    <div class="header-edit" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
-                padding:30px;border-radius:20px;margin:20px 0;
-                box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
-      <div class="header-content" style="display:flex;align-items:flex-start;gap:30px;flex-wrap:wrap">
-${avatar}
-        <div style="flex:1;min-width:300px">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:20px">
-            <div>
-              <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Username:</label>
-              <input id="username-input" type="text" value="${profile.username}" required minlength="3"
-                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
-                            font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
-              <small style="color:${GRID_COLORS.muted}">Min 3 characters</small>
-            </div>
-            <div>
-              <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Display Name:</label>
-              <input id="display-input" type="text" value="${profile.display_name || profile.name || ''}" required
-                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
-                            font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
-              <small style="color:${GRID_COLORS.muted}">Public name shown in games</small>
-            </div>
-          </div>
-          <div style="margin-bottom:20px">
-            <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Email:</label>
-            <input id="email-input" type="email" value="${profile.email || ''}"
-                   style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
-                          font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
-            <small style="color:${GRID_COLORS.muted}">Optional - for account recovery</small>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <button id="save-btn"
-                    style="background:${GRID_COLORS.success};color:#fff;border:none;padding:12px 24px;
-                           border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;
-                           transition:all 0.3s;box-shadow:0 4px 12px rgba(0,213,99,0.3)">
-              💾 Save Changes
-            </button>
-            <button id="cancel-btn"
-                    style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
-                           border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
-                           transition:all 0.3s">
-              ❌ Cancel
-            </button>
-            <button id="pass-btn"
-                    style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
-                           border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
-                           transition:all 0.3s;box-shadow:0 4px 12px rgba(155,89,182,0.3)">
-              🔒 Change Password
-            </button>
-          </div>
-          <div id="save-error" style="color:${GRID_COLORS.accent};margin-top:15px;font-size:14px;font-weight:500"></div>
-        </div>
-      </div>
-      <div style="margin-top:25px;padding-top:25px;border-top:1px solid ${GRID_COLORS.cool}">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;font-size:14px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <span style="font-weight:600;color:${GRID_COLORS.primary}">Team:</span>
-            <div style="display:flex;align-items:center;gap:8px">
-${teamLogo ? `<img src="${teamLogo}" width="24" height="24" style="border-radius:50%" alt="Team"/>` : ''}
-              <span>${profile.team || '—'}</span>
-            </div>
-          </div>
-          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> ${createdAtText}</div>
-          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}</div>
-          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
-        </div>
-      </div>
-    </div>`
-		: `
-    <div class="header-view" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
-                padding:30px;border-radius:20px;margin:20px 0;
-                box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
-      <div class="header-content" style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
-${avatar}
-        <div style="flex:1;min-width:300px">
-          <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
-            <h3 style="margin:0;color:${GRID_COLORS.primary};font-size:28px;font-weight:700">@${profile.username}</h3>
-            <button id="edit-btn" title="Edit profile"
-                    style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.cool};
-                           padding:8px;border-radius:50%;transition:all 0.3s">🖊️</button>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-weight:600;color:${GRID_COLORS.primary}">Display Name:</span>
-              <span style="color:${GRID_COLORS.muted}">${profile.display_name || profile.name || '—'}</span>
-            </div>
-            <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Email:</span> <span style="color:${GRID_COLORS.muted}">${profile.email || 'Not provided'}</span></div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-weight:600;color:${GRID_COLORS.primary}">Team:</span>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="color:${GRID_COLORS.muted}">${profile.team || '—'}</span>
-              </div>
-            </div>
-            <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> <span style="color:${GRID_COLORS.muted}">${createdAtText}</span></div>
-          </div>
-          <div style="font-size:14px;color:${GRID_COLORS.muted};padding:12px;background:rgba(0,174,239,0.1);border-radius:8px">
-            <span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} •
-            <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}
-          </div>
-        </div>
-      </div>
-    </div>`;
+    </div>
+  `;
 }
 export function friendsList(friends: Friend[]): string {
 	if (!friends || friends.length === 0) {
@@ -568,292 +502,409 @@ ${AVAILABLE_AVATARS.map((a, i) => `
 
 export function layout(profile: Profile, stats: Stats, history: Match[], friends: Friend[], statsTab: string, historyView: string, editMode: boolean): string {
 	const responsiveStyles = `
-  <style>
-    /* Use a system serif font (no external import) */
-    body {
-      margin:0; padding:0;
-      background: url('/assets/Background.png') no-repeat center/cover;
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      color: ${GRID_COLORS.secondary};
-      overflow-x: hidden;
-    }
-    .profile-container {
-      background: rgba(28,33,38,0.8);
-      border-radius: 16px;
-      padding: 20px;
-    }
-    .petal {
-    position: relative;
-    width: 100%;
-    top: -340px;
-    text-align: left;
-	}
-
-	.petal span {
-		display: inline-block;
-		overflow: hidden;
-		width: 5px;
-		height: 5px;
-		border-radius: 200px 10px 200px 200px;
-		background: linear-gradient(to bottom, #faaca8, #ddd6f3);
-		z-index: 1;
-		transform: skewX(30deg);
-		backface-visibility: visible;
-		-webkit-animation: fallingSakura1 8s ease infinite;
-	}
-
-	.petal span:nth-of-type(3n+2) {
-		-webkit-animation: fallingSakura2 8s ease infinite;
-	}
-
-	.petal span:nth-of-type(3n+1) {
-		-webkit-animation: fallingSakura3 8s ease infinite;
-	}
-
-
-	.petal span:nth-of-type(n)   { -webkit-animation-delay: -1.9s;}
-	.petal span:nth-of-type(2n)  { -webkit-animation-delay: 3.9s;}
-	.petal span:nth-of-type(3n)  { -webkit-animation-delay: 2.3s;}
-	.petal span:nth-of-type(4n)  { -webkit-animation-delay: 4.4s;}
-	.petal span:nth-of-type(5n)  { -webkit-animation-delay: 5s;  }
-	.petal span:nth-of-type(6n)  { -webkit-animation-delay: 3.5s;}
-	.petal span:nth-of-type(7n)  { -webkit-animation-delay: 2.8s;}
-	.petal span:nth-of-type(8n)  { -webkit-animation-delay: 1.5s;}
-	.petal span:nth-of-type(9n)  { -webkit-animation-delay: 3.3s;}
-	.petal span:nth-of-type(10n) { -webkit-animation-delay: 2.5s;}
-	.petal span:nth-of-type(11n) { -webkit-animation-delay: 1.2s;}
-	.petal span:nth-of-type(12n) { -webkit-animation-delay: 4.1s;}
-	.petal span:nth-of-type(13n) { -webkit-animation-delay: 5.8s;}
-	.petal span:nth-of-type(14n) { -webkit-animation-delay: -0.1s;}
-	.petal span:nth-of-type(15n) { -webkit-animation-delay: 6.3s;}
-	.petal span:nth-of-type(16n) { -webkit-animation-delay: -1s;}
-	.petal span:nth-of-type(17n) { -webkit-animation-delay: 7.4s;}
-	.petal span:nth-of-type(18n) { -webkit-animation-delay: -0.3s;}
-	.petal span:nth-of-type(19n) { -webkit-animation-delay: 8.3s;}
-	.petal span:nth-of-type(20n) { -webkit-animation-delay: -0.6s;}
-	.petal span:nth-of-type(21n) { -webkit-animation-delay: 7.7s;}
-
-	.petal span:nth-of-type(2n+2) {
-		background: linear-gradient(to right, #fffbd5, #F15F79);
-	}
-
-	.petal span:nth-of-type(3n+1) {
-		background: linear-gradient(to right, #DD5E89, #F7BB97);
-	}
-
-	.petal span:nth-of-type(3n+2) {
-		border-radius: 20px 1px;
-	}
-	.petal span:nth-of-type(3n+3) {
-		transform: rotateX(-180deg);
-	}
-
-	.petal span:nth-of-type(3n+2) {
-		animation-duration: 12sec;
-	}
-
-	.petal span:nth-of-type(4n+2) {
-		animation-duration: 9sec;
-	}
-
-	.petal span:nth-of-type(5n+2) {
-		width: 12px;
-		height: 12px;
-		box-shadow: 1.5px 1.5px 8px #fc7bd1;
-	}
-
-	.petal span:nth-of-type(4n+3) {
-		width: 10px;
-		height: 10px;
-		box-shadow: 1px 1px 6px #fc7bd1;
-	}
-	.petal span:nth-of-type(n)    { height:23px; width:30px; }
-
-	.petal span:nth-of-type(2n+1)    { height:11px; width:16px; }
-
-	.petal span:nth-of-type(3n+2)  { height:17px; width:23px; }
-
-	@-webkit-keyframes fallingSakura1 {
-		0% {
-			-webkit-transform:
-				translate3d(0,0,0)
-				rotateX(0deg);
-			opacity: 1;
-		}
-
-		100% {
-			-webkit-transform:
-				translate3d(400px,1200px,0px)
-				rotateX(-290deg);
-			opacity: 0.3;
-		}
-	}
-
-	@-webkit-keyframes fallingSakura2 {
-		0% {
-			-webkit-transform:
-				translate3d(0,0,0)
-				rotateX(-20deg);
-		opacity: 1;
-		}
-
-		100% {
-			-webkit-transform:
-				translate3d(200px,1200px,0px)
-				rotateX(-70deg);
-				opacity: 0.2;
-		}
-	}
-
-	@-webkit-keyframes fallingSakura3 {
-		0% {
-			-webkit-transform:
-				translate3d(0,0,0)
-				rotateX(90deg);
-		opacity: 1;
-		}
-
-		100% {
-			-webkit-transform:
-				translate3d(500px,1200px,0px)
-				rotateX(290deg);
-			opacity: 0;
-		}
-	}
-
-	/* tabs hover & active states */
-	.stats-tab:hover, .history-tab:hover { color: ${GRID_COLORS.accent}; }
-	.stats-tab.active, .history-tab.active {
-  color: ${GRID_COLORS.accent};
-  border-bottom-color: ${GRID_COLORS.accent};
-    }
-    @media (max-width: 1024px) {
-      .profile-layout {
-        grid-template-columns: 1fr !important;
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        margin: 0; padding: 0;
+        background: linear-gradient(120deg, #e3e6f3 60%, #b6a6ca33 100%, #7fc7d933 120%), url('/assets/Background.png') no-repeat center/cover;
+        font-family: 'Inter', 'EB Garamond', serif;
+        color: #23272f;
+        overflow-x: hidden;
+        min-height: 100vh;
       }
-      .header-content {
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
+      .gris-petal-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
       }
-      .stats-grid {
-        grid-template-columns: 1fr !important;
+      .gris-petal-bg span {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.13;
+        filter: blur(2.5px);
+        pointer-events: none;
+        animation: grisPetalFloat 18s linear infinite;
       }
-    }
-    @media (max-width: 768px) {
-      .container {
-        padding: 10px !important;
+      @keyframes grisPetalFloat {
+        0% { transform: translateY(0) scale(1); opacity: 0.13; }
+        40% { opacity: 0.18; }
+        60% { transform: translateY(40vh) scale(1.08); opacity: 0.15; }
+        100% { transform: translateY(80vh) scale(0.95); opacity: 0.08; }
       }
-      .match-item {
-        flex-direction: column !important;
+      .gris-main-card {
+        max-width: 1200px;
+        margin: 60px auto 40px auto;
+        background: rgba(255,255,255,0.65);
+        border-radius: 32px;
+        box-shadow: 0 12px 64px 0 #b6a6ca44, 0 2px 16px 0 #7fc7d933;
+        padding: 0;
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 0;
+        min-height: 600px;
+        backdrop-filter: blur(22px) saturate(1.3);
+        border: 1.5px solid #e3e6f3;
+        overflow: hidden;
+        animation: dreamyFadeSlideIn 1.1s cubic-bezier(.4,2,.6,1);
       }
-      h2 {
-        font-size: 24px !important;
+      @media (max-width: 900px) {
+        .gris-main-card { grid-template-columns: 1fr; min-height: unset; }
       }
-      h3 {
-        font-size: 20px !important;
+      @keyframes dreamyFadeSlideIn {
+        0% { opacity: 0; transform: translateY(60px) scale(0.98); }
+        60% { opacity: 0.7; }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
       }
-      h4 {
-        font-size: 16px !important;
+      .gris-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        box-shadow: 0 8px 40px #b6a6ca44, 0 2px 8px #7fc7d933;
+        background: radial-gradient(ellipse at 60% 40%, #f4f6fa 60%, #b6a6ca 100%, #7fc7d9 120%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 48px auto 18px auto;
+        position: relative;
+        overflow: visible;
+        animation: dreamyAvatarFloat 7s ease-in-out infinite alternate;
+        transition: box-shadow 0.4s;
       }
-      button, input {
-        font-size: 12px !important;
+      @keyframes dreamyAvatarFloat {
+        0% { transform: translateY(0) scale(1.01); }
+        100% { transform: translateY(-18px) scale(1.04) rotate(-2deg); }
       }
-      .friend-item {
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
+      @keyframes grisAvatarFloat {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-8px); }
       }
-    }
-    @media (max-width: 480px) {
-      .container {
-        padding: 5px !important;
+      .gris-avatar img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2.5px solid #fff;
+        background: rgba(255,255,255,0.7);
+        box-shadow: 0 2px 16px 0 #b6a6ca33;
       }
-      canvas {
-        height: 150px !important;
+      .gris-username {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #23272f;
+        text-align: center;
+        letter-spacing: -1.5px;
+        margin: 0 0 6px 0;
+        font-family: 'Inter', 'EB Garamond', serif;
       }
-    }
-  </style>
+      .gris-quote {
+        font-size: 1.15rem;
+        color: #b6a6ca;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 18px;
+        font-family: 'EB Garamond', serif;
+      }
+      .gris-divider {
+        width: 80px;
+        height: 3px;
+        margin: 18px auto 18px auto;
+        background: repeating-linear-gradient(90deg,#b6a6ca,#b6a6ca 10px,#7fc7d9 10px,#7fc7d9 20px,#e6c79c 20px,#e6c79c 30px,#fff 30px);
+        border-radius: 2px;
+        opacity: 0.7;
+        box-shadow: 0 1px 4px #b6a6ca33;
+      }
+      .gris-section {
+        width: 100%;
+        background: rgba(255,255,255,0.92);
+        border-radius: 18px;
+        box-shadow: 0 2px 18px #b6a6ca22;
+        padding: 32px 32px 24px 32px;
+        margin-bottom: 24px;
+        font-family: 'Inter', 'EB Garamond', serif;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        animation: dreamySectionFloat 6s ease-in-out infinite alternate;
+      }
+      @keyframes dreamySectionFloat {
+        0% { box-shadow: 0 2px 18px #b6a6ca22; }
+        100% { box-shadow: 0 8px 32px #b6a6ca33; }
+      }
+      .gris-section-title {
+        font-size: 1.35rem;
+        color: #23272f;
+        font-weight: 700;
+        margin-bottom: 12px;
+        text-align: left;
+        font-family: 'Inter', 'EB Garamond', serif;
+        letter-spacing: -0.5px;
+      }
+      .gris-section-content {
+        font-size: 1.08rem;
+        color: #23272f;
+        text-align: left;
+        font-family: 'Inter', 'EB Garamond', serif;
+      }
+      .gris-action-btn {
+        background: linear-gradient(90deg,#b6a6ca,#7fc7d9);
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        min-width: 54px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        font-family: 'Inter', 'EB Garamond', serif;
+        font-weight: 600;
+        box-shadow: 0 2px 12px #b6a6ca33;
+        cursor: pointer;
+        margin: 0 8px;
+        padding: 0 24px;
+        transition: background 0.3s, box-shadow 0.3s, transform 0.25s cubic-bezier(.4,2,.6,1), filter 0.3s;
+        filter: drop-shadow(0 2px 8px #b6a6ca33);
+        will-change: transform, filter;
+        animation: dreamyButtonFloat 4s ease-in-out infinite alternate;
+        letter-spacing: 0.02em;
+      }
+      .gris-action-btn:active {
+        transform: scale(0.96) translateY(2px);
+        filter: brightness(0.95) blur(0.5px);
+      }
+      .gris-action-btn:hover {
+        background: linear-gradient(90deg,#7fc7d9,#b6a6ca);
+        box-shadow: 0 4px 24px #b6a6ca55;
+        transform: scale(1.06) translateY(-2px) rotate(-2deg);
+        filter: brightness(1.08) blur(0.2px) drop-shadow(0 6px 18px #b6a6ca33);
+      }
+      @keyframes dreamyButtonFloat {
+        0% { transform: translateY(0) scale(1); }
+        100% { transform: translateY(-6px) scale(1.03) rotate(-1.5deg); }
+      }
+      .gris-main-card {
+        /* ...existing code... */
+        /* Entrance animation removed */
+      }
+      /* dreamyCardFadeIn keyframes removed */
+      @media (max-width: 1100px) {
+        .gris-main-card { padding: 24px 2vw; max-width: 98vw; }
+        .gris-section { padding: 18px 2vw 14px 2vw; }
+      }
+      @media (max-width: 700px) {
+        .gris-main-card { padding: 12px 1vw; max-width: 100vw; }
+        .gris-section { padding: 10px 1vw 8px 1vw; }
+        .gris-avatar { width: 80px; height: 80px; }
+        .gris-avatar img { width: 60px; height: 60px; }
+        .gris-username { font-size: 1.2rem; }
+      }
+    </style>
 `;
 
 	return `${responsiveStyles}
-      <div class="petal">
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-	  </div>
-      <div class="profile-container" style="max-width:1400px;margin:0 auto;">
-${header(profile, editMode)}
-        <div class="profile-layout" style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:30px">
-          <div>
-            <div style="background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);border-radius:12px;box-shadow:0 4px 20px rgba(0,174,239,0.1);margin-bottom:30px;">
-              <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.success} 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0">
-                <h3 style="margin:0;font-size:20px;display:flex;align-items:center;gap:10px">📊 Gaming Statistics Dashboard</h3>
-                <p style="margin:5px 0 0 0;opacity:0.9;font-size:14px">Comprehensive view of your gaming performance</p>
-              </div>
-              <div style="display:flex;border-bottom:1px solid rgba(0,174,239,0.2);background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%)">
-${['overview', 'performance', 'trends'].map(tab => `
-                  <button class="stats-tab ${statsTab === tab ? 'active' : ''}" data-tab="${tab}"
-                          style="flex:1;padding:12px 20px;border:none;background:${statsTab === tab ? GRID_COLORS.bg : 'transparent'};
-                                 border-bottom:3px solid ${statsTab === tab ? GRID_COLORS.cool : 'transparent'};
-                                 cursor:pointer;font-weight:${statsTab === tab ? 'bold' : 'normal'};color:${GRID_COLORS.primary}">
-${tab === 'overview' ? '📈 Overview' : tab === 'performance' ? '🎯 Performance' : '📊 Trends'}
-                  </button>
-                `).join('')}
-              </div>
-              <div id="stats-content" style="padding:20px"></div>
-            </div>
-            <div style="background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);border-radius:12px;box-shadow:0 4px 20px rgba(0,174,239,0.1);">
-              <div style="background:linear-gradient(135deg, ${GRID_COLORS.accent} 0%, ${GRID_COLORS.warm} 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0">
-                <h3 style="margin:0;font-size:20px;display:flex;align-items:center;gap:10px">🏆 Match History Dashboard</h3>
-                <p style="margin:5px 0 0 0;opacity:0.9;font-size:14px">Detailed analysis of your game sessions</p>
-              </div>
-              <div style="display:flex;border-bottom:1px solid rgba(0,174,239,0.2);background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%)">
-${['list', 'detailed', 'analysis'].map(view => `
-                  <button class="history-tab ${historyView === view ? 'active' : ''}" data-view="${view}"
-                          style="flex:1;padding:12px 20px;border:none;background:${historyView === view ? GRID_COLORS.bg : 'transparent'};
-                                 border-bottom:3px solid ${historyView === view ? GRID_COLORS.accent : 'transparent'};
-                                 cursor:pointer;font-weight:${historyView === view ? 'bold' : 'normal'};color:${GRID_COLORS.primary}">
-${view === 'list' ? '📋 Match List' : view === 'detailed' ? '🔍 Detailed View' : '📈 Analysis'}
-                  </button>
-                `).join('')}
-              </div>
-              <div id="history-content" style="padding:20px"></div>
-            </div>
+    <div class="gris-petal-bg">
+      ${Array.from({ length: 18 }).map((_, i) => {
+		const size = 60 + Math.random() * 120;
+		const left = Math.random() * 100;
+		const delay = (Math.random() * 18).toFixed(2);
+		const pastel = [
+			'rgba(127,199,217,0.18)',
+			'rgba(182,166,202,0.18)',
+			'rgba(230,199,156,0.13)',
+			'rgba(244,246,250,0.18)',
+			'rgba(255,255,255,0.22)'
+		];
+		const color = pastel[Math.floor(Math.random() * pastel.length)];
+		return `<span style="top:-${size / 2}px;left:${left}vw;width:${size}px;height:${size * 1.2}px;background:${color};animation-delay:${delay}s;"></span>`;
+	}).join('')}
+    </div>
+      <main class="gris-main-card">
+        <div style="background:linear-gradient(120deg,#f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 0 32px 0;gap:18px;min-height:100%;border-right:1.5px solid #e3e6f3;">
+          <div class="gris-avatar">
+            <img src="${profile.avatar_url}" alt="Avatar"/>
           </div>
-          <div>
-            <h3 style="color:${GRID_COLORS.primary};border-bottom:2px solid ${GRID_COLORS.accent};padding-bottom:8px;margin-bottom:15px">👥 Friends</h3>
-            <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:15px;border-radius:8px;margin-bottom:20px;">
-              <h4 style="margin:0 0 10px 0;font-size:14px;color:${GRID_COLORS.muted}">Add New Friend</h4>
-              <div style="display:flex;gap:8px">
-                <input id="friend-input" placeholder="Enter username..." style="flex:1;padding:8px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;font-size:14px;background:white"/>
-                <button id="friend-add" style="background:${GRID_COLORS.cool};color:#fff;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-size:14px">➕ Add</button>
-              </div>
-              <div id="friend-msg" style="margin-top:8px;font-size:12px"></div>
-            </div>
-            <div id="friends-container">${friendsList(friends)}</div>
+          <div class="gris-username">@${profile.username}</div>
+          <div class="gris-quote">“The world is painted in gentle hues.”</div>
+          <div class="gris-divider"></div>
+          <div style="display:flex;flex-direction:column;gap:10px;width:100%;align-items:center;">
+            <button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button">Edit</button>
+            <button id="pass-btn" class="gris-action-btn" title="Change Password" type="button">Change Password</button>
           </div>
         </div>
-${modals()}
-      </div>
+        <div style="display:flex;flex-direction:column;gap:32px;padding:48px 32px 32px 32px;">
+          <div class="gris-section collapsible open" id="profile-section">
+            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="profile-content">Profile <span class="toggle-arrow">▼</span></div>
+            <div class="gris-section-content collapsible-content" id="profile-content" style="display:block;">
+              <div><b>Name:</b> ${profile.display_name || profile.name}</div>
+              <div><b>Email:</b> ${profile.email || 'Not provided'}</div>
+              <div><b>Team:</b> ${profile.team || '—'}</div>
+              <div><b>Member since:</b> ${profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</div>
+            </div>
+          </div>
+          <div class="gris-section collapsible" id="stats-section">
+            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="stats-content">Statistics <span class="toggle-arrow">▶</span></div>
+            <div class="gris-section-content collapsible-content" id="stats-content" style="display:none;">
+              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+                <button class="stats-tab gris-action-btn" data-tab="overview" type="button" style="background:${statsTab === 'overview' ? '#7fc7d9' : '#b6a6ca'}">Overview</button>
+                <button class="stats-tab gris-action-btn" data-tab="performance" type="button" style="background:${statsTab === 'performance' ? '#7fc7d9' : '#b6a6ca'}">Performance</button>
+                <button class="stats-tab gris-action-btn" data-tab="trends" type="button" style="background:${statsTab === 'trends' ? '#7fc7d9' : '#b6a6ca'}">Trends</button>
+              </div>
+              <div id="stats-content-inner">Loading stats...</div>
+            </div>
+          </div>
+          <div class="gris-section collapsible" id="history-section">
+            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="history-content">Match History <span class="toggle-arrow">▶</span></div>
+            <div class="gris-section-content collapsible-content" id="history-content" style="display:none;">
+              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+                <button class="history-tab gris-action-btn" data-view="list" type="button" style="background:${historyView === 'list' ? '#7fc7d9' : '#b6a6ca'}">List</button>
+                <button class="history-tab gris-action-btn" data-view="detailed" type="button" style="background:${historyView === 'detailed' ? '#7fc7d9' : '#b6a6ca'}">Detailed</button>
+                <button class="history-tab gris-action-btn" data-view="analysis" type="button" style="background:${historyView === 'analysis' ? '#7fc7d9' : '#b6a6ca'}">Analysis</button>
+                <button class="gris-action-btn" id="open-history-modal" type="button" style="background:#b6a6ca;">Open Full History</button>
+              </div>
+              <div id="history-content-inner">Loading history...</div>
+            </div>
+          </div>
+          <div class="gris-section collapsible" id="friends-section">
+            <div class="gris-section-title collapsible-toggle" tabindex="0" data-target="friends-content">Friends <span class="toggle-arrow">▶</span></div>
+            <div class="gris-section-content collapsible-content" id="friends-content" style="display:none;">
+              <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
+                <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+                <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
+              </form>
+              <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
+            </div>
+          </div>
+        </div>
+        ${modals()}
+      </main>
+    <script>
+      // Animate petal background
+      (function(){
+        document.querySelectorAll('.gris-petal-bg span').forEach(function(s){
+          s.style.animationDuration = (14+Math.random()*8)+'s';
+        });
+      })();
+      // Collapsible sections, modal, and button event fixes
+      function safeGet(id) {
+        return document.getElementById(id) || null;
+      }
+      function setupCollapsibles() {
+        document.querySelectorAll('.collapsible-toggle').forEach(function(toggle) {
+          // Mouse click
+          toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = toggle.getAttribute('data-target');
+            var content = safeGet(targetId);
+            var arrow = toggle.querySelector('.toggle-arrow');
+            if (content) {
+              var isOpen = content.style.display === 'block';
+              // Hide all other sections if not friends
+              if (targetId !== 'friends-content') {
+                document.querySelectorAll('.collapsible-content').forEach(function(c) {
+                  if (c.id !== targetId) {
+                    c.style.display = 'none';
+                    var t = document.querySelector('.collapsible-toggle[data-target="'+c.id+'"] .toggle-arrow');
+                    if (t) t.textContent = '▶';
+                  }
+                });
+              }
+              content.style.display = isOpen ? 'none' : 'block';
+              if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
+            }
+          });
+          // Keyboard: Enter or Space
+          toggle.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggle.click();
+            }
+          });
+        });
+        // Set initial state: only profile open
+        document.querySelectorAll('.collapsible-content').forEach(function(c) {
+          if (c.id === 'profile-content') {
+            c.style.display = 'block';
+            var t = document.querySelector('.collapsible-toggle[data-target="'+c.id+'"] .toggle-arrow');
+            if (t) t.textContent = '▼';
+          } else {
+            c.style.display = 'none';
+            var t = document.querySelector('.collapsible-toggle[data-target="'+c.id+'"] .toggle-arrow');
+            if (t) t.textContent = '▶';
+          }
+        });
+      }
+      function setupFriendForm() {
+        var friendForm = safeGet('friend-form');
+        if (friendForm) {
+          friendForm.onsubmit = function(e) {
+            e.preventDefault();
+            var input = safeGet('friend-input');
+            if (input && input.value.trim()) {
+              var evt = new CustomEvent('add-friend', { detail: { username: input.value.trim() } });
+              window.dispatchEvent(evt);
+              input.value = '';
+            }
+          };
+        }
+      }
+      function setupButtons() {
+        // Edit button
+        var editBtn = safeGet('edit-btn');
+        if (editBtn) editBtn.onclick = function(e) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('profile-edit'));
+        };
+        // Cancelar edição
+        var cancelBtn = safeGet('cancel-btn');
+        if (cancelBtn) cancelBtn.onclick = function(e) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('profile-cancel'));
+        };
+        // Alterar password
+        var passBtn = safeGet('pass-btn');
+        if (passBtn) passBtn.onclick = function(e) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('profile-password'));
+        };
+        // Modal de histórico
+        var openHistoryBtn = safeGet('open-history-modal');
+        if (openHistoryBtn) openHistoryBtn.onclick = function(e) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('open-history-modal'));
+        };
+        // Fechar modal de password
+        var passModal = safeGet('pass-modal');
+        if (passModal) {
+          var passCancel = safeGet('pass-cancel');
+          if (passCancel) passCancel.onclick = function(e) {
+            e.preventDefault();
+            passModal.style.display = 'none';
+          };
+        }
+      }
+      function setupFallbacks() {
+        var friendsEl = safeGet('friends-container');
+        if (friendsEl && !friendsEl.innerHTML) friendsEl.innerHTML = 'No friends';
+        var statsEl = safeGet('stats-content-inner');
+        if (statsEl && !statsEl.innerHTML) statsEl.innerHTML = 'No stats';
+        var historyEl = safeGet('history-content-inner');
+        if (historyEl && !historyEl.innerHTML) historyEl.innerHTML = 'No history';
+      }
+      function setupAll() {
+        setupCollapsibles();
+        setupFriendForm();
+        setupButtons();
+        setupFallbacks();
+      }
+      // Run setup on DOMContentLoaded and after dynamic updates
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupAll);
+      } else {
+        setTimeout(setupAll, 200);
+      }
+    </script>
     `;
 }

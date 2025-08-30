@@ -128,6 +128,7 @@ export function setupRemoveFriendEvents() {
 }
 
 export function setupEvents(container: HTMLElement) {
+
 	container.addEventListener('click', async (e) => {
 		const t = e.target as HTMLElement;
 		const id = t.id;
@@ -182,18 +183,28 @@ export function setupEvents(container: HTMLElement) {
 		}
 
 		if (id === 'pass-btn') {
-			document.getElementById('pass-modal')!.style.display = 'flex';
+			const modal = document.getElementById('pass-modal');
+			if (modal) modal.style.display = 'flex';
 			return;
 		}
 
 		if (id === 'avatar-btn') {
-			document.getElementById('avatar-modal')!.style.display = 'flex';
+			const modal = document.getElementById('avatar-modal');
+			if (modal) modal.style.display = 'flex';
 			return;
 		}
 
 		if (id === 'avatar-modal-close') {
 			const modal = document.getElementById('avatar-modal') as HTMLElement | null;
 			if (modal) modal.style.display = 'none';
+			return;
+		}
+
+		if (id === 'pass-cancel') {
+			const modal = document.getElementById('pass-modal') as HTMLElement | null;
+			if (modal) modal.style.display = 'none';
+			const form = document.getElementById('pass-form') as HTMLFormElement | null;
+			if (form) form.reset();
 			return;
 		}
 
@@ -213,11 +224,25 @@ export function setupEvents(container: HTMLElement) {
 			const btn = document.getElementById('friend-add') as HTMLButtonElement;
 			const username = input.value.trim();
 			if (!username) return;
+			// Check if username exists
+			// Check if user exists
+			try {
+				const res = await fetch(`/api/users/${encodeURIComponent(username)}`);
+				if (!res.ok) {
+					showInlineMessage('friend-msg', 'User does not exist', '#dc3545');
+					return;
+				}
+			} catch (e) {
+				showInlineMessage('friend-msg', 'Error checking user', '#dc3545');
+				return;
+			}
+
 			// Check if already a friend or self
 			if (friendsList(state.friends).toLowerCase().includes(username.toLowerCase()) || (state.profile && state.profile.username.toLowerCase() === username.toLowerCase())) {
 				showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
 				return;
 			}
+
 			// Check if a friend request has already been made (outgoing)
 			await loadOutgoingFriendRequests();
 			if (state.outgoingFriendRequests && Array.isArray(state.outgoingFriendRequests)) {
@@ -230,6 +255,7 @@ export function setupEvents(container: HTMLElement) {
 					return;
 				}
 			}
+			// Send friend request
 			try {
 				btn.disabled = true;
 				btn.textContent = '⏳ Adding...';
@@ -273,7 +299,12 @@ export function setupEvents(container: HTMLElement) {
 			const confirm = document.getElementById('avatar-confirm') as HTMLButtonElement;
 			confirm.disabled = false;
 			confirm.style.opacity = '1';
-			confirm.onclick = () => {
+			// Remove previous click listeners
+			confirm.replaceWith(confirm.cloneNode(true));
+			const newConfirm = document.getElementById('avatar-confirm') as HTMLButtonElement;
+			newConfirm.disabled = false;
+			newConfirm.style.opacity = '1';
+			newConfirm.onclick = () => {
 				const selected = option.getAttribute('data-avatar');
 				const preview = document.getElementById('avatar-preview') as HTMLImageElement;
 				if (selected && preview) preview.src = selected;
