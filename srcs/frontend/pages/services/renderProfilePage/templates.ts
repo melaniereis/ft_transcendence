@@ -22,80 +22,147 @@ const TEAM_LOGOS = {
 	'LOGIC LEAGUE': '/assets/logicleague.png',
 	'CODE ALLIANCE': '/assets/codealliance.png'
 };
+
 export function header(profile: Profile, isEdit: boolean): string {
 	const teamLogo = TEAM_LOGOS[profile.team?.toUpperCase() as keyof typeof TEAM_LOGOS] || '';
-	const avatar = `
-    <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-      <div style="background:radial-gradient(ellipse at 60% 40%, #f4f6fa 60%, #b6a6ca 100%, #7fc7d9 120%);border-radius:50%;padding:10px;box-shadow:0 8px 40px 0 #b6a6ca33, 0 2px 16px 0 #7fc7d933;">
-        <img
-          ${isEdit ? 'id="avatar-preview"' : ''}
-          src="${profile.avatar_url}"
-          width="120" height="120"
-          style="border-radius:50%;border:2.5px solid #fff;object-fit:cover;background:rgba(255,255,255,0.7);box-shadow:0 2px 16px 0 #b6a6ca33;${isEdit ? 'cursor:pointer;' : ''}font-family:'Cormorant Garamond',serif;"
-          alt="Avatar"
-        />
-        ${teamLogo ? `<img src="${teamLogo}" width="34" height="34" style="position:absolute;bottom:0;right:0;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:contain;box-shadow:0 2px 8px #b6a6ca22;" alt="Team Logo"/>` : ''}
-        ${isEdit ? `<div id="avatar-overlay" style="position:absolute;inset:0;background:rgba(127,199,217,0.13);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer"><span style="color:#6b7a8f;font-size:15px;font-weight:600;font-family:'Cormorant Garamond',serif;">Change</span></div>` : ''}
+	const avatar = isEdit
+		? `
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="position:relative;display:inline-block">
+        <img id="avatar-preview" src="${profile.avatar_url}" width="120" height="120"
+             style="border-radius:50%;border:4px solid ${GRID_COLORS.cool};object-fit:cover;cursor:pointer;
+                    box-shadow:0 8px 32px rgba(0,174,239,0.2);" alt="Avatar"/>
+        <div id="avatar-overlay" style="position:absolute;inset:0;background:rgba(28,33,38,0.7);border-radius:50%;
+                    display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer">
+          <span style="color:white;font-size:14px;font-weight:600">📷 Change</span>
+        </div>
       </div>
-      ${isEdit ? `<div style="margin-top:14px;text-align:center"><button id="avatar-btn" type="button" style="background:linear-gradient(90deg,#b6a6ca,#7fc7d9);color:#fff;border:none;padding:8px 20px;border-radius:18px;cursor:pointer;font-size:14px;font-weight:500;box-shadow:0 2px 8px #b6a6ca33;font-family:'Cormorant Garamond',serif;">Choose Avatar</button></div>` : ''}
-    </div>
-  `;
-	const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
-	return `
-    <div class="header-gris" style="background:linear-gradient(120deg, #f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);padding:40px 32px 32px 32px;border-radius:32px;margin:32px 0 36px 0;box-shadow:0 10px 48px 0 #b6a6ca33, 0 2px 16px 0 #7fc7d933;display:flex;align-items:center;gap:44px;flex-wrap:wrap;backdrop-filter:blur(2.5px);">
-      <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;">
-        ${avatar}
-        <div style="margin-top:10px;font-size:1.1rem;color:#7fc7d9;font-weight:600;letter-spacing:0.5px;text-shadow:0 2px 8px #fff8;font-family:'Cormorant Garamond',serif;">“The world is painted in gentle hues.”</div>
+      <div style="margin-top:15px">
+        <button id="avatar-btn" type="button"
+                style="background:${GRID_COLORS.cool};color:#fff;border:none;padding:8px 16px;
+                       border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;
+                       transition:all 0.3s;box-shadow:0 4px 12px rgba(0,174,239,0.3)">
+          📷 Choose Avatar
+        </button>
       </div>
-      <div style="flex:1;min-width:260px;max-width:600px;display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-          <h2 style="margin:0;color:#6b7a8f;font-size:2.2rem;font-weight:700;letter-spacing:-1.5px;line-height:1.1;text-shadow:0 2px 8px #fff8;font-family:'Cormorant Garamond',serif;">@${profile.username}</h2>
-          ${!isEdit ? `<button id="edit-btn" title="Edit profile" style="background:none;border:none;cursor:pointer;font-size:1.5rem;color:#b6a6ca;padding:8px;border-radius:50%;transition:all 0.3s"><span class='icon-edit'></span>Edit</button>` : ''}
-        </div>
-        <div style="color:#6b7a8f;font-size:1.15rem;font-weight:500;margin-bottom:2px;text-shadow:0 1px 4px #fff6;font-family:'Cormorant Garamond',serif;">${profile.display_name || profile.name || ''}</div>
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-size:1rem;">
-          <span style="color:#7fc7d9;font-weight:600;font-family:'Cormorant Garamond',serif;">${profile.email || 'No email'}</span>
-          <span style="color:#b6a6ca;font-weight:600;font-family:'Cormorant Garamond',serif;">${profile.team ? `Team: <span style='color:#7fc7d9;font-weight:700;font-family:'Cormorant Garamond',serif;'>${profile.team}</span>` : 'No team'}</span>
-          <span style="color:#6b7a8f;font-weight:600;font-family:'Cormorant Garamond',serif;">Since: <span style="color:#b6a6ca;font-weight:500;font-family:'Cormorant Garamond',serif;">${createdAtText}</span></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-size:1rem;">
-          <span style="color:#b6a6ca;font-weight:600;font-family:'Cormorant Garamond',serif;">Status: ${profile.online_status ? '<span style=\'color:#a3d9b1\'>Online</span>' : '<span style=\'color:#b6a6ca\'>Offline</span>'}</span>
-          <span style="color:#6b7a8f;font-weight:600;font-family:'Cormorant Garamond',serif;">Last seen: <span style="color:#b6a6ca;font-weight:500;font-family:'Cormorant Garamond',serif;">${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}</span></span>
-        </div>
-        ${isEdit ? `
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-top:18px;">
-            <div>
-              <label style="display:block;margin-bottom:8px;font-weight:600;color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Username:</label>
-              <input id="username-input" type="text" value="${profile.username}" required minlength="3"
-                     style="width:100%;padding:12px;border:2px solid #b6a6ca;border-radius:12px;font-size:14px;transition:border-color 0.3s;background:#f4f6fa;font-family:'Cormorant Garamond',serif;"/>
-              <small style="color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Min 3 characters</small>
-            </div>
-            <div>
-              <label style="display:block;margin-bottom:8px;font-weight:600;color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Display Name:</label>
-              <input id="display-input" type="text" value="${profile.display_name || profile.name || ''}" required
-                     style="width:100%;padding:12px;border:2px solid #b6a6ca;border-radius:12px;font-size:14px;transition:border-color 0.3s;background:#f4f6fa;font-family:'Cormorant Garamond',serif;"/>
-              <small style="color:#b6a6ca;font-family:'Cormorant Garamond',serif;">Public name shown in games</small>
-            </div>
-          </div>
-          <div style="margin:18px 0 0 0">
-            <label style="display:block;margin-bottom:8px;font-weight:600;color:#9b59b6">Email:</label>
-            <input id="email-input" type="email" value="${profile.email || ''}"
-                   style="width:100%;padding:12px;border:2px solid #e84393;border-radius:12px;font-size:14px;transition:border-color 0.3s;background:#f8f9f8"/>
-            <small style="color:#e84393">Optional - for account recovery</small>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
-      <button id="save-btn"
-        style="background:linear-gradient(90deg,#00d563,#9b59b6);color:#fff;border:none;padding:12px 24px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 4px 12px #9b59b633">Save Changes</button>
-      <button id="cancel-btn"
-        style="background:linear-gradient(90deg,#e84393,#9b59b6);color:#fff;border:none;padding:12px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s">Cancel</button>
-      <button id="pass-btn"
-        style="background:linear-gradient(90deg,#e84393,#9b59b6);color:#fff;border:none;padding:12px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s;box-shadow:0 4px 12px #e8439333">Change Password</button>
-          </div>
-          <div id="save-error" style="color:#e84393;margin-top:15px;font-size:14px;font-weight:500"></div>
+    </div>`
+		: `
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="position:relative;display:inline-block">
+        <img src="${profile.avatar_url}" width="120" height="120"
+             style="border-radius:50%;border:4px solid ${GRID_COLORS.cool};object-fit:cover;
+                    box-shadow:0 8px 32px rgba(0,174,239,0.2);" alt="Avatar"/>
+${teamLogo ? `
+          <img src="${teamLogo}" width="40" height="40"
+               style="position:absolute;bottom:-5px;right:-5px;border-radius:50%;
+                      border:3px solid white;background:white;object-fit:contain" alt="Team Logo"/>
         ` : ''}
       </div>
-    </div>
-  `;
+    </div>`;
+	const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
+	return isEdit
+		? `
+    <div class="header-edit" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
+                padding:30px;border-radius:20px;margin:20px 0;
+                box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
+      <div class="header-content" style="display:flex;align-items:flex-start;gap:30px;flex-wrap:wrap">
+${avatar}
+        <div style="flex:1;min-width:300px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:20px">
+            <div>
+              <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Username:</label>
+              <input id="username-input" type="text" value="${profile.username}" required minlength="3"
+                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
+                            font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
+              <small style="color:${GRID_COLORS.muted}">Min 3 characters</small>
+            </div>
+            <div>
+              <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Display Name:</label>
+              <input id="display-input" type="text" value="${profile.display_name || profile.name || ''}" required
+                     style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
+                            font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
+              <small style="color:${GRID_COLORS.muted}">Public name shown in games</small>
+            </div>
+          </div>
+          <div style="margin-bottom:20px">
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:${GRID_COLORS.primary}">Email:</label>
+            <input id="email-input" type="email" value="${profile.email || ''}"
+                   style="width:100%;padding:12px;border:2px solid ${GRID_COLORS.secondary};border-radius:12px;
+                          font-size:14px;transition:border-color 0.3s;background:${GRID_COLORS.bg}"/>
+            <small style="color:${GRID_COLORS.muted}">Optional - for account recovery</small>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button id="save-btn"
+                    style="background:${GRID_COLORS.success};color:#fff;border:none;padding:12px 24px;
+                           border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;
+                           transition:all 0.3s;box-shadow:0 4px 12px rgba(0,213,99,0.3)">
+              💾 Save Changes
+            </button>
+            <button id="cancel-btn"
+                    style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
+                           border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
+                           transition:all 0.3s">
+              ❌ Cancel
+            </button>
+            <button id="pass-btn"
+                    style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
+                           border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
+                           transition:all 0.3s;box-shadow:0 4px 12px rgba(155,89,182,0.3)">
+              🔒 Change Password
+            </button>
+          </div>
+          <div id="save-error" style="color:${GRID_COLORS.accent};margin-top:15px;font-size:14px;font-weight:500"></div>
+        </div>
+      </div>
+      <div style="margin-top:25px;padding-top:25px;border-top:1px solid ${GRID_COLORS.cool}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;font-size:14px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-weight:600;color:${GRID_COLORS.primary}">Team:</span>
+            <div style="display:flex;align-items:center;gap:8px">
+${teamLogo ? `<img src="${teamLogo}" width="24" height="24" style="border-radius:50%" alt="Team"/>` : ''}
+              <span>${profile.team || '—'}</span>
+            </div>
+          </div>
+          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> ${createdAtText}</div>
+          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}</div>
+          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
+        </div>
+      </div>
+    </div>`
+		: `
+    <div class="header-view" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);
+                padding:30px;border-radius:20px;margin:20px 0;
+                box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
+      <div class="header-content" style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+${avatar}
+        <div style="flex:1;min-width:300px">
+          <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
+            <h3 style="margin:0;color:${GRID_COLORS.primary};font-size:28px;font-weight:700">@${profile.username}</h3>
+            <button id="edit-btn" title="Edit profile"
+                    style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.cool};
+                           padding:8px;border-radius:50%;transition:all 0.3s">🖊️</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-weight:600;color:${GRID_COLORS.primary}">Display Name:</span>
+              <span style="color:${GRID_COLORS.muted}">${profile.display_name || profile.name || '—'}</span>
+            </div>
+            <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Email:</span> <span style="color:${GRID_COLORS.muted}">${profile.email || 'Not provided'}</span></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-weight:600;color:${GRID_COLORS.primary}">Team:</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="color:${GRID_COLORS.muted}">${profile.team || '—'}</span>
+              </div>
+            </div>
+            <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> <span style="color:${GRID_COLORS.muted}">${createdAtText}</span></div>
+          </div>
+          <div style="font-size:14px;color:${GRID_COLORS.muted};padding:12px;background:rgba(0,174,239,0.1);border-radius:8px">
+            <span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} •
+            <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}
+          </div>
+        </div>
+      </div>
+    </div>`;
 }
 export function friendsList(friends: Friend[]): string {
 	if (!friends || friends.length === 0) {
