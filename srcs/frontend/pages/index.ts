@@ -4,7 +4,7 @@ import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
 import { renderLoginForm } from './services/renderLoginForm.js';
-import { startMatchmaking } from './services/matchmaking.js';
+import { startMatchmaking } from './services/remote/matchmaking.js';
 
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
