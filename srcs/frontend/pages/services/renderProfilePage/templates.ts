@@ -859,7 +859,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                   <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
                   <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
                 </form>
-                <div id="friend-msg" style="margin-top:8px;font-size:12px"></div>
+                <div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff">.</div>
                 <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
               </div>
             </div>
