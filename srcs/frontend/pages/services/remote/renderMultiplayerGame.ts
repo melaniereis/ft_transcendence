@@ -41,45 +41,61 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	function draw(ctx: CanvasRenderingContext2D) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		// Draw scoreboard (player names and scores)
+		const isMirrored = playerSide === 'right';
+
+		// ⬇️ First, draw scoreboard (not mirrored)
 		ctx.fillStyle = 'white';
 		ctx.font = '20px Arial';
 		ctx.textAlign = 'center';
+		ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any transforms
 		ctx.fillText(`${leftPlayerName} ${leftScore} - ${rightScore} ${rightPlayerName}`, canvas.width / 2, 30);
 
-		// Draw dashed center line
+		// ⬇️ Draw countdown BEFORE mirroring
+		if (!gameStarted && countdownValue >= 0) {
+			ctx.fillStyle = 'white';
+			ctx.textAlign = 'center';
+
+			if (countdownValue > 0) {
+				ctx.font = '120px Arial';
+				ctx.fillText(`${countdownValue}`, canvas.width / 2, canvas.height / 2 + 40);
+			} else {
+				ctx.font = '80px Arial';
+				ctx.fillText(`GO!`, canvas.width / 2, canvas.height / 2 + 30);
+			}
+		}
+
+		// ⬇️ Apply mirroring transform for gameplay elements (right player only)
+		if (isMirrored) {
+			ctx.save();
+			ctx.translate(canvas.width, 0);
+			ctx.scale(-1, 1);
+		}
+
+		// ⬇️ Dashed center line
 		ctx.strokeStyle = 'white';
 		ctx.lineWidth = 2;
-		ctx.setLineDash([10, 15]);  // 10px dash, 15px gap
+		ctx.setLineDash([10, 15]);
 		ctx.beginPath();
 		ctx.moveTo(canvas.width / 2, 0);
 		ctx.lineTo(canvas.width / 2, canvas.height);
 		ctx.stroke();
-		ctx.setLineDash([]); // reset to solid line for next drawings
+		ctx.setLineDash([]);
 
-		// Draw paddles
+		// ⬇️ Paddles
+		ctx.fillStyle = 'white';
 		ctx.fillRect(20, leftY, 10, paddleHeight);
 		ctx.fillRect(770, rightY, 10, paddleHeight);
 
-		// Draw ball if game has started
+		// ⬇️ Ball
 		if (gameStarted) {
 			ctx.beginPath();
 			ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
 			ctx.fill();
 		}
 
-		// Draw countdown if active
-		if (!gameStarted && countdownValue > 0) {
-			ctx.fillStyle = 'white';
-			ctx.font = '120px Arial'; // Bigger font size for countdown
-			ctx.fillText(`${countdownValue}`, canvas.width / 2, canvas.height / 2 + 40); // Adjust vertical position for better centering
-		}
-
-		if (!gameStarted && countdownValue === 0) {
-			ctx.fillStyle = 'white';
-			ctx.font = '80px Arial';
-			ctx.fillText(`GO!`, canvas.width / 2, canvas.height / 2 + 30);
-		}
+		// ⬇️ Restore if mirrored
+		if (isMirrored)
+			ctx.restore();
 
 		requestAnimationFrame(() => draw(ctx));
 	}
