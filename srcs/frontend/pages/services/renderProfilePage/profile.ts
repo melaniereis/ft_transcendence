@@ -28,6 +28,7 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 		state.history = history;
 		state.friends = friends;
 
+
 		// Initial render
 		container.innerHTML = layout(profile, stats, history, friends, state.activeStatsTab, state.activeHistoryView, state.editMode, state.activeMainTab || 'profile');
 
@@ -38,7 +39,30 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 		histEl.innerHTML = state.history.length ? historyList(state.history) :
 			'<div style="padding:40px;text-align:center;color:#666;background:#f8f9fa;border-radius:8px"><div style="font-size:48px;margin-bottom:15px">🎮</div><h4 style="margin:0 0 10px 0">No Match History</h4><p style="margin:0;color:#999">Your game history will appear here once you start playing!</p></div>';
 
+		// Always rerender friends after layout to ensure DOM is up to date and 'Loading friends...' is replaced
+		setTimeout(() => {
+			const { rerenderFriends } = require('./events.js');
+			rerenderFriends();
+		}, 0);
+
+
 		setupEvents(container);
+
+		// Event delegation para navegação dos amigos
+		container.addEventListener('click', (e) => {
+			const t = e.target as HTMLElement;
+			if (t.id === 'friends-prev') {
+				if (!window.state) window.state = {};
+				window.state.friendsPage = Math.max(0, (window.state.friendsPage || 0) - 1);
+				renderProfilePage(container, onBadgeUpdate);
+			}
+			if (t.id === 'friends-next') {
+				if (!window.state) window.state = {};
+				const total = Math.ceil(state.friends.length / 10);
+				window.state.friendsPage = Math.min(total - 1, (window.state.friendsPage || 0) + 1);
+				renderProfilePage(container, onBadgeUpdate);
+			}
+		});
 
 		setTimeout(async () => {
 			const { setupFriendHoverEffects, setupRemoveFriendEvents } = await import('./events.js');

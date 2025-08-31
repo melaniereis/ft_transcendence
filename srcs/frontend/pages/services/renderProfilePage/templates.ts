@@ -1,3 +1,7 @@
+// Tipagem global para window.state (usado na paginação de friends)
+declare global {
+	interface Window { state: any; }
+}
 // renderProfilePage/templates.ts - FIXED VERSION with working PetalFall animation
 import { AVAILABLE_AVATARS, Friend, Match, Profile, Stats } from './types.js';
 import {
@@ -166,42 +170,67 @@ ${avatar}
 }
 export function friendsList(friends: Friend[]): string {
 	if (!friends || friends.length === 0) {
-		return '<div style="padding:15px;text-align:center;color:#666;font-size:14px">No friends added yet</div>';
+		return `<div style="padding:32px 0;text-align:center;color:${GRID_COLORS.muted};font-size:16px;letter-spacing:0.5px;">No friends added yet</div>`;
 	}
-	return `
-    <div>
-${friends.map((f: any) => {
+
+	// Paginação: 10 por página, 2 colunas
+	const pageSize = 10;
+	const page = (window.state && typeof window.state.friendsPage === 'number') ? window.state.friendsPage : 0;
+	const totalPages = Math.ceil(friends.length / pageSize);
+	const start = page * pageSize;
+	const end = start + pageSize;
+	const pageFriends = friends.slice(start, end);
+	const col1 = pageFriends.slice(0, 5);
+	const col2 = pageFriends.slice(5, 10);
+
+	function friendCard(f: any) {
 		const id = f.friend_id ?? f.id ?? f.userId ?? '';
 		const displayName = f.display_name || f.name || f.username || 'Unknown';
 		const username = f.username || '';
 		const avatar = f.avatar_url || '/assets/avatar/default.png';
 		const online = !!f.online_status;
 		return `
-          <div class="friend-item"
-               data-id="${id}" data-name="${displayName}"
-               style="background:linear-gradient(135deg, ${GRID_COLORS.bg} 0%, white 100%);padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,174,239,0.1);position:relative;display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <img src="${avatar}" width="35" height="35" style="border-radius:50%;object-fit:cover;border:2px solid ${online ? GRID_COLORS.success : GRID_COLORS.accent}" alt="Avatar"/>
-            <div style="flex:1">
-              <div style="font-weight:bold;font-size:14px;color:${GRID_COLORS.primary}">${displayName}</div>
-              <div style="font-size:12px;color:${GRID_COLORS.muted}">@${username}</div>
-              <div style="font-size:11px;color:${online ? GRID_COLORS.success : GRID_COLORS.accent}">${online ? '🟢 Online' : '🔴 Offline'}</div>
-            </div>
-            <button
-              class="remove-friend-btn"
-              data-action="remove-friend"
-              data-id="${id}"
-              data-friend-id="${id}"
-              data-name="${displayName}"
-              data-friend-name="${displayName}"
-              title="Remove friend"
-              style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px">
-              ×
-            </button>
-          </div>
-        `;
-	}).join('')}
+    <div class="friend-item" data-id="${id}" data-name="${displayName}"
+      style="background:linear-gradient(120deg, #f8f9f8 0%, #eaeaea 100%);border-radius:18px;box-shadow:0 2px 12px rgba(0,174,239,0.10);display:flex;align-items:center;gap:18px;padding:20px 22px;position:relative;transition:box-shadow 0.2s, transform 0.2s;cursor:pointer;overflow:hidden;"
+    >
+      <img src="${avatar}" width="54" height="54" style="border-radius:50%;object-fit:cover;border:3px solid ${online ? GRID_COLORS.success : GRID_COLORS.accent};box-shadow:0 2px 8px #b6a6ca22;transition:border 0.2s;" alt="Avatar"/>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:17px;color:${GRID_COLORS.primary};text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:0.2px;">${displayName}
+          <span style="margin-left:10px;vertical-align:middle;display:inline-block;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${online ? GRID_COLORS.success : GRID_COLORS.accent};color:#fff;box-shadow:0 1px 4px #a3d9b133;">${online ? 'Online' : 'Offline'}</span>
+        </div>
+        <div style="font-size:13px;color:${GRID_COLORS.muted};margin-top:2px;">@${username}</div>
+      </div>
+      <button class="remove-friend-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}"
+        title="Remove friend"
+        style="background:transparent;border:none;outline:none;cursor:pointer;padding:0 0 0 10px;display:flex;align-items:center;opacity:0.5;transition:opacity 0.2s;z-index:2;">
+        <span style="display:inline-block;width:36px;height:36px;border-radius:50%;background:#ff5c5c;color:#fff;font-size:20px;line-height:36px;text-align:center;transition:background 0.2s;box-shadow:0 2px 8px #b6a6ca22;">×</span>
+      </button>
+      <div class="friend-hover-overlay" style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 0.2s;background:linear-gradient(90deg,rgba(123,97,255,0.07),rgba(174,239,239,0.09));z-index:1;"></div>
     </div>
-  `;
+    `;
+	}
+
+	return `
+  <div style="max-width:700px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:18px;font-weight:600;color:${GRID_COLORS.primary};letter-spacing:0.5px;">Your Friends <span style="font-size:13px;color:${GRID_COLORS.accent};font-weight:400">(${friends.length})</span></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button id="friends-prev" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === 0 ? 0.3 : 1};pointer-events:${page === 0 ? 'none' : 'auto'};transition:opacity 0.2s;">&#8592;</button>
+        <span style="font-size:13px;color:${GRID_COLORS.primary};font-weight:500;">${page + 1}/${totalPages}</span>
+        <button id="friends-next" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === totalPages - 1 ? 0.3 : 1};pointer-events:${page === totalPages - 1 ? 'none' : 'auto'};transition:opacity 0.2s;">&#8594;</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <div>
+        ${col1.map(friendCard).join('')}
+      </div>
+      <div>
+        ${col2.map(friendCard).join('')}
+      </div>
+    </div>
+  </div>
+  <!-- Navegação controlada por event delegation no profile.ts -->
+`;
 }
 export function historyList(history: Match[]): string {
 	const recent = history.slice(0, 5);
@@ -572,32 +601,179 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
       body {
-        margin: 0; padding: 0;
-        background: linear-gradient(120deg, #e3e6f3 60%, #b6a6ca33 100%, #7fc7d933 120%), url('/assets/Background.png') no-repeat center/cover;
-        font-family: 'Inter', 'EB Garamond', serif;
-        color: #23272f;
+        margin:0; padding:0;
+        background: url('/assets/Background.png') no-repeat center/cover;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        color: ${GRID_COLORS.secondary};
         overflow-x: hidden;
-        min-height: 100vh;
       }
-      .gris-petal-bg {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
+      .petal {
+        position: relative;
+        width: 100%;
+        top: -340px;
+        text-align: left;
+        z-index: 2;
         pointer-events: none;
       }
-      .gris-petal-bg span {
-        position: absolute;
-        border-radius: 50%;
-        opacity: 0.13;
-        filter: blur(2.5px);
-        pointer-events: none;
-        animation: grisPetalFloat 18s linear infinite;
+      .petal span {
+        display: inline-block;
+        overflow: hidden;
+        width: 5px;
+        height: 5px;
+        border-radius: 200px 10px 200px 200px;
+        background: linear-gradient(to bottom, #faaca8, #ddd6f3);
+        z-index: 1;
+        transform: skewX(30deg);
+        backface-visibility: visible;
+        -webkit-animation: fallingSakura1 8s linear infinite;
+        animation: fallingSakura1 8s linear infinite;
+        position: relative;
       }
-      @keyframes grisPetalFloat {
-        0% { transform: translateY(0) scale(1); opacity: 0.13; }
-        40% { opacity: 0.18; }
-        60% { transform: translateY(40vh) scale(1.08); opacity: 0.15; }
-        100% { transform: translateY(80vh) scale(0.95); opacity: 0.08; }
+      .petal span:nth-of-type(3n+2) {
+        -webkit-animation: fallingSakura2 8s linear infinite;
+        animation: fallingSakura2 8s linear infinite;
+      }
+      .petal span:nth-of-type(3n+1) {
+        -webkit-animation: fallingSakura3 8s linear infinite;
+        animation: fallingSakura3 8s linear infinite;
+      }
+      .petal span:nth-of-type(n)   { -webkit-animation-delay: -1.9s; animation-delay: -1.9s;}
+      .petal span:nth-of-type(2n)  { -webkit-animation-delay: 3.9s; animation-delay: 3.9s;}
+      .petal span:nth-of-type(3n)  { -webkit-animation-delay: 2.3s; animation-delay: 2.3s;}
+      .petal span:nth-of-type(4n)  { -webkit-animation-delay: 4.4s; animation-delay: 4.4s;}
+      .petal span:nth-of-type(5n)  { -webkit-animation-delay: 5s; animation-delay: 5s;}
+      .petal span:nth-of-type(6n)  { -webkit-animation-delay: 3.5s; animation-delay: 3.5s;}
+      .petal span:nth-of-type(7n)  { -webkit-animation-delay: 2.8s; animation-delay: 2.8s;}
+      .petal span:nth-of-type(8n)  { -webkit-animation-delay: 1.5s; animation-delay: 1.5s;}
+      .petal span:nth-of-type(9n)  { -webkit-animation-delay: 3.3s; animation-delay: 3.3s;}
+      .petal span:nth-of-type(10n) { -webkit-animation-delay: 2.5s; animation-delay: 2.5s;}
+      .petal span:nth-of-type(11n) { -webkit-animation-delay: 1.2s; animation-delay: 1.2s;}
+      .petal span:nth-of-type(12n) { -webkit-animation-delay: 4.1s; animation-delay: 4.1s;}
+      .petal span:nth-of-type(13n) { -webkit-animation-delay: 5.8s; animation-delay: 5.8s;}
+      .petal span:nth-of-type(14n) { -webkit-animation-delay: -0.1s; animation-delay: -0.1s;}
+      .petal span:nth-of-type(15n) { -webkit-animation-delay: 6.3s; animation-delay: 6.3s;}
+      .petal span:nth-of-type(16n) { -webkit-animation-delay: -1s; animation-delay: -1s;}
+      .petal span:nth-of-type(17n) { -webkit-animation-delay: 7.4s; animation-delay: 7.4s;}
+      .petal span:nth-of-type(18n) { -webkit-animation-delay: -0.3s; animation-delay: -0.3s;}
+      .petal span:nth-of-type(19n) { -webkit-animation-delay: 8.3s; animation-delay: 8.3s;}
+      .petal span:nth-of-type(20n) { -webkit-animation-delay: -0.6s; animation-delay: -0.6s;}
+      .petal span:nth-of-type(21n) { -webkit-animation-delay: 7.7s; animation-delay: 7.7s;}
+      .petal span:nth-of-type(2n+2) {
+        background: linear-gradient(to right, #fffbd5, #F15F79);
+      }
+      .petal span:nth-of-type(3n+1) {
+        background: linear-gradient(to right, #DD5E89, #F7BB97);
+      }
+      .petal span:nth-of-type(3n+2) {
+        border-radius: 20px 1px;
+      }
+      .petal span:nth-of-type(3n+3) {
+        transform: rotateX(-180deg);
+      }
+      .petal span:nth-of-type(3n+2) {
+        animation-duration: 12s;
+        -webkit-animation-duration: 12s;
+      }
+      .petal span:nth-of-type(4n+2) {
+        animation-duration: 9s;
+        -webkit-animation-duration: 9s;
+      }
+      .petal span:nth-of-type(5n+2) {
+        width: 12px;
+        height: 12px;
+        box-shadow: 1.5px 1.5px 8px #fc7bd1;
+      }
+      .petal span:nth-of-type(4n+3) {
+        width: 10px;
+        height: 10px;
+        box-shadow: 1px 1px 6px #fc7bd1;
+      }
+      .petal span:nth-of-type(n)    { height:23px; width:30px; }
+      .petal span:nth-of-type(2n+1)    { height:11px; width:16px; }
+      .petal span:nth-of-type(3n+2)  { height:17px; width:23px; }
+      @-webkit-keyframes fallingSakura1 {
+        0% {
+          -webkit-transform:
+            translate3d(0,0,0)
+            rotateX(0deg);
+          opacity: 1;
+        }
+        100% {
+          -webkit-transform:
+            translate3d(400px,1200px,0px)
+            rotateX(-290deg);
+          opacity: 0.3;
+        }
+      }
+      @-webkit-keyframes fallingSakura2 {
+        0% {
+          -webkit-transform:
+            translate3d(0,0,0)
+            rotateX(-20deg);
+          opacity: 1;
+        }
+        100% {
+          -webkit-transform:
+            translate3d(200px,1200px,0px)
+            rotateX(-70deg);
+          opacity: 0.2;
+        }
+      }
+      @-webkit-keyframes fallingSakura3 {
+        0% {
+          -webkit-transform:
+            translate3d(0,0,0)
+            rotateX(90deg);
+          opacity: 1;
+        }
+        100% {
+          -webkit-transform:
+            translate3d(500px,1200px,0px)
+            rotateX(290deg);
+          opacity: 0;
+        }
+      }
+      @keyframes fallingSakura1 {
+        0% {
+          transform:
+            translate3d(0,0,0)
+            rotateX(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform:
+            translate3d(400px,1200px,0px)
+            rotateX(-290deg);
+          opacity: 0.3;
+        }
+      }
+      @keyframes fallingSakura2 {
+        0% {
+          transform:
+            translate3d(0,0,0)
+            rotateX(-20deg);
+          opacity: 1;
+        }
+        100% {
+          transform:
+            translate3d(200px,1200px,0px)
+            rotateX(-70deg);
+          opacity: 0.2;
+        }
+      }
+      @keyframes fallingSakura3 {
+        0% {
+          transform:
+            translate3d(0,0,0)
+            rotateX(90deg);
+          opacity: 1;
+        }
+        100% {
+          transform:
+            translate3d(500px,1200px,0px)
+            rotateX(290deg);
+          opacity: 0;
+        }
       }
       .gris-main-card {
         max-width: 1200px;
@@ -772,21 +948,10 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
 `;
 
 	return `${responsiveStyles}
-    <div class="gris-petal-bg">
-      ${Array.from({ length: 18 }).map((_, i) => {
-		const size = 60 + Math.random() * 120;
-		const left = Math.random() * 100;
-		const delay = (Math.random() * 18).toFixed(2);
-		const pastel = [
-			'rgba(127,199,217,0.18)',
-			'rgba(182,166,202,0.18)',
-			'rgba(230,199,156,0.13)',
-			'rgba(244,246,250,0.18)',
-			'rgba(255,255,255,0.22)'
-		];
-		const color = pastel[Math.floor(Math.random() * pastel.length)];
-		return `<span style="top:-${size / 2}px;left:${left}vw;width:${size}px;height:${size * 1.2}px;background:${color};animation-delay:${delay}s;"></span>`;
-	}).join('')}
+    <div class="petal">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span>
     </div>
       <main class="gris-main-card">
         <div style="background:linear-gradient(120deg,#f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 0 32px 0;gap:18px;min-height:100%;border-right:1.5px solid #e3e6f3;">
