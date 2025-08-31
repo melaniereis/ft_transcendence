@@ -1,17 +1,10 @@
-export async function endGame(
-gameId: number,
-score1: number,
-score2: number,
-canvas: HTMLCanvasElement,
-onRestart: (winnerId?: number) => void,
-player1Name: string,
-player2Name: string,
-mode: 'single' | 'tournament' = 'single'
-) {
+export async function endGame(gameId: number, score1: number, score2: number,
+canvas: HTMLCanvasElement, onRestart: (winnerId?: number) => void, player1Name: string,
+player2Name: string, mode: 'single' | 'tournament' = 'single') {
 	let winnerId: number | undefined;
 
 	try {
-		const res = await fetch(`https://localhost:3000/games/${gameId}/end`, {
+		const res = await fetch(`/games/${gameId}/end`, {
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ score_player1: score1, score_player2: score2 })

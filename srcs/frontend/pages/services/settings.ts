@@ -22,7 +22,7 @@ export function renderSettingsPage(container: HTMLElement) {
 
     showUsersBtn.addEventListener('click', async () => {
         try {
-            const response = await fetch('https://localhost:3000/users');
+            const response = await fetch('/users');
             if (!response.ok) throw new Error('Failed to fetch users');
 
             const users = await response.json();
@@ -38,7 +38,7 @@ export function renderSettingsPage(container: HTMLElement) {
 
     showStatsBtn.addEventListener('click', async () => {
         try {
-            const response = await fetch('https://localhost:3000/stats');
+            const response = await fetch('/stats');
             if (!response.ok) throw new Error('Failed to fetch user stats');
 
             const stats = await response.json();
@@ -65,7 +65,7 @@ export function renderSettingsPage(container: HTMLElement) {
         }
 
         try {
-            const response = await fetch('https://localhost:3000/users');
+            const response = await fetch('/users');
             if (!response.ok) throw new Error('Failed to fetch users');
 
             const users = await response.json();
@@ -76,7 +76,7 @@ export function renderSettingsPage(container: HTMLElement) {
                 return;
             }
 
-            await fetch(`https://localhost:3000/users/${user.id}`, { method: 'DELETE' });
+            await fetch(`/users/${user.id}`, { method: 'DELETE' });
             result.innerText = `🗑️ Deleted user "${usernameToDelete}" (ID: ${user.id})`;
         } catch (err) {
             result.innerText = `${(err as Error).message}`;

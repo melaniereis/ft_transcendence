@@ -31,7 +31,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 	| 'easy' | 'normal' | 'hard' | 'crazy';
 
 	try {
-		const response = await fetch('https://localhost:3000/users');
+		const response = await fetch('/users');
 		const users = await response.json();
 
 		users.forEach((user: any) => {
@@ -64,7 +64,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		}
 
 	try {
-		const response = await fetch('https://localhost:3000/games', {
+		const response = await fetch('/games', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

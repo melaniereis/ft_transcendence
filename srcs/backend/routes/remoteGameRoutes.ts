@@ -60,8 +60,8 @@ function startGameLoop(gameId: string) {
 			else {
 				r.ballX = 400;
 				r.ballY = 200;
-				r.ballVX = r.ballVX > 0 ? 5 : -5;
-				r.ballVY = 3;
+				r.ballVX = r.ballVX > 0 ? 7 : -5;
+				r.ballVY = 5;
 
 				[r.left, r.right].forEach((player) => {
 					if (player && player.readyState === player.OPEN) {
@@ -146,8 +146,8 @@ export async function gameSocketRoutes(fastify: FastifyInstance) {
 								right: null,
 								ballX: 400,
 								ballY: 200,
-								ballVX: 5,
-								ballVY: 3,
+								ballVX: 7,
+								ballVY: 5,
 								leftY: 160,
 								rightY: 160,
 								paddleHeight: 80,

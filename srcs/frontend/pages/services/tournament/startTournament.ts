@@ -67,7 +67,7 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 	// Semifinal 1
 	renderTournamentBracket(canvas, ctx, players, winners, async () => {
 		gameWrapper.innerHTML = ''; // Clear previous game
-		const game1Res = await fetch('https://localhost:3000/games', {
+		const game1Res = await fetch('/games', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
@@ -94,7 +94,7 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 			// Semifinal 2
 			renderTournamentBracket(canvas, ctx, players, winners, async () => {
 				gameWrapper.innerHTML = '';
-				const game2Res = await fetch('https://localhost:3000/games', {
+				const game2Res = await fetch('/games', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -120,7 +120,7 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 					// Final
 					renderTournamentBracket(canvas, ctx, players, winners, async () => {
 						gameWrapper.innerHTML = '';
-						const finalGameRes = await fetch('https://localhost:3000/games', {
+						const finalGameRes = await fetch('/games', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
