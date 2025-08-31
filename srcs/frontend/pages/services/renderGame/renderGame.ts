@@ -8,15 +8,7 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal',
 onGameEnd?: (canvas: HTMLCanvasElement, score1: number, score2: number) => void,
 mode: 'single' | 'tournament' = 'single') {
 	container.innerHTML = `
-		<canvas id="pong" width="800" height="400"></canvas>
-		<style>
-		canvas {
-			background: #111;
-			border: 2px solid white;
-			display: block;
-			margin: auto;
-		}
-		</style>
+		<canvas id="pong" width="800" height="400" style="background:#111; border:2px solid white; display:block; margin:auto;"></canvas>
 	`;
 
 	const canvas = document.getElementById('pong') as HTMLCanvasElement;
@@ -27,19 +19,40 @@ mode: 'single' | 'tournament' = 'single') {
 
 	setupControls(leftPaddle, rightPaddle, 6);
 
-	startGameLoop(
-		canvas,
-		ctx,
-		leftPaddle,
-		rightPaddle,
-		ball,
-		gameId,
-		maxGames,
-		(score1: number, score2: number) => {
-		if (onGameEnd) {
-			onGameEnd(canvas, score1, score2);
-		}
-		},
-		mode
-	);
+	let countdown = 3;
+	let countdownInterval: number | null = null;
+
+	function drawCountdown() {
+		// Clear canvas
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		// Draw countdown number big and centered
+		ctx.fillStyle = 'white';
+		ctx.font = 'bold 100px Arial';
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillText(countdown.toString(), canvas.width / 2, canvas.height / 2);
+	}
+
+	function startCountdown() {
+		drawCountdown();
+		countdownInterval = window.setInterval(() => {
+			countdown--;
+			if (countdown > 0)
+				drawCountdown();
+			else {
+				if (countdownInterval) {
+					clearInterval(countdownInterval);
+					countdownInterval = null;
+				}
+				startGameLoop(canvas, ctx, leftPaddle, rightPaddle, ball,
+				gameId, maxGames, (score1: number, score2: number) => {
+					if (onGameEnd)
+						onGameEnd(canvas, score1, score2);
+				}, mode);
+			}
+		}, 1000);
+	}
+
+	startCountdown();
 }

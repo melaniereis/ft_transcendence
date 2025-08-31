@@ -47,6 +47,16 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		ctx.textAlign = 'center';
 		ctx.fillText(`${leftPlayerName} ${leftScore} - ${rightScore} ${rightPlayerName}`, canvas.width / 2, 30);
 
+		// Draw dashed center line
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.setLineDash([10, 15]);  // 10px dash, 15px gap
+		ctx.beginPath();
+		ctx.moveTo(canvas.width / 2, 0);
+		ctx.lineTo(canvas.width / 2, canvas.height);
+		ctx.stroke();
+		ctx.setLineDash([]); // reset to solid line for next drawings
+
 		// Draw paddles
 		ctx.fillRect(20, leftY, 10, paddleHeight);
 		ctx.fillRect(770, rightY, 10, paddleHeight);
@@ -61,14 +71,14 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		// Draw countdown if active
 		if (!gameStarted && countdownValue > 0) {
 			ctx.fillStyle = 'white';
-			ctx.font = '60px Arial';
-			ctx.fillText(`${countdownValue}`, canvas.width / 2, canvas.height / 2);
+			ctx.font = '120px Arial'; // Bigger font size for countdown
+			ctx.fillText(`${countdownValue}`, canvas.width / 2, canvas.height / 2 + 40); // Adjust vertical position for better centering
 		}
 
 		if (!gameStarted && countdownValue === 0) {
 			ctx.fillStyle = 'white';
-			ctx.font = '50px Arial';
-			ctx.fillText(`GO!`, canvas.width / 2, canvas.height / 2);
+			ctx.font = '80px Arial';
+			ctx.fillText(`GO!`, canvas.width / 2, canvas.height / 2 + 30);
 		}
 
 		requestAnimationFrame(() => draw(ctx));
