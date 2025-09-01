@@ -1,3 +1,4 @@
+//routes/statsRoutes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getAllUserStats, getUserStatsById } from '../services/statsService.js'; 
 

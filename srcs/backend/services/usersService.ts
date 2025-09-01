@@ -1,3 +1,5 @@
+//services/usersService.ts
+
 import db from '../db/database.js';
 import bcrypt from 'bcrypt';
 import { User } from '../types/user.js';

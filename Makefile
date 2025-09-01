@@ -5,7 +5,7 @@ COMPOSE_FILE=srcs/docker-compose.yml
 all: build up
 
 build:
-	$(COMPOSE) -f $(COMPOSE_FILE) build
+	$(COMPOSE) -f $(COMPOSE_FILE) build --no-cache
 
 up:
 	$(COMPOSE) -f $(COMPOSE_FILE) up -d

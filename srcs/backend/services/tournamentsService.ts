@@ -1,3 +1,4 @@
+//services/tournamentsService.ts
 import db from '../db/database.js';
 import { Tournament } from '../types/tournament.js';
 

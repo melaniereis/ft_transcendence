@@ -2,7 +2,7 @@ export async function endGame(gameId: number,score1: number,score2: number,
     canvas: HTMLCanvasElement,onRestart: () => void, player1Name: string,
     player2Name: string,) {
     try {
-        await fetch(`/games/${gameId}/end`, {
+        await fetch(`https://localhost:3000/games/${gameId}/end`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

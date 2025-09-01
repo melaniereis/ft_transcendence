@@ -1,3 +1,4 @@
+//types/game.ts
 export type GameRecord = {
     game_id: number;
     player1_id: number;

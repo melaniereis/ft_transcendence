@@ -1,3 +1,4 @@
+//services/teamService.ts
 import db from '../db/database.js';
 import { TeamStats } from '../types/team.js';
 

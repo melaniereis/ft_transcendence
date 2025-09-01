@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+COPY certs/ certs/
+
 RUN npm run build
 
 RUN mkdir -p dist/frontend/pages/assets

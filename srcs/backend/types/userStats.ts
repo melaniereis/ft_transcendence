@@ -1,3 +1,4 @@
+//types/userStats.ts
 export type MatchResult = 'win' | 'loss';
 
 export interface UserMatch {

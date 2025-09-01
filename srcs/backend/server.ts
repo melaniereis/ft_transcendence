@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import path from 'path';
+import fs from 'fs';
 
 import { userRoutes } from './routes/user.js';
 import { tournamentRoutes } from './routes/tournamentRoutes.js';
@@ -9,24 +10,33 @@ import { registerTeamRoutes } from './routes/teamRoutes.js';
 import { gameRoutes } from './routes/gameRoutes.js';
 import { statsRoutes } from './routes/statsRoutes.js';
 import { authRoutes } from './routes/authRoutes.js';
-import { getSecrets } from './utils/vaultUtils.js';
-
-
+import { matchHistoryRoutes } from './routes/matchHistoryRoutes.js';
+import { userProfileRoutes } from './routes/userProfileRoutes.js';
+import { friendsRoutes } from './routes/friendsRoutes.js';
 import '../backend/db/database.js';
 
-const fastify = Fastify({ logger: true });
+const keyPath = path.join(process.cwd(), 'certs', 'key.pem');
+const certPath = path.join(process.cwd(), 'certs', 'cert.pem');
 
-// Enable CORS for all origins
-fastify.register(fastifyCors, {
-	origin: true,
+const fastify = Fastify({
+logger: true,
+https: {
+	key: fs.readFileSync(keyPath),
+	cert: fs.readFileSync(certPath),
+},
+});
+
+await fastify.register(fastifyCors, {
+origin: true,
 });
 
 const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
 console.log('Serving pages from:', pagesPath);
+
 fastify.register(fastifyStatic, {
-	root: pagesPath,
-	prefix: '/',
-	index: ['index.html'],
+root: pagesPath,
+prefix: '/',
+index: ['index.html'],
 });
 
 fastify.register(userRoutes);
@@ -35,17 +45,19 @@ fastify.register(registerTeamRoutes);
 fastify.register(gameRoutes);
 fastify.register(statsRoutes);
 fastify.register(authRoutes);
+fastify.register(matchHistoryRoutes);
+fastify.register(userProfileRoutes);
+fastify.register(friendsRoutes);
 
 const start = async () => {
-	try {
-		await getSecrets();
-		await fastify.listen({ port: 3000, host: '0.0.0.0' });
-		console.log('Server running at http://localhost:3000');
-	} 
-	catch (err) {
-		fastify.log.error(err);
-		process.exit(1);
-	}
+try {
+	await fastify.listen({ port: 3000, host: '0.0.0.0' });
+	console.log('✅ Server running at https://localhost:3000');
+} 
+catch (err) {
+	fastify.log.error(err);
+	process.exit(1);
+}
 };
 
 start();

@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Pong Game</title>
 </head>
 <body>
   <h1>PONG!!!!</h1>
-  <button id="play-btn">Play</button>
-  <button id="settings-btn">Player Settings</button>
-  <button id="tournaments-btn">Tournaments</button>
-  <button id="teams-btn">Teams</button>
+
+  <!-- Buttons hidden by default unless login state is valid -->
+  <button id="play-btn" style="display: none;">Play</button>
+  <button id="settings-btn" style="display: none;">Player Settings</button>
+  <button id="tournaments-btn" style="display: none;">Tournaments</button>
+  <button id="teams-btn" style="display: none;">Teams</button>
+
+  <!-- Auth buttons -->
+  <button id="login-btn">Login</button>
+  <button id="register-btn">Register</button>
+  <button id="logout-btn" style="display: none;">Logout</button>
+  <button id="profile-btn" style="display: none;">Profile</button>
+
+  <!-- 🔥 FRIEND REQUESTS NOTIFICATION -->
+  <button id="friend-requests-btn" style="display: none; position: relative; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+    📧 Friend Requests
+    <span id="friend-requests-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; text-align: center; line-height: 20px;"></span>
+  </button>
+
   <div id="app"></div>
 
   <script type="module" src="index.js"></script>

@@ -1,3 +1,4 @@
+//routes/user.ts 
 import { FastifyInstance } from 'fastify';
 import { createUser, getAllUsers, deleteUser } from '../services/services.js';
 
