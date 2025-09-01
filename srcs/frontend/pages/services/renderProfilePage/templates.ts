@@ -1,4 +1,10 @@
 // SVG ICON HELPERS (top-level scope)
+function svgUserIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>`;
+}
+function svgFriendsIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b6a6ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="8" r="4"/><circle cx="17" cy="8" r="4"/><path d="M7 12c-4 0-4 4-4 4v2h8v-2c0-4-4-4-4-4zm10 0c-4 0-4 4-4 4v2h8v-2c0-4-4-4-4-4z"/></svg>`;
+}
 function svgChartIcon() {
 	return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8" rx="1.5"/><rect x="9" y="8" width="4" height="12" rx="1.5"/><rect x="15" y="4" width="4" height="16" rx="1.5"/></svg>`;
 }
@@ -72,7 +78,7 @@ export function header(profile: Profile, isEdit: boolean): string {
                     box-shadow:0 8px 32px rgba(0,174,239,0.2);" alt="Avatar"/>
         <div id="avatar-overlay" style="position:absolute;inset:0;background:rgba(28,33,38,0.7);border-radius:50%;
                     display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer">
-          <span style="color:white;font-size:14px;font-weight:600">📷 Change</span>
+          <span style="color:white;font-size:14px;font-weight:600">${svgChartIcon()} Change</span>
         </div>
       </div>
       <div style="margin-top:15px">
@@ -80,7 +86,7 @@ export function header(profile: Profile, isEdit: boolean): string {
                 style="background:${GRID_COLORS.cool};color:#fff;border:none;padding:8px 16px;
                        border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;
                        transition:all 0.3s;box-shadow:0 4px 12px rgba(0,174,239,0.3)">
-          📷 Choose Avatar
+          ${svgChartIcon()} Choose Avatar
         </button>
       </div>
     </div>`
@@ -134,19 +140,19 @@ ${avatar}
                     style="background:${GRID_COLORS.success};color:#fff;border:none;padding:12px 24px;
                            border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;
                            transition:all 0.3s;box-shadow:0 4px 12px rgba(0,213,99,0.3)">
-              💾 Save Changes
+              <span style="vertical-align:middle;">${svgBarChartIcon()}</span> Save Changes
             </button>
             <button id="cancel-btn"
                     style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
                            border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
                            transition:all 0.3s">
-              ❌ Cancel
+              <span style="vertical-align:middle;">${svgFlameIcon()}</span> Cancel
             </button>
             <button id="pass-btn"
                     style="background:${GRID_COLORS.warm};color:#fff;border:none;padding:12px 24px;
                            border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;
                            transition:all 0.3s;box-shadow:0 4px 12px rgba(155,89,182,0.3)">
-              🔒 Change Password
+              <span style="vertical-align:middle;">${svgClockIcon()}</span> Change Password
             </button>
           </div>
           <div id="save-error" style="color:${GRID_COLORS.accent};margin-top:15px;font-size:14px;font-weight:500"></div>
@@ -163,7 +169,9 @@ ${teamLogo ? `<img src="${teamLogo}" width="24" height="24" style="border-radius
           </div>
           <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> ${createdAtText}</div>
           <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}</div>
-          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'}</div>
+          <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status
+			? '<svg width="16" height="16" style="vertical-align:middle;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#4be17b" stroke="#fff" stroke-width="2"/></svg> Online'
+			: '<svg width="16" height="16" style="vertical-align:middle;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#b6a6ca" stroke="#fff" stroke-width="2"/></svg> Offline'}</div>
         </div>
       </div>
     </div>`
@@ -176,9 +184,9 @@ ${avatar}
         <div style="flex:1;min-width:300px">
           <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
             <h3 style="margin:0;color:${GRID_COLORS.primary};font-size:28px;font-weight:700">@${profile.username}</h3>
-            <button id="edit-btn" title="Edit profile"
-                    style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.cool};
-                           padding:8px;border-radius:50%;transition:all 0.3s">🖊️</button>
+      <button id="edit-btn" title="Edit profile"
+        style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.cool};
+         padding:8px;border-radius:50%;transition:all 0.3s">${svgTrendIcon()}</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px">
             <div style="display:flex;align-items:center;gap:8px">
@@ -195,7 +203,9 @@ ${avatar}
             <div><span style="font-weight:600;color:${GRID_COLORS.primary}">Member since:</span> <span style="color:${GRID_COLORS.muted}">${createdAtText}</span></div>
           </div>
           <div style="font-size:14px;color:${GRID_COLORS.muted};padding:12px;background:rgba(0,174,239,0.1);border-radius:8px">
-            <span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status ? '🟢 Online' : '🔴 Offline'} •
+            <span style="font-weight:600;color:${GRID_COLORS.primary}">Status:</span> ${profile.online_status
+			? '<svg width="16" height="16" style="vertical-align:middle;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#4be17b" stroke="#fff" stroke-width="2"/></svg> Online'
+			: '<svg width="16" height="16" style="vertical-align:middle;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#b6a6ca" stroke="#fff" stroke-width="2"/></svg> Offline'} •
             <span style="font-weight:600;color:${GRID_COLORS.primary}">Last seen:</span> ${profile.last_seen ? new Date(profile.last_seen).toLocaleString().substring(0, 10) : '—'}
           </div>
         </div>
@@ -240,7 +250,7 @@ export function friendsList(friends: Friend[]): string {
         <div class="amazing-friend-username">@${username}</div>
       </div>
       <button class="remove-friend-btn amazing-remove-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}" title="Remove friend">
-        <span>×</span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></span>
       </button>
     </div>
     <style>
@@ -406,7 +416,7 @@ export function historyList(history: Match[]): string {
 		return `
       <div style="padding:40px;text-align:center;color:${GRID_COLORS.muted};
                   background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);border-radius:12px;">
-        <div style="font-size:48px;margin-bottom:15px">🎮</div>
+  <div style="font-size:48px;margin-bottom:15px">${svgChartIcon()}</div>
         <h4 style="margin:0 0 10px 0;color:${GRID_COLORS.primary}">No Match History</h4>
         <p style="margin:0">Your game history will appear here once you start playing!</p>
       </div>
@@ -669,7 +679,7 @@ export function historyDetailed(history: Match[]): string {
               <option value="month">This Month</option>
               <option value="quarter">Last 3 Months</option>
             </select>
-            <button data-action="apply-history-filters" style="background:${GRID_COLORS.cool};color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer">🔍 Apply</button>
+            <button data-action="apply-history-filters" style="background:${GRID_COLORS.cool};color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer">${svgTrendIcon()} Apply</button>
           </div>
         </div>
         <div id="filtered-matches" style="display:grid;gap:22px">
@@ -677,7 +687,7 @@ export function historyDetailed(history: Match[]): string {
 		const isWin = m.result === 'win';
 		const diff = Math.abs(m.user_score - m.opponent_score);
 		const matchType = diff <= 2 ? 'Nail-biter' : diff <= 5 ? 'Close' : diff <= 10 ? 'Competitive' : 'Dominant';
-		const mvp = diff >= 10 ? '🏅 MVP' : '';
+		const mvp = diff >= 10 ? svgMedalGold() + ' MVP' : '';
 		const barColor = isWin ? '#4be17b' : '#ff5c5c';
 		return `
       <div class="amazing-match-card-detailed" style="display:flex;align-items:center;gap:24px;padding:28px 0 28px 0;position:relative;min-height:90px;background:rgba(255,255,255,0.22);border-radius:22px;box-shadow:0 4px 24px #b6a6ca22;overflow:hidden;backdrop-filter:blur(8px) saturate(1.13);">
@@ -691,7 +701,7 @@ export function historyDetailed(history: Match[]): string {
           <div style="display:flex;align-items:center;gap:18px;">
             <span style="font-weight:900;font-size:32px;color:${barColor};letter-spacing:1.5px;font-family:'Share Tech Mono',monospace;text-shadow:0 2px 8px #fff8;padding:0 18px 0 0;">${m.user_score} - ${m.opponent_score}</span>
             <span style="font-size:19px;font-weight:800;color:${barColor};display:flex;align-items:center;gap:4px;">
-              ${isWin ? '🏆 WIN' : '💀 LOSS'}
+              ${isWin ? svgMedalGold() + ' WIN' : svgFlameIcon() + ' LOSS'}
             </span>
             <span style="font-size:16px;color:${diff <= 2 ? '#7fc7d9' : diff <= 5 ? '#b6a6ca' : '#e6c79c'};font-weight:700;display:flex;align-items:center;gap:4px;">
               <span style="background:linear-gradient(90deg,#e6c79c22,#7fc7d922);padding:3px 14px;border-radius:10px;font-size:14px;font-weight:700;">${matchType}</span>
@@ -727,10 +737,10 @@ export function statsOverview(stats: Stats, history: Match[]): string {
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin-bottom:30px">
 ${[
-			{ label: 'Total Matches', value: stats.matches_played, color: GRID_COLORS.cool, icon: '🎮', sub: 'Games played' },
-			{ label: 'Win Rate', value: `${wr}%`, color: parseFloat(wr) >= 50 ? GRID_COLORS.success : GRID_COLORS.accent, icon: '🏆', sub: `${stats.matches_won}W / ${stats.matches_lost}L` },
-			{ label: 'Score Ratio', value: kd, color: parseFloat(kd) >= 1 ? GRID_COLORS.success : GRID_COLORS.warm, icon: '⚡', sub: 'Scored / Conceded' },
-			{ label: 'Tournaments Won', value: stats.tournaments_won || 0, color: GRID_COLORS.warm, icon: '🏅', sub: 'Titles' }
+			{ label: 'Total Matches', value: stats.matches_played, color: GRID_COLORS.cool, icon: svgChartIcon(), sub: 'Games played' },
+			{ label: 'Win Rate', value: `${wr}%`, color: parseFloat(wr) >= 50 ? GRID_COLORS.success : GRID_COLORS.accent, icon: svgMedalGold(), sub: `${stats.matches_won}W / ${stats.matches_lost}L` },
+			{ label: 'Score Ratio', value: kd, color: parseFloat(kd) >= 1 ? GRID_COLORS.success : GRID_COLORS.warm, icon: svgTrendIcon(), sub: 'Scored / Conceded' },
+			{ label: 'Tournaments Won', value: stats.tournaments_won || 0, color: GRID_COLORS.warm, icon: svgMedalGold(), sub: 'Titles' }
 		].map(s => `
           <div style="background:linear-gradient(135deg, ${s.color}15, ${s.color}05);padding:20px;border-radius:12px;border-left:4px solid ${s.color};">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -744,7 +754,7 @@ ${[
       </div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px">
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
-          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary};display:flex;align-items:center;gap:8px"><span>📊</span> Scoring Statistics</h4>
+          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary};display:flex;align-items:center;gap:8px"><span>${svgBarChartIcon()}</span> Scoring Statistics</h4>
           <div>
 ${[
 			['Total Points Scored', `<strong style="color:${GRID_COLORS.success}">${stats.points_scored}</strong>`],
@@ -759,7 +769,7 @@ ${[
           </div>
         </div>
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
-          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary};display:flex;align-items:center;gap:8px"><span>🎯</span> Performance Metrics</h4>
+          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary};display:flex;align-items:center;gap:8px"><span>${svgFlameIcon()}</span> Performance Metrics</h4>
           <div>
 ${[
 			['Current Win Streak', `<strong style="color:${ws > 0 ? GRID_COLORS.success : GRID_COLORS.accent}">${ws}</strong>`],
@@ -787,16 +797,16 @@ export function statsPerformance(stats: Stats, history: Match[]): string {
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px">
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
-          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">📊 Recent Match Scores</h4>
+          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgBarChartIcon()} Recent Match Scores</h4>
           <canvas id="performanceChart" width="300" height="200" style="width:100%;height:200px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
         </div>
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
-          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">🏆 Performance Rankings</h4>
+          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgMedalGold()} Performance Rankings</h4>
 ${[
-			{ label: 'Consistency', value: `${cons}%`, desc: 'Performance stability', color: cons >= 70 ? GRID_COLORS.success : cons >= 50 ? GRID_COLORS.warm : GRID_COLORS.accent, icon: '🎯' },
-			{ label: 'Clutch Factor', value: `${clutch}%`, desc: 'Close game wins', color: clutch >= 60 ? GRID_COLORS.success : GRID_COLORS.warm, icon: '🔥' },
-			{ label: 'Dominance', value: `${dom}%`, desc: 'Big-margin wins', color: GRID_COLORS.cool, icon: '👑' },
-			{ label: 'Efficiency', value: eff, desc: 'Performance per match', color: GRID_COLORS.accent, icon: '⚡' },
+			{ label: 'Consistency', value: `${cons}%`, desc: 'Performance stability', color: cons >= 70 ? GRID_COLORS.success : cons >= 50 ? GRID_COLORS.warm : GRID_COLORS.accent, icon: svgBarChartIcon() },
+			{ label: 'Clutch Factor', value: `${clutch}%`, desc: 'Close game wins', color: clutch >= 60 ? GRID_COLORS.success : GRID_COLORS.warm, icon: svgFlameIcon() },
+			{ label: 'Dominance', value: `${dom}%`, desc: 'Big-margin wins', color: GRID_COLORS.cool, icon: svgTrendIcon() },
+			{ label: 'Efficiency', value: eff, desc: 'Performance per match', color: GRID_COLORS.accent, icon: svgBarChartIcon() },
 		].map(r => `
             <div style="display:flex;align-items:center;gap:12px;padding:10px;background:${GRID_COLORS.bg};border-radius:8px;border-left:4px solid ${r.color};margin-bottom:10px;">
               <div style="font-size:20px">${r.icon}</div>
@@ -809,7 +819,7 @@ ${[
         </div>
       </div>
       <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;margin-bottom:20px;">
-        <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">🔥 Activity Heatmap (7 days)</h4>
+  <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgFlameIcon()} Activity Heatmap (7 days)</h4>
         <canvas id="activityHeatmap" width="600" height="100" style="width:100%;height:100px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
       </div>
     </div>
@@ -819,10 +829,10 @@ export function statsTrends(stats: Stats): string {
 	return `
     <div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:30px">
-${[
-			{ label: 'Win Rate', value: `${(stats.win_rate * 100).toFixed(1)}%`, color: GRID_COLORS.success, icon: '🏆', period: 'current' },
-			{ label: 'Avg Score', value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: GRID_COLORS.cool, icon: '📊', period: 'per match' },
-			{ label: 'Games/Week', value: String(gamesThisWeek([])), color: GRID_COLORS.cool, icon: '🎮', period: 'this week' }, /* updated at runtime in index */
+ ${[
+			{ label: 'Win Rate', value: `${(stats.win_rate * 100).toFixed(1)}%`, color: GRID_COLORS.success, icon: svgMedalGold(), period: 'current' },
+			{ label: 'Avg Score', value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: GRID_COLORS.cool, icon: svgBarChartIcon(), period: 'per match' },
+			{ label: 'Games/Week', value: String(gamesThisWeek([])), color: GRID_COLORS.cool, icon: svgChartIcon(), period: 'this week' }, /* updated at runtime in index */
 		].map(t => `
           <div style="background:linear-gradient(135deg, ${t.color}15, ${t.color}05);padding:18px;border-radius:12px;border-left:4px solid ${t.color};">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -835,16 +845,16 @@ ${[
         `).join('')}
       </div>
       <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;margin-bottom:30px;">
-        <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">📈 Win Rate Progression</h4>
+        <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgTrendIcon()} Win Rate Progression</h4>
         <canvas id="trendsChart" width="800" height="300" style="width:100%;height:300px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
       </div>
       <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px">
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
-          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">📅 Weekly Breakdown</h4>
+          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgClockIcon()} Weekly Breakdown</h4>
           <canvas id="weeklyChart" width="300" height="200" style="width:100%;height:200px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
         </div>
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
-          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">⏰ Time-based Performance</h4>
+          <h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgClockIcon()} Time-based Performance</h4>
           <canvas id="timeAnalysisChart" width="800" height="250" style="width:100%;height:250px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
         </div>
       </div>
@@ -1375,9 +1385,9 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                 style="flex:1;padding:18px 0;border:none;background:${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'};
                        color:${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted};font-size:1.15rem;font-weight:700;
                        border-bottom:4px solid ${tab === mainTab ? GRID_COLORS.cool : 'transparent'};cursor:pointer;transition:all 0.2s">
-                ${tab === 'profile' ? '👤 Profile' : tab === 'stats' ? '📊 Statistics' : tab === 'history' ? '🏆 Match History' : '👥 Friends'}
-              </button>
-            `).join('')}
+                ${(tab === 'profile' ? `${svgUserIcon()} Profile` : tab === 'stats' ? `${svgBarChartIcon()} Statistics` : tab === 'history' ? `${svgMedalGold()} Match History` : `${svgOpponentIcon()} Friends`)}
+				</button>
+	`).join('')}
           </div>
           <!-- Tab Panels -->
           <div class="tab-panel" id="profile-panel" style="display:${mainTab === 'profile' ? 'block' : 'none'}">
