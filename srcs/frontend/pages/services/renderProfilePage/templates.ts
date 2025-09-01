@@ -398,7 +398,7 @@ export function friendsList(friends: Friend[]): string {
         <button id="friends-next" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === totalPages - 1 ? 0.3 : 1};pointer-events:${page === totalPages - 1 ? 'none' : 'auto'};transition:opacity 0.2s;">&#8594;</button>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="amazing-friends-grid">
       <div>
         ${col1.map(friendCard).join('')}
       </div>
@@ -406,6 +406,63 @@ export function friendsList(friends: Friend[]): string {
         ${col2.map(friendCard).join('')}
       </div>
     </div>
+    <style>
+      .amazing-friends-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      @media (max-width: 700px) {
+        .amazing-friends-grid {
+          grid-template-columns: 1fr;
+        }
+        .amazing-friends-grid > div {
+          margin-bottom: 0;
+        }
+        .amazing-friend-card {
+          min-width: 0;
+          padding: 14px 10px 14px 10px;
+        }
+        .amazing-avatar {
+          width: 44px;
+          height: 44px;
+        }
+        .amazing-team-logo {
+          width: 22px;
+          height: 22px;
+        }
+        .amazing-friend-name {
+          font-size: 16px;
+        }
+        .amazing-friend-username {
+          font-size: 12px;
+        }
+      }
+      @media (max-width: 480px) {
+        .amazing-friends-grid {
+          grid-template-columns: 1fr;
+        }
+        .amazing-friend-card {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 10px 4px;
+        }
+        .amazing-avatar {
+          width: 36px;
+          height: 36px;
+        }
+        .amazing-team-logo {
+          width: 16px;
+          height: 16px;
+        }
+        .amazing-friend-name {
+          font-size: 14px;
+        }
+        .amazing-friend-username {
+          font-size: 11px;
+        }
+      }
+    </style>
   </div>
   <!-- Navegação controlada por event delegation no profile.ts -->
 `;
