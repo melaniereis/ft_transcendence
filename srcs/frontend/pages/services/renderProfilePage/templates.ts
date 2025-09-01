@@ -192,23 +192,38 @@ export function friendsList(friends: Friend[]): string {
 		const username = f.username || '';
 		const avatar = f.avatar_url || '/assets/avatar/default.png';
 		const online = !!f.online_status;
+		const team = f.team ? f.team.toUpperCase() : '';
+		let teamLogo = '';
+		if (team && Object.prototype.hasOwnProperty.call(TEAM_LOGOS, team)) {
+			teamLogo = TEAM_LOGOS[team as keyof typeof TEAM_LOGOS];
+		}
 		return `
     <div class="friend-item" data-id="${id}" data-name="${displayName}"
-      style="background:linear-gradient(120deg, #f8f9f8 0%, #eaeaea 100%);border-radius:18px;box-shadow:0 2px 12px rgba(0,174,239,0.10);display:flex;align-items:center;gap:18px;padding:20px 22px;position:relative;transition:box-shadow 0.2s, transform 0.2s;cursor:pointer;overflow:hidden;"
+      style="background:linear-gradient(120deg, #f8f9f8 0%, #eaeaea 100%);border-radius:18px;box-shadow:0 4px 18px 0 #b6a6ca22, 0 1.5px 8px #7fc7d933;display:flex;align-items:center;gap:18px;padding:18px 18px 18px 18px;position:relative;transition:box-shadow 0.2s, transform 0.2s;cursor:pointer;overflow:hidden;min-height:80px;"
+      onmouseover="this.style.transform='scale(1.025)';this.style.boxShadow='0 8px 32px #b6a6ca33'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px 0 #b6a6ca22, 0 1.5px 8px #7fc7d933'"
     >
-      <img src="${avatar}" width="54" height="54" style="border-radius:50%;object-fit:cover;border:3px solid ${online ? GRID_COLORS.success : GRID_COLORS.accent};box-shadow:0 2px 8px #b6a6ca22;transition:border 0.2s;" alt="Avatar"/>
+      <div style="position:relative;display:flex;align-items:center;">
+        <img src="${avatar}" width="54" height="54" style="border-radius:50%;object-fit:cover;border:3px solid ${online ? GRID_COLORS.success : GRID_COLORS.accent};box-shadow:0 2px 8px #b6a6ca22;transition:border 0.2s;" alt="Avatar"/>
+        ${teamLogo ? `<img src="${teamLogo}" width="28" height="28" style="position:absolute;bottom:-7px;right:-12px;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:contain;box-shadow:0 2px 8px #b6a6ca22;" alt="Team Logo"/>` : ''}
+      </div>
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:17px;color:${GRID_COLORS.primary};text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:0.2px;">${displayName}
-          <span style="margin-left:10px;vertical-align:middle;display:inline-block;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${online ? GRID_COLORS.success : GRID_COLORS.accent};color:#fff;box-shadow:0 1px 4px #a3d9b133;">${online ? 'Online' : 'Offline'}</span>
+        <div style="font-weight:700;font-size:17px;color:${GRID_COLORS.primary};text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:0.2px;display:flex;align-items:center;gap:8px;">
+          <span>${displayName}</span>
+          <span style="margin-left:0;vertical-align:middle;display:inline-block;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${online ? GRID_COLORS.success : GRID_COLORS.accent};color:#fff;box-shadow:0 1px 4px #a3d9b133;">${online ? 'Online' : 'Offline'}</span>
         </div>
-        <div style="font-size:13px;color:${GRID_COLORS.muted};margin-top:2px;">@${username}</div>
+  <div style="font-size:13px;color:${GRID_COLORS.muted};margin-top:2px;">@${username}</div>
       </div>
       <button class="remove-friend-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}"
         title="Remove friend"
-        style="background:transparent;border:none;outline:none;cursor:pointer;padding:0 0 0 10px;display:flex;align-items:center;opacity:0.5;transition:opacity 0.2s;z-index:2;">
-        <span style="display:inline-block;width:36px;height:36px;border-radius:50%;background:#ff5c5c;color:#fff;font-size:20px;line-height:36px;text-align:center;transition:background 0.2s;box-shadow:0 2px 8px #b6a6ca22;">×</span>
+        style="background:transparent;border:none;outline:none;cursor:pointer;padding:0 0 0 10px;display:flex;align-items:center;opacity:0;transition:opacity 0.2s;z-index:2;position:relative;">
+        <span style="display:inline-block;width:32px;height:32px;border-radius:50%;background:#ff5c5c;color:#fff;font-size:18px;line-height:32px;text-align:center;transition:background 0.2s;box-shadow:0 2px 8px #b6a6ca22;">×</span>
       </button>
       <div class="friend-hover-overlay" style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 0.2s;background:linear-gradient(90deg,rgba(123,97,255,0.07),rgba(174,239,239,0.09));z-index:1;"></div>
+      <style>
+        .friend-item:hover .remove-friend-btn {
+          opacity: 1 !important;
+        }
+      </style>
     </div>
     `;
 	}
