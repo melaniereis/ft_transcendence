@@ -198,33 +198,152 @@ export function friendsList(friends: Friend[]): string {
 			teamLogo = TEAM_LOGOS[team as keyof typeof TEAM_LOGOS];
 		}
 		return `
-    <div class="friend-item" data-id="${id}" data-name="${displayName}"
-      style="background:linear-gradient(120deg, #f8f9f8 0%, #eaeaea 100%);border-radius:18px;box-shadow:0 4px 18px 0 #b6a6ca22, 0 1.5px 8px #7fc7d933;display:flex;align-items:center;gap:18px;padding:18px 18px 18px 18px;position:relative;transition:box-shadow 0.2s, transform 0.2s;cursor:pointer;overflow:hidden;min-height:80px;"
-      onmouseover="this.style.transform='scale(1.025)';this.style.boxShadow='0 8px 32px #b6a6ca33'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px 0 #b6a6ca22, 0 1.5px 8px #7fc7d933'"
-    >
-      <div style="position:relative;display:flex;align-items:center;">
-        <img src="${avatar}" width="54" height="54" style="border-radius:50%;object-fit:cover;border:3px solid ${online ? GRID_COLORS.success : GRID_COLORS.accent};box-shadow:0 2px 8px #b6a6ca22;transition:border 0.2s;" alt="Avatar"/>
-        ${teamLogo ? `<img src="${teamLogo}" width="28" height="28" style="position:absolute;bottom:-7px;right:-12px;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:contain;box-shadow:0 2px 8px #b6a6ca22;" alt="Team Logo"/>` : ''}
+    <div class="friend-item amazing-friend-card" data-id="${id}" data-name="${displayName}">
+      <div class="amazing-avatar-wrap">
+        <img src="${avatar}" width="56" height="56" class="amazing-avatar" alt="Avatar"/>
+        ${teamLogo ? `<img src="${teamLogo}" width="30" height="30" class="amazing-team-logo" alt="Team Logo"/>` : ''}
+        <span class="amazing-status-dot" style="background:${online ? '#4be17b' : '#b6a6ca'};box-shadow:0 0 8px 2px ${online ? '#4be17b88' : '#b6a6ca55'}"></span>
       </div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:17px;color:${GRID_COLORS.primary};text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:0.2px;display:flex;align-items:center;gap:8px;">
-          <span>${displayName}</span>
-          <span style="margin-left:0;vertical-align:middle;display:inline-block;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${online ? GRID_COLORS.success : GRID_COLORS.accent};color:#fff;box-shadow:0 1px 4px #a3d9b133;">${online ? 'Online' : 'Offline'}</span>
-        </div>
-  <div style="font-size:13px;color:${GRID_COLORS.muted};margin-top:2px;">@${username}</div>
+      <div class="amazing-friend-info">
+        <div class="amazing-friend-name">${displayName}</div>
+        <div class="amazing-friend-username">@${username}</div>
       </div>
-      <button class="remove-friend-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}"
-        title="Remove friend"
-        style="background:transparent;border:none;outline:none;cursor:pointer;padding:0 0 0 10px;display:flex;align-items:center;opacity:0;transition:opacity 0.2s;z-index:2;position:relative;">
-        <span style="display:inline-block;width:32px;height:32px;border-radius:50%;background:#ff5c5c;color:#fff;font-size:18px;line-height:32px;text-align:center;transition:background 0.2s;box-shadow:0 2px 8px #b6a6ca22;">×</span>
+      <button class="remove-friend-btn amazing-remove-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}" title="Remove friend">
+        <span>×</span>
       </button>
-      <div class="friend-hover-overlay" style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 0.2s;background:linear-gradient(90deg,rgba(123,97,255,0.07),rgba(174,239,239,0.09));z-index:1;"></div>
-      <style>
-        .friend-item:hover .remove-friend-btn {
-          opacity: 1 !important;
-        }
-      </style>
     </div>
+    <style>
+      .amazing-friend-card {
+        background: rgba(255,255,255,0.55);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px 0 #b6a6ca33, 0 1.5px 8px #7fc7d933;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 22px 18px 18px;
+        position: relative;
+        min-height: 90px;
+        overflow: hidden;
+        backdrop-filter: blur(8px) saturate(1.2);
+        border: 1.5px solid #eaeaea;
+        transition: box-shadow 0.25s, transform 0.18s;
+        cursor: pointer;
+        z-index: 1;
+      }
+      .amazing-friend-card:hover {
+        box-shadow: 0 16px 48px 0 #b6a6ca55, 0 2px 12px #7fc7d955;
+        transform: translateY(-2px) scale(1.035) rotate(-0.5deg);
+        border-color: #b6a6ca;
+      }
+      .amazing-avatar-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+      }
+      .amazing-avatar {
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #b6a6ca;
+        box-shadow: 0 2px 8px #b6a6ca22;
+        width: 56px;
+        height: 56px;
+        background: #fff;
+        transition: border 0.2s, box-shadow 0.2s;
+      }
+      .amazing-friend-card:hover .amazing-avatar {
+        border: 3px solid #7fc7d9;
+        box-shadow: 0 4px 16px #7fc7d955;
+      }
+      .amazing-team-logo {
+        position: absolute;
+        bottom: -8px;
+        right: -14px;
+        border-radius: 50%;
+        border: 2.5px solid #fff;
+        background: #fff;
+        box-shadow: 0 2px 8px #b6a6ca22;
+        width: 30px;
+        height: 30px;
+        z-index: 2;
+        transition: transform 0.18s;
+      }
+      .amazing-friend-card:hover .amazing-team-logo {
+        transform: scale(1.08) rotate(-8deg);
+      }
+      .amazing-status-dot {
+        position: absolute;
+        left: -7px;
+        bottom: 2px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 2.5px solid #fff;
+        z-index: 2;
+        transition: background 0.2s, box-shadow 0.2s;
+      }
+      .amazing-friend-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .amazing-friend-name {
+        font-weight: 800;
+        font-size: 18px;
+        color: #6b7a8f;
+        letter-spacing: 0.2px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        text-shadow: 0 1px 8px #fff8;
+      }
+      .amazing-friend-username {
+        font-size: 13px;
+        color: #b6a6ca;
+        opacity: 0.85;
+        font-weight: 600;
+        letter-spacing: 0.1px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .amazing-remove-btn {
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 0 0 0 10px;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 2;
+        position: relative;
+      }
+      .amazing-friend-card:hover .amazing-remove-btn {
+        opacity: 1 !important;
+      }
+      .amazing-remove-btn span {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#ff5c5c 60%,#eaeaea 100%);
+        color: #fff;
+        font-size: 20px;
+        line-height: 32px;
+        text-align: center;
+        box-shadow: 0 2px 8px #b6a6ca22;
+        transition: background 0.2s, box-shadow 0.2s;
+      }
+      .amazing-remove-btn:hover span {
+        background: #ff2d2d;
+        box-shadow: 0 4px 16px #ff5c5c55;
+      }
+    </style>
     `;
 	}
 
