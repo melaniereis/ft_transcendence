@@ -1,6 +1,9 @@
 // Tipagem global para window.state (usado na paginação de friends)
 declare global {
-	interface Window { state: any; }
+	interface Window {
+		state: any;
+		renderProfilePage?: (container: HTMLElement, onBadgeUpdate?: () => void) => void;
+	}
 }
 // renderProfilePage/templates.ts - FIXED VERSION with working PetalFall animation
 import { AVAILABLE_AVATARS, Friend, Match, Profile, Stats } from './types.js';

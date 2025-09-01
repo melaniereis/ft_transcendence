@@ -84,7 +84,6 @@ export function render(container: HTMLElement) {
 	const activePanel = document.getElementById(mainTab + '-panel');
 	if (activePanel) (activePanel as HTMLElement).style.display = 'block';
 
-
 	// Preencher conteúdo das sub-abas SÓ se a tab principal correspondente estiver ativa
 	if (mainTab === 'stats') {
 		const statsInner = document.getElementById('stats-content-inner');
@@ -104,7 +103,16 @@ export function render(container: HTMLElement) {
 	}
 	if (mainTab === 'friends') {
 		const friendsContainer = document.getElementById('friends-container');
-		if (friendsContainer) friendsContainer.innerHTML = friendsList(state.friends);
+		if (friendsContainer) {
+			friendsContainer.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;">
+			       <div style="width:48px;height:48px;border:5px solid #eaeaea;border-top:5px solid #b6a6ca;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
+			       <div style="font-size:18px;color:#b6a6ca;font-weight:500;">Loading friends...</div>
+			       <style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
+		       </div>`;
+			setTimeout(() => {
+				friendsContainer.innerHTML = friendsList(state.friends);
+			}, 350);
+		}
 	}
 
 	// Listeners para tabs principais (corrigido para .main-tab e data-main-tab)
@@ -519,9 +527,42 @@ export function setupEvents(container: HTMLElement) {
 
 export function rerenderFriends() {
 	const fc = document.getElementById('friends-container');
-	if (fc) setHTML(fc, friendsList(state.friends));
-	setupFriendHoverEffects();
-	setupRemoveFriendEvents();
+	if (fc) {
+		setHTML(fc, friendsList(state.friends));
+		setupFriendHoverEffects();
+		setupRemoveFriendEvents();
+	} else {
+		// Se o container ainda não existe (ex: loading), tenta renderizar a tab inteira
+		const friendsPanel = document.getElementById('friends-panel');
+		if (friendsPanel) {
+			friendsPanel.innerHTML = `
+				<div class="gris-section" id="friends-section">
+					<div class="gris-section-title">Friends</div>
+					<div class="gris-section-content" id="friends-content">
+						<form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
+							<input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+							<button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
+						</form>
+						<div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff"></div>
+						<div id="friends-container" style="margin:10px 0;text-align:center">${friendsList(state.friends)}</div>
+					</div>
+				</div>`;
+			setupFriendHoverEffects();
+			setupRemoveFriendEvents();
+		}
+	}
+}
+// Sempre renderiza a tab de amigos por completo, garantindo que o loading suma
+state.activeMainTab = 'friends';
+if (state.container) {
+	// @ts-ignore
+	if (typeof window.renderProfilePage === 'function') {
+		window.renderProfilePage(state.container, state.onBadgeUpdate);
+	} else {
+		// fallback para render padrão
+		const { render } = require('./events.js');
+		render(state.container);
+	}
 }
 
 // Add these functions to your existing events.ts file
