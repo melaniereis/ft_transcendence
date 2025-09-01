@@ -16,7 +16,8 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 		headers: { Authorization: `Bearer ${token}` }
 		});
 		users = await res.json();
-	} catch (err) {
+	} 
+	catch (err) {
 		container.innerHTML += `<p>Error loading users.</p>`;
 		return;
 	}

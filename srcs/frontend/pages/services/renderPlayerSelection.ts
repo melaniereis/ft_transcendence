@@ -9,14 +9,20 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		<select id="player2-select"></select>
 	</label>
 	<label>Max Games:
-		<input type="number" id="max-games" value="3" min="1" />
+		<select id="max-games-select">
+			<option value="3">3</option>
+			<option value="5">5</option>
+			<option value="7">7</option>
+			<option value="9">9</option>
+			<option value="11">11</option>
+		</select>
 	</label>
 	<label>Difficulty:
 		<select id="difficulty-select">
-		<option value="easy">Easy</option>
-		<option value="normal" selected>Normal</option>
-		<option value="hard">Hard</option>
-		<option value="crazy">Crazy</option>
+			<option value="easy">Easy</option>
+			<option value="normal" selected>Normal</option>
+			<option value="hard">Hard</option>
+			<option value="crazy">Crazy</option>
 		</select>
 	</label>
 	<button id="start-game-btn">Start Game</button>
@@ -27,8 +33,6 @@ export async function renderPlayerSelection(container: HTMLElement) {
 	const player2Select = document.getElementById('player2-select') as HTMLSelectElement;
 	const startGameBtn = document.getElementById('start-game-btn') as HTMLButtonElement;
 	const errorDiv = document.getElementById('selection-error') as HTMLDivElement;
-	const difficulty = (document.getElementById('difficulty-select') as HTMLSelectElement).value as
-	| 'easy' | 'normal' | 'hard' | 'crazy';
 
 	try {
 		const response = await fetch('/users');
@@ -56,38 +60,43 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		const player2Id = Number(player2Select.value);
 		const player1Name = player1Select.selectedOptions[0].textContent!;
 		const player2Name = player2Select.selectedOptions[0].textContent!;
-		const maxGames = Number((document.getElementById('max-games') as HTMLInputElement).value);
+		const maxGames = Number((document.getElementById('max-games-select') as HTMLSelectElement).value);
+		const difficulty = (document.getElementById('difficulty-select') as HTMLSelectElement).value as
+			| 'easy'
+			| 'normal'
+			| 'hard'
+			| 'crazy';
 
 		if (!player1Id || !player2Id || player1Id === player2Id) {
-		errorDiv.textContent = 'Please select two different players.';
-		return;
+			errorDiv.textContent = 'Please select two different players.';
+			return;
 		}
 
-	try {
-		const response = await fetch('/games', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-			player1_id: player1Id,
-			player2_id: player2Id,
-			max_games: maxGames,
-			time_started: new Date().toISOString()
-			})
-		});
+		try {
+			const response = await fetch('/games', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					player1_id: player1Id,
+					player2_id: player2Id,
+					max_games: maxGames,
+					time_started: new Date().toISOString()
+				})
+			});
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Failed to create game');
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || 'Failed to create game');
+			}
+
+			const data = await response.json();
+			const gameId = data.game_id;
+
+			container.innerHTML = '';
+			renderGame(container, player1Name, player2Name, gameId, maxGames, difficulty);
+		} 
+		catch (err: any) {
+			errorDiv.textContent = `Error starting game: ${err.message}`;
 		}
-
-		const data = await response.json();
-		const gameId = data.game_id;
-
-		container.innerHTML = '';
-		renderGame(container, player1Name, player2Name, gameId, maxGames, difficulty); 
-	} 
-	catch (err: any) {
-		errorDiv.textContent = `Error starting game: ${err.message}`;
-	}
 	});
 }
