@@ -1,64 +1,78 @@
 //routes/tournamentRoutes.ts
 import { FastifyInstance } from 'fastify';
-import {createTournament, getAllTournaments, getTournamentById,
-updateTournament, deleteTournament} from '../services/tournamentsService.js';
+import {createTournament, getTournamentById, updateMatchResult,
+getAllTournaments, deleteTournamentByName} from '../services/tournamentsService.js';
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
-	fastify.post('/tournaments', async (request, reply) => {
-		const { name, team_winner, team_victories, size } = request.body as {
-		name: string;
-		team_winner: string;
-		team_victories: number;
-		size: number;
-		};
-
+	fastify.get('/api/tournaments', async (_req, reply) => {
 		try {
-			await createTournament(name, team_winner, team_victories, size);
-			reply.status(201).send({ message: 'Tournament created' });
+			const tournaments = await getAllTournaments();
+			reply.send(tournaments);
 		} 
-		catch (error) {
+		catch (err) {
+			reply.status(500).send({ error: 'Failed to fetch tournaments' });
+		}
+	});
+
+	fastify.get('/api/tournaments/:id', async (req, reply) => {
+		const { id } = req.params as { id: string };
+		
+		try {
+			const tournament = await getTournamentById(+id);
+			reply.send(tournament);
+		}
+		catch (err) {
+			reply.status(404).send({ error: 'Tournament not found' });
+		}
+	});
+	
+	fastify.post('/api/tournaments', async (req, reply) => {
+		const { name, playerIds } = req.body as { name?: string; playerIds?: number[] };
+		
+		if (!name || !playerIds || playerIds.length !== 4)
+			return reply.status(400).send({ error: 'Tournament name and 4 player IDs are required' });
+		
+		try {
+			const tournament = await createTournament(name, playerIds);
+			reply.status(201).send(tournament);
+		} 
+		catch (err) {
+			console.error('Error creating tournament:', err);
 			reply.status(500).send({ error: 'Failed to create tournament' });
 		}
 	});
-
-	fastify.get('/tournaments', async (_request, reply) => {
-		const tournaments = await getAllTournaments();
-		reply.send(tournaments);
-	});
-
-	fastify.get('/tournaments/:id', async (request, reply) => {
-		const { id } = request.params as { id: string };
-		const tournament = await getTournamentById(Number(id));
-
-		if (!tournament)
-		return reply.status(404).send({ error: 'Tournament not found' });
-
-		reply.send(tournament);
-	});
-
-	fastify.put('/tournaments/:id', async (request, reply) => {
-		const { id } = request.params as { id: string };
-		const { name, team_winner, team_victories, size } = request.body as {
-		name: string;
-		team_winner: string;
-		team_victories: number;
-		size: number;
+	
+	fastify.put('/api/tournaments/:id/match', async (req, reply) => {
+		const { id } = req.params as { id: string };
+		const { round, winnerId } = req.body as {
+			round?: 'semifinal1' | 'semifinal2' | 'final';
+			winnerId?: number;
 		};
 
+		if (!round || !winnerId)
+			return reply.status(400).send({ error: 'Round and winnerId are required' });
+
 		try {
-			await updateTournament(Number(id), name, team_winner, team_victories, size);
-			reply.send({ message: 'Tournament updated' });
+			await updateMatchResult(+id, round, winnerId);
+			reply.send({ message: `Match result for ${round} updated` });
 		} 
 		catch (err) {
-			reply.status(500).send({ error: 'Failed to update tournament' });
+			reply.status(500).send({ error: 'Failed to update match result' });
 		}
 	});
 
-	fastify.delete('/tournaments/:id', async (request, reply) => {
-		const { id } = request.params as { id: string };
+	fastify.delete('/api/tournaments', async (req, reply) => {
+		const { name } = req.body as { name?: string };
+
+		if (!name)
+			return reply.status(400).send({ error: 'Tournament name is required' });
+
 		try {
-			await deleteTournament(Number(id));
-			reply.send({ message: 'Tournament deleted' });
+			const deleted = await deleteTournamentByName(name);
+			if (deleted)
+				reply.send({ message: `Tournament "${name}" deleted successfully.` }); 
+			else
+				reply.status(404).send({ error: `Tournament "${name}" not found.` });
 		} 
 		catch (err) {
 			reply.status(500).send({ error: 'Failed to delete tournament' });

@@ -1,6 +1,5 @@
 //services/statsService.ts
 import db from '../db/database.js';
-
 import {UserStats} from '../types/userStats.js';
 
 export function createUserStats(userId: number): Promise<void> {
@@ -19,13 +18,8 @@ export function createUserStats(userId: number): Promise<void> {
 	});
 }
 
-export function updateUserStatsAfterGame(
-    gameId: number,
-    player1Id: number,
-    player2Id: number,
-    score1: number,
-    score2: number
-): Promise<void> {
+export async function updateUserStatsAfterGame(gameId: number, player1Id: number,
+player2Id: number, score1: number, score2: number): Promise<void> {
     return new Promise(async (resolve, reject) => {
         console.log(`Starting updateUserStatsAfterGame for game ${gameId}`);
         
@@ -99,29 +93,29 @@ export function ensureUserStatsExist(userId: number): Promise<void> {
 }
 
 export function getAllUserStats(): Promise<UserStats[]> {
-    return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM user_stats`, (err, rows) => {
-            if (err){
-                console.error('Failed to fetch user stats:', err.message);
-                reject(err);
+	return new Promise((resolve, reject) => {
+		db.all(`SELECT * FROM user_stats`, (err, rows) => {
+			if (err){
+				console.error('Failed to fetch user stats:', err.message);
+				reject(err);
 			}
 			else 
-            	resolve(rows as UserStats[]);
-        });
-    });
+				resolve(rows as UserStats[]);
+		});
+	});
 }
 
 export function getUserStatsById(userId: number): Promise<UserStats> {
-    return new Promise((resolve, reject) => {
-        db.get(`SELECT * FROM user_stats WHERE user_id = ?`, [userId], (err, row) => {
-            if (err) {
-                console.error(`Failed to fetch stats for user ${userId}:`, err.message);
-                reject(err);
-            } 
+	return new Promise((resolve, reject) => {
+		db.get(`SELECT * FROM user_stats WHERE user_id = ?`, [userId], (err, row) => {
+			if (err) {
+				console.error(`Failed to fetch stats for user ${userId}:`, err.message);
+				reject(err);
+			} 
 			else if (!row)
-                reject(new Error(`No stats found for user ${userId}`));
-            else
-                resolve(row as UserStats);
-        });
-    });
+				reject(new Error(`No stats found for user ${userId}`));
+			else
+				resolve(row as UserStats);
+		});
+	});
 }

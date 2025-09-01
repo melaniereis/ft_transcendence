@@ -43,7 +43,7 @@ export function renderRegistrationForm(container: HTMLElement): void {
         const data = { name, username, team, password };
 
         try {
-            const res = await fetch('https://localhost:3000/api/register', {
+            const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),

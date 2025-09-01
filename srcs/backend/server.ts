@@ -1,19 +1,14 @@
 import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
+import fastifyWebsocket from '@fastify/websocket';
 import path from 'path';
 import fs from 'fs';
 
-import { userRoutes } from './routes/user.js';
-import { tournamentRoutes } from './routes/tournamentRoutes.js';
-import { registerTeamRoutes } from './routes/teamRoutes.js';
-import { gameRoutes } from './routes/gameRoutes.js';
-import { statsRoutes } from './routes/statsRoutes.js';
-import { authRoutes } from './routes/authRoutes.js';
-import { matchHistoryRoutes } from './routes/matchHistoryRoutes.js';
-import { userProfileRoutes } from './routes/userProfileRoutes.js';
-import { friendsRoutes } from './routes/friendsRoutes.js';
 import '../backend/db/database.js';
+import {userRoutes,tournamentRoutes,registerTeamRoutes,
+gameRoutes,statsRoutes, authRoutes, websocketMatchmakingRoutes, 
+gameSocketRoutes, matchHistoryRoutes, userProfileRoutes, friendsRoutes} from './routes/routes.js';
 
 const keyPath = path.join(process.cwd(), 'certs', 'key.pem');
 const certPath = path.join(process.cwd(), 'certs', 'cert.pem');
@@ -26,28 +21,29 @@ https: {
 },
 });
 
-await fastify.register(fastifyCors, {
-origin: true,
-});
+await fastify.register(fastifyWebsocket);
+await fastify.register(fastifyCors, { origin: true });
 
 const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
 console.log('Serving pages from:', pagesPath);
 
-fastify.register(fastifyStatic, {
-root: pagesPath,
-prefix: '/',
-index: ['index.html'],
+await fastify.register(fastifyStatic, {
+	root: pagesPath,
+	prefix: '/',
+	index: ['index.html'],
 });
 
-fastify.register(userRoutes);
-fastify.register(tournamentRoutes);
-fastify.register(registerTeamRoutes);
-fastify.register(gameRoutes);
-fastify.register(statsRoutes);
-fastify.register(authRoutes);
-fastify.register(matchHistoryRoutes);
-fastify.register(userProfileRoutes);
-fastify.register(friendsRoutes);
+await fastify.register(matchHistoryRoutes);
+await fastify.register(userProfileRoutes);
+await fastify.register(friendsRoutes);
+await fastify.register(userRoutes);
+await fastify.register(tournamentRoutes);
+await fastify.register(registerTeamRoutes);
+await fastify.register(gameRoutes);
+await fastify.register(statsRoutes);
+await fastify.register(authRoutes);
+await fastify.register(websocketMatchmakingRoutes);
+await fastify.register(gameSocketRoutes); 
 
 const start = async () => {
 try {
