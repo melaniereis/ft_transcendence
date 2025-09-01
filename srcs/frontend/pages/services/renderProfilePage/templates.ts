@@ -1,3 +1,34 @@
+// SVG ICON HELPERS (top-level scope)
+function svgChartIcon() {
+	return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8" rx="1.5"/><rect x="9" y="8" width="4" height="12" rx="1.5"/><rect x="15" y="4" width="4" height="16" rx="1.5"/></svg>`;
+}
+function svgFlameIcon() {
+	return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e6c79c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 7 8 7 13a5 5 0 0 0 10 0c0-5-5-11-5-11z"/><path d="M12 22a7 7 0 0 1-7-7c0-2.5 2-5.5 7-13 5 7.5 7 10.5 7 13a7 7 0 0 1-7 7z"/></svg>`;
+}
+function svgBarChartIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b6a6ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="4" height="10" rx="1.5"/><rect x="9" y="6" width="4" height="14" rx="1.5"/><rect x="15" y="2" width="4" height="18" rx="1.5"/></svg>`;
+}
+function svgStarIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="#e6c79c" stroke="#e6c79c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.5 21 12 17.8 5.5 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>`;
+}
+function svgClockIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+}
+function svgTrendIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4be17b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>`;
+}
+function svgOpponentIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7a8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M7 11c-4 0-4 4-4 4v2h8v-2c0-4-4-4-4-4zm10 0c-4 0-4 4-4 4v2h8v-2c0-4-4-4-4-4z"/></svg>`;
+}
+function svgMedalGold() {
+	return `<svg width="28" height="28" viewBox="0 0 24 24" fill="#e6c79c" stroke="#b6a6ca" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>`;
+}
+function svgMedalSilver() {
+	return `<svg width="28" height="28" viewBox="0 0 24 24" fill="#b6a6ca" stroke="#7fc7d9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>`;
+}
+function svgMedalBronze() {
+	return `<svg width="28" height="28" viewBox="0 0 24 24" fill="#e6a06c" stroke="#b6a6ca" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>`;
+}
 // Tipagem global para window.state (usado na paginação de friends)
 declare global {
 	interface Window {
@@ -824,7 +855,11 @@ export function historyAnalysis(history: Match[]): string {
 	return `
       <div>
         <div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:28px 24px 24px 24px;border-radius:18px;margin-bottom:32px;box-shadow:0 8px 32px #b6a6ca33;">
-          <h4 style="margin:0 0 18px 0;color:${GRID_COLORS.primary};font-size:26px;letter-spacing:0.5px;font-weight:900;display:flex;align-items:center;gap:10px;">📈 Match Performance Analysis <span style='font-size:20px;opacity:0.7'>🔥</span></h4>
+          <h4 style="margin:0 0 18px 0;color:${GRID_COLORS.primary};font-size:26px;letter-spacing:0.5px;font-weight:900;display:flex;align-items:center;gap:10px;">
+            <span style="display:inline-flex;align-items:center;">${svgChartIcon()}</span>
+            Match Performance Analysis
+            <span style="display:inline-flex;align-items:center;">${svgFlameIcon()}</span>
+          </h4>
           <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px;margin-top:18px;">
             <div style="background:rgba(255,255,255,0.22);border-radius:14px;box-shadow:0 2px 12px #b6a6ca22;padding:18px 12px 12px 12px;backdrop-filter:blur(6px) saturate(1.1);">
               <canvas id="winRateChart" width="250" height="200" style="width:100%;height:200px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
@@ -836,22 +871,59 @@ export function historyAnalysis(history: Match[]): string {
         </div>
         <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;margin-bottom:32px">
           <div style="background:rgba(255,255,255,0.33);padding:32px 24px 24px 24px;border-radius:22px;box-shadow:0 8px 32px #b6a6ca33, 0 1.5px 8px #7fc7d955;border:2px solid #eaeaea;backdrop-filter:blur(10px) saturate(1.18);">
-            <h4 style="margin:0 0 22px 0;color:${GRID_COLORS.primary};font-size:22px;font-weight:900;letter-spacing:0.3px;display:flex;align-items:center;gap:8px;">Performance Patterns <span style='font-size:18px'>📊</span></h4>
+            <h4 style="margin:0 0 22px 0;color:${GRID_COLORS.primary};font-size:22px;font-weight:900;letter-spacing:0.3px;display:flex;align-items:center;gap:8px;">
+              <span style="display:inline-flex;align-items:center;">${svgBarChartIcon()}</span>
+              Performance Patterns
+            </h4>
   ${[
-			{ label: 'Best Day', value: bestPlayingDay(history), desc: 'Highest win rate', color: GRID_COLORS.success, icon: '🌟' },
-			{ label: 'Preferred Time', value: mostActiveTime(history), desc: 'Most active period', color: GRID_COLORS.cool, icon: '⏰' },
-			{ label: 'Momentum', value: currentMomentum(history), desc: 'Recent trend', color: GRID_COLORS.cool, icon: '📈' },
+			{ label: 'Best Day', value: bestPlayingDay(history), desc: 'Highest win rate', color: GRID_COLORS.success, icon: svgStarIcon() },
+			{ label: 'Preferred Time', value: mostActiveTime(history), desc: 'Most active period', color: GRID_COLORS.cool, icon: svgClockIcon() },
+			{ label: 'Momentum', value: currentMomentum(history), desc: 'Recent trend', color: GRID_COLORS.cool, icon: svgTrendIcon() },
 		].map(p => `
               <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0 14px 0;background:linear-gradient(135deg, ${GRID_COLORS.cool}11 0%, ${GRID_COLORS.bg} 100%);border-radius:12px;margin-bottom:14px;box-shadow:0 2px 8px #b6a6ca11;">
-                <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;">${p.icon}</span><div><div style="font-weight:900;color:${GRID_COLORS.primary};font-size:16px;">${p.label}</div><div style="font-size:13px;color:${GRID_COLORS.muted}">${p.desc}</div></div></div>
+                <div style="display:flex;align-items:center;gap:10px"><span style="display:inline-flex;align-items:center;">${p.icon}</span><div><div style="font-weight:900;color:${GRID_COLORS.primary};font-size:16px;">${p.label}</div><div style="font-size:13px;color:${GRID_COLORS.muted}">${p.desc}</div></div></div>
                 <div style="font-weight:900;color:${p.color};font-size:17px;">${p.value}</div>
               </div>
             `).join('')}
           </div>
           <div style="background:rgba(255,255,255,0.33);padding:32px 24px 24px 24px;border-radius:22px;box-shadow:0 8px 32px #b6a6ca33, 0 1.5px 8px #7fc7d955;border:2px solid #eaeaea;backdrop-filter:blur(10px) saturate(1.18);">
-            <h4 style="margin:0 0 22px 0;color:${GRID_COLORS.primary};font-size:22px;font-weight:900;letter-spacing:0.3px;display:flex;align-items:center;gap:8px;">Opponent Analysis <span style='font-size:18px'>🤼‍♂️</span></h4>
+            <h4 style="margin:0 0 22px 0;color:${GRID_COLORS.primary};font-size:22px;font-weight:900;letter-spacing:0.3px;display:flex;align-items:center;gap:8px;">
+              <span style="display:inline-flex;align-items:center;">${svgOpponentIcon()}</span>
+              Opponent Analysis
+            </h4>
   ${opponentAnalysis(history).map((o, i) => {
-			const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+			const medal = i === 0 ? svgMedalGold() : i === 1 ? svgMedalSilver() : i === 2 ? svgMedalBronze() : '';
+			// SVG ICON HELPERS
+			function svgChartIcon() {
+				return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8" rx="1.5"/><rect x="9" y="8" width="4" height="12" rx="1.5"/><rect x="15" y="4" width="4" height="16" rx="1.5"/></svg>`;
+			}
+			function svgFlameIcon() {
+				return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e6c79c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 7 8 7 13a5 5 0 0 0 10 0c0-5-5-11-5-11z"/><path d="M12 22a7 7 0 0 1-7-7c0-2.5 2-5.5 7-13 5 7.5 7 10.5 7 13a7 7 0 0 1-7 7z"/></svg>`;
+			}
+			function svgBarChartIcon() {
+				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b6a6ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="4" height="10" rx="1.5"/><rect x="9" y="6" width="4" height="14" rx="1.5"/><rect x="15" y="2" width="4" height="18" rx="1.5"/></svg>`;
+			}
+			function svgStarIcon() {
+				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="#e6c79c" stroke="#e6c79c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.5 21 12 17.8 5.5 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>`;
+			}
+			function svgClockIcon() {
+				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+			}
+			function svgTrendIcon() {
+				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4be17b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>`;
+			}
+			function svgOpponentIcon() {
+				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7a8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><path d="M7 11c-4 0-4 4-4 4v2h8v-2c0-4-4-4-4-4zm10 0c-4 0-4 4-4 4v2h8v-2c0-4-4-4-4-4z"/></svg>`;
+			}
+			function svgMedalGold() {
+				return `<svg width="28" height="28" viewBox="0 0 24 24" fill="#e6c79c" stroke="#b6a6ca" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>`;
+			}
+			function svgMedalSilver() {
+				return `<svg width="28" height="28" viewBox="0 0 24 24" fill="#b6a6ca" stroke="#7fc7d9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>`;
+			}
+			function svgMedalBronze() {
+				return `<svg width="28" height="28" viewBox="0 0 24 24" fill="#e6a06c" stroke="#b6a6ca" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>`;
+			}
 			const barColor = o.winRate >= 50 ? GRID_COLORS.success : GRID_COLORS.accent;
 			return `
       <div style="display:flex;align-items:center;gap:18px;padding:14px 0;border-bottom:1.5px solid rgba(0,174,239,0.10);position:relative;">
