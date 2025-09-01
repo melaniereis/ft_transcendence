@@ -496,6 +496,8 @@ export function historyList(history: Match[]): string {
 ${recent.map((m, index) => {
 		const isWin = m.result === 'win';
 		const diff = Math.abs(m.user_score - m.opponent_score);
+		// Prefer display_name, then username, then opponent_name, then fallback
+		const opponentDisplay = m.opponent_display_name || m.opponent_username || m.opponent_name || `Player ${m.opponent_id}`;
 		return `
   <div class="amazing-match-card" style="display:flex;align-items:center;gap:16px;padding:13px 0 13px 0;position:relative;min-height:50px;background:linear-gradient(90deg,rgba(255,255,255,0.13) 60%,rgba(76,225,123,0.09) 100%);border-radius:14px;box-shadow:0 2px 12px #b6a6ca22;">
       <style>
@@ -566,7 +568,7 @@ ${recent.map((m, index) => {
         </div>
       </div>
       <div style="flex:1;min-width:0;display:flex;align-items:center;gap:14px;justify-content:space-between;">
-        <span style="font-weight:900;font-size:16px;color:${GRID_COLORS.primary};max-width:120px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:0.2px;">${m.opponent_name || `Player ${m.opponent_id}`}</span>
+        <span style="font-weight:900;font-size:16px;color:${GRID_COLORS.primary};max-width:120px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:0.2px;">vs @${opponentDisplay}</span>
         <span style="font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:900;color:${isWin ? '#4be17b' : '#ff5c5c'};letter-spacing:0.7px;">${m.user_score} - ${m.opponent_score}</span>
         <span style="font-size:13px;color:${GRID_COLORS.muted};">${new Date(m.date_played).toLocaleDateString()}</span>
         <span style="font-size:17px;font-weight:900;color:${isWin ? '#4be17b' : '#ff5c5c'};letter-spacing:0.5px;">${isWin ? 'WIN' : 'LOSS'}</span>
@@ -709,8 +711,8 @@ export function historyDetailed(history: Match[]): string {
             ${mvp ? `<span style="font-size:16px;font-weight:900;color:#e6c79c;">${mvp}</span>` : ''}
           </div>
           <div style="display:flex;align-items:center;gap:14px;">
-            <span style="font-weight:800;font-size:18px;color:${GRID_COLORS.primary};letter-spacing:0.2px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;cursor:pointer;" title="${m.opponent_name || `Player ${m.opponent_id}`}: ${new Date(m.date_played).toLocaleString()}">
-              vs ${m.opponent_name || `Player ${m.opponent_id}`}
+            <span style="font-weight:800;font-size:18px;color:${GRID_COLORS.primary};letter-spacing:0.2px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;cursor:pointer;" title="${m.opponent_display_name || m.opponent_username || m.opponent_name || `Player ${m.opponent_id}`}: ${new Date(m.date_played).toLocaleString()}">
+              vs ${m.opponent_display_name || m.opponent_username || m.opponent_name || `Player ${m.opponent_id}`}
             </span>
             <span style="font-size:14px;color:${GRID_COLORS.muted};">${new Date(m.date_played).toLocaleDateString()}</span>
           </div>
@@ -903,19 +905,6 @@ export function historyAnalysis(history: Match[]): string {
             </h4>
   ${opponentAnalysis(history).map((o, i) => {
 			const medal = i === 0 ? svgMedalGold() : i === 1 ? svgMedalSilver() : i === 2 ? svgMedalBronze() : '';
-			// SVG ICON HELPERS
-			function svgChartIcon() {
-				return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8" rx="1.5"/><rect x="9" y="8" width="4" height="12" rx="1.5"/><rect x="15" y="4" width="4" height="16" rx="1.5"/></svg>`;
-			}
-			function svgFlameIcon() {
-				return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e6c79c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 7 8 7 13a5 5 0 0 0 10 0c0-5-5-11-5-11z"/><path d="M12 22a7 7 0 0 1-7-7c0-2.5 2-5.5 7-13 5 7.5 7 10.5 7 13a7 7 0 0 1-7 7z"/></svg>`;
-			}
-			function svgBarChartIcon() {
-				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b6a6ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="4" height="10" rx="1.5"/><rect x="9" y="6" width="4" height="14" rx="1.5"/><rect x="15" y="2" width="4" height="18" rx="1.5"/></svg>`;
-			}
-			function svgStarIcon() {
-				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="#e6c79c" stroke="#e6c79c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.5 21 12 17.8 5.5 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>`;
-			}
 			function svgClockIcon() {
 				return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
 			}
@@ -939,7 +928,7 @@ export function historyAnalysis(history: Match[]): string {
       <div style="display:flex;align-items:center;gap:18px;padding:14px 0;border-bottom:1.5px solid rgba(0,174,239,0.10);position:relative;">
         <div style="width:38px;height:38px;border-radius:50%;background:${GRID_COLORS.cool};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;box-shadow:0 2px 8px #b6a6ca22;">${medal || i + 1}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:900;color:${GRID_COLORS.primary};font-size:17px;letter-spacing:0.2px;">Player ${o.id}</div>
+          <div style="font-weight:900;color:${GRID_COLORS.primary};font-size:17px;letter-spacing:0.2px;">${o.display || `Player ${o.id}`}</div>
           <div style="font-size:13px;color:${GRID_COLORS.muted};margin-bottom:2px;">${o.matches} matches</div>
           <div style="width:100%;height:8px;background:linear-gradient(90deg,#eaeaea 0%,${barColor} 100%);border-radius:6px;overflow:hidden;">
             <div style="height:100%;width:${Math.max(10, Math.min(100, o.winRate))}%;background:${barColor};border-radius:6px;transition:width 0.3s;"></div>
