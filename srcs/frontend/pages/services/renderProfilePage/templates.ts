@@ -685,13 +685,15 @@ export function historyDetailed(history: Match[]): string {
           </div>
         </div>
         <div id="filtered-matches" style="display:grid;gap:22px">
-  ${history.slice(0, 6).map((m, idx) => {
-		const isWin = m.result === 'win';
-		const diff = Math.abs(m.user_score - m.opponent_score);
-		const matchType = diff <= 2 ? 'Nail-biter' : diff <= 5 ? 'Close' : diff <= 10 ? 'Competitive' : 'Dominant';
-		const mvp = diff >= 10 ? svgMedalGold() + ' MVP' : '';
-		const barColor = isWin ? '#4be17b' : '#ff5c5c';
-		return `
+  ${history.length === 0
+			? `<div style="padding:40px 0;text-align:center;color:${GRID_COLORS.muted};font-size:20px;font-weight:600;">No matches found for the selected filter.</div>`
+			: history.map((m, idx) => {
+				const isWin = m.result === 'win';
+				const diff = Math.abs(m.user_score - m.opponent_score);
+				const matchType = diff <= 2 ? 'Nail-biter' : diff <= 5 ? 'Close' : diff <= 10 ? 'Competitive' : 'Dominant';
+				const mvp = diff >= 10 ? svgMedalGold() + ' MVP' : '';
+				const barColor = isWin ? '#4be17b' : '#ff5c5c';
+				return `
       <div class="amazing-match-card-detailed" style="display:flex;align-items:center;gap:24px;padding:28px 0 28px 0;position:relative;min-height:90px;background:rgba(255,255,255,0.22);border-radius:22px;box-shadow:0 4px 24px #b6a6ca22;overflow:hidden;backdrop-filter:blur(8px) saturate(1.13);">
         <div style="position:absolute;left:0;top:18px;bottom:18px;width:10px;border-radius:10px;background:${barColor};box-shadow:0 0 18px 0 ${barColor}55;"></div>
         <div style="margin-left:44px;display:flex;align-items:center;gap:0;">
@@ -723,7 +725,7 @@ export function historyDetailed(history: Match[]): string {
         </div>
       </div>
     `;
-	}).join('')}
+			}).join('')}
         </div>
       </div>
     `;
