@@ -4,12 +4,17 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+# Install dependencies (including TypeScript)
+RUN npm install
+
+# Optional: upgrade npm if needed
 RUN npm install -g npm@11.5.2
 
 COPY . .
 
 COPY certs/ certs/
 
+# Now build
 RUN npm run build
 
 RUN mkdir -p dist/frontend/pages/assets
