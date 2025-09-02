@@ -315,10 +315,11 @@ export function setupEvents(container: HTMLElement) {
 		}
 
 		if (id === 'save-btn') {
+			if (e && typeof e.preventDefault === 'function') e.preventDefault();
 			const username = (document.getElementById('username-input') as HTMLInputElement)?.value?.trim();
 			const display_name = (document.getElementById('display-input') as HTMLInputElement)?.value?.trim();
 			const email = (document.getElementById('email-input') as HTMLInputElement)?.value?.trim();
-			const avatar_url = (document.getElementById('avatar-preview') as HTMLImageElement)?.src;
+			const avatar_url = (document.getElementById('avatar-url-input') as HTMLInputElement)?.value?.trim() || (document.getElementById('avatar-preview') as HTMLImageElement)?.src;
 
 			if (!username || username.length < 3) {
 				const err = document.getElementById('save-error');
@@ -328,14 +329,11 @@ export function setupEvents(container: HTMLElement) {
 
 			try {
 				const patch = await updateProfile({ username, display_name, email, avatar_url });
-
-				let full: Profile | null = null;
-				try {
-					full = await loadProfile();
-				} catch { /* ignore */ }
-
+				// Always reload the full profile after saving
+				const full = await loadProfile();
 				state.profile = full ? full : { ...(state.profile || {}), ...(patch as any) };
 				state.editMode = false;
+				state.activeMainTab = 'profile';
 				render(container);
 				showNotification('Profile updated successfully!', '#28a745');
 			} catch (err: any) {
@@ -482,6 +480,12 @@ export function setupEvents(container: HTMLElement) {
 				const selected = option.getAttribute('data-avatar');
 				const preview = document.getElementById('avatar-preview') as HTMLImageElement;
 				if (selected && preview) preview.src = selected;
+				// Also update the header avatar live
+				const headerAvatar = document.querySelector('.header-view img, .gris-avatar img') as HTMLImageElement;
+				if (selected && headerAvatar) headerAvatar.src = selected;
+				// Update hidden input for avatar_url
+				const avatarInput = document.getElementById('avatar-url-input') as HTMLInputElement;
+				if (selected && avatarInput) avatarInput.value = selected;
 				document.getElementById('avatar-modal')!.style.display = 'none';
 			};
 		}
