@@ -37,7 +37,8 @@ onNext?: () => void) {
 		['p1', 'p2', 'p3', 'p4'].forEach((key, index) => {
 		const pos = positions[key as keyof typeof positions];
 		const player = players[index];
-		if (pos && player) ctx.fillText(player.name, pos.x, pos.y);
+		if (pos && player) 
+			ctx.fillText(player.name, pos.x, pos.y);
 		});
 
 		// Draw lines to semifinals
@@ -54,46 +55,48 @@ onNext?: () => void) {
 
 		// Draw semifinal winners
 		if (winners.semifinal1) {
-		const winnerName = players.find(p => p.id === winners.semifinal1)?.name || 'Winner';
-		ctx.fillText(winnerName, positions.semi1.x + 10, positions.semi1.y);
+			const winnerName = players.find(p => p.id === winners.semifinal1)?.name || 'Winner';
+			ctx.fillText(winnerName, positions.semi1.x + 10, positions.semi1.y);
 		}
 		if (winners.semifinal2) {
-		const winnerName = players.find(p => p.id === winners.semifinal2)?.name || 'Winner';
-		ctx.fillText(winnerName, positions.semi2.x + 10, positions.semi2.y);
+			const winnerName = players.find(p => p.id === winners.semifinal2)?.name || 'Winner';
+			ctx.fillText(winnerName, positions.semi2.x + 10, positions.semi2.y);
 		}
 
 		// Draw lines to final
 		if (winners.semifinal1 && winners.semifinal2) {
-		ctx.beginPath();
-		ctx.moveTo(positions.semi1.x + horizontalSpacing, positions.semi1.y);
-		ctx.lineTo(positions.final.x - verticalOffset, positions.final.y - verticalOffset);
-		ctx.moveTo(positions.semi2.x + horizontalSpacing, positions.semi2.y);
-		ctx.lineTo(positions.final.x - verticalOffset, positions.final.y + verticalOffset);
-		ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(positions.semi1.x + horizontalSpacing, positions.semi1.y);
+			ctx.lineTo(positions.final.x - verticalOffset, positions.final.y - verticalOffset);
+			ctx.moveTo(positions.semi2.x + horizontalSpacing, positions.semi2.y);
+			ctx.lineTo(positions.final.x - verticalOffset, positions.final.y + verticalOffset);
+			ctx.stroke();
 		}
 
 		// Draw final winner
 		if (winners.final) {
-		const winnerName = players.find(p => p.id === winners.final)?.name || 'Champion';
-		ctx.fillText(`🏆 ${winnerName}`, positions.final.x + 10, positions.final.y);
+			const winnerName = players.find(p => p.id === winners.final)?.name || 'Champion';
+			ctx.fillText(`🏆 ${winnerName}`, positions.final.x + 10, positions.final.y);
 		}
 
 		// Create button
 		const parent = document.getElementById('bracket-wrapper');
-		if (!parent) return;
+		if (!parent) 
+			return;
 
 		const existingButton = parent.querySelector('.next-match-btn');
-		if (existingButton) existingButton.remove();
+		if (existingButton) 
+			existingButton.remove();
 
 		const button = document.createElement('button');
 		if (!winners.semifinal1 && !winners.semifinal2 && !winners.final)
-		button.textContent = 'Start Tournament';
+			button.textContent = 'Start Tournament';
 		else if ((winners.semifinal1 && !winners.semifinal2) || (!winners.semifinal1 && winners.semifinal2))
-		button.textContent = 'Next Semifinal';
+			button.textContent = 'Next Semifinal';
 		else if (winners.semifinal1 && winners.semifinal2 && !winners.final)
-		button.textContent = 'Go to Final';
+			button.textContent = 'Go to Final';
 		else if (winners.final)
-		button.textContent = '🏁 Tournament Finished — Back to Main Menu';
+			button.textContent = '🏁 Tournament Finished — Back to Main Menu';
 
 		button.className = 'next-match-btn';
 		button.style.display = 'block';
@@ -102,7 +105,8 @@ onNext?: () => void) {
 		button.style.fontSize = '16px';
 		button.onclick = () => {
 		button.remove();
-		if (onNext) onNext();
+		if (onNext) 
+			onNext();
 		};
 
 		parent.appendChild(button);

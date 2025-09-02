@@ -41,7 +41,7 @@ const SPEED_INCREMENT = 0.2;
 const MAX_SPEED = 20;
 
 export function updateBall(ball: Ball, leftPaddle: Paddle, rightPaddle: Paddle,
-canvas: HTMLCanvasElement, maxGames: number, gameId: number, onGameEnd: () => void) {
+canvas: HTMLCanvasElement, maxGames: number, onGameEnd: () => void) {
 	// Move the ball
 	ball.x += ball.dx;
 	ball.y += ball.dy;

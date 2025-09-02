@@ -7,6 +7,8 @@ import { renderLoginForm } from './services/renderLoginForm.js';
 import { renderProfilePage } from './services/renderProfilePage.js';
 import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 import { startMatchmaking } from './services/remote/matchmaking.js';
+import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
+import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
@@ -20,7 +22,7 @@ const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
 const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
 const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
 const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
-
+const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
 const appDiv = document.getElementById('app') as HTMLDivElement;
 
 // 🔄 Update UI based on login state
@@ -48,7 +50,7 @@ function updateUIBasedOnAuth(): void {
 // 🧠 Event Listeners
 playBtn.addEventListener('click', () => {
     appDiv.innerHTML = '';
-    renderPlayMenu(appDiv);
+    renderPlayerSelection(appDiv);
 });
 
 settingsBtn.addEventListener('click', () => {
@@ -90,6 +92,11 @@ profileBtn.addEventListener('click', () => {
 friendRequestsBtn.addEventListener('click', () => {
     appDiv.innerHTML = '';
     renderFriendRequestsPage(appDiv);
+});
+
+quickPlayBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderQuickGameSetup(appDiv);
 });
 
 matchmakingBtn.addEventListener('click', () => {

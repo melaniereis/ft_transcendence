@@ -1,22 +1,23 @@
-export async function endGame(gameId: number, score1: number, score2: number,
+export async function endGame( score1: number, score2: number,
 canvas: HTMLCanvasElement, onRestart: (winnerId?: number) => void, player1Name: string,
-player2Name: string, mode: 'single' | 'tournament' = 'single') {
+player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	let winnerId: number | undefined;
-
-	try {
-		const res = await fetch(`/games/${gameId}/end`, {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ score_player1: score1, score_player2: score2 })
-		});
-		const data = await res.json();
-		winnerId = data.winner_id;
-		console.log('✅ Game ended. Winner:', winnerId);
-	} 
-	catch (err) {
-		console.error('❌ Failed to end game:', err);
+	console.log("ESTE E O MODE CARALHES", mode);
+	if (gameId){
+		try {
+			const res = await fetch(`/games/${gameId}/end`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ score_player1: score1, score_player2: score2 })
+			});
+			const data = await res.json();
+			winnerId = data.winner_id;
+			console.log('✅ Game ended. Winner:', winnerId);
+		} 
+		catch (err) {
+			console.error('❌ Failed to end game:', err);
+		}
 	}
-
 	const ctx = canvas.getContext('2d');
 	if (!ctx) 
 		return;

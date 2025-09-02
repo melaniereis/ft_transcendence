@@ -4,7 +4,8 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	container.innerHTML = `<h2>Tournaments</h2>`;
 
 	const token = localStorage.getItem('authToken');
-	if (!token) {
+	const loggedInPlayerId = Number(localStorage.getItem('playerId'));
+	if (!token || !loggedInPlayerId) {
 		container.innerHTML += `<p>Please log in to view tournaments.</p>`;
 		return;
 	}
@@ -13,12 +14,17 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	let users: any[] = [];
 	try {
 		const res = await fetch('/users', {
-		headers: { Authorization: `Bearer ${token}` }
+			headers: { Authorization: `Bearer ${token}` }
 		});
 		users = await res.json();
-	} 
-	catch (err) {
+	} catch (err) {
 		container.innerHTML += `<p>Error loading users.</p>`;
+		return;
+	}
+
+	const loggedInPlayer = users.find(u => u.id === loggedInPlayerId);
+	if (!loggedInPlayer) {
+		container.innerHTML += `<p>Logged-in user not found.</p>`;
 		return;
 	}
 
@@ -29,7 +35,7 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	const form = document.createElement('form');
 	form.innerHTML = `
 		<input type="text" id="tournament-name" placeholder="Tournament Name" required />
-		<label>Select 4 Players:</label>
+		<label>Select 3 Opponents (you will be auto-included):</label>
 		<select id="player-select" multiple size="8" required></select>
 		<div id="selected-preview"><em>No players selected yet.</em></div>
 		<button type="submit">Create Tournament</button>
@@ -40,45 +46,49 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	const preview = form.querySelector('#selected-preview') as HTMLDivElement;
 
 	users.forEach((user) => {
+		if (user.id === loggedInPlayerId) return; // Skip logged-in user
 		const option = document.createElement('option');
 		option.value = user.id;
 		option.textContent = `${user.name} (${user.username}) - Team: ${user.team}`;
 		playerSelect.appendChild(option);
 	});
 
-	// 🔄 Live preview of selected players
+	// Live preview of selected players
 	playerSelect.addEventListener('change', () => {
 		const selected = Array.from(playerSelect.selectedOptions).map(opt => userMap.get(Number(opt.value)));
 		if (selected.length === 0) {
-		preview.innerHTML = `<em>No players selected yet.</em>`;
+			preview.innerHTML = `<em>No players selected yet.</em>`;
 		} else {
-		preview.innerHTML = `
-			<strong>Selected Players:</strong>
-			<ul>
-			${selected.map(u => `<li>${u.name} (${u.username}) - Team: ${u.team}</li>`).join('')}
-			</ul>
-		`;
+			preview.innerHTML = `
+				<strong>Selected Players:</strong>
+				<ul>
+					<li>${loggedInPlayer.name} (${loggedInPlayer.username}) - Team: ${loggedInPlayer.team} <em>(You)</em></li>
+					${selected.map(u => `<li>${u.name} (${u.username}) - Team: ${u.team}</li>`).join('')}
+				</ul>
+			`;
 		}
 	});
 
-	// 🆕 Tournament creation with manual start
+	// Tournament creation
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		const name = (document.getElementById('tournament-name') as HTMLInputElement).value;
 		const selectedPlayers = Array.from(playerSelect.selectedOptions).map(opt => Number(opt.value));
 
-		if (selectedPlayers.length !== 4) {
-		alert('Please select exactly 4 players.');
-		return;
+		if (selectedPlayers.length !== 3) {
+			alert('Please select exactly 3 opponents.');
+			return;
 		}
 
+		const allPlayerIds = [...selectedPlayers, loggedInPlayerId];
+
 		const res = await fetch('/api/tournaments', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({ name, playerIds: selectedPlayers })
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify({ name, playerIds: allPlayerIds })
 		});
 
 		if (res.ok) {
@@ -90,13 +100,16 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 
 			document.getElementById('start-btn')?.addEventListener('click', async () => {
 				const verifiedPlayers = new Set<number>();
-				const selectedPlayerObjects = users.filter(u => selectedPlayers.includes(u.id));
+				verifiedPlayers.add(loggedInPlayerId); // Already verified
+
+				const selectedPlayerObjects = users.filter(u => allPlayerIds.includes(u.id));
+				const playersToVerify = selectedPlayerObjects.filter(p => p.id !== loggedInPlayerId);
 
 				container.innerHTML = `<h3>Player Verification</h3><div id="verification-forms"></div><div id="start-status"></div>`;
 				const formsContainer = document.getElementById('verification-forms') as HTMLDivElement;
 				const statusDiv = document.getElementById('start-status') as HTMLDivElement;
 
-				selectedPlayerObjects.forEach(player => {
+				playersToVerify.forEach(player => {
 					const form = document.createElement('form');
 					form.innerHTML = `
 						<h4>${player.name} (${player.username})</h4>
@@ -129,17 +142,14 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 
 								if (verifiedPlayers.size === 4) {
 									statusDiv.innerHTML = `<p>All players verified. Starting tournament...</p>`;
-
-									// 🧹 Clean up verification forms
 									formsContainer.innerHTML = '';
-									
-									// Optionally, add a short delay before starting
+
 									setTimeout(async () => {
 										await startTournament(container, tournament, selectedPlayerObjects);
-									}, 500); // half-second delay for smoother UX
+									}, 500);
 								}
-
-							} else {
+							} 
+							else {
 								resultDiv.textContent = '❌ Invalid credentials or wrong user.';
 							}
 						} 
@@ -163,62 +173,63 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 
 	try {
 		const res = await fetch('/api/tournaments', {
-		headers: { Authorization: `Bearer ${token}` }
+			headers: { Authorization: `Bearer ${token}` }
 		});
 		const tournaments = await res.json();
 
 		if (tournaments.length === 0) {
-		list.innerHTML += `<p>No tournaments found.</p>`;
-		} else {
-		tournaments.forEach((t: any) => {
-			const item = document.createElement('div');
-			item.className = 'tournament-card';
+			list.innerHTML += `<p>No tournaments found.</p>`;
+		} 
+		else {
+			tournaments.forEach((t: any) => {
+				const item = document.createElement('div');
+				item.className = 'tournament-card';
 
-			const getUserName = (id: number) =>
-			userMap.get(id)?.name || `User ${id}`;
+				const getUserName = (id: number) => userMap.get(id)?.name || `User ${id}`;
 
-			item.innerHTML = `
-			<strong>${t.name}</strong> (ID: ${t.id})<br/>
-			Players: ${getUserName(t.player1_id)}, ${getUserName(t.player2_id)}, ${getUserName(t.player3_id)}, ${getUserName(t.player4_id)}<br/>
-			Semifinal Winners: ${getUserName(t.semifinal1_winner_id) || 'TBD'}, ${getUserName(t.semifinal2_winner_id) || 'TBD'}<br/>
-			Finalists: ${getUserName(t.final_player1_id) || 'TBD'} vs ${getUserName(t.final_player2_id) || 'TBD'}<br/>
-			Winner: ${getUserName(t.winner_id) || 'TBD'}
-			`;
-			list.appendChild(item);
-		});
+				item.innerHTML = `
+					<strong>${t.name}</strong> (ID: ${t.id})<br/>
+					Players: ${getUserName(t.player1_id)}, ${getUserName(t.player2_id)}, ${getUserName(t.player3_id)}, ${getUserName(t.player4_id)}<br/>
+					Semifinal Winners: ${getUserName(t.semifinal1_winner_id) || 'TBD'}, ${getUserName(t.semifinal2_winner_id) || 'TBD'}<br/>
+					Finalists: ${getUserName(t.final_player1_id) || 'TBD'} vs ${getUserName(t.final_player2_id) || 'TBD'}<br/>
+					Winner: ${getUserName(t.winner_id) || 'TBD'}
+				`;
+				list.appendChild(item);
+			});
 		}
 	} 
 	catch (err) {
 		list.innerHTML += `<p>Error loading tournaments.</p>`;
 	}
 
-		const deleteForm = document.createElement('form');
+	// Delete tournament form
+	const deleteForm = document.createElement('form');
 	deleteForm.innerHTML = `
-	<h3>Delete Tournament</h3>
-	<input type="text" id="delete-name" placeholder="Tournament Name" required />
-	<button type="submit">Delete</button>
+		<h3>Delete Tournament</h3>
+		<input type="text" id="delete-name" placeholder="Tournament Name" required />
+		<button type="submit">Delete</button>
 	`;
 	container.appendChild(deleteForm);
 
 	deleteForm.addEventListener('submit', async (e) => {
-	e.preventDefault();
-	const name = (document.getElementById('delete-name') as HTMLInputElement).value;
+		e.preventDefault();
+		const name = (document.getElementById('delete-name') as HTMLInputElement).value;
 
-	const res = await fetch('/api/tournaments', {
-		method: 'DELETE',
-		headers: {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({ name })
-	});
+		const res = await fetch('/api/tournaments', {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify({ name })
+		});
 
-	const result = await res.json();
-	if (res.ok) {
-		alert(result.message);
-		renderTournamentsPage(container); // refresh view
-	} 
-	else
-		alert(`Error: ${result.error}`);
+		const result = await res.json();
+		if (res.ok) {
+			alert(result.message);
+			renderTournamentsPage(container); // refresh view
+		} 
+		else
+			alert(`Error: ${result.error}`);
 	});
 }
