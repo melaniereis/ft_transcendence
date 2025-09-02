@@ -110,12 +110,10 @@ ${teamLogo ? `
         ${avatar}
         <div style="flex:1;min-width:300px">
           <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
-            <h3 style="margin:0;color:${GRID_COLORS.primary};font-size:28px;font-weight:700">@${profile.username}</h3>
-            <button id="edit-btn" title="Edit profile"
+		  <button id="edit-btn" title="Edit profile"
               style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.cool};padding:8px;border-radius:50%;transition:all 0.3s">${svgTrendIcon()}</button>
-            <button id="pass-btn" title="Change Password"
-              style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.warm};padding:8px;border-radius:50%;transition:all 0.3s">${svgFlameIcon()}</button>
-          </div>
+            <h3 style="margin:0;color:${GRID_COLORS.primary};font-size:28px;font-weight:700">@${profile.username}</h3>
+        </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px">
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-weight:600;color:${GRID_COLORS.primary}">Display Name:</span>
@@ -1348,10 +1346,6 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
           <div class="gris-username">@${profile.username}</div>
           <div class="gris-quote">“The world is painted in gentle hues.”</div>
           <div class="gris-divider"></div>
-          <div style="display:flex;flex-direction:column;gap:10px;width:100%;align-items:center;">
-            <button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button">Edit</button>
-            <button id="pass-btn" class="gris-action-btn" title="Change Password" type="button">Change Password</button>
-          </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:0;padding:48px 32px 32px 32px;">
           <!-- Main Tabs -->
@@ -1370,18 +1364,32 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
             <div class="profile-timeline-bg" style="position:relative;min-height:420px;padding:0 0 24px 0;overflow:visible;">
               <div class="profile-timeline-rail" style="position:absolute;left:50%;top:40px;bottom:24px;width:6px;background:linear-gradient(180deg,#7fc7d9 0%,#e6c79c 100%);border-radius:3px;box-shadow:0 0 24px 4px #e6c79c44,0 0 0 2px #fff;transform:translateX(-50%);z-index:0;animation:railGlow 2.2s ease-in-out infinite alternate;"></div>
               <form id="profile-edit-form" class="profile-timeline-events" style="margin-top:0;display:flex;flex-direction:column;align-items:center;gap:32px;">
+                <button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button"
+                  style="position:absolute;top:0;right:0;margin:12px 18px 0 0;padding:6px 10px;background:rgba(255,255,255,0.85);border:none;border-radius:50%;box-shadow:0 2px 8px #7fc7d944;cursor:pointer;z-index:20;transition:background 0.18s, box-shadow 0.18s;min-width:unset;width:36px;height:36px;display:flex;align-items:center;justify-content:center;outline:none;"
+                  class="profile-edit-btn"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                </button>
+                <style>
+                  .profile-edit-btn:hover {
+                    background: #e6f7fa !important;
+                    box-shadow: 0 4px 16px #7fc7d988 !important;
+                  }
+                </style>
                 ${editMode ? `
-                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
+                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
                   <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#7fc7d9 0%,#e6c79c 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #e6c79c55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.2s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgStarIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#e6c79c11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:2px solid #7fc7d9;padding:2px 6px 2px 0;margin-bottom:6px;" maxlength="24" placeholder="Username"/>
-                    <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:2px solid #b6a6ca;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
-                    <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:1.5px solid #e6c79c;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
+                    <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="24" placeholder="Username"/>
+                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">unique, for login</div>
+                    <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
+                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">name shown to others</div>
+                    <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
                   </div>
                 </div>
-                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
+                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
                   <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#e6c79c 0%,#7fc7d9 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #7fc7d955,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.5s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgUserIcon()}</span>
                   </div>
@@ -1390,7 +1398,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <div style="font-size:0.92rem;color:#b6a6ca;">${profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</div>
                   </div>
                 </div>
-                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
+                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
                   <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#b6a6ca 0%,#e6c79c 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #b6a6ca55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.8s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgFriendsIcon()}</span>
                   </div>
@@ -1399,15 +1407,16 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <div style="font-size:0.92rem;color:#b6a6ca;">${profile.team || '—'}</div>
                   </div>
                 </div>
-                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
+                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
                   <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#a3d9b1 0%,#b6a6ca 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #a3d9b155,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 2.1s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgChartIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#a3d9b111 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:1.5px solid #a3d9b1;padding:2px 6px 2px 0;" placeholder="Email"/>
+                    <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Email"/>
+                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">for notifications</div>
                   </div>
                 </div>
-                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
+                <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
                   <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#4be17b 0%,#7fc7d9 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #4be17b55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.3s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgFlameIcon()}</span>
                   </div>
@@ -1416,7 +1425,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <div style="font-size:0.92rem;color:${profile.online_status ? '#4be17b' : '#b6a6ca'};font-weight:600;">${profile.online_status ? 'Online' : 'Offline'}</div>
                   </div>
                 </div>
-                <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;justify-content:center;">
+                <div style="display:flex;gap:16px;margin-top:24px;margin-bottom:8px;flex-wrap:wrap;justify-content:center;">
                   <button id="avatar-btn" type="button" style="background:#7fc7d9;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #7fc7d944;"><span style="vertical-align:middle;">${svgChartIcon()}</span> Edit Avatar</button>
                   <input id="avatar-url-input" type="hidden" value="${profile.avatar_url || ''}" />
                   <button id="pass-btn" type="button" style="background:#e6c79c;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #e6c79c44;"><span style="vertical-align:middle;">${svgFlameIcon()}</span> Change Password</button>
