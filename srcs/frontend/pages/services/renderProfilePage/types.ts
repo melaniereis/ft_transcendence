@@ -45,6 +45,7 @@ export type Profile = {
 	created_at: string;
 	last_seen?: string;
 	online_status?: boolean;
+	bio?: string;
 };
 
 export type StatsTab = 'overview' | 'performance' | 'trends';
