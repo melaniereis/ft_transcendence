@@ -20,11 +20,11 @@ const keyPath = path.join(process.cwd(), 'certs', 'key.pem');
 const certPath = path.join(process.cwd(), 'certs', 'cert.pem');
 
 const fastify = Fastify({
-logger: true,
-https: {
-	key: fs.readFileSync(keyPath),
-	cert: fs.readFileSync(certPath),
-},
+	logger: true,
+	https: {
+		key: fs.readFileSync(keyPath),
+		cert: fs.readFileSync(certPath),
+	},
 });
 
 async function start() {
@@ -55,17 +55,16 @@ try {
 	console.log('📁 Serving pages from:', pagesPath);
 
 	await fastify.register(fastifyStatic, {
-	root: pagesPath,
-	prefix: '/',
-	index: ['index.html'],
+		root: pagesPath,
+		prefix: '/',
+		index: ['index.html'],
 	});
 
 	// Register routes
-	const {
-	userRoutes, tournamentRoutes, registerTeamRoutes,
+	const {userRoutes, tournamentRoutes, registerTeamRoutes,
 	gameRoutes, statsRoutes, authRoutes, websocketMatchmakingRoutes,
-	gameSocketRoutes, matchHistoryRoutes, userProfileRoutes, friendsRoutes
-	} = await import('./routes/routes.js');
+	gameSocketRoutes, matchHistoryRoutes, userProfileRoutes, 
+	friendsRoutes} = await import('./routes/routes.js');
 
 	await fastify.register(matchHistoryRoutes);
 	await fastify.register(userProfileRoutes);
@@ -79,17 +78,20 @@ try {
 	await fastify.register(websocketMatchmakingRoutes);
 	await fastify.register(gameSocketRoutes);
 
+	fastify.get('/healthz', async (request, reply) => {
+    	reply.send({ status: 'ok' });
+	});
 	await fastify.listen({ port: 3000, host: '0.0.0.0' });
 	console.log('✅ Server running at https://localhost:3000');
 
 	// Encrypt DB on shutdown
 	const shutdown = async () => {
-	if (fs.existsSync(decryptedPath)) {
-		console.log('🔒 Encrypting database before shutdown...');
-		await encryptFile(decryptedPath, encryptedPath, key);
-		fs.unlinkSync(decryptedPath);
-	}
-	process.exit();
+		if (fs.existsSync(decryptedPath)) {
+			console.log('🔒 Encrypting database before shutdown...');
+			await encryptFile(decryptedPath, encryptedPath, key);
+			fs.unlinkSync(decryptedPath);
+		}
+		process.exit();
 	};
 
 	process.on('SIGINT', shutdown);
