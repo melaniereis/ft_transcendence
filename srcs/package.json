@@ -17,7 +17,8 @@
 		"rimraf": "^5.0.0",
 		"ts-node": "^10.9.2",
 		"tsx": "^4.20.5",
-		"typescript": "^5.9.2"
+		"typescript": "^5.9.2",
+		"@types/axios": "^0.14.0"
 	},
 	"dependencies": {
 		"@fastify/cors": "^11.1.0",
@@ -28,7 +29,8 @@
 		"node-vault": "^0.10.5",
 		"sqlite3": "^5.1.7",
 		"uuid": "^11.1.0",
-		"ws": "^8.18.3"
+		"ws": "^8.18.3",
+		"axios": "^1.6.0"
 	},
 	"scripts": {
 		"dev": "node dist/backend/server.js",
