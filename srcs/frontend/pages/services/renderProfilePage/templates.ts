@@ -40,6 +40,7 @@ declare global {
 	interface Window {
 		state: any;
 		renderProfilePage?: (container: HTMLElement, onBadgeUpdate?: () => void) => void;
+		setupButtons?: () => void;
 	}
 }
 // renderProfilePage/templates.ts - FIXED VERSION with working PetalFall animation
@@ -110,8 +111,7 @@ ${teamLogo ? `
         ${avatar}
         <div style="flex:1;min-width:300px">
           <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
-		  <button id="edit-btn" title="Edit profile"
-              style="background:none;border:none;cursor:pointer;font-size:20px;color:${GRID_COLORS.cool};padding:8px;border-radius:50%;transition:all 0.3s">${svgTrendIcon()}</button>
+// Edit button removed from header
             <h3 style="margin:0;color:${GRID_COLORS.primary};font-size:28px;font-weight:700">@${profile.username}</h3>
         </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px">
@@ -310,6 +310,40 @@ export function friendsList(friends: Friend[]): string {
         background: #ff2d2d;
         box-shadow: 0 4px 16px #ff5c5c55;
       }
+    /* Editable input hover effect */
+    #profile-edit-form input[type="text"],
+    #profile-edit-form input[type="email"] {
+      transition: background 0.18s, box-shadow 0.18s;
+    }
+    #profile-edit-form input[type="text"]:hover,
+    #profile-edit-form input[type="email"]:hover,
+    #profile-edit-form input[type="text"]:focus,
+    #profile-edit-form input[type="email"]:focus {
+      background: #f4f6fa;
+      box-shadow: 0 2px 8px #b6a6ca33;
+      outline: none;
+    }
+    /* Button hover effects for edit section */
+    #avatar-btn:hover {
+      background: #a3e1f7 !important;
+      color: #23272f !important;
+      box-shadow: 0 4px 16px #7fc7d988 !important;
+    }
+    #pass-btn:hover {
+      background: #ffe6b3 !important;
+      color: #23272f !important;
+      box-shadow: 0 4px 16px #e6c79c88 !important;
+    }
+    #save-btn:hover {
+      background: #00e68a !important;
+      color: #fff !important;
+      box-shadow: 0 4px 16px #00d56388 !important;
+    }
+    #cancel-btn:hover {
+      background: #d1a3e6 !important;
+      color: #fff !important;
+      box-shadow: 0 4px 16px #9b59b688 !important;
+    }
     </style>
     `;
 	}
@@ -958,17 +992,20 @@ ${AVAILABLE_AVATARS.map((a, i) => `
         <h3 style="margin:0 0 20px 0;color:${GRID_COLORS.primary}">🔒 Change Password</h3>
         <form id="pass-form">
           <div style="margin-bottom:15px">
-            <label style="display:block;margin-bottom:5px;font-weight:bold">Current Password:</label>
-            <input id="pass-cur" type="password" required style="width:100%;padding:10px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;box-sizing:border-box;background:${GRID_COLORS.bg}"/>
+            <label style="display:block;margin-bottom:5px;font-weight:bold">Current Password:
+              <input id="pass-cur" type="password" required style="width:100%;padding:10px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;box-sizing:border-box;background:${GRID_COLORS.bg}"/>
+            </label>
           </div>
           <div style="margin-bottom:15px">
-            <label style="display:block;margin-bottom:5px;font-weight:bold">New Password:</label>
-            <input id="pass-new" type="password" minlength="6" required style="width:100%;padding:10px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;box-sizing:border-box;background:${GRID_COLORS.bg}"/>
+            <label style="display:block;margin-bottom:5px;font-weight:bold">New Password:
+              <input id="pass-new" type="password" minlength="6" required style="width:100%;padding:10px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;box-sizing:border-box;background:${GRID_COLORS.bg}"/>
+            </label>
             <small style="color:${GRID_COLORS.muted}">Minimum 6 characters</small>
           </div>
           <div style="margin-bottom:20px">
-            <label style="display:block;margin-bottom:5px;font-weight:bold">Confirm Password:</label>
-            <input id="pass-conf" type="password" minlength="6" required style="width:100%;padding:10px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;box-sizing:border-box;background:${GRID_COLORS.bg}"/>
+            <label style="display:block;margin-bottom:5px;font-weight:bold">Confirm Password:
+              <input id="pass-conf" type="password" minlength="6" required style="width:100%;padding:10px;border:1px solid ${GRID_COLORS.cool};border-radius:4px;box-sizing:border-box;background:${GRID_COLORS.bg}"/>
+            </label>
           </div>
           <div style="display:flex;justify-content:flex-end;gap:10px">
             <button type="button" id="pass-cancel" style="background:${GRID_COLORS.muted};color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer">Cancel</button>
@@ -1309,6 +1346,40 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
         transform: scale(1.06) translateY(-2px) rotate(-2deg);
         filter: brightness(1.08) blur(0.2px) drop-shadow(0 6px 18px #b6a6ca33);
       }
+      /* Editable input hover effect */
+      #profile-edit-form input[type="text"],
+      #profile-edit-form input[type="email"] {
+        transition: background 0.18s, box-shadow 0.18s;
+      }
+      #profile-edit-form input[type="text"]:hover,
+      #profile-edit-form input[type="email"]:hover,
+      #profile-edit-form input[type="text"]:focus,
+      #profile-edit-form input[type="email"]:focus {
+        background: #f4f6fa;
+        box-shadow: 0 2px 8px #b6a6ca33;
+        outline: none;
+      }
+      /* Button hover effects for edit section */
+      #avatar-btn:hover {
+        background: #a3e1f7 !important;
+        color: #23272f !important;
+        box-shadow: 0 4px 16px #7fc7d988 !important;
+      }
+      #pass-btn:hover {
+        background: #ffe6b3 !important;
+        color: #23272f !important;
+        box-shadow: 0 4px 16px #e6c79c88 !important;
+      }
+      #save-btn:hover {
+        background: #00e68a !important;
+        color: #fff !important;
+        box-shadow: 0 4px 16px #00d56388 !important;
+      }
+      #cancel-btn:hover {
+        background: #d1a3e6 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 16px #9b59b688 !important;
+      }
       @keyframes dreamyButtonFloat {
         0% { transform: translateY(0) scale(1); }
         100% { transform: translateY(-6px) scale(1.03) rotate(-1.5deg); }
@@ -1364,12 +1435,12 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
             <div class="profile-timeline-bg" style="position:relative;min-height:420px;padding:0 0 24px 0;overflow:visible;">
               <div class="profile-timeline-rail" style="position:absolute;left:50%;top:40px;bottom:24px;width:6px;background:linear-gradient(180deg,#7fc7d9 0%,#e6c79c 100%);border-radius:3px;box-shadow:0 0 24px 4px #e6c79c44,0 0 0 2px #fff;transform:translateX(-50%);z-index:0;animation:railGlow 2.2s ease-in-out infinite alternate;"></div>
               <form id="profile-edit-form" class="profile-timeline-events" style="margin-top:0;display:flex;flex-direction:column;align-items:center;gap:32px;">
-                <button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button"
-                  style="position:absolute;top:0;right:0;margin:12px 18px 0 0;padding:6px 10px;background:rgba(255,255,255,0.85);border:none;border-radius:50%;box-shadow:0 2px 8px #7fc7d944;cursor:pointer;z-index:20;transition:background 0.18s, box-shadow 0.18s;min-width:unset;width:36px;height:36px;display:flex;align-items:center;justify-content:center;outline:none;"
+                ${!editMode ? `<button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button"
+                  style="position:absolute;top:0;right:0;margin:12px 18px 0 0;padding:6px 10px;background:#fff6;border:2px solid #7fc7d9;border-radius:50%;box-shadow:0 2px 8px #7fc7d944;cursor:pointer;z-index:99;transition:background 0.18s, box-shadow 0.18s;min-width:unset;width:40px;height:40px;display:flex;align-items:center;justify-content:center;outline:none;"
                   class="profile-edit-btn"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                </button>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;pointer-events:none;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                </button>` : ''}
                 <style>
                   .profile-edit-btn:hover {
                     background: #e6f7fa !important;
@@ -1382,11 +1453,17 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <span style="display:block;width:22px;height:22px;">${svgStarIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#e6c79c11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="24" placeholder="Username"/>
+                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Username
+                      <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="24" placeholder="Username"/>
+                    </label>
                     <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">unique, for login</div>
-                    <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
+                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Display Name
+                      <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
+                    </label>
                     <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">name shown to others</div>
-                    <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
+                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Bio
+                      <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
+                    </label>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
@@ -1412,7 +1489,9 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <span style="display:block;width:22px;height:22px;">${svgChartIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#a3d9b111 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Email"/>
+                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Email
+                      <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Email"/>
+                    </label>
                     <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">for notifications</div>
                   </div>
                 </div>
@@ -1524,7 +1603,9 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
               <div class="gris-section-title">Friends</div>
               <div class="gris-section-content" id="friends-content">
                 <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
-                  <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+                  <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Friend Username
+                    <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+                  </label>
                   <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
                 </form>
                 <div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff">.</div>
@@ -1584,13 +1665,19 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
           };
         }
       }
-      function setupButtons() {
+  function setupButtons() {
         // Edit button
         var editBtn = safeGet('edit-btn');
-        if (editBtn) editBtn.onclick = function(e) {
-          e.preventDefault();
-          window.dispatchEvent(new CustomEvent('profile-edit'));
-        };
+        if (editBtn) {
+          console.log('[DEBUG] Attaching click event to edit-btn');
+          editBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('[DEBUG] Edit button clicked');
+            window.dispatchEvent(new CustomEvent('profile-edit'));
+          };
+        } else {
+          console.warn('[DEBUG] edit-btn not found in DOM');
+        }
         // Cancelar edição
         var cancelBtn = safeGet('cancel-btn');
         if (cancelBtn) cancelBtn.onclick = function(e) {
@@ -1655,13 +1742,15 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
           });
         });
       }
-      function setupAll() {
+  function setupAll() {
         setupMainTabs();
         setupFriendForm();
         setupButtons();
         setupFallbacks();
         setupTabStateSync();
       }
+      // Expose setupButtons globally for re-attachment after render
+      window.setupButtons = setupButtons;
       // Run setup on DOMContentLoaded and after dynamic updates
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupAll);

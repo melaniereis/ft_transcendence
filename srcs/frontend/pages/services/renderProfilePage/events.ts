@@ -75,6 +75,8 @@ export function render(container: HTMLElement) {
 		state.editMode,
 		state.activeMainTab || 'profile'
 	);
+	// Always re-attach button events after render
+	if (typeof window.setupButtons === 'function') window.setupButtons();
 
 	// Controle de visibilidade dos painéis das tabs principais
 	const mainTab = state.activeMainTab || 'profile';
