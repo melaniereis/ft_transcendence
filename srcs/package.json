@@ -10,8 +10,9 @@
 	"devDependencies": {
 		"@fastify/static": "^8.2.0",
 		"@tsconfig/node20": "^20.1.6",
+		"@types/axios": "^0.14.0",
 		"@types/bcrypt": "^6.0.0",
-		"@types/node": "^24.2.1",
+		"@types/node": "^24.3.1",
 		"@types/uuid": "^10.0.0",
 		"@types/ws": "^8.5.4",
 		"rimraf": "^5.0.0",
@@ -22,6 +23,7 @@
 	"dependencies": {
 		"@fastify/cors": "^11.1.0",
 		"@fastify/websocket": "^11.2.0",
+		"axios": "^1.6.0",
 		"bcrypt": "^6.0.0",
 		"better-sqlite3": "^12.2.0",
 		"fastify": "^5.5.0",

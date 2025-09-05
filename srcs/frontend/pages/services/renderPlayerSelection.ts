@@ -42,7 +42,16 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 	let users: any[] = [];
 	try {
-		const response = await fetch('/users');
+		const token = localStorage.getItem('authToken');
+		const response = await fetch('/users', {
+        	headers: {
+            Authorization: `Bearer ${token}`
+       		}
+    	});
+
+		if (!response.ok) {
+			throw new Error('Unauthorized or failed request');
+		}
 		users = await response.json();
 
 		users.forEach((user: any) => {
