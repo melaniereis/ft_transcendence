@@ -1477,9 +1477,11 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
           <div style="display:flex;gap:0;margin-bottom:32px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px #b6a6ca22;">
             ${['profile', 'stats', 'history', 'friends'].map(tab => `
               <button class="main-tab${tab === mainTab ? ' active' : ''}" data-main-tab="${tab}"
-                style="flex:1;padding:18px 0;border:none;background:${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'};
-                       color:${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted};font-size:1.15rem;font-weight:700;
-                       border-bottom:4px solid ${tab === mainTab ? GRID_COLORS.cool : 'transparent'};cursor:pointer;transition:all 0.2s">
+      style="flex:1;padding:18px 0;border:none;background:${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'};
+        color:${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted};font-size:1.15rem;font-weight:700;
+        border-bottom:4px solid ${tab === mainTab ? GRID_COLORS.cool : 'transparent'};cursor:pointer;transition:all 0.2s"
+      onmouseover="this.style.background='${GRID_COLORS.cool}';this.style.color='#fff';this.style.boxShadow='0 2px 12px #7fc7d944';"
+      onmouseout="this.style.background='${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'}';this.style.color='${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted}';this.style.boxShadow='none';">
                 ${(tab === 'profile' ? `${svgUserIcon()} Profile` : tab === 'stats' ? `${svgBarChartIcon()} Statistics` : tab === 'history' ? `${svgMedalGold()} Match History` : `${svgOpponentIcon()} Friends`)}
 				</button>
 	`).join('')}
@@ -1558,8 +1560,8 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                   <button id="avatar-btn" type="button" style="background:#7fc7d9;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #7fc7d944;"><span style="vertical-align:middle;">${svgChartIcon()}</span> Edit Avatar</button>
                   <input id="avatar-url-input" type="hidden" value="${profile.avatar_url || ''}" />
                   <button id="pass-btn" type="button" style="background:#e6c79c;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #e6c79c44;"><span style="vertical-align:middle;">${svgFlameIcon()}</span> Change Password</button>
-                  <button id="save-btn" type="submit" style="background:#00d563;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #00d56344;"><span style="vertical-align:middle;">💾</span> Save</button>
-                  <button id="cancel-btn" type="button" style="background:#9b59b6;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s"><span style="vertical-align:middle;">❌</span> Cancel</button>
+                  <button id="save-btn" type="submit" style="background:#00d563;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #00d56344;"><span style="vertical-align:middle;">${svgMedalGold()}</span> Save</button>
+                  <button id="cancel-btn" type="button" style="background:#9b59b6;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s"><span style="vertical-align:middle;">${svgUserIcon()}</span> Cancel</button>
                   <div id="save-error" style="color:#e84393;font-size:14px;font-weight:500"></div>
                 </div>
                 ` : `
