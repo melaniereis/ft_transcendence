@@ -138,8 +138,8 @@ ${teamLogo ? `
     </div>`;
 	const createdAtText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—';
 	return `
-    <div class="header-view" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:30px;border-radius:20px;margin:20px 0;box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};">
-      <div class="header-content" style="display:flex;align-items:center;gap:30px;flex-wrap:wrap">
+    <div class="header-view" style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:30px 0 0 0;border-radius:20px;margin:0 0 20px 0;box-shadow:0 8px 32px rgba(0,174,239,0.2);border:1px solid ${GRID_COLORS.cool};position:relative;z-index:10;">
+      <div class="header-content" style="display:flex;align-items:flex-start;gap:30px;flex-wrap:wrap;justify-content:center;position:sticky;top:0;left:0;width:100%;max-width:1200px;margin:0 auto;">
         ${avatar}
         <div style="flex:1;min-width:300px">
           <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
@@ -1464,7 +1464,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
       <span></span>
     </div>
       <main class="gris-main-card">
-        <div style="background:linear-gradient(120deg,#f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 0 32px 0;gap:18px;min-height:100%;border-right:1.5px solid #e3e6f3;">
+  <div class="fixed-profile-header" style="background:linear-gradient(120deg,#f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 0 32px 0;gap:18px;min-height:100px;border-right:1.5px solid #e3e6f3;">
           <div class="gris-avatar">
             <img src="${profile.avatar_url}" alt="Avatar"/>
           </div>
@@ -1655,11 +1655,10 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
               <div class="gris-section-title">Friends</div>
               <div class="gris-section-content" id="friends-content">
                 <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
-                  <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Friend Username
-                    <input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
-                  </label>
-                  <button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
-                </form>
+					<label for="friend-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Friend Username</label>
+					<input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+					<button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
+				</form>
                 <div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff">.</div>
                 <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
               </div>
