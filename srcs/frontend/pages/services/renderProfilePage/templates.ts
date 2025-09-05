@@ -1394,11 +1394,33 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
         .gris-section { padding: 18px 2vw 14px 2vw; }
       }
       @media (max-width: 700px) {
-        .gris-main-card { padding: 12px 1vw; max-width: 100vw; }
-        .gris-section { padding: 10px 1vw 8px 1vw; }
-        .gris-avatar { width: 80px; height: 80px; }
-        .gris-avatar img { width: 60px; height: 60px; }
-        .gris-username { font-size: 1.2rem; }
+        .gris-main-card { padding: 8px 0.5vw; max-width: 100vw; }
+        .gris-section { padding: 6px 0.5vw 6px 0.5vw; }
+        .gris-avatar { width: 60px; height: 60px; }
+        .gris-avatar img { width: 44px; height: 44px; }
+        .gris-username { font-size: 1rem; }
+        .profile-timeline-bg {
+          min-height: 320px !important;
+          padding-bottom: 8px !important;
+        }
+        .profile-timeline-events {
+          gap: 18px !important;
+        }
+        .edit-mode.profile-timeline-events {
+          gap: 8px !important;
+        }
+        .timeline-event {
+          max-width: 98vw !important;
+          gap: 8px !important;
+        }
+        #profile-edit-form {
+          padding: 0 2vw !important;
+        }
+        .gris-action-btn {
+          font-size: 0.95rem !important;
+          height: 38px !important;
+          padding: 0 12px !important;
+        }
       }
     </style>
 `;
@@ -1432,9 +1454,9 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
           </div>
           <!-- Tab Panels -->
           <div class="tab-panel" id="profile-panel" style="display:${mainTab === 'profile' ? 'block' : 'none'}">
-            <div class="profile-timeline-bg" style="position:relative;min-height:420px;padding:0 0 24px 0;overflow:visible;">
-              <div class="profile-timeline-rail" style="position:absolute;left:50%;top:40px;bottom:24px;width:6px;background:linear-gradient(180deg,#7fc7d9 0%,#e6c79c 100%);border-radius:3px;box-shadow:0 0 24px 4px #e6c79c44,0 0 0 2px #fff;transform:translateX(-50%);z-index:0;animation:railGlow 2.2s ease-in-out infinite alternate;"></div>
-              <form id="profile-edit-form" class="profile-timeline-events" style="margin-top:0;display:flex;flex-direction:column;align-items:center;gap:32px;">
+            <div class="profile-timeline-bg${editMode ? ' edit-mode' : ''}" style="position:relative;min-height:420px;padding:0 0 24px 0;overflow:visible;">
+
+              <form id="profile-edit-form" class="profile-timeline-events${editMode ? ' edit-mode' : ''}" style="margin-top:0;display:flex;flex-direction:column;align-items:center;${editMode ? 'gap:8px;' : 'gap:32px;'}">
                 ${!editMode ? `<button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button"
                   style="position:absolute;top:0;right:0;margin:12px 18px 0 0;padding:6px 10px;background:#fff6;border:2px solid #7fc7d9;border-radius:50%;box-shadow:0 2px 8px #7fc7d944;cursor:pointer;z-index:99;transition:background 0.18s, box-shadow 0.18s;min-width:unset;width:40px;height:40px;display:flex;align-items:center;justify-content:center;outline:none;"
                   class="profile-edit-btn"
@@ -1453,17 +1475,14 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <span style="display:block;width:22px;height:22px;">${svgStarIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#e6c79c11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Username
-                      <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="24" placeholder="Username"/>
-                    </label>
+                    <label for="username-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Username</label>
+                    <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="24" placeholder="Username"/>
                     <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">unique, for login</div>
-                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Display Name
-                      <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
-                    </label>
+                    <label for="display-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Display Name</label>
+                    <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
                     <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">name shown to others</div>
-                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Bio
-                      <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
-                    </label>
+                    <label for="bio-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Bio</label>
+                    <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
@@ -1489,9 +1508,8 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
                     <span style="display:block;width:22px;height:22px;">${svgChartIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#a3d9b111 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <label style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Email
-                      <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Email"/>
-                    </label>
+                    <label for="email-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Email</label>
+                    <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Email"/>
                     <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">for notifications</div>
                   </div>
                 </div>

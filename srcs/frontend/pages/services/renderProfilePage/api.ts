@@ -93,11 +93,10 @@ export async function updateProfile(payload: {
 	return apiSend<Partial<Profile>>('/api/profile', 'PUT', payload);
 }
 
-// FIX: Correct parameter names for password change
-export async function changePassword(current_password: string, new_password: string): Promise<void> {
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
 	await apiSend<void>('/api/profile/change-password', 'POST', {
-		current_password,
-		new_password
+		currentPassword,
+		newPassword
 	});
 }
 
