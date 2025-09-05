@@ -6,8 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     image: web:latest
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     volumes:
       - ./data:/usr/src/app/data
       - ./certs:/usr/src/app/certs

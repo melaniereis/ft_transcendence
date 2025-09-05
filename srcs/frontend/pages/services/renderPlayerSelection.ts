@@ -44,10 +44,10 @@ export async function renderPlayerSelection(container: HTMLElement) {
 	try {
 		const token = localStorage.getItem('authToken');
 		const response = await fetch('/users', {
-        	headers: {
-            Authorization: `Bearer ${token}`
-       		}
-    	});
+			headers: {
+			Authorization: `Bearer ${token}`
+			}
+		});
 
 		if (!response.ok) {
 			throw new Error('Unauthorized or failed request');
