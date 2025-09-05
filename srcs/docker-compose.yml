@@ -1,5 +1,6 @@
 services:
   web:
+    stop_grace_period: 30s 
     container_name: web
     build:
       context: .
@@ -14,7 +15,6 @@ services:
       - DB_PATH=/usr/src/app/data/database.db
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=root  # For development only
-    command: npm run dev
     depends_on: 
       - vault
     networks:
@@ -54,6 +54,8 @@ services:
       - ./vault/data:/vault/data
       - ./vault/logs:/vault/logs
       - ./vault/policies:/vault/policies
+      - ./vault/init-vault.sh:/usr/local/bin/init-vault.sh
+      - ./vault/secrets/encryption_key.txt:/run/secrets/encryption_key.txt:ro
     ports:
       - "8200:8200"
     cap_add:
@@ -61,7 +63,8 @@ services:
     networks:
       - transcendence
     restart: unless-stopped
-    
+    entrypoint: ["sh", "/usr/local/bin/init-vault.sh"]
+
 networks:
   transcendence:
     driver: bridge

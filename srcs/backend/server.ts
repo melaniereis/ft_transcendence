@@ -9,12 +9,13 @@ import { fileURLToPath } from 'url';
 import { getEncryptionKey } from './services/vault/vault.js';
 import { decryptFile, encryptFile } from './services/vault/encrypt.js';
 
+import { waitForVaultReady } from './services/vault/waitForVault.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const encryptedPath = path.join(__dirname, '..', '..',  'data', 'database.db.enc');
-
-const decryptedPath = path.join(__dirname, '..', 'data', 'database.db');
+const encryptedPath = path.join(__dirname, '..', '..', 'data', 'database.db.enc');
+const decryptedPath = path.join(__dirname, '..', '..', 'data', 'database.db');
 const dataDir = path.dirname(decryptedPath);
 
 const keyPath = path.join(process.cwd(), 'certs', 'key.pem');
@@ -43,14 +44,41 @@ const fastify = Fastify({
     https: httpsOptions,
 });
 
-import { waitForVaultReady } from './services/vault/waitForVault.js';
-async function start() {
-    let key: string;
+// 🔐 Declare the encryption key globally so `shutdown()` can access it
+let key: string;
 
+// ✅ Define shutdown logic OUTSIDE `start()` so signals can access it
+const shutdown = async () => {
+    console.log('⚠️ Shutdown function triggered...');
+    try {
+        if (fs.existsSync(decryptedPath)) {
+            console.log('🔒 Encrypting database before shutdown...');
+            await encryptFile(decryptedPath, encryptedPath, key);
+            fs.unlinkSync(decryptedPath);
+            console.log('✅ Database encrypted and decrypted copy removed');
+        } else {
+            console.log('ℹ️ No decrypted database file found to clean up.');
+        }
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            console.error('❌ Error during shutdown encryption:', err.message);
+        } else {
+            console.error('❌ Error during shutdown encryption (non-Error):', err);
+        }
+    }
+    process.exit();
+};
+
+// 🧠 Register shutdown hooks BEFORE calling `start()` to catch signals early
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+process.on('exit', shutdown);
+
+async function start() {
     try {
         console.log('🔑 Fetching encryption key from Vault...');
         await waitForVaultReady();
-        key = await getEncryptionKey();
+        key = await getEncryptionKey(); // ✅ sets global key
         console.log('✅ Encryption key retrieved');
     } catch (err: unknown) {
         if (err instanceof Error) {
@@ -62,27 +90,23 @@ async function start() {
     }
 
     try {
-        if (!fs.existsSync(dataDir)) {
-            console.log('📁 Creating data directory...');
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
-
         if (!fs.existsSync(encryptedPath)) {
             console.warn('⚠️ Encrypted database not found. Skipping decryption for now.');
         } else {
             console.log('🔓 Encrypted DB found. Decrypting...');
             await decryptFile(encryptedPath, decryptedPath, key);
-            console.log('✅ Database decrypted');
-
+            fs.chmodSync(decryptedPath, 0o600); // rw-------, owner read/write
+            console.log('✅ Database decrypted and permissions set');
             const stats = fs.statSync(decryptedPath);
             if (stats.size === 0) {
                 console.warn('⚠️ Decrypted DB is empty. You may need to initialize it.');
             }
         }
 
-        console.log('📋 Initializing database...');
+
+/*         console.log('📋 Initializing database...');
         await import('../backend/db/database.js');
-        console.log('✅ Database initialized');
+        console.log('✅ Database initialized'); */
 
         await fastify.register(fastifyWebsocket);
         await fastify.register(fastifyCors, { origin: true });
@@ -132,29 +156,6 @@ async function start() {
             }
             process.exit(1);
         }
-
-        const shutdown = async () => {
-            try {
-                if (fs.existsSync(decryptedPath)) {
-                    console.log('🔒 Encrypting database before shutdown...');
-                    await encryptFile(decryptedPath, encryptedPath, key);
-                    fs.unlinkSync(decryptedPath);
-                    console.log('✅ Database encrypted and decrypted copy removed');
-                }
-            } catch (err: unknown) {
-                if (err instanceof Error) {
-                    console.error('❌ Error during shutdown encryption:', err.message);
-                } else {
-                    console.error('❌ Error during shutdown encryption (non-Error):', err);
-                }
-            }
-            process.exit();
-        };
-
-        process.on('SIGINT', shutdown);
-        process.on('SIGTERM', shutdown);
-        process.on('exit', shutdown);
-
     } catch (err: unknown) {
         if (err instanceof Error) {
             console.error('❌ Server startup failed:', err.message);

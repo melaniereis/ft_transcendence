@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 # Optional: upgrade npm
-RUN npm install -g npm@11.5.2
+RUN npm install -g npm@11.6.0
 
 # Install curl (if needed at runtime)
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
@@ -24,4 +24,4 @@ RUN cp -r frontend/assets/* dist/frontend/pages/assets/
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["node", "dist/backend/server.js"]
