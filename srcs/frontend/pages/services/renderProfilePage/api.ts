@@ -89,6 +89,7 @@ export async function updateProfile(payload: {
 	display_name?: string;
 	email?: string;
 	avatar_url?: string;
+	bio?: string;
 }): Promise<Partial<Profile>> {
 	return apiSend<Partial<Profile>>('/api/profile', 'PUT', payload);
 }

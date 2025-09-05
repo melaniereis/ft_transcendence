@@ -8,23 +8,24 @@ const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
 
-const dbPath = path.join(__dirname, '..' , '..', '..', 'data', 'database.db');
+const dbPath = path.join(__dirname, '..', '..', '..', 'data', 'database.db');
 
 const db = new sqlite3.Database(dbPath, (err) => {
-    if (err)
-        console.error('Failed to connect to database:', err.message);
-    else 
-        console.log('Connected to SQLite');
+	if (err)
+		console.error('Failed to connect to database:', err.message);
+	else
+		console.log('Connected to SQLite');
 });
 
 db.serialize(() => {
-    // USERS - Com campo TEAM corrigido
-    db.run(`CREATE TABLE IF NOT EXISTS users (
+	// USERS - Com campo TEAM corrigido
+	db.run(`CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         name TEXT NOT NULL,
-        team TEXT NOT NULL,
+        team TEXT,
+        bio TEXT,
         display_name TEXT,
         email TEXT UNIQUE,
         avatar_url TEXT DEFAULT '/assets/avatar/default.png',
@@ -33,8 +34,8 @@ db.serialize(() => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // TOURNAMENTS
-    db.run(`CREATE TABLE IF NOT EXISTS tournaments (
+	// TOURNAMENTS
+	db.run(`CREATE TABLE IF NOT EXISTS tournaments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         team_winner TEXT NOT NULL,
@@ -43,8 +44,8 @@ db.serialize(() => {
         date_created TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // TEAM TABLES
-    db.run(`CREATE TABLE IF NOT EXISTS hacktivists (
+	// TEAM TABLES
+	db.run(`CREATE TABLE IF NOT EXISTS hacktivists (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         members TEXT NOT NULL UNIQUE,
         victories INTEGER DEFAULT 0,
@@ -54,7 +55,7 @@ db.serialize(() => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS bug_busters (
+	db.run(`CREATE TABLE IF NOT EXISTS bug_busters (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         members TEXT NOT NULL UNIQUE,
         victories INTEGER DEFAULT 0,
@@ -64,7 +65,7 @@ db.serialize(() => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS logic_league (
+	db.run(`CREATE TABLE IF NOT EXISTS logic_league (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         members TEXT NOT NULL UNIQUE,
         victories INTEGER DEFAULT 0,
@@ -74,7 +75,7 @@ db.serialize(() => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS code_alliance (
+	db.run(`CREATE TABLE IF NOT EXISTS code_alliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         members TEXT NOT NULL UNIQUE,
         victories INTEGER DEFAULT 0,
@@ -84,8 +85,8 @@ db.serialize(() => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // USER STATS 
-    db.run(`CREATE TABLE IF NOT EXISTS user_stats (
+	// USER STATS
+	db.run(`CREATE TABLE IF NOT EXISTS user_stats (
         user_id INTEGER PRIMARY KEY,
         matches_played INTEGER DEFAULT 0,
         matches_won INTEGER DEFAULT 0,
@@ -100,8 +101,8 @@ db.serialize(() => {
         FOREIGN KEY (user_id) REFERENCES users(id)
     )`);
 
-    // GAMES
-    db.run(`CREATE TABLE IF NOT EXISTS games (
+	// GAMES
+	db.run(`CREATE TABLE IF NOT EXISTS games (
         game_id INTEGER PRIMARY KEY AUTOINCREMENT,
         player1_id INTEGER NOT NULL,
         player2_id INTEGER NOT NULL,
@@ -118,8 +119,8 @@ db.serialize(() => {
         FOREIGN KEY (winner_id) REFERENCES users(id)
     )`);
 
-    // SESSIONS
-    db.run(`CREATE TABLE IF NOT EXISTS sessions (
+	// SESSIONS
+	db.run(`CREATE TABLE IF NOT EXISTS sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         token TEXT NOT NULL UNIQUE,
@@ -128,8 +129,8 @@ db.serialize(() => {
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 
-    // FRIENDSHIPS
-    db.run(`CREATE TABLE IF NOT EXISTS friendships (
+	// FRIENDSHIPS
+	db.run(`CREATE TABLE IF NOT EXISTS friendships (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         friend_id INTEGER NOT NULL,
@@ -140,8 +141,8 @@ db.serialize(() => {
         FOREIGN KEY(friend_id) REFERENCES users(id)
     )`);
 
-    // MATCH HISTORY
-    db.run(`CREATE TABLE IF NOT EXISTS match_history (
+	// MATCH HISTORY
+	db.run(`CREATE TABLE IF NOT EXISTS match_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         game_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
@@ -153,7 +154,7 @@ db.serialize(() => {
         date_played TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    console.log('📋 Database tables created successfully');
+	console.log('📋 Database tables created successfully');
 });
 
 export default db;

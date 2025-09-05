@@ -322,6 +322,7 @@ export function setupEvents(container: HTMLElement) {
 			const display_name = (document.getElementById('display-input') as HTMLInputElement)?.value?.trim();
 			const email = (document.getElementById('email-input') as HTMLInputElement)?.value?.trim();
 			const avatar_url = (document.getElementById('avatar-url-input') as HTMLInputElement)?.value?.trim() || (document.getElementById('avatar-preview') as HTMLImageElement)?.src;
+			const bio = (document.getElementById('bio-input') as HTMLInputElement)?.value?.trim();
 
 			if (!username || username.length < 3) {
 				const err = document.getElementById('save-error');
@@ -330,7 +331,7 @@ export function setupEvents(container: HTMLElement) {
 			}
 
 			try {
-				const patch = await updateProfile({ username, display_name, email, avatar_url });
+				const patch = await updateProfile({ username, display_name, email, avatar_url, bio });
 				// Always reload the full profile after saving
 				const full = await loadProfile();
 				state.profile = full ? full : { ...(state.profile || {}), ...(patch as any) };
