@@ -28,9 +28,37 @@ export async function updateUserProfile(
 	const entries = Object.entries(updates).filter(([_, value]) =>
 		value !== undefined && value !== null && value !== ''
 	);
-
 	if (entries.length === 0) {
-		throw new Error('Nenhum campo para atualizar');
+		throw new Error('No fields to update');
+	}
+
+	// Check for uniqueness
+	if (updates.username) {
+		const existing = await new Promise((resolve, reject) => {
+			db.get('SELECT id FROM users WHERE username = ? AND id != ?', [updates.username, userId], (err, row) => {
+				if (err) reject(err);
+				else resolve(row);
+			});
+		});
+		if (existing) throw new Error('Username already exists.');
+	}
+	if (updates.display_name) {
+		const existing = await new Promise((resolve, reject) => {
+			db.get('SELECT id FROM users WHERE display_name = ? AND id != ?', [updates.display_name, userId], (err, row) => {
+				if (err) reject(err);
+				else resolve(row);
+			});
+		});
+		if (existing) throw new Error('Display name already exists.');
+	}
+	if (updates.email) {
+		const existing = await new Promise((resolve, reject) => {
+			db.get('SELECT id FROM users WHERE email = ? AND id != ?', [updates.email, userId], (err, row) => {
+				if (err) reject(err);
+				else resolve(row);
+			});
+		});
+		if (existing) throw new Error('Email already exists.');
 	}
 
 	const setClause = entries.map(([key]) => `${key} = ?`).join(', ');
@@ -42,10 +70,10 @@ export async function updateUserProfile(
 			[...values, userId],
 			function (err) {
 				if (err) {
-					console.error('Erro ao atualizar perfil:', err);
+					console.error('Error updating profile:', err);
 					reject(err);
 				} else if (this.changes === 0) {
-					reject(new Error('Utilizador não encontrado'));
+					reject(new Error('User not found'));
 				} else {
 					resolve();
 				}

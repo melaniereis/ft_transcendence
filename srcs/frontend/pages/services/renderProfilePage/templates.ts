@@ -1,3 +1,35 @@
+// Error display helper
+function showProfileError(message: string) {
+	let errorDiv = document.getElementById('save-error');
+	if (errorDiv) {
+		errorDiv.textContent = message;
+		errorDiv.style.display = 'block';
+		errorDiv.style.background = '#ffe0e0';
+		errorDiv.style.color = '#b00020';
+		errorDiv.style.border = '1px solid #b00020';
+		errorDiv.style.padding = '8px';
+		errorDiv.style.marginTop = '10px';
+		errorDiv.style.borderRadius = '4px';
+		errorDiv.style.fontWeight = 'bold';
+	}
+}
+
+// Max length constants
+const MAX_USERNAME_LENGTH = 20;
+const MAX_DISPLAYNAME_LENGTH = 30;
+
+// Profile input validation
+function validateProfileInput(username: string, displayName: string) {
+	if (username.length > MAX_USERNAME_LENGTH) {
+		showProfileError(`Username must be at most ${MAX_USERNAME_LENGTH} characters.`);
+		return false;
+	}
+	if (displayName.length > MAX_DISPLAYNAME_LENGTH) {
+		showProfileError(`Display name must be at most ${MAX_DISPLAYNAME_LENGTH} characters.`);
+		return false;
+	}
+	return true;
+}
 // SVG ICON HELPERS (top-level scope)
 function svgUserIcon() {
 	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>`;
