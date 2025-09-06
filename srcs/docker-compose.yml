@@ -17,7 +17,6 @@ services:
       - VAULT_TOKEN=root # For development only
     command: npm run dev
     depends_on:
-      - db
       - vault
     networks:
       - transcendence
