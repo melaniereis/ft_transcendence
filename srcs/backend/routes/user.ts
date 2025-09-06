@@ -33,12 +33,6 @@ export async function userRoutes(fastify: FastifyInstance) {
 		}
 	});
 
-
-	fastify.get('/users', async (_request, reply) => {
-		const users = await getAllUsers();
-		return reply.send(users);
-	});
-
 	// Nova rota: buscar usuário por username (para o frontend)
 	fastify.get('/api/users/:username', async (request, reply) => {
 		const { username } = request.params as { username: string };

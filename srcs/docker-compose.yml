@@ -15,7 +15,6 @@ services:
       - DB_PATH=/usr/src/app/data/database.db
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=root # For development only
-    command: npm run dev
     depends_on:
       - vault
     networks:
