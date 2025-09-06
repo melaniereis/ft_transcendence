@@ -1054,9 +1054,16 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
 	const responsiveStyles = `
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+      /* Ensure viewport sizing is stable so background calculations don't jump */
+      html, body { height: 100%; margin: 0; padding: 0; }
+
+      /* Fixed, cover background so it does NOT visually change when content height changes */
       body {
-        margin:0; padding:0;
-        background: url('/assets/Background.png') no-repeat center/cover;
+        background-image: url('/assets/Background.png');
+        background-repeat: no-repeat;
+        background-size: cover;           /* scale to cover viewport */
+        background-position: center center;
+        background-attachment: fixed;     /* <-- key: keep background fixed to viewport */
         font-family: Georgia, 'Times New Roman', Times, serif;
         color: ${GRID_COLORS.secondary};
         overflow-x: hidden;

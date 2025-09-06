@@ -41,13 +41,38 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
                         <div class="amazing-loader" style="text-align:center;padding:32px 0;color:#b6a6ca;font-size:18px;">Loading pending requests...</div>
                     </div>
                 </div>
-                <button id="back-to-profile" style="display:block;margin:32px auto 0 auto;padding:12px 32px;background:linear-gradient(90deg,#b6a6ca 0%,#7fc7d9 100%);color:#fff;border:none;border-radius:22px;cursor:pointer;font-size:1.1rem;font-weight:700;box-shadow:0 4px 16px #7fc7d988;transition:background 0.2s,box-shadow 0.2s;">
-                    ${svgBackIcon()} Back to Profile
-                </button>
+                                <button id="back-to-profile" class="envelope-btn" title="Back to Profile" style="display:block;margin:32px auto 0 auto;background:transparent;border:none;cursor:pointer;">
+                                    <span style="display:inline-block;">
+                                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="8" y="16" width="48" height="32" rx="8" fill="#f8f9f8" stroke="#b6a6ca" stroke-width="3"/>
+                                            <polyline points="8,16 32,40 56,16" fill="none" stroke="#7fc7d9" stroke-width="3"/>
+                                            <polyline points="8,48 32,28 56,48" fill="none" stroke="#e6c79c" stroke-width="3"/>
+                                            <circle cx="32" cy="32" r="3.5" fill="#b6a6ca"/>
+                                        </svg>
+                                    </span>
+                                </button>
                 <div id="notification" style="display:none;position:fixed;top:32px;right:32px;background:linear-gradient(90deg,#a3d9b1 0%,#e6c79c 100%);color:#23272f;padding:18px 32px;border-radius:16px;box-shadow:0 4px 24px #7fc7d988;z-index:1000;font-size:1.1rem;font-weight:700;letter-spacing:0.5px;opacity:0.98;"></div>
             </div>
             <style>
-                .amazing-request-card {
+				.envelope-btn {
+					background: transparent;
+					border: none;
+					cursor: pointer;
+					transition: transform 0.18s, box-shadow 0.18s;
+					display: block;
+					margin: 32px auto 0 auto;
+					outline: none;
+				}
+				.envelope-btn:hover svg {
+					transform: scale(1.08) rotate(-2deg);
+					box-shadow: 0 8px 32px #b6a6ca44;
+					filter: drop-shadow(0 4px 16px #7fc7d988);
+				}
+				.envelope-btn:active svg {
+					transform: scale(0.98);
+					filter: brightness(0.95);
+				}
+				.amazing-request-card {
                     background: rgba(255,255,255,0.75);
                     border-radius: 22px;
                     box-shadow: 0 8px 32px 0 #b6a6ca33, 0 1.5px 8px #7fc7d933;
