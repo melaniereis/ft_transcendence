@@ -1,3 +1,0 @@
-#TODO
-
-- App setting (game rules(speed), AI difficulty)

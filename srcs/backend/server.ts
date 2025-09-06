@@ -23,19 +23,18 @@ const certPath = path.join(process.cwd(), 'certs', 'cert.pem');
 
 let httpsOptions;
 try {
-    console.log("LOGSSSSS SAO ESTES: ", encryptedPath);
     console.log('🔍 Looking for TLS certs at:', keyPath, certPath);
     httpsOptions = {
         key: fs.readFileSync(keyPath),
         cert: fs.readFileSync(certPath),
     };
     console.log('✅ TLS certificates loaded');
-} catch (err: unknown) {
-    if (err instanceof Error) {
-        console.error('❌ Failed to load TLS certificates:', err.message);
-    } else {
+} 
+catch (err: unknown) {
+    if (err instanceof Error)
+        console.error('❌ Failed to load TLS certificates:', err.message); 
+    else
         console.error('❌ Failed to load TLS certificates (non-Error):', err);
-    }
     process.exit(1);
 }
 
@@ -56,15 +55,15 @@ const shutdown = async () => {
             await encryptFile(decryptedPath, encryptedPath, key);
             fs.unlinkSync(decryptedPath);
             console.log('✅ Database encrypted and decrypted copy removed');
-        } else {
+        } 
+        else
             console.log('ℹ️ No decrypted database file found to clean up.');
-        }
-    } catch (err: unknown) {
-        if (err instanceof Error) {
+    } 
+    catch (err: unknown) {
+        if (err instanceof Error)
             console.error('❌ Error during shutdown encryption:', err.message);
-        } else {
+        else
             console.error('❌ Error during shutdown encryption (non-Error):', err);
-        }
     }
     process.exit();
 };
@@ -80,33 +79,31 @@ async function start() {
         await waitForVaultReady();
         key = await getEncryptionKey(); // ✅ sets global key
         console.log('✅ Encryption key retrieved');
-    } catch (err: unknown) {
-        if (err instanceof Error) {
+    } 
+    catch (err: unknown) {
+        if (err instanceof Error)
             console.error('❌ Error fetching encryption key:', err.message);
-        } else {
+        else
             console.error('❌ Error fetching encryption key (non-Error):', err);
-        }
         process.exit(1);
     }
 
     try {
-        if (!fs.existsSync(encryptedPath)) {
+        if (!fs.existsSync(encryptedPath))
             console.warn('⚠️ Encrypted database not found. Skipping decryption for now.');
-        } else {
+        else {
             console.log('🔓 Encrypted DB found. Decrypting...');
             await decryptFile(encryptedPath, decryptedPath, key);
             fs.chmodSync(decryptedPath, 0o600); // rw-------, owner read/write
             console.log('✅ Database decrypted and permissions set');
             const stats = fs.statSync(decryptedPath);
-            if (stats.size === 0) {
+            if (stats.size === 0)
                 console.warn('⚠️ Decrypted DB is empty. You may need to initialize it.');
-            }
         }
-
 
 /*         console.log('📋 Initializing database...');
         await import('../backend/db/database.js');
-        console.log('✅ Database initialized'); */
+        console.log('✅ Database initialized');  */
 
         await fastify.register(fastifyWebsocket);
         await fastify.register(fastifyCors, { origin: true });
@@ -148,21 +145,22 @@ async function start() {
         try {
             await fastify.listen({ port: 3000, host: '0.0.0.0' });
             console.log('✅ Server running at https://localhost:3000');
-        } catch (err: unknown) {
-            if (err instanceof Error) {
+        } 
+        catch (err: unknown) {
+            if (err instanceof Error)
                 console.error('❌ Failed to start Fastify server:', err.message);
-            } else {
+            else
                 console.error('❌ Failed to start Fastify server (non-Error):', err);
-            }
             process.exit(1);
         }
-    } catch (err: unknown) {
+    } 
+    catch (err: unknown) {
         if (err instanceof Error) {
             console.error('❌ Server startup failed:', err.message);
             console.error(err.stack);
-        } else {
+        } 
+        else
             console.error('❌ Server startup failed with non-Error:', err);
-        }
         process.exit(1);
     }
 }

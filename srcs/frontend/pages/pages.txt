@@ -1,5 +1,0 @@
-#TODO
-
-- Main screens
-- Game page for Pong canvas/rendering (Canvas for game, buttons for AI/human)
-- Tournament page for matchmaking

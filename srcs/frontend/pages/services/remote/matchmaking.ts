@@ -3,8 +3,7 @@ import { renderMatchReadyScreen } from './renderMatchReadyScreen.js';
 
 let socket: WebSocket | null = null;
 
-export function startMatchmaking(appDiv: HTMLDivElement,
-playerId: number, playerName: string,
+export function startMatchmaking(appDiv: HTMLDivElement, playerId: number, playerName: string, 
 difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 	if (socket && socket.readyState === WebSocket.OPEN) {
 		console.log('🟢 Already connected to matchmaking');
@@ -14,67 +13,52 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 	socket = new WebSocket(`${protocol}://${location.host}/matchmaking`);
 
-	socket.onopen = () => {
-		console.log('✅ Connected to matchmaking server. Waiting for opponent...');
-		const payload = {
-		type: 'join',  // important: tell server this is a join
+	socket.onopen = () => handleSocketOpen(playerId, playerName, difficulty);
+	socket.onmessage = (event) => handleSocketMessage(event, appDiv, playerName, difficulty);
+	socket.onclose = () => handleSocketClose(appDiv);
+	socket.onerror = (err) => handleSocketError(err, appDiv);
+}
+
+function handleSocketOpen(playerId: number, playerName: string, difficulty: string) {
+	console.log('✅ Connected to matchmaking server. Waiting for opponent...');
+	const payload = {
+		type: 'join',
 		id: playerId,
 		username: playerName,
 		difficulty
-		};
-		console.log('Sending join payload:', payload);
-		socket!.send(JSON.stringify(payload));
 	};
+	console.log('Sending join payload:', payload);
+	socket!.send(JSON.stringify(payload));
+}
 
-	socket.onmessage = (event: MessageEvent) => {
-		const data = JSON.parse(event.data);
-		console.log('Received WS message:', data);
+function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, playerName: string,difficulty: string) {
+	const data = JSON.parse(event.data);
+	console.log('Received WS message:', data);
 
-		switch (data.type) {
+	switch (data.type) {
 		case 'chooseMaxGames':
-			console.log('Received chooseMaxGames');
-			appDiv.innerHTML = `
-			<p>Select number of games (odd numbers 3–11):</p>
-			<select id="gameCountSelect">
-				<option value="3">3</option>
-				<option value="5">5</option>
-				<option value="7">7</option>
-				<option value="9">9</option>
-				<option value="11">11</option>
-			</select>
-			<button id="confirmMaxGames">Confirm</button>
-			`;
-			document.getElementById('confirmMaxGames')?.addEventListener('click', () => {
-			const select = document.getElementById('gameCountSelect') as HTMLSelectElement;
-			const selected = parseInt(select.value);
-			console.log('Selected max games:', selected);
-			socket!.send(JSON.stringify({ type: 'selectMaxGames', maxGames: selected }));
-			});
+			renderGameSelectionUI(appDiv);
+			break;
+
+		case 'waitingForGameSelection':
+			renderWaitingMessage(appDiv, 'Waiting for opponent to choose number of games...');
+			break;
+
+		case 'waitingForOpponent':
+			renderWaitingMessage(appDiv, 'Waiting for another player to join...');
 			break;
 
 		case 'ready':
-			console.log('Received ready:', data);
-			const opponent = data.opponent as string;
-			const maxGames = data.maxGames as number;
-
-			console.log('Rendering Match Ready Screen with:', { playerName, opponent, maxGames });
-			renderMatchReadyScreen(appDiv, playerName, opponent, maxGames, () => {
+			renderMatchReadyScreen(appDiv, playerName, data.opponent, data.maxGames, () => {
 				console.log('Confirm ready clicked');
 				socket!.send(JSON.stringify({ type: 'confirmReady' }));
 			});
 			break;
 
 		case 'start':
-			console.log(`🎮 Game starting! Game ID: ${data.game_id}`);
 			appDiv.innerHTML = '';
-			renderMultiplayerGame({
-			container: appDiv,
-			playerName,
-			opponentName: data.opponent,
-			gameId: data.game_id,
-			maxGames: data.maxGames,
-			difficulty,
-			});
+			renderMultiplayerGame({container: appDiv, playerName, opponentName: data.opponent, gameId: data.game_id,
+			maxGames: data.maxGames,difficulty: difficulty as 'easy' | 'normal' | 'hard' | 'crazy',});
 			break;
 
 		case 'error':
@@ -84,19 +68,47 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 
 		default:
 			console.warn('⚠️ Unknown message type:', data);
-		}
-	};
+	}
+}
 
-	socket.onclose = () => {
-		console.warn('🔌 Disconnected from matchmaking server.');
-		appDiv.innerHTML = `<p>Disconnected from matchmaking.</p>`;
-		socket = null;
-	};
+function renderGameSelectionUI(appDiv: HTMLDivElement) {
+	console.log('Received chooseMaxGames');
+	appDiv.innerHTML = `
+		<p>Select number of games (odd numbers 3–11):</p>
+		<select id="gameCountSelect">
+			<option value="3">3</option>
+			<option value="5">5</option>
+			<option value="7">7</option>
+			<option value="9">9</option>
+			<option value="11">11</option>
+		</select>
+		<button id="confirmMaxGames">Confirm</button>
+	`;
+	document.getElementById('confirmMaxGames')?.addEventListener('click', () => {
+		const select = document.getElementById('gameCountSelect') as HTMLSelectElement;
+		const selected = parseInt(select.value);
+		console.log('Selected max games:', selected);
+		socket!.send(JSON.stringify({ type: 'selectMaxGames', maxGames: selected }));
+	});
+}
 
-	socket.onerror = (err) => {
-		console.error('❌ WebSocket error:', err);
-		appDiv.innerHTML = `<p>Connection error. Please try again.</p>`;
-		socket?.close();
-		socket = null;
-	};
+function renderWaitingMessage(appDiv: HTMLDivElement, message: string) {
+	console.log(message);
+	appDiv.innerHTML = `
+		<p>⏳ ${message}</p>
+		<div class="loader"></div>
+	`;
+}
+
+function handleSocketClose(appDiv: HTMLDivElement) {
+	console.warn('🔌 Disconnected from matchmaking server.');
+	appDiv.innerHTML = `<p>Disconnected from matchmaking.</p>`;
+	socket = null;
+}
+
+function handleSocketError(err: Event, appDiv: HTMLDivElement) {
+	console.error('❌ WebSocket error:', err);
+	appDiv.innerHTML = `<p>Connection error. Please try again.</p>`;
+	socket?.close();
+	socket = null;
 }

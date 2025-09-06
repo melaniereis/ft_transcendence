@@ -12,7 +12,6 @@ interface AcceptRequestBody {
 
 export async function friendsRoutes(fastify: FastifyInstance) {
 
-    // Send friend request by username
     fastify.post('/api/friends/request', async (req, reply) => {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
@@ -26,25 +25,21 @@ export async function friendsRoutes(fastify: FastifyInstance) {
 
         try {
             const userId = await verifyToken(token);
-            if (!userId) {
+            if (!userId)
                 return reply.status(401).send({ error: 'Token inválido' });
-            }
 
             const { friendUsername } = req.body as FriendRequestBody;
             
-            if (!friendUsername) {
+            if (!friendUsername)
                 return reply.status(400).send({ error: 'Username do amigo é obrigatório' });
-            }
 
             // Check if friend exists
             const friend = await getUserByUsername(friendUsername);
-            if (!friend) {
+            if (!friend)
                 return reply.status(404).send({ error: 'Utilizador não encontrado' });
-            }
 
-            if (friend.id === userId) {
+            if (friend.id === userId)
                 return reply.status(400).send({ error: 'Não podes adicionar-te a ti próprio' });
-            }
 
             await sendFriendRequest(userId, friend.id);
             reply.status(201).send({ 
@@ -54,37 +49,32 @@ export async function friendsRoutes(fastify: FastifyInstance) {
         } 
         catch (err: any) {
             console.error('Erro ao enviar pedido:', err);
-            if (err.message.includes('already exists')) {
+            if (err.message.includes('already exists'))
                 reply.status(409).send({ error: 'Pedido já existe ou já são amigos' });
-            } else {
+            else
                 reply.status(500).send({ error: 'Erro interno do servidor' });
-            }
         }
     });
 
     // Accept friend request
     fastify.post('/api/friends/accept', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader) {
+        if (!authHeader)
             return reply.status(401).send({ error: 'Header de autorização em falta' });
-        }
 
         const token = authHeader.split(' ')[1];
-        if (!token) {
+        if (!token)
             return reply.status(401).send({ error: 'Token em falta' });
-        }
 
         try {
             const userId = await verifyToken(token);
-            if (!userId) {
+            if (!userId)
                 return reply.status(401).send({ error: 'Token inválido' });
-            }
 
             const { friendId } = req.body as AcceptRequestBody;
             
-            if (!friendId || typeof friendId !== 'number') {
+            if (!friendId || typeof friendId !== 'number')
                 return reply.status(400).send({ error: 'ID do amigo é obrigatório e deve ser número' });
-            }
 
             await acceptFriendRequest(userId, friendId);
             reply.send({ 
@@ -94,20 +84,18 @@ export async function friendsRoutes(fastify: FastifyInstance) {
         } 
         catch (err: any) {
             console.error('Erro ao aceitar pedido:', err);
-            if (err.message.includes('No pending')) {
+            if (err.message.includes('No pending'))
                 reply.status(404).send({ error: 'Pedido pendente não encontrado' });
-            } else {
+            else
                 reply.status(500).send({ error: 'Erro interno do servidor' });
-            }
         }
     });
 
     // List friends
     fastify.get('/api/friends', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader) {
+        if (!authHeader)
             return reply.status(401).send({ error: 'Header de autorização em falta' });
-        }
 
         const token = authHeader.split(' ')[1];
         if (!token) {
@@ -116,9 +104,8 @@ export async function friendsRoutes(fastify: FastifyInstance) {
 
         try {
             const userId = await verifyToken(token);
-            if (!userId) {
+            if (!userId)
                 return reply.status(401).send({ error: 'Token inválido' });
-            }
 
             const friends = await getFriends(userId);
             reply.send({ friends });
@@ -133,20 +120,17 @@ export async function friendsRoutes(fastify: FastifyInstance) {
     // Get pending friend requests
     fastify.get('/api/friends/pending', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader) {
+        if (!authHeader)
             return reply.status(401).send({ error: 'Header de autorização em falta' });
-        }
 
         const token = authHeader.split(' ')[1];
-        if (!token) {
+        if (!token)
             return reply.status(401).send({ error: 'Token em falta' });
-        }
 
         try {
             const userId = await verifyToken(token);
-            if (!userId) {
+            if (!userId)
                 return reply.status(401).send({ error: 'Token inválido' });
-            }
 
             const pendingRequests = await getPendingRequests(userId);
             reply.send({ pending: pendingRequests });
@@ -160,26 +144,22 @@ export async function friendsRoutes(fastify: FastifyInstance) {
     // Reject friend request
     fastify.post('/api/friends/reject', async (req, reply) => {
         const authHeader = req.headers.authorization;
-        if (!authHeader) {
+        if (!authHeader)
             return reply.status(401).send({ error: 'Header de autorização em falta' });
-        }
 
         const token = authHeader.split(' ')[1];
-        if (!token) {
+        if (!token)
             return reply.status(401).send({ error: 'Token em falta' });
-        }
 
         try {
             const userId = await verifyToken(token);
-            if (!userId) {
+            if (!userId)
                 return reply.status(401).send({ error: 'Token inválido' });
-            }
 
             const { friendId } = req.body as { friendId: number };
             
-            if (!friendId || typeof friendId !== 'number') {
+            if (!friendId || typeof friendId !== 'number')
                 return reply.status(400).send({ error: 'ID do amigo é obrigatório e deve ser número' });
-            }
 
             await rejectFriendRequest(userId, friendId);
             reply.send({ 
@@ -189,11 +169,10 @@ export async function friendsRoutes(fastify: FastifyInstance) {
         } 
         catch (err: any) {
             console.error('Erro ao rejeitar pedido:', err);
-            if (err.message.includes('No pending')) {
+            if (err.message.includes('No pending'))
                 reply.status(404).send({ error: 'Pedido pendente não encontrado' });
-            } else {
+            else
                 reply.status(500).send({ error: 'Erro interno do servidor' });
-            }
         }
     });
 

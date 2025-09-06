@@ -1,5 +1,0 @@
-#TODO
-
-- DB schemas/interaction using SQLite
-- User model for auth/stats
-- Game model for history/tournaments
