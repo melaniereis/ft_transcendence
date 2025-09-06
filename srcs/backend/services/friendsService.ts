@@ -1,7 +1,7 @@
-//services/friendsService.ts
 import db from '../db/database.js';
 import { Friendship } from '../types/friendship.js';
 import { User } from '../types/user.js';
+
 
 
 // Obtain outgoing friend requests
@@ -31,7 +31,7 @@ export async function getOutgoingRequests(userId: number): Promise<any[]> {
 	});
 }
 
-// Function to get user by username
+// Get user by username
 export async function getUserByUsername(username: string): Promise<User | null> {
 	return new Promise((resolve, reject) => {
 		db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, row) => {
@@ -119,7 +119,7 @@ export async function acceptFriendRequest(userId: number, friendId: number): Pro
 	});
 }
 
-// Obtain friends list
+// Get friends list
 export async function getFriends(userId: number): Promise<any[]> {
 	return new Promise((resolve, reject) => {
 		const query = `
@@ -149,7 +149,7 @@ export async function getFriends(userId: number): Promise<any[]> {
 	});
 }
 
-// Obtain pending friend requests
+// Get pending friend requests
 export async function getPendingRequests(userId: number): Promise<any[]> {
 	return new Promise((resolve, reject) => {
 		const query = `
@@ -177,7 +177,7 @@ export async function getPendingRequests(userId: number): Promise<any[]> {
 	});
 }
 
-// Remove friend(remove friendship in both directions)
+// Remove friend (both directions)
 export async function removeFriend(userId: number, friendId: number): Promise<void> {
 	return new Promise((resolve, reject) => {
 		db.run(

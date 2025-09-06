@@ -1,5 +1,12 @@
-export function drawRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) {
-	ctx.fillStyle = color;
+export function drawRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
+h: number, fill: string | HTMLImageElement) {
+	if (typeof fill === 'string')
+		ctx.fillStyle = fill;
+	else {
+		const pattern = ctx.createPattern(fill, 'repeat');
+		if (pattern) 
+			ctx.fillStyle = pattern;
+	}
 	ctx.fillRect(x, y, w, h);
 }
 

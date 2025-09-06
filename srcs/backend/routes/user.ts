@@ -1,8 +1,17 @@
 //routes/user.ts
 import { FastifyInstance } from 'fastify';
 import { createUser, getAllUsers, deleteUser } from '../services/services.js';
+import { authHook } from '../hooks/auth.js';
 
 export async function userRoutes(fastify: FastifyInstance) {
+	fastify.get('/users', {
+		preHandler: authHook,
+		handler: async (_request, reply) => {
+			const users = await getAllUsers();
+			return reply.send(users);
+		}
+	});
+
 	fastify.post('/users', async (request, reply) => {
 		const { name, username, team, password } = request.body as {
 			name: string;
@@ -39,16 +48,19 @@ export async function userRoutes(fastify: FastifyInstance) {
 		return reply.send(user);
 	});
 
-	fastify.delete('/users/:id', async (request, reply) => {
-		const { id } = request.params as { id: string };
+	fastify.delete('/users/:id', {
+		preHandler: authHook,
+		handler: async (request, reply) => {
+			const { id } = request.params as { id: string };
 
-		try {
-			await deleteUser(Number(id));
-			return reply.send({ message: `User ${id} deleted` });
-		}
-		catch (err) {
-			console.error('Delete error:', err);
-			return reply.status(500).send({ error: 'Failed to delete user' });
+			try {
+				await deleteUser(Number(id));
+				return reply.send({ message: `User ${id} deleted` });
+			}
+			catch (err) {
+				console.error('Delete error:', err);
+				return reply.status(500).send({ error: 'Failed to delete user' });
+			}
 		}
 	});
 }

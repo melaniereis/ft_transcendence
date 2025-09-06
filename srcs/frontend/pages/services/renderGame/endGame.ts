@@ -1,72 +1,75 @@
-export async function endGame(gameId: number,score1: number,score2: number,
-    canvas: HTMLCanvasElement,onRestart: () => void, player1Name: string,
-    player2Name: string,) {
-    try {
-        await fetch(`https://localhost:3000/games/${gameId}/end`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                score_player1: score1,
-                score_player2: score2
-            })
-        });
-        console.log('Game ended and scores saved.');
-    } 
-    catch (err) {
-        console.error('Failed to end game:', err);
-    }
+export async function endGame( score1: number, score2: number,
+canvas: HTMLCanvasElement, onRestart: (winnerId?: number) => void, player1Name: string,
+player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
+	let winnerId: number | undefined;
+	console.log("ESTE E O MODE CARALHES", mode);
+	if (gameId){
+		try {
+			const res = await fetch(`/games/${gameId}/end`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ score_player1: score1, score_player2: score2 })
+			});
+			const data = await res.json();
+			winnerId = data.winner_id;
+			console.log('✅ Game ended. Winner:', winnerId);
+		} 
+		catch (err) {
+			console.error('❌ Failed to end game:', err);
+		}
+	}
+	const ctx = canvas.getContext('2d');
+	if (!ctx) 
+		return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) 
-        return;
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = '#000';
+	ctx.font = '24px Arial';
+	ctx.textAlign = 'center';
+	ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 40);
+	ctx.fillText(`${player1Name}: ${score1}`, canvas.width / 2, canvas.height / 2);
+	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 40);
 
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+	// 🎯 Create centered button container
+	const buttonContainer = document.createElement('div');
+	buttonContainer.style.position = 'absolute';
+	buttonContainer.style.top = '50%';
+	buttonContainer.style.left = '50%';
+	buttonContainer.style.transform = 'translate(-50%, -50%)';
+	buttonContainer.style.display = 'flex';
+	buttonContainer.style.flexDirection = 'row';
+	buttonContainer.style.gap = '20px';
+	buttonContainer.style.zIndex = '10';
 
-    const winner =
-        score1 > score2 ? `${player1Name} wins!` :
-        score2 > score1 ? `${player2Name} wins!` : 'It\'s a draw!';
+	// ▶️ Restart / Next Match button
+	const restartBtn = document.createElement('button');
+	restartBtn.textContent = mode === 'tournament' ? 'Next Match' : 'Restart';
+	restartBtn.style.padding = '10px 20px';
+	restartBtn.style.fontSize = '16px';
+	restartBtn.style.cursor = 'pointer';
+	buttonContainer.appendChild(restartBtn);
 
-    ctx.fillStyle = 'white';
-    ctx.font = '32px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 60);
-    ctx.fillText(winner, canvas.width / 2, canvas.height / 2 - 20);
-    ctx.fillText(`Final Score: ${player1Name} ${score1} - ${score2} ${player2Name}`, canvas.width / 2, canvas.height / 2 + 20);
 
-    const rect = canvas.getBoundingClientRect();
+	// 🏠 Menu button (only in single mode)
+	if (mode !== 'tournament') {
+		const menuBtn = document.createElement('button');
+		menuBtn.textContent = 'Main Menu';
+		menuBtn.style.padding = '10px 20px';
+		menuBtn.style.fontSize = '16px';
+		menuBtn.style.cursor = 'pointer';
+		buttonContainer.appendChild(menuBtn);
 
-    const restartBtn = document.createElement('button');
-    restartBtn.textContent = 'Restart Game';
-    restartBtn.style.position = 'absolute';
-    restartBtn.style.left = `${rect.left + canvas.width / 2 - 130}px`;
-    restartBtn.style.top = `${rect.top + canvas.height / 2 + 60}px`;
-    restartBtn.style.padding = '10px 20px';
-    restartBtn.style.fontSize = '16px';
-    restartBtn.style.cursor = 'pointer';
+		menuBtn.onclick = () => {
+		buttonContainer.remove();
+		window.location.href = '/';
+		};
+		document.body.appendChild(buttonContainer);
 
-    const menuBtn = document.createElement('button');
-    menuBtn.textContent = 'Back to Menu';
-    menuBtn.style.position = 'absolute';
-    menuBtn.style.left = `${rect.left + canvas.width / 2 + 10}px`;
-    menuBtn.style.top = `${rect.top + canvas.height / 2 + 60}px`;
-    menuBtn.style.padding = '10px 20px';
-    menuBtn.style.fontSize = '16px';
-    menuBtn.style.cursor = 'pointer';
-
-    document.body.appendChild(restartBtn);
-    document.body.appendChild(menuBtn);
-
-    restartBtn.onclick = () => {
-        restartBtn.remove();
-        menuBtn.remove();
-        onRestart();
-    };
-
-    menuBtn.onclick = () => {
-        restartBtn.remove();
-        menuBtn.remove();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        location.reload();
-    };
+		restartBtn.onclick = () => {
+			buttonContainer.remove();
+			onRestart(winnerId);
+		};
+	}
+	else
+		onRestart(winnerId);
 }

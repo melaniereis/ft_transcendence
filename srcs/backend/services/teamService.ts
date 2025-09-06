@@ -1,36 +1,41 @@
-//services/teamService.ts
 import db from '../db/database.js';
 import { TeamStats } from '../types/team.js';
 
 function runAsync(query: string, params: any[] = []): Promise<void> {
 	return new Promise((resolve, reject) => {
-		db.run(query, params, function (err) {
-		if (err) 
-			reject(err);
-		else 
-			resolve();
+		db.run(query, params, function (err: Error | null) {
+			if (err) {
+				console.error(`❌ Failed to execute query: ${query}`, err.message);
+				reject(err);
+			} 
+			else
+				resolve();
 		});
 	});
 }
 
 function getAsync<T = any>(query: string, params: any[] = []): Promise<T | undefined> {
 	return new Promise((resolve, reject) => {
-		db.get(query, params, (err, row) => {
-		if (err) 
-			reject(err);
-		else 
-			resolve(row as T);
+		db.get(query, params, (err: Error | null, row: unknown) => {
+			if (err) {
+				console.error(`❌ Failed to fetch single record: ${query}`, err.message);
+				reject(err);
+			} 
+			else
+				resolve(row as T);
 		});
 	});
 }
 
 function allAsync<T = any>(query: string, params: any[] = []): Promise<T[]> {
 	return new Promise((resolve, reject) => {
-		db.all(query, params, (err, rows) => {
-		if (err) 
-			reject(err);
-		else 
-			resolve(rows as T[]);
+		db.all(query, params, (err: Error | null, rows: unknown[] | undefined) => {
+			if (err){
+				console.error(`❌ Failed to fetch multiple records: ${query}`, err.message);
+				reject(err);
+			}
+			else
+				resolve(rows as T[]);
 		});
 	});
 }
@@ -50,9 +55,11 @@ export function getTeamMemberById(table: string, id: number): Promise<TeamStats 
 	return getAsync<TeamStats>(query, [id]);
 }
 
-export function updateTeamMember( table: string, id: number, members: string,
-victories: number, tournaments_won: number, defeats: number, win_rate: number): Promise<void> {
-	const query = `UPDATE ${table} SET members = ?, victories = ?, tournaments_won = ?, defeats = ?, win_rate = ? WHERE id = ?`;
+export function updateTeamMember(table: string, id: number, members: string, victories: number,
+tournaments_won: number, defeats: number, win_rate: number): Promise<void> {
+	const query = `UPDATE ${table} 
+		SET members = ?, victories = ?, tournaments_won = ?, defeats = ?, win_rate = ? 
+		WHERE id = ?`;
 	return runAsync(query, [members, victories, tournaments_won, defeats, win_rate, id]);
 }
 

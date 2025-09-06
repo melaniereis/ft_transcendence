@@ -1,4 +1,3 @@
-//services/userProfileService.ts
 import db from '../db/database.js';
 import { User } from '../types/user.js';
 import * as bcrypt from 'bcrypt';
@@ -82,7 +81,7 @@ export async function updateUserProfile(
 	});
 }
 
-// Function to update user's online status
+// Update user's online status
 export async function updateOnlineStatus(userId: number, isOnline: boolean): Promise<void> {
 	return new Promise((resolve, reject) => {
 		db.run(
@@ -102,7 +101,7 @@ export async function updateOnlineStatus(userId: number, isOnline: boolean): Pro
 	});
 }
 
-// Function to get user with stats
+// Get user with stats
 export async function getUserWithStats(userId: number): Promise<any> {
 	return new Promise((resolve, reject) => {
 		const query = `

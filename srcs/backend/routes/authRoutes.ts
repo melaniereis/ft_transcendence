@@ -1,20 +1,6 @@
-//routes/authRoutes.ts
 import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
 import { registerUser, loginUser, verifyToken } from '../services/authService.js';
-
-interface RegisterRequest {
-	username: string;
-	password: string;
-	name: string;
-	team: string;
-	display_name?: string;
-	email?: string;
-}
-
-interface LoginRequest {
-	username: string;
-	password: string;
-}
+import { LoginRequest, RegisterRequest } from '../types/login.js';
 
 export async function authRoutes(fastify: FastifyInstance) {
 	// User Registration
