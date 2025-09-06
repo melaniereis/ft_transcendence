@@ -9,10 +9,10 @@ export async function getUserProfile(userId: number)
 	return new Promise((resolve, reject) => {
 		db.get(`SELECT id, username, name, team, display_name, email, avatar_url, bio, online_status, last_seen, created_at FROM users WHERE id = ?`, [userId], (err, row) => {
 			if (err) {
-				console.error('❌ Erro ao buscar perfil:', err);
+				console.error('❌ Error fetching profile:', err);
 				reject(err);
 			} else {
-				console.log('✅ Perfil encontrado:', row);
+				console.log('✅ Profile found:', row);
 				resolve(row ? (row as Omit<User, 'password'>) : null);
 			}
 		});
@@ -90,10 +90,10 @@ export async function updateOnlineStatus(userId: number, isOnline: boolean): Pro
 			[isOnline ? 1 : 0, userId],
 			function (err) {
 				if (err) {
-					console.error('Erro ao atualizar status online:', err);
+					console.error('Error updating online status:', err);
 					reject(err);
 				} else if (this.changes === 0) {
-					reject(new Error('Utilizador não encontrado'));
+					reject(new Error('User not found'));
 				} else {
 					resolve();
 				}
@@ -124,7 +124,7 @@ export async function getUserWithStats(userId: number): Promise<any> {
 
 		db.get(query, [userId], (err, row) => {
 			if (err) {
-				console.error('Erro ao buscar utilizador com stats:', err);
+				console.error('Error fetching user with stats:', err);
 				reject(err);
 			} else {
 				resolve(row || null);
@@ -143,12 +143,12 @@ export async function changeUserPassword(
 		// First get current user data
 		db.get(`SELECT password FROM users WHERE id = ?`, [userId], async (err, row) => {
 			if (err) {
-				console.error('Erro ao buscar utilizador:', err);
+				console.error('Error fetching user:', err);
 				return reject(err);
 			}
 
 			if (!row) {
-				return reject(new Error('Utilizador não encontrado'));
+				return reject(new Error('User not found'));
 			}
 
 			const user = row as { password: string };
@@ -157,7 +157,7 @@ export async function changeUserPassword(
 				// Verify current password
 				const match = await bcrypt.compare(currentPassword, user.password);
 				if (!match) {
-					return reject(new Error('Password atual incorreta'));
+					return reject(new Error('Incorrect current password'));
 				}
 
 				// Hash new password
@@ -169,17 +169,17 @@ export async function changeUserPassword(
 					[hashedNewPassword, userId],
 					function (err) {
 						if (err) {
-							console.error('Erro ao atualizar password:', err);
+							console.error('Error updating password:', err);
 							reject(err);
 						} else if (this.changes === 0) {
-							reject(new Error('Utilizador não encontrado'));
+							reject(new Error('User not found'));
 						} else {
 							resolve();
 						}
 					}
 				);
 			} catch (bcryptErr) {
-				console.error('Erro na comparação de password:', bcryptErr);
+				console.error('Error comparing password:', bcryptErr);
 				reject(bcryptErr);
 			}
 		});

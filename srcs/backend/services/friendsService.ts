@@ -22,7 +22,7 @@ export async function getOutgoingRequests(userId: number): Promise<any[]> {
         `;
 		db.all(query, [userId], (err, rows) => {
 			if (err) {
-				console.error('Erro ao buscar pedidos enviados:', err);
+				console.error('Error fetching outgoing requests:', err);
 				reject(err);
 			} else {
 				resolve(rows || []);
@@ -36,7 +36,7 @@ export async function getUserByUsername(username: string): Promise<User | null> 
 	return new Promise((resolve, reject) => {
 		db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, row) => {
 			if (err) {
-				console.error('Erro ao buscar utilizador:', err);
+				console.error('Error fetching user:', err);
 				reject(err);
 			} else {
 				resolve(row ? (row as User) : null);
@@ -55,12 +55,12 @@ export async function sendFriendRequest(userId: number, friendId: number): Promi
 			[userId, friendId, friendId, userId],
 			(err, row) => {
 				if (err) {
-					console.error('Erro ao verificar amizade:', err);
+					console.error('Error checking friendship:', err);
 					return reject(err);
 				}
 
 				if (row) {
-					return reject(new Error('Pedido já existe ou utilizadores já são amigos'));
+					return reject(new Error('Request already exists or users are already friends'));
 				}
 
 				// Insert new friend request
@@ -69,7 +69,7 @@ export async function sendFriendRequest(userId: number, friendId: number): Promi
 					[userId, friendId],
 					function (err) {
 						if (err) {
-							console.error('Erro ao inserir pedido:', err);
+							console.error('Error inserting request:', err);
 							reject(err);
 						} else {
 							resolve();
@@ -85,28 +85,28 @@ export async function sendFriendRequest(userId: number, friendId: number): Promi
 export async function acceptFriendRequest(userId: number, friendId: number): Promise<void> {
 	return new Promise((resolve, reject) => {
 		db.serialize(() => {
-			// Atualizar pedido para aceite
+			// Update request to accepted
 			db.run(
 				`UPDATE friendships SET status = 'accepted'
-                 WHERE user_id = ? AND friend_id = ? AND status = 'pending'`,
+				 WHERE user_id = ? AND friend_id = ? AND status = 'pending'`,
 				[friendId, userId],
 				function (err) {
 					if (err) {
-						console.error('Erro ao aceitar pedido:', err);
+						console.error('Error accepting request:', err);
 						return reject(err);
 					}
 
 					if (this.changes === 0) {
-						return reject(new Error('Pedido pendente não encontrado'));
+						return reject(new Error('Pending request not found'));
 					}
 
-					// Criar relação inversa
+					// Create inverse relationship
 					db.run(
 						`INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'accepted')`,
 						[userId, friendId],
 						function (err) {
 							if (err) {
-								console.error('Erro ao criar relação inversa:', err);
+								console.error('Error creating inverse relationship:', err);
 								reject(err);
 							} else {
 								resolve();
@@ -140,7 +140,7 @@ export async function getFriends(userId: number): Promise<any[]> {
 
 		db.all(query, [userId], (err, rows) => {
 			if (err) {
-				console.error('Erro ao buscar amigos:', err);
+				console.error('Error fetching friends:', err);
 				reject(err);
 			} else {
 				resolve(rows || []);
@@ -168,7 +168,7 @@ export async function getPendingRequests(userId: number): Promise<any[]> {
 
 		db.all(query, [userId], (err, rows) => {
 			if (err) {
-				console.error('Erro ao buscar pedidos pendentes:', err);
+				console.error('Error fetching pending requests:', err);
 				reject(err);
 			} else {
 				resolve(rows || []);
@@ -186,7 +186,7 @@ export async function removeFriend(userId: number, friendId: number): Promise<vo
 			[userId, friendId, friendId, userId],
 			function (err) {
 				if (err) {
-					console.error('Erro ao remover amigo:', err);
+					console.error('Error removing friend:', err);
 					reject(err);
 				} else {
 					// Resolve even if no rows affected (friendship may not exist)
@@ -206,10 +206,10 @@ export async function rejectFriendRequest(userId: number, friendId: number): Pro
 			[friendId, userId],
 			function (err) {
 				if (err) {
-					console.error('Erro ao rejeitar pedido:', err);
+					console.error('Error rejecting request:', err);
 					reject(err);
 				} else if (this.changes === 0) {
-					reject(new Error('Pedido pendente não encontrado'));
+					reject(new Error('Pending request not found'));
 				} else {
 					resolve();
 				}
