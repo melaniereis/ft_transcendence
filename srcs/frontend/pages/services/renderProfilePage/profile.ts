@@ -14,6 +14,7 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 	state.token = token;
 	state.container = container;
 	state.onBadgeUpdate = onBadgeUpdate;
+	state.activeMainTab = 'profile';
 
 	try {
 		const profile = await loadProfile();
