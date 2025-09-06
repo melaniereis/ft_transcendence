@@ -1,267 +1,23 @@
 // renderProfilePage/events.ts
-import { loadFriends, changePassword, addFriendApi, removeFriendApi, updateProfile, loadProfile, loadMatchesWithPagination } from './api.js';
 import { state } from './state.js';
-import { renderAllCharts } from './charts.js';
-import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
+import { changePassword, updateProfile, loadProfile } from './api.js';
+import { showNotification } from './utils.js';
 import { Profile, Match } from './types.js';
+import { render } from './render.js';
+import { rerenderFriends, setupFriendsEvents, setupFriendHoverEffects, setupRemoveFriendEvents } from './friends-events.js';
+import { setupHistoryEvents } from './history-events.js';
 
-// Fetch outgoing friend requests from backend and update state
-export async function loadOutgoingFriendRequests() {
-	if (!state.token) return;
-	try {
-		const res = await fetch('/api/friends/outgoing', {
-			headers: { 'Authorization': `Bearer ${state.token}` }
-		});
-		if (res.ok) {
-			const data = await res.json();
-			// Assume data.outgoing is an array of { username: string }
-			state.outgoingFriendRequests = data.outgoing || [];
-		}
-	} catch (e) {
-		// ignore
-	}
+// Re-export everything from the split files
+export {
+	setupFriendHoverEffects,
+	setupRemoveFriendEvents,
+	render,
+	setupFriendsEvents,
+	setupHistoryEvents,
+	rerenderFriends
 }
 
-function setHTML(el: HTMLElement, html: string) { el.innerHTML = html; }
-
-function showNotification(message: string, color: string) {
-	const el = document.getElementById('notification');
-	if (!el) return;
-	el.textContent = message;
-	(el as HTMLElement).style.backgroundColor = color;
-	(el as HTMLElement).style.display = 'block';
-	setTimeout(() => ((el as HTMLElement).style.display = 'none'), 3000);
-}
-
-function showInlineMessage(id: string, message: string, color: string) {
-	const el = document.getElementById(id) as HTMLElement | null;
-	if (!el) return;
-	el.textContent = message;
-	el.style.color = color;
-	setTimeout(() => { el.textContent = ''; }, 3000);
-}
-
-export function setupFriendHoverEffects() {
-	const friendItems = document.querySelectorAll('.friend-item');
-
-	friendItems.forEach(item => {
-		const removeBtn = item.querySelector('.remove-friend-btn') as HTMLElement;
-
-		item.addEventListener('mouseenter', () => {
-			if (removeBtn) {
-				removeBtn.style.display = 'block';
-				(item as HTMLElement).style.backgroundColor = '#f8f9fa';
-			}
-		});
-
-		item.addEventListener('mouseleave', () => {
-			if (removeBtn) {
-				removeBtn.style.display = 'none';
-				(item as HTMLElement).style.backgroundColor = '#fff';
-			}
-		});
-	});
-}
-
-export function render(container: HTMLElement) {
-	if (!state.profile) return;
-	container.innerHTML = layout(
-		state.profile,
-		state.stats,
-		state.history,
-		state.friends,
-		state.activeStatsTab,
-		state.activeHistoryView,
-		state.editMode,
-		state.activeMainTab || 'profile'
-	);
-	// Always re-attach button events after render
-	if (typeof window.setupButtons === 'function') window.setupButtons();
-
-	// Controle de visibilidade dos painéis das tabs principais
-	const mainTab = state.activeMainTab || 'profile';
-	document.querySelectorAll('.tab-panel').forEach(panel => {
-		(panel as HTMLElement).style.display = 'none';
-	});
-	const activePanel = document.getElementById(mainTab + '-panel');
-	if (activePanel) (activePanel as HTMLElement).style.display = 'block';
-
-	// Preencher conteúdo das sub-abas SÓ se a tab principal correspondente estiver ativa
-	if (mainTab === 'stats') {
-		const statsInner = document.getElementById('stats-content-inner');
-		if (statsInner) {
-			if (state.activeStatsTab === 'overview') statsInner.innerHTML = statsOverview(state.stats, state.history);
-			if (state.activeStatsTab === 'performance') statsInner.innerHTML = statsPerformance(state.stats, state.history);
-			if (state.activeStatsTab === 'trends') statsInner.innerHTML = statsTrends(state.stats);
-		}
-	}
-	if (mainTab === 'history') {
-		const histInner = document.getElementById('history-content-inner');
-		if (histInner) {
-			if (state.activeHistoryView === 'list') histInner.innerHTML = historyList(state.history);
-			if (state.activeHistoryView === 'detailed') {
-				// Persist filter values at module level
-				let profileHistoryFilters: { match: string; time: string } = (globalThis as any)._profileHistoryFilters || { match: 'all', time: 'all' };
-				(globalThis as any)._profileHistoryFilters = profileHistoryFilters;
-				function renderFiltered(matches: Match[]) {
-					if (!histInner) return;
-					histInner.innerHTML = historyDetailed(matches);
-					setTimeout(() => {
-						// Restore filter values
-						const matchFilterEl = document.getElementById('match-filter') as HTMLSelectElement | null;
-						const timeFilterEl = document.getElementById('time-filter') as HTMLSelectElement | null;
-						if (matchFilterEl) matchFilterEl.value = profileHistoryFilters.match;
-						if (timeFilterEl) timeFilterEl.value = profileHistoryFilters.time;
-						const filterBtn = document.querySelector('[data-action="apply-history-filters"]');
-						if (filterBtn) {
-							filterBtn.addEventListener('click', () => {
-								const matchFilter = (document.getElementById('match-filter') as HTMLSelectElement)?.value || 'all';
-								const timeFilter = (document.getElementById('time-filter') as HTMLSelectElement)?.value || 'all';
-								profileHistoryFilters.match = matchFilter;
-								profileHistoryFilters.time = timeFilter;
-								(globalThis as any)._profileHistoryFilters = profileHistoryFilters;
-								let filtered = [...state.history];
-								// Apply match result filter
-								if (matchFilter === 'wins') filtered = filtered.filter(m => m.result === 'win');
-								else if (matchFilter === 'losses') filtered = filtered.filter(m => m.result === 'loss');
-								else if (matchFilter === 'close') filtered = filtered.filter(m => Math.abs(m.user_score - m.opponent_score) <= 2);
-								else if (matchFilter === 'blowouts') filtered = filtered.filter(m => Math.abs(m.user_score - m.opponent_score) >= 10);
-								// Apply time filter
-								if (timeFilter !== 'all') {
-									const now = Date.now();
-									let cutoff = 0;
-									if (timeFilter === 'week') cutoff = now - 7 * 24 * 60 * 60 * 1000;
-									else if (timeFilter === 'month') cutoff = now - 30 * 24 * 60 * 60 * 1000;
-									else if (timeFilter === 'quarter') cutoff = now - 90 * 24 * 60 * 60 * 1000;
-									filtered = filtered.filter(m => {
-										const matchDate = typeof m.date_played === 'string' ? Date.parse(m.date_played) : new Date(m.date_played).getTime();
-										return matchDate >= cutoff;
-									});
-								}
-								renderFiltered(filtered);
-							});
-						}
-					}, 0);
-				}
-				// Use persisted filter values for initial render
-				let filtered = [...state.history];
-				const matchFilter = profileHistoryFilters.match;
-				const timeFilter = profileHistoryFilters.time;
-				if (matchFilter === 'wins') filtered = filtered.filter(m => m.result === 'win');
-				else if (matchFilter === 'losses') filtered = filtered.filter(m => m.result === 'loss');
-				else if (matchFilter === 'close') filtered = filtered.filter(m => Math.abs(m.user_score - m.opponent_score) <= 2);
-				else if (matchFilter === 'blowouts') filtered = filtered.filter(m => Math.abs(m.user_score - m.opponent_score) >= 10);
-				if (timeFilter !== 'all') {
-					const now = Date.now();
-					let cutoff = 0;
-					if (timeFilter === 'week') cutoff = now - 7 * 24 * 60 * 60 * 1000;
-					else if (timeFilter === 'month') cutoff = now - 30 * 24 * 60 * 60 * 1000;
-					else if (timeFilter === 'quarter') cutoff = now - 90 * 24 * 60 * 60 * 1000;
-					filtered = filtered.filter(m => {
-						const matchDate = typeof m.date_played === 'string' ? Date.parse(m.date_played) : new Date(m.date_played).getTime();
-						return matchDate >= cutoff;
-					});
-				}
-				renderFiltered(filtered);
-			}
-			if (state.activeHistoryView === 'analysis') histInner.innerHTML = historyAnalysis(state.history);
-		}
-	}
-	if (mainTab === 'friends') {
-		const friendsContainer = document.getElementById('friends-container');
-		if (friendsContainer) {
-			friendsContainer.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;">
-			       <div style="width:48px;height:48px;border:5px solid #eaeaea;border-top:5px solid #b6a6ca;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
-			       <div style="font-size:18px;color:#b6a6ca;font-weight:500;">Loading friends...</div>
-			       <style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
-		       </div>`;
-			setTimeout(() => {
-				friendsContainer.innerHTML = friendsList(state.friends);
-			}, 350);
-		}
-	}
-
-	// Listeners para tabs principais (corrigido para .main-tab e data-main-tab)
-	document.querySelectorAll('.main-tab').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			const tab = (e.currentTarget as HTMLElement).dataset.mainTab;
-			if (!tab) return;
-			if (state.activeMainTab !== tab) {
-				state.activeMainTab = tab as 'profile' | 'stats' | 'history' | 'friends';
-				// Reset sub-tab ao trocar de tab principal
-				if (tab === 'stats') state.activeStatsTab = 'overview';
-				if (tab === 'history') state.activeHistoryView = 'list';
-				render(container);
-			}
-		});
-	});
-
-	// Listeners para sub-tabs de stats
-	if (mainTab === 'stats') {
-		document.querySelectorAll('.stats-tab-btn').forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				const tab = (e.currentTarget as HTMLElement).dataset.tab;
-				if (!tab) return;
-				if (state.activeStatsTab !== tab) {
-					state.activeStatsTab = tab as typeof state.activeStatsTab;
-					render(container);
-				}
-			});
-		});
-	}
-	// Listeners para sub-tabs de history
-	if (mainTab === 'history') {
-		document.querySelectorAll('.history-tab-btn').forEach(btn => {
-			btn.addEventListener('click', (e) => {
-				const tab = (e.currentTarget as HTMLElement).dataset.tab;
-				if (!tab) return;
-				if (state.activeHistoryView !== tab) {
-					state.activeHistoryView = tab as typeof state.activeHistoryView;
-					render(container);
-				}
-			});
-		});
-	}
-
-	renderAllCharts();
-}
-
-// FIX: Improved remove friend functionality
-export function setupRemoveFriendEvents() {
-	document.querySelectorAll('.remove-friend-btn').forEach(btn => {
-		btn.addEventListener('click', async (e) => {
-			e.stopPropagation();
-			e.preventDefault();
-
-			const target = e.target as HTMLElement;
-			const friendId = target.dataset.friendId;
-			const friendName = target.dataset.friendName;
-
-			if (!friendId || !friendName) {
-				console.error('Missing friend data:', { friendId, friendName });
-				return;
-			}
-
-			if (confirm(`Are you sure you want to remove ${friendName} from your friends?`)) {
-				try {
-					await removeFriendApi(friendId);
-					showNotification(`${friendName} removed from friends list`, '#28a745');
-
-					// Reload friends list and re-render
-					const friends = await loadFriends();
-					state.friends = friends;
-					rerenderFriends();
-				} catch (err: any) {
-					console.error('Error removing friend:', err);
-					showNotification('Error while removing friend: ' + (err.message || 'Unknown error'), '#dc3545');
-				}
-			}
-		});
-	});
-}
-
-export function setupEvents(container: HTMLElement) {
-	// Main Tabs e Secondary Tabs (delegation)
+export function setupTabEvents(container: HTMLElement) {
 	container.addEventListener('click', (e) => {
 		const t = e.target as HTMLElement;
 		// Main Tabs
@@ -298,11 +54,12 @@ export function setupEvents(container: HTMLElement) {
 			return;
 		}
 	}, true);
+}
 
+export function setupProfileEvents(container: HTMLElement) {
 	container.addEventListener('click', async (e) => {
 		const t = e.target as HTMLElement;
 		const id = t.id;
-		const action = t.dataset.action;
 
 		if (id === 'edit-btn') {
 			state.editMode = true;
@@ -346,11 +103,6 @@ export function setupEvents(container: HTMLElement) {
 			return;
 		}
 
-		if (id === 'load-more-btn') {
-			await loadMoreMatches();
-			return;
-		}
-
 		if (id === 'pass-btn') {
 			const modal = document.getElementById('pass-modal');
 			if (modal) modal.style.display = 'flex';
@@ -374,95 +126,6 @@ export function setupEvents(container: HTMLElement) {
 			if (modal) modal.style.display = 'none';
 			const form = document.getElementById('pass-form') as HTMLFormElement | null;
 			if (form) form.reset();
-			return;
-		}
-
-		// FIX: Show all friends modal
-		if (id === 'show-all-friends') {
-			document.getElementById('friends-modal')!.style.display = 'flex';
-			return;
-		}
-
-		if (id === 'friends-modal-close') {
-			document.getElementById('friends-modal')!.style.display = 'none';
-			return;
-		}
-
-		if (id === 'friend-add') {
-			const input = document.getElementById('friend-input') as HTMLInputElement;
-			const btn = document.getElementById('friend-add') as HTMLButtonElement;
-			const username = input.value.trim();
-			if (!username) return;
-			// Check if username exists
-			// Check if user exists
-			try {
-				const res = await fetch(`/api/users/${encodeURIComponent(username)}`);
-				if (!res.ok) {
-					showInlineMessage('friend-msg', 'User does not exist', '#dc3545');
-					return;
-				}
-			} catch (e) {
-				showInlineMessage('friend-msg', 'Error checking user', '#dc3545');
-				return;
-			}
-
-			// Check if already a friend or self (robust: check array, not HTML)
-			const isFriend = Array.isArray(state.friends) && state.friends.some((f: any) => {
-				// Ajuste conforme estrutura do objeto amigo
-				return (f.username && f.username.toLowerCase() === username.toLowerCase()) ||
-					(f.name && f.name.toLowerCase() === username.toLowerCase());
-			});
-			const isSelf = state.profile && state.profile.username.toLowerCase() === username.toLowerCase();
-			if (isFriend || isSelf) {
-				showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
-				return;
-			}
-
-			// Check if a friend request has already been made (outgoing)
-			await loadOutgoingFriendRequests();
-			if (state.outgoingFriendRequests && Array.isArray(state.outgoingFriendRequests)) {
-				const alreadyRequested = state.outgoingFriendRequests.some((req: any) => {
-					return (req.username && req.username.toLowerCase() === username.toLowerCase()) ||
-						(req.targetUsername && req.targetUsername.toLowerCase() === username.toLowerCase());
-				});
-				if (alreadyRequested) {
-					showInlineMessage('friend-msg', 'Friend request already sent to this user', '#ffc107');
-					return;
-				}
-			}
-			// Send friend request
-			try {
-				btn.disabled = true;
-				btn.textContent = '⏳ Adding...';
-				await addFriendApi(username);
-				input.value = '';
-				// Refresh friends and outgoing requests from backend and rerender
-				try { state.friends = await loadFriends(); } catch { }
-				await loadOutgoingFriendRequests();
-				rerenderFriends();
-				showInlineMessage('friend-msg', 'Friend added successfully!', '#28a745');
-			} catch (err: any) {
-				showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
-			} finally {
-				btn.disabled = false;
-				btn.textContent = '➕ Add';
-			}
-			return;
-		}
-
-		// Match templates.ts: remove button uses class "remove-friend-btn" and data-friend-id/name
-		if (t.classList.contains('remove-friend-btn')) {
-			const friendId = t.getAttribute('data-friend-id') || '';
-			const friendName = t.getAttribute('data-friend-name') || '';
-			if (!friendId) return;
-			try {
-				await removeFriendApi(friendId);
-				try { state.friends = await loadFriends(); } catch { }
-				rerenderFriends();
-				showNotification('Friend removed successfully!', '#28a745');
-			} catch (err: any) {
-				showNotification(err?.message || 'Failed to remove friend', '#dc3545');
-			}
 			return;
 		}
 
@@ -492,16 +155,6 @@ export function setupEvents(container: HTMLElement) {
 				document.getElementById('avatar-modal')!.style.display = 'none';
 			};
 		}
-
-		// Tabs agora são tratados pelo setupTabNavigation do template
-
-		// FIX: History pagination
-		if (id === 'load-more-matches') {
-			state.historyPage = (state.historyPage || 1) + 1;
-			const moreMatches = await loadMoreMatches();
-			appendMatches(moreMatches);
-			return;
-		}
 	});
 
 	container.addEventListener('submit', async (e) => {
@@ -529,101 +182,21 @@ export function setupEvents(container: HTMLElement) {
 			}
 			return;
 		}
-		if (form.id === 'friend-form') {
-			e.preventDefault();
-			const input = document.getElementById('friend-input') as HTMLInputElement;
-			const btn = document.getElementById('friend-add') as HTMLButtonElement;
-			const username = input.value.trim();
-			if (!username) return;
-			// 1. Verificar se username existe
-			try {
-				const res = await fetch(`/api/users/${encodeURIComponent(username)}`);
-				if (!res.ok) {
-					showInlineMessage('friend-msg', 'User does not exist', '#dc3545');
-					return;
-				}
-			} catch (e) {
-				showInlineMessage('friend-msg', 'Error checking user', '#dc3545');
-				return;
-			}
-			// 2. Verificar se já é amigo ou é o próprio user (robust: check array, not HTML)
-			const isFriend = Array.isArray(state.friends) && state.friends.some((f: any) => {
-				return (f.username && f.username.toLowerCase() === username.toLowerCase()) ||
-					(f.name && f.name.toLowerCase() === username.toLowerCase());
-			});
-			const isSelf = state.profile && state.profile.username.toLowerCase() === username.toLowerCase();
-			if (isFriend || isSelf) {
-				showInlineMessage('friend-msg', 'This user is already your friend', '#ffc107');
-				return;
-			}
-			// 3. Verificar se já foi enviado pedido
-			await loadOutgoingFriendRequests();
-			if (state.outgoingFriendRequests && Array.isArray(state.outgoingFriendRequests)) {
-				const alreadyRequested = state.outgoingFriendRequests.some((req: any) => {
-					return (req.username && req.username.toLowerCase() === username.toLowerCase()) ||
-						(req.targetUsername && req.targetUsername.toLowerCase() === username.toLowerCase());
-				});
-				if (alreadyRequested) {
-					showInlineMessage('friend-msg', 'Friend request already sent to this user', '#ffc107');
-					return;
-				}
-			}
-			// 4. Enviar pedido
-			try {
-				btn.disabled = true;
-				btn.textContent = '⏳ Adding...';
-				await addFriendApi(username);
-				input.value = '';
-				// Refresh friends and outgoing requests from backend and rerender
-				try { state.friends = await loadFriends(); } catch { }
-				await loadOutgoingFriendRequests();
-				render(container);
-				showInlineMessage('friend-msg', 'Friend request sent!', '#28a745');
-			} catch (err: any) {
-				showInlineMessage('friend-msg', err?.message || 'Failed to add friend', '#dc3545');
-			} finally {
-				btn.disabled = false;
-				btn.textContent = '➕ Add';
-			}
-			return;
-		}
 	});
+}
 
-	// Initial friend hover and remove setup
+export function setupEvents(container: HTMLElement) {
+	setupTabEvents(container);
+	setupProfileEvents(container);
+	setupFriendsEvents(container);
+	setupHistoryEvents(container);
 	setTimeout(() => {
 		setupFriendHoverEffects();
 		setupRemoveFriendEvents();
 	}, 100);
 }
 
-export function rerenderFriends() {
-	const fc = document.getElementById('friends-container');
-	if (fc) {
-		setHTML(fc, friendsList(state.friends));
-		setupFriendHoverEffects();
-		setupRemoveFriendEvents();
-	} else {
-		// Se o container ainda não existe (ex: loading), tenta renderizar a tab inteira
-		const friendsPanel = document.getElementById('friends-panel');
-		if (friendsPanel) {
-			friendsPanel.innerHTML = `
-				<div class="gris-section" id="friends-section">
-					<div class="gris-section-title">Friends</div>
-					<div class="gris-section-content" id="friends-content">
-						<form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
-							<input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
-							<button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
-						</form>
-						<div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff"></div>
-						<div id="friends-container" style="margin:10px 0;text-align:center">${friendsList(state.friends)}</div>
-					</div>
-				</div>`;
-			setupFriendHoverEffects();
-			setupRemoveFriendEvents();
-		}
-	}
-}
-// Sempre renderiza a tab de amigos por completo, garantindo que o loading suma
+// Optional execution code (if this is the entry point)
 state.activeMainTab = 'friends';
 if (state.container) {
 	// @ts-ignore
@@ -631,192 +204,6 @@ if (state.container) {
 		window.renderProfilePage(state.container, state.onBadgeUpdate);
 	} else {
 		// fallback para render padrão
-		const { render } = require('./events.js');
 		render(state.container);
 	}
-}
-
-// Add these functions to your existing events.ts file
-
-export async function loadMoreMatches(): Promise<Match[]> {
-	if (state.matchPagination.isLoadingMore || !state.matchPagination.hasMoreMatches) {
-		return [];
-	}
-
-	state.matchPagination.isLoadingMore = true;
-
-	// Update load more button to show loading state
-	const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
-	if (loadMoreBtn) {
-		loadMoreBtn.disabled = true;
-		loadMoreBtn.textContent = '⏳ Loading more matches...';
-	}
-
-	try {
-		const nextPage = state.matchPagination.currentPage + 1;
-		const result = await loadMatchesWithPagination(nextPage, 10);
-
-		if (result.matches.length > 0) {
-			state.matchPagination.currentPage = nextPage;
-			state.matchPagination.hasMoreMatches = result.hasMore;
-			state.matchPagination.totalMatches = result.totalCount;
-
-			// Append new matches to existing history
-			appendMatches(result.matches);
-
-			return result.matches;
-		}
-
-		// No more matches
-		state.matchPagination.hasMoreMatches = false;
-		return [];
-	} catch (error) {
-		console.error('Error loading more matches:', error);
-		return [];
-	} finally {
-		state.matchPagination.isLoadingMore = false;
-
-		// Reset button state
-		if (loadMoreBtn) {
-			loadMoreBtn.disabled = false;
-			if (state.matchPagination.hasMoreMatches) {
-				loadMoreBtn.textContent = '📄 Load More Matches';
-			} else {
-				loadMoreBtn.textContent = '✅ All matches loaded';
-				loadMoreBtn.disabled = true;
-			}
-		}
-	}
-}
-
-export function appendMatches(newMatches: Match[]): void {
-	if (!newMatches || newMatches.length === 0) return;
-
-	// Add new matches to the state
-	state.history = [...state.history, ...newMatches];
-
-	// Get the current active history view
-	const currentView = state.activeHistoryView;
-	const historyContentEl = document.getElementById('history-content');
-
-	if (!historyContentEl) return;
-
-	// Update the display based on current view
-	switch (currentView) {
-		case 'list':
-			appendToHistoryList(newMatches);
-			break;
-		case 'detailed':
-			appendToHistoryDetailed(newMatches);
-			break;
-		case 'analysis':
-			// For analysis view, re-render the entire view since it's chart-based
-			rerenderAnalysisView();
-			break;
-	}
-
-	// Update any charts that depend on the full history
-	setTimeout(() => {
-		try {
-			renderAllCharts();
-		} catch (e) {
-			console.log('Chart update error', e);
-		}
-	}, 100);
-}
-
-function appendToHistoryList(newMatches: Match[]): void {
-	const historyContentEl = document.getElementById('history-content');
-	if (!historyContentEl) return;
-
-	// Find the matches container or create one
-	let matchesContainer = historyContentEl.querySelector('.matches-container');
-	if (!matchesContainer) {
-		// If no container exists, re-render the entire list
-		historyContentEl.innerHTML = historyList(state.history);
-		return;
-	}
-
-	// Create HTML for new matches
-	const newMatchesHtml = newMatches.map(m => {
-		const isWin = m.result === 'win';
-		const diff = Math.abs(m.user_score - m.opponent_score);
-		const type = diff <= 2 ? { label: 'NAIL-BITER', color: '#dc3545' }
-			: diff <= 5 ? { label: 'CLOSE', color: '#ffc107' }
-				: diff <= 10 ? { label: 'COMPETITIVE', color: '#17a2b8' }
-					: { label: 'DOMINANT', color: '#28a745' };
-
-		return `
-      <div style="padding:15px;border-bottom:1px solid #f1f3f4;display:flex;align-items:center;gap:15px">
-        <div style="width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${isWin ? '#28a745' : '#dc3545'};color:#fff;font-weight:bold;font-size:18px">
-          ${isWin ? '🏆' : '❌'}
-        </div>
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <span style="font-weight:bold;color:#333">vs Player ${m.opponent_id}</span>
-            <span style="background:${type.color};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:bold">${type.label}</span>
-          </div>
-          <div style="font-size:13px;color:#666">${new Date(m.date_played).toLocaleDateString()} • ${new Date(m.date_played).toLocaleTimeString()}</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:monospace;font-size:18px;font-weight:bold;color:#333">${m.user_score} - ${m.opponent_score}</div>
-          <div style="font-size:12px;color:${isWin ? '#28a745' : '#dc3545'};font-weight:bold">${isWin ? 'VICTORY' : 'DEFEAT'}</div>
-        </div>
-        <div style="text-align:center;min-width:60px">
-          <div style="font-size:14px;color:#666">⏱️</div>
-          <div style="font-size:12px;color:#666">${m.duration || 'N/A'}</div>
-        </div>
-      </div>`;
-	}).join('');
-
-	// Append new matches
-	matchesContainer.insertAdjacentHTML('beforeend', newMatchesHtml);
-}
-
-function appendToHistoryDetailed(newMatches: Match[]): void {
-	const historyContentEl = document.getElementById('history-content');
-	if (!historyContentEl) return;
-
-	let filteredMatches = historyContentEl.querySelector('#filtered-matches');
-	if (!filteredMatches) {
-		// Re-render the entire detailed view
-		historyContentEl.innerHTML = historyDetailed(state.history);
-		return;
-	}
-
-	// Create detailed HTML for new matches
-	const startIndex = state.history.length - newMatches.length;
-	const newMatchesHtml = newMatches.map((m, idx) => `
-    <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-left:5px solid ${m.result === 'win' ? '#28a745' : '#dc3545'}">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${m.result === 'win' ? '#28a745' : '#dc3545'};color:#fff;font-size:16px">
-            ${m.result === 'win' ? '🏆' : '❌'}
-          </div>
-          <div>
-            <h4 style="margin:0;color:#333">Match #${startIndex + idx + 1}</h4>
-            <div style="font-size:13px;color:#666">${new Date(m.date_played).toLocaleString()}</div>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:monospace;font-size:24px;font-weight:bold;color:#333">${m.user_score} - ${m.opponent_score}</div>
-          <div style="font-size:12px;color:${m.result === 'win' ? '#28a745' : '#dc3545'};font-weight:bold">${m.result === 'win' ? 'VICTORY' : 'DEFEAT'}</div>
-        </div>
-      </div>
-      <!-- Additional match details would go here -->
-    </div>
-  `).join('');
-
-	filteredMatches.insertAdjacentHTML('beforeend', newMatchesHtml);
-}
-
-function rerenderAnalysisView(): void {
-	const historyContentEl = document.getElementById('history-content');
-	if (!historyContentEl) return;
-
-	// Re-render the entire analysis view with updated data
-	historyContentEl.innerHTML = historyAnalysis(state.history);
-
-	// Re-render charts with new data
-	renderAllCharts();
 }

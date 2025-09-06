@@ -1,6 +1,6 @@
 import { loadFriends, loadHistory, loadProfile, loadStats } from './api.js';
 import { renderAllCharts } from './charts.js';
-import { setupEvents, rerenderFriends } from './events.js';
+import { setupEvents, rerenderFriends, setupFriendHoverEffects, setupFriendsEvents, setupRemoveFriendEvents } from './events.js';
 import { state } from './state.js';
 import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis } from './templates.js';
 import { gamesThisWeek } from './metrics.js';
@@ -84,7 +84,6 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 		});
 
 		setTimeout(async () => {
-			const { setupFriendHoverEffects, setupRemoveFriendEvents } = await import('./events.js');
 			setupFriendHoverEffects();
 			setupRemoveFriendEvents();
 		}, 100);
