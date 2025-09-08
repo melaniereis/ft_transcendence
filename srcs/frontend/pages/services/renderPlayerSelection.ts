@@ -1,11 +1,17 @@
 import { renderGame } from './renderGame/renderGame.js';
+import { translations } from './language/translations.js';
 
 export async function renderPlayerSelection(container: HTMLElement) {
-	container.innerHTML = `<h2>Select Opponent</h2>
-	<label>Opponent:
+	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+		? localStorage.getItem('preferredLanguage')
+		: 'en') as keyof typeof translations;
+	const t = translations[lang];
+
+	container.innerHTML = `<h2>${t.selectOpponentTitle}</h2>
+	<label>${t.opponentLabel}:
 		<select id="player1-select"></select>
 	</label>
-	<label>Max Games:
+	<label>${t.maxGamesLabel}:
 		<select id="max-games-select">
 			<option value="3">3</option>
 			<option value="5">5</option>
@@ -14,7 +20,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 			<option value="11">11</option>
 		</select>
 	</label>
-	<label>Difficulty:
+	<label>${t.difficultyLabel}:
 		<select id="difficulty-select">
 			<option value="easy">Easy</option>
 			<option value="normal" selected>Normal</option>
@@ -22,7 +28,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 			<option value="crazy">Crazy</option>
 		</select>
 	</label>
-	<button id="start-game-btn">Start Game</button>
+	<button id="start-game-btn">${t.startGame}</button>
 	<div id="selection-error" style="color:red;"></div>
 	<div id="verification-form"></div>
 	`;
@@ -36,7 +42,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 	const loggedInPlayerName = localStorage.getItem('playerName') || 'You';
 
 	if (!loggedInPlayerId) {
-		errorDiv.textContent = 'You must be logged in to start a game.';
+		errorDiv.textContent = t.mustBeLoggedIn;
 		return;
 	}
 
@@ -44,14 +50,10 @@ export async function renderPlayerSelection(container: HTMLElement) {
 	try {
 		const token = localStorage.getItem('authToken');
 		const response = await fetch('/users', {
-			headers: {
-			Authorization: `Bearer ${token}`
-			}
+			headers: { Authorization: `Bearer ${token}` }
 		});
 
-		if (!response.ok) {
-			throw new Error('Unauthorized or failed request');
-		}
+		if (!response.ok) throw new Error('Unauthorized or failed request');
 		users = await response.json();
 
 		users.forEach((user: any) => {
@@ -61,9 +63,8 @@ export async function renderPlayerSelection(container: HTMLElement) {
 			option.textContent = user.username;
 			player1Select.appendChild(option);
 		});
-	} 
-	catch (err) {
-		errorDiv.textContent = 'Failed to load users.';
+	} catch {
+		errorDiv.textContent = t.failedToLoadUsers;
 		return;
 	}
 
@@ -72,24 +73,20 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		const opponentName = player1Select.selectedOptions[0]?.textContent;
 		const maxGames = Number((document.getElementById('max-games-select') as HTMLSelectElement).value);
 		const difficulty = (document.getElementById('difficulty-select') as HTMLSelectElement).value as
-			| 'easy'
-			| 'normal'
-			| 'hard'
-			| 'crazy';
+			| 'easy' | 'normal' | 'hard' | 'crazy';
 
 		if (!opponentId || opponentId === loggedInPlayerId) {
-			errorDiv.textContent = 'Please select a valid opponent.';
+			errorDiv.textContent = t.invalidOpponent;
 			return;
 		}
 
-		// Show verification form
 		const opponent = users.find(u => u.id === opponentId);
 		verificationDiv.innerHTML = `
-			<h3>Verify Opponent: ${opponent.name} (${opponent.username})</h3>
+			<h3>${t.verifyOpponent}: ${opponent.name} (${opponent.username})</h3>
 			<form id="verify-form">
-				<input type="text" name="username" placeholder="Username" required />
-				<input type="password" name="password" placeholder="Password" required />
-				<button type="submit">Verify & Start</button>
+				<input type="text" name="username" placeholder="${t.verifyUsername}" required />
+				<input type="password" name="password" placeholder="${t.verifyPassword}" required />
+				<button type="submit">${t.verifyStart}</button>
 				<div class="result" style="color:red;"></div>
 			</form>
 		`;
@@ -113,7 +110,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 				if (res.ok && result.user.id === opponentId) {
 					resultDiv.style.color = 'green';
-					resultDiv.textContent = '✅ Verified. Starting game...';
+					resultDiv.textContent = t.verifySuccess;
 
 					const gameRes = await fetch('/games', {
 						method: 'POST',
@@ -137,11 +134,12 @@ export async function renderPlayerSelection(container: HTMLElement) {
 					container.innerHTML = '';
 					renderGame(container, loggedInPlayerName, opponentName!, maxGames, difficulty, undefined, 'single', gameId);
 				} 
-				else
-					resultDiv.textContent = '❌ Invalid credentials or wrong user.';
+				else {
+					resultDiv.textContent = t.verifyInvalid;
+				}
 			} 
 			catch {
-				resultDiv.textContent = '❌ Login failed.';
+				resultDiv.textContent = t.verifyFailed;
 			}
 		});
 	});
