@@ -9,7 +9,7 @@ import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js'
 import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
-
+import { translations } from './services/language/translations .js';
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
@@ -24,6 +24,9 @@ const friendRequestsBadge = document.getElementById('friend-requests-badge') as 
 const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
 const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
 const appDiv = document.getElementById('app') as HTMLDivElement;
+const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+const languageOptions = document.getElementById('language-options') as HTMLDivElement;
+
 
 // 🔄 Update UI based on login state
 function updateUIBasedOnAuth(): void {
@@ -31,9 +34,9 @@ function updateUIBasedOnAuth(): void {
 	const isLoggedIn = !!token;
 
 	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-	if (isLoggedIn) {
+	
+	if (isLoggedIn)
 		updateFriendRequestsBadge();
-	}
 
 	playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 	settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
@@ -84,31 +87,10 @@ registerBtn.addEventListener('click', () => {
 	renderRegistrationForm(appDiv);
 });
 
-logoutBtn.addEventListener('click', async () => {
-	// Update status to offline before logout
-	const token = localStorage.getItem('authToken');
-	if (token) {
-		try {
-			await fetch('/api/profile/status', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${token}`
-				},
-				body: JSON.stringify({ online: false })
-			});
-		} catch (error) {
-			console.error('Failed to update status on logout:', error);
-		}
-	}
-
+logoutBtn.addEventListener('click', () => {
 	localStorage.removeItem('authToken');
 	appDiv.innerHTML = '<p>You have been logged out.</p>';
 	updateUIBasedOnAuth();
-
-	// Clean up activity monitoring
-	document.removeEventListener('visibilitychange', () => { });
-	window.removeEventListener('beforeunload', () => { });
 });
 
 profileBtn.addEventListener('click', () => {
@@ -159,10 +141,6 @@ export async function updateFriendRequestsBadge() {
 	}
 }
 
-// 🚀 Initialize UI
-updateUIBasedOnAuth();
-
-
 // In index.ts - replace the DOMContentLoaded section
 document.addEventListener('DOMContentLoaded', async () => {
 	const token = localStorage.getItem('authToken');
@@ -188,7 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 				localStorage.removeItem('authToken');
 				updateUIBasedOnAuth();
 			}
-		} catch (error) {
+		} 
+		catch (error) {
 			console.error('Error verifying token on page load:', error);
 			localStorage.removeItem('authToken');
 			updateUIBasedOnAuth();
@@ -228,7 +207,47 @@ async function setOnlineOnLoad() {
 			},
 			body: JSON.stringify({ online: true })
 		});
-	} catch (err) {
-		console.error('Failed to set online on load:', err);
+	} 
+	catch (error) {
+		console.error('Failed to set online on load:', error);
 	}
 }
+
+// Toggle language options visibility
+languageBtn.addEventListener('click', () => {
+	languageOptions.style.display = languageOptions.style.display === 'none' ? 'block' : 'none';
+});
+
+// Handle language selection
+languageOptions.querySelectorAll('button').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang') || 'en';
+		localStorage.setItem('preferredLanguage', selectedLang);
+		applyLanguage(selectedLang);
+		languageOptions.style.display = 'none';
+	});
+});
+
+type Language = 'en' | 'es' | 'pt';
+function applyLanguage(lang: string) {
+	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
+	const t = translations[safeLang];
+
+	playBtn.textContent = t.play;
+	settingsBtn.textContent = t.settings;
+	tournamentsBtn.textContent = t.tournaments;
+	teamsBtn.textContent = t.teams;
+	loginBtn.textContent = t.login;
+	logoutBtn.textContent = t.logout;
+	registerBtn.textContent = t.register;
+	profileBtn.textContent = t.profile;
+	friendRequestsBtn.textContent = t.friendRequests;
+	quickPlayBtn.textContent = t.quickPlay;
+	matchmakingBtn.textContent = t.matchmaking;
+	languageBtn.textContent = t.language;
+}
+
+// 🚀 Initialize UI
+const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+applyLanguage(storedLang);
+updateUIBasedOnAuth();
