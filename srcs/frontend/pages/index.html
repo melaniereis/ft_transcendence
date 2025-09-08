@@ -1,42 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Pong Game</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Pong Game</title>
 </head>
+
 <body>
-  <h1>PONG!!!!</h1>
+	<h1>PONG!!!!</h1>
 
-  <!-- Buttons hidden by default unless login state is valid -->
-  <button id="play-btn" style="display: none;">Play</button>
-  <button id="settings-btn" style="display: none;">Player Settings</button>
-  <button id="tournaments-btn" style="display: none;">Tournaments</button>
-  <button id="teams-btn" style="display: none;">Teams</button>
-  <button id="matchmaking-btn" style="display: none;">Join Matchmaking</button>
+	<!-- Buttons hidden by default unless login state is valid -->
+	<button id="play-btn" style="display: none;">Play</button>
+	<button id="settings-btn" style="display: none;">Player Settings</button>
+	<button id="tournaments-btn" style="display: none;">Tournaments</button>
+	<button id="teams-btn" style="display: none;">Teams</button>
+	<button id="matchmaking-btn" style="display: none;">Join Matchmaking</button>
 
 
-  <!-- Auth buttons -->
-  <button id="quick-play-btn">Quick Play</button>
-  <button id="login-btn">Login</button>
-  <button id="register-btn">Register</button>
-  <button id="logout-btn" style="display: none;">Logout</button>
-  <button id="profile-btn" style="display: none;">Profile</button>
+	<!-- Auth buttons -->
+	<button id="quick-play-btn">Quick Play</button>
+	<button id="login-btn">Login</button>
+	<button id="register-btn">Register</button>
+	<button id="logout-btn" style="display: none;">Logout</button>
+	<button id="profile-btn" style="display: none;">Profile</button>
 
-  <!-- 🔥 FRIEND REQUESTS NOTIFICATION -->
-  <button id="friend-requests-btn" style="display: none; position: relative; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
-    📧 Friend Requests
-    <span id="friend-requests-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; text-align: center; line-height: 20px;"></span>
-  </button>
+	<!-- 🔥 FRIEND REQUESTS NOTIFICATION -->
+	<button id="friend-requests-btn"
+		style="display: none; position: relative; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+		📧 Friend Requests
+		<span id="friend-requests-badge"
+			style="display: none; position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; text-align: center; line-height: 20px;"></span>
+	</button>
 
-  <button id="language-btn">🌐 Language</button>
-    <div id="language-options" style="display: none;">
-      <button data-lang="en">English</button>
-      <button data-lang="es">Español</button>
-      <button data-lang="pt">Português</button>
-    </div>
+  	<button id="language-btn">🌐 Language</button>
+		<div id="language-options" style="display: none;">
+		<button data-lang="en">English</button>
+		<button data-lang="es">Español</button>
+		<button data-lang="pt">Português</button>
+		</div>
 
   <div id="app"></div>
 
-  <script type="module" src="index.js"></script>
+	<script type="module" src="index.js"></script>
 </body>
+
 </html>

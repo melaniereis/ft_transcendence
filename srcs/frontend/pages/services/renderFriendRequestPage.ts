@@ -1,5 +1,27 @@
 //services/renderFriendRequestPage.ts
 import { updateFriendRequestsBadge } from '../index.js';
+// Import team logos and SVG icon helpers from profile page templates
+// Team logo mapping (copied from templates.ts)
+const TEAM_LOGOS = {
+	'HACKTIVISTS': '/assets/hacktivists.png',
+	'BUG BUSTERS': '/assets/bugbusters.png',
+	'LOGIC LEAGUE': '/assets/logicleague.png',
+	'CODE ALLIANCE': '/assets/codealliance.png'
+};
+
+// SVG ICON HELPERS (local, for requests page)
+function svgInboxIcon() {
+	return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b6a6ca" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>`;
+}
+function svgBackIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+}
+function svgAcceptIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+}
+function svgRejectIcon() {
+	return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>`;
+}
 
 export async function renderFriendRequestsPage(container: HTMLElement) {
 	const token = localStorage.getItem('authToken');

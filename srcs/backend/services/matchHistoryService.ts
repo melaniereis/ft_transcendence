@@ -2,7 +2,7 @@ import db from '../db/database.js';
 import { MatchHistoryRecord } from '../types/matchHistory.js';
 
 export async function createMatchHistoryRecord(gameId: number, userId: number, opponentId: number,
-userScore: number, opponentScore: number, duration: number): Promise<void> {
+	userScore: number, opponentScore: number, duration: number): Promise<void> {
 	const result = userScore > opponentScore ? 'win' : 'loss';
 
 	return new Promise<void>((resolve, reject) => {
@@ -15,7 +15,7 @@ userScore: number, opponentScore: number, duration: number): Promise<void> {
 				if (err) {
 					console.error('❌ Erro ao criar histórico de partida:', err.message);
 					reject(err);
-				} 
+				}
 				else
 					resolve();
 			}
@@ -26,18 +26,49 @@ userScore: number, opponentScore: number, duration: number): Promise<void> {
 export async function getMatchHistory(userId: number): Promise<MatchHistoryRecord[]> {
 	return new Promise((resolve, reject) => {
 		db.all(
-			`SELECT * FROM match_history 
-			WHERE user_id = ? 
-			ORDER BY date_played DESC 
-			LIMIT 20`,
+			`SELECT mh.*, u.username AS opponentUsername, u.display_name AS opponentDisplayName
+             FROM match_history mh
+             LEFT JOIN users u ON u.id = mh.opponent_id
+             WHERE mh.user_id = ? ORDER BY date_played DESC LIMIT 20`,
 			[userId],
-			(err: Error | null, rows: unknown[] | undefined) => {
+			(err, rows) => {
 				if (err) {
-					console.error('❌ Erro ao buscar histórico de partidas:', err.message);
 					reject(err);
-				} 
-				else
+				} else {
 					resolve(rows as MatchHistoryRecord[]);
+				}
+			}
+		);
+	});
+}
+
+export async function getMatchHistoryPaginated(userId: number, offset: number, limit: number): Promise<MatchHistoryRecord[]> {
+	return new Promise((resolve, reject) => {
+		db.all(
+			`SELECT * FROM match_history WHERE user_id = ? ORDER BY date_played DESC LIMIT ? OFFSET ?`,
+			[userId, limit, offset],
+			(err, rows) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(rows as MatchHistoryRecord[]);
+				}
+			}
+		);
+	});
+}
+
+export async function getMatchHistoryCount(userId: number): Promise<number> {
+	return new Promise((resolve, reject) => {
+		db.get(
+			`SELECT COUNT(*) as count FROM match_history WHERE user_id = ?`,
+			[userId],
+			(err, row: any) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(row?.count || 0);
+				}
 			}
 		);
 	});

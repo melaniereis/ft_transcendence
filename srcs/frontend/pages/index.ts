@@ -3,8 +3,8 @@ import { renderSettingsPage } from './services/settings.js';
 import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
-import { renderLoginForm } from './services/renderLoginForm.js';
-import { renderProfilePage } from './services/renderProfilePage.js';
+import { renderLoginForm, startActivityMonitoring } from './services/renderLoginForm.js';
+import { renderProfilePage } from './services/renderProfilePage/profile.js';
 import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
@@ -48,6 +48,12 @@ function updateUIBasedOnAuth(): void {
 
 	loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 	registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+
+	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	if (isLoggedIn) {
+		updateFriendRequestsBadge();
+		setOnlineOnLoad();
+	}
 }
 
 // 🧠 Event Listeners
@@ -130,9 +136,80 @@ export async function updateFriendRequestsBadge() {
 				friendRequestsBadge.style.display = 'none';
 			}
 		}
+	} catch (error) {
+		console.error('Error updating friend requests badge:', error);
+	}
+}
+
+// In index.ts - replace the DOMContentLoaded section
+document.addEventListener('DOMContentLoaded', async () => {
+	const token = localStorage.getItem('authToken');
+	if (token) {
+		// Verify token is still valid
+		try {
+			const response = await fetch('/api/protected', {
+				headers: { 'Authorization': `Bearer ${token}` }
+			});
+
+			if (response.ok) {
+				// Token is valid, start activity monitoring
+				const { startActivityMonitoring } = await import('./services/renderLoginForm.js');
+				startActivityMonitoring();
+
+				// Set user as online
+				await updateOnlineStatus(true);
+
+				// Update friend requests badge
+				updateFriendRequestsBadge();
+			} else {
+				// Token is invalid, remove it
+				localStorage.removeItem('authToken');
+				updateUIBasedOnAuth();
+			}
+		} 
+		catch (error) {
+			console.error('Error verifying token on page load:', error);
+			localStorage.removeItem('authToken');
+			updateUIBasedOnAuth();
+		}
+	}
+});
+
+// Add this helper function to index.ts
+async function updateOnlineStatus(isOnline: boolean) {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+
+	try {
+		await fetch('/api/profile/status', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			},
+			body: JSON.stringify({ online: isOnline })
+		});
+		console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
+	} catch (error) {
+		console.error('Failed to update status:', error);
+	}
+}
+
+async function setOnlineOnLoad() {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+	try {
+		await fetch('/api/profile/status', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			},
+			body: JSON.stringify({ online: true })
+		});
 	} 
 	catch (error) {
-		console.error('Error updating friend requests badge:', error);
+		console.error('Failed to set online on load:', error);
 	}
 }
 

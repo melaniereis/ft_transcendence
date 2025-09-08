@@ -1,17 +1,22 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "outDir": "dist/backend",
-    "rootDir": "backend",
-    "strict": true,
-    "skipLibCheck": true,
-    "types": ["node", "ws"]
-  },
-  "include": ["backend"],
-  "ts-node": {
-    "esm": true
-  }
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"outDir": "dist/backend",
+		"rootDir": "backend",
+		"strict": true,
+		"skipLibCheck": true,
+		"types": [
+			"node",
+			"ws"
+		]
+	},
+	"include": [
+		"backend"
+	],
+	"ts-node": {
+		"esm": true
+	}
 }
