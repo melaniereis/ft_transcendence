@@ -9,7 +9,7 @@ import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js'
 import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
-import { translations } from './services/language/translations .js';
+import { translations } from './services/language/translations.js';
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
@@ -228,7 +228,7 @@ languageOptions.querySelectorAll('button').forEach(btn => {
 	});
 });
 
-type Language = 'en' | 'es' | 'pt';
+
 function applyLanguage(lang: string) {
 	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
 	const t = translations[safeLang];
