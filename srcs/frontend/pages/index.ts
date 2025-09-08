@@ -9,7 +9,7 @@ import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js'
 import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
-
+import { translations } from './services/language/translations .js';
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
@@ -24,113 +24,153 @@ const friendRequestsBadge = document.getElementById('friend-requests-badge') as 
 const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
 const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
 const appDiv = document.getElementById('app') as HTMLDivElement;
+const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+const languageOptions = document.getElementById('language-options') as HTMLDivElement;
+
 
 // 🔄 Update UI based on login state
 function updateUIBasedOnAuth(): void {
-    const token = localStorage.getItem('authToken');
-    const isLoggedIn = !!token;
+	const token = localStorage.getItem('authToken');
+	const isLoggedIn = !!token;
 
-    friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    if (isLoggedIn) {
-        updateFriendRequestsBadge();
-    }
+	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	
+	if (isLoggedIn)
+		updateFriendRequestsBadge();
 
-    playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-    matchmakingBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	matchmakingBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 
-    loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
-    registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+	loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+	registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 }
 
 // 🧠 Event Listeners
 playBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderPlayerSelection(appDiv);
+	appDiv.innerHTML = '';
+	renderPlayerSelection(appDiv);
 });
 
 settingsBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderSettingsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderSettingsPage(appDiv);
 });
 
 tournamentsBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderTournamentsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderTournamentsPage(appDiv);
 });
 
 teamsBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderTeamsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderTeamsPage(appDiv);
 });
 
 loginBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderLoginForm(appDiv, updateUIBasedOnAuth);
+	appDiv.innerHTML = '';
+	renderLoginForm(appDiv, updateUIBasedOnAuth);
 });
 
 registerBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderRegistrationForm(appDiv);
+	appDiv.innerHTML = '';
+	renderRegistrationForm(appDiv);
 });
 
 logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('authToken');
-    appDiv.innerHTML = '<p>You have been logged out.</p>';
-    updateUIBasedOnAuth();
+	localStorage.removeItem('authToken');
+	appDiv.innerHTML = '<p>You have been logged out.</p>';
+	updateUIBasedOnAuth();
 });
 
 profileBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderProfilePage(appDiv);
+	appDiv.innerHTML = '';
+	renderProfilePage(appDiv);
 });
 
 friendRequestsBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderFriendRequestsPage(appDiv);
+	appDiv.innerHTML = '';
+	renderFriendRequestsPage(appDiv);
 });
 
 quickPlayBtn.addEventListener('click', () => {
-    appDiv.innerHTML = '';
-    renderQuickGameSetup(appDiv);
+	appDiv.innerHTML = '';
+	renderQuickGameSetup(appDiv);
 });
 
 matchmakingBtn.addEventListener('click', () => {
-    const playerId = Number(localStorage.getItem('playerId'));
-    const playerName = localStorage.getItem('playerName') || 'Unknown';
-    const difficulty = 'normal';
-    startMatchmaking(appDiv, playerId, playerName, difficulty);
+	const playerId = Number(localStorage.getItem('playerId'));
+	const playerName = localStorage.getItem('playerName') || 'Unknown';
+	const difficulty = 'normal';
+	startMatchmaking(appDiv, playerId, playerName, difficulty);
 });
 
 // 🔔 Update friend requests badge
 export async function updateFriendRequestsBadge() {
-    const token = localStorage.getItem('authToken');
-    if (!token) return;
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
 
-    try {
-        const response = await fetch('/api/friends/pending', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+	try {
+		const response = await fetch('/api/friends/pending', {
+			headers: { 'Authorization': `Bearer ${token}` }
+		});
 
-        if (response.ok) {
-            const data = await response.json();
-            const pendingCount = data.pending?.length || 0;
+		if (response.ok) {
+			const data = await response.json();
+			const pendingCount = data.pending?.length || 0;
 
-            if (pendingCount > 0) {
-                friendRequestsBadge.textContent = pendingCount.toString();
-                friendRequestsBadge.style.display = 'block';
-            } else {
-                friendRequestsBadge.style.display = 'none';
-            }
-        }
-    } catch (error) {
-        console.error('Error updating friend requests badge:', error);
-    }
+			if (pendingCount > 0) {
+				friendRequestsBadge.textContent = pendingCount.toString();
+				friendRequestsBadge.style.display = 'block';
+			} else {
+				friendRequestsBadge.style.display = 'none';
+			}
+		}
+	} 
+	catch (error) {
+		console.error('Error updating friend requests badge:', error);
+	}
+}
+
+// Toggle language options visibility
+languageBtn.addEventListener('click', () => {
+	languageOptions.style.display = languageOptions.style.display === 'none' ? 'block' : 'none';
+});
+
+// Handle language selection
+languageOptions.querySelectorAll('button').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang') || 'en';
+		localStorage.setItem('preferredLanguage', selectedLang);
+		applyLanguage(selectedLang);
+		languageOptions.style.display = 'none';
+	});
+});
+
+type Language = 'en' | 'es' | 'pt';
+function applyLanguage(lang: string) {
+	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
+	const t = translations[safeLang];
+
+	playBtn.textContent = t.play;
+	settingsBtn.textContent = t.settings;
+	tournamentsBtn.textContent = t.tournaments;
+	teamsBtn.textContent = t.teams;
+	loginBtn.textContent = t.login;
+	logoutBtn.textContent = t.logout;
+	registerBtn.textContent = t.register;
+	profileBtn.textContent = t.profile;
+	friendRequestsBtn.textContent = t.friendRequests;
+	quickPlayBtn.textContent = t.quickPlay;
+	matchmakingBtn.textContent = t.matchmaking;
+	languageBtn.textContent = t.language;
 }
 
 // 🚀 Initialize UI
+const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+applyLanguage(storedLang);
 updateUIBasedOnAuth();
