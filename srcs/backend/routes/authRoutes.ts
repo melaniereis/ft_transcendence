@@ -51,7 +51,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 				return reply.status(401).send({ error: 'Invalid credentials' });
 			}
 
-			reply.send({ token: result.token, message: 'Login successful' });
+			reply.send({token: result.token, user: result.user, message: 'Login successful'});
 		}
 		catch (err: any) {
 			console.error('Login error:', err);
