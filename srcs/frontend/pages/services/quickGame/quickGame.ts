@@ -1,14 +1,24 @@
 import { renderGame } from '../renderGame/renderGame.js';
+import { translations } from "../language/translations.js";
 
 export function renderQuickGameSetup(container: HTMLElement) {
-	container.innerHTML = `<h2>Quick Game Setup</h2>
-	<label>Player 1 Name:
-		<input type="text" id="player1-name" placeholder="Player 1">
+	const supportedLangs = ['en', 'es', 'pt'] as const;
+	const fallbackLang = 'en';
+
+	const storedLang = localStorage.getItem('preferredLanguage');
+	const lang = supportedLangs.includes(storedLang as typeof supportedLangs[number])
+		? (storedLang as keyof typeof translations)
+		: fallbackLang;
+
+	const t = translations[lang];
+	container.innerHTML = `<h2>${t.quickPlay}</h2>
+	<label>${t.username} 1:
+		<input type="text" id="player1-name" placeholder="${t.username} 1">
 	</label>
-	<label>Player 2 Name:
-		<input type="text" id="player2-name" placeholder="Player 2">
+	<label>${t.username} 2:
+		<input type="text" id="player2-name" placeholder="${t.username} 2">
 	</label>
-	<label>Max Games:
+	<label>${t.maxGamesLabel}:
 		<select id="max-games-select">
 			<option value="3">3</option>
 			<option value="5">5</option>
@@ -17,15 +27,15 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			<option value="11">11</option>
 		</select>
 	</label>
-	<label>Difficulty:
+	<label>${t.difficultyLabel}:
 		<select id="difficulty-select">
-			<option value="easy">Easy</option>
-			<option value="normal" selected>Normal</option>
-			<option value="hard">Hard</option>
-			<option value="crazy">Crazy</option>
+			<option value="easy">${t.difficultyEasy ?? 'Easy'}</option>
+			<option value="normal" selected>${t.difficultyNormal ?? 'Normal'}</option>
+			<option value="hard">${t.difficultyHard ?? 'Hard'}</option>
+			<option value="crazy">${t.difficultyCrazy ?? 'Crazy'}</option>
 		</select>
 	</label>
-	<button id="start-game-btn">Start Game</button>
+	<button id="start-game-btn">${t.startGame}</button>
 	<div id="selection-error" style="color:red;"></div>
 	`;
 
@@ -43,10 +53,10 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			| 'crazy';
 
 		if (!player1Name || !player2Name || player1Name === player2Name) {
-			errorDiv.textContent = 'Please enter two different player names.';
+			errorDiv.textContent = t.invalidOpponent || 'Please enter two different player names.';
 			return;
 		}
 		container.innerHTML = '';
-		renderGame(container, player1Name, player2Name, maxGames, difficulty , undefined, 'quick', undefined,);
-	}); 
+		renderGame(container, player1Name, player2Name, maxGames, difficulty, undefined, 'quick', undefined);
+	});
 }

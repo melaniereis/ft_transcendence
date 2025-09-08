@@ -10,6 +10,8 @@ import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
+import {Language} from '../types/language.js';
+
 // Button references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;

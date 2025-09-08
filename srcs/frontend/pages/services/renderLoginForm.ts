@@ -48,10 +48,11 @@ export function renderLoginForm(container: HTMLElement, onLoginSuccess: () => vo
 				localStorage.setItem('playerName', result.user.username);
 				resultDiv.textContent = t.success;
 				onLoginSuccess();
-			} else {
+			} 
+			else
 				resultDiv.textContent = t.invalid;
-			}
-		} catch (err) {
+		} 
+		catch (err) {
 			resultDiv.textContent = t.failed;
 		}
 	});
@@ -127,7 +128,8 @@ async function updateOnlineStatus(isOnline: boolean) {
 			body: JSON.stringify({ online: isOnline })
 		});
 		console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
-	} catch (error) {
+	} 
+	catch (error) {
 		console.error('Failed to update status:', error);
 	}
 }
@@ -143,7 +145,8 @@ async function updateLastSeen() {
 				'Authorization': `Bearer ${token}`
 			}
 		});
-	} catch (error) {
+	} 
+	catch (error) {
 		console.error('Failed to update last seen:', error);
 	}
 }
