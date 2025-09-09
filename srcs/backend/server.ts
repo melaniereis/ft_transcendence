@@ -107,7 +107,7 @@ async function start() {
 
         await fastify.register(fastifyWebsocket);
         await fastify.register(fastifyCors, { origin: true });
-
+        
         const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
         console.log('📁 Serving static pages from:', pagesPath);
 

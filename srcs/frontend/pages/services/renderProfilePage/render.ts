@@ -3,18 +3,17 @@ import { state } from './state.js';
 import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis, friendsList } from './templates.js';
 import { renderAllCharts } from './charts.js';
 import { Match } from './types.js';
+import { translations } from '../language/translations.js'
+
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
+const t = translations[lang];
 
 export function render(container: HTMLElement) {
 	if (!state.profile) return;
-	container.innerHTML = layout(
-		state.profile,
-		state.stats,
-		state.history,
-		state.friends,
-		state.activeStatsTab,
-		state.activeHistoryView,
-		state.editMode,
-		state.activeMainTab || 'profile'
+	container.innerHTML = layout(state.profile, state.stats, state.history, state.friends,
+	state.activeStatsTab, state.activeHistoryView, state.editMode, state.activeMainTab || 'profile'
 	);
 	// Always re-attach button events after render
 	if (typeof window.setupButtons === 'function') window.setupButtons();
@@ -112,10 +111,10 @@ export function render(container: HTMLElement) {
 		const friendsContainer = document.getElementById('friends-container');
 		if (friendsContainer) {
 			friendsContainer.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;">
-			       <div style="width:48px;height:48px;border:5px solid #eaeaea;border-top:5px solid #b6a6ca;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
-			       <div style="font-size:18px;color:#b6a6ca;font-weight:500;">Loading friends...</div>
-			       <style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
-		       </div>`;
+				<div style="width:48px;height:48px;border:5px solid #eaeaea;border-top:5px solid #b6a6ca;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
+				<div style="font-size:18px;color:#b6a6ca;font-weight:500;">${t.loadingFriends}</div>
+				<style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
+			</div>`;
 			setTimeout(() => {
 				friendsContainer.innerHTML = friendsList(state.friends);
 			}, 350);

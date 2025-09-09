@@ -4,6 +4,12 @@ import { setupEvents, rerenderFriends, setupFriendHoverEffects, setupFriendsEven
 import { state } from './state.js';
 import { layout, statsOverview, statsPerformance, statsTrends, historyList, historyDetailed, historyAnalysis } from './templates.js';
 import { gamesThisWeek } from './metrics.js';
+import { translations } from '../language/translations.js';
+
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
+const t = translations[lang];
 
 export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: () => void) {
 	const token = localStorage.getItem('authToken');
@@ -29,7 +35,6 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 		state.history = history;
 		state.friends = friends;
 
-
 		// Initial render
 		container.innerHTML = layout(profile, stats, history, friends, state.activeStatsTab, state.activeHistoryView, state.editMode, state.activeMainTab || 'profile');
 
@@ -40,12 +45,12 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 		histEl.innerHTML = state.history.length ? historyList(state.history) :
 			'<div style="padding:40px;text-align:center;color:#666;background:#f8f9fa;border-radius:8px"><div style="font-size:48px;margin-bottom:15px">🎮</div><h4 style="margin:0 0 10px 0">No Match History</h4><p style="margin:0;color:#999">Your game history will appear here once you start playing!</p></div>';
 
-		// Show loading spinner in friends section, then render friends list after a short delay
+		// ✅ Show loading spinner in friends section with localized string
 		const friendsContainer = document.getElementById('friends-container');
 		if (friendsContainer) {
 			friendsContainer.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;">
 				<div style="width:48px;height:48px;border:5px solid #eaeaea;border-top:5px solid #b6a6ca;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
-				<div style="font-size:18px;color:#b6a6ca;font-weight:500;">Loading friends...</div>
+				<div style="font-size:18px;color:#b6a6ca;font-weight:500;">${t.loadingFriends}</div>
 				<style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
 			</div>`;
 			setTimeout(() => {
@@ -53,30 +58,28 @@ export async function renderProfilePage(container: HTMLElement, onBadgeUpdate?: 
 			}, 350);
 		}
 
-
 		setupEvents(container);
 
 		// Event delegation para navegação dos amigos
 		container.addEventListener('click', (e) => {
-			const t = e.target as HTMLElement;
-			if (t.id === 'friends-prev' || t.id === 'friends-next') {
+			const tEl = e.target as HTMLElement;
+			if (tEl.id === 'friends-prev' || tEl.id === 'friends-next') {
 				if (!window.state) window.state = {};
 				const total = Math.ceil(state.friends.length / 10);
-				if (t.id === 'friends-prev') {
+				if (tEl.id === 'friends-prev') {
 					window.state.friendsPage = Math.max(0, (window.state.friendsPage || 0) - 1);
 				} else {
 					window.state.friendsPage = Math.min(total - 1, (window.state.friendsPage || 0) + 1);
 				}
-				// Mostra loading antes de renderizar
+				// ✅ Show localized loading spinner before rendering
 				const friendsPanel = document.getElementById('friends-panel');
 				if (friendsPanel) {
 					friendsPanel.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;">
 						<div style="width:48px;height:48px;border:5px solid #eaeaea;border-top:5px solid #b6a6ca;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:18px;"></div>
-						<div style="font-size:18px;color:#b6a6ca;font-weight:500;">Loading friends...</div>
+						<div style="font-size:18px;color:#b6a6ca;font-weight:500;">${t.loadingFriends}</div>
 						<style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
 					</div>`;
 				}
-				// Instead of reloading the whole profile, just rerender the friends list after a short delay
 				setTimeout(() => {
 					rerenderFriends();
 				}, 350);
@@ -102,6 +105,9 @@ export async function refreshFriends() {
 	if (res.ok) {
 		state.friends = await res.json();
 		rerenderFriends();
-		try { state.onBadgeUpdate?.(); } catch { /* ignore */ }
+		try { 
+			state.onBadgeUpdate?.(); 
+		} 
+		catch { /* ignore */ }
 	}
 }

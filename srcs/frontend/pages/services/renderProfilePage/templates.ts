@@ -7,15 +7,5 @@ import { statsOverview, statsPerformance, statsTrends } from './stats.js';
 import { modals } from './modals.js';
 import { layout } from './layout.js';
 
-export {
-	header,
-	friendsList,
-	historyList,
-	historyDetailed,
-	historyAnalysis,
-	statsOverview,
-	statsPerformance,
-	statsTrends,
-	modals,
-	layout
-};
+export {header, friendsList, historyList, historyDetailed, historyAnalysis,
+statsOverview, statsPerformance, statsTrends, modals, layout};

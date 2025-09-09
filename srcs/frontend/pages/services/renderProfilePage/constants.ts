@@ -55,19 +55,7 @@ const TEAM_LOGOS = {
 	'CODE ALLIANCE': '/assets/codealliance.png'
 };
 
-export {
-	svgUserIcon,
-	svgFriendsIcon,
-	svgChartIcon,
-	svgFlameIcon,
-	svgBarChartIcon,
-	svgStarIcon,
-	svgClockIcon,
-	svgTrendIcon,
-	svgOpponentIcon,
-	svgMedalGold,
-	svgMedalSilver,
-	svgMedalBronze,
-	GRID_COLORS,
-	TEAM_LOGOS
+export {svgUserIcon, svgFriendsIcon, svgChartIcon, svgFlameIcon, svgBarChartIcon,
+svgStarIcon, svgClockIcon, svgTrendIcon, svgOpponentIcon, svgMedalGold,
+svgMedalSilver, svgMedalBronze, GRID_COLORS, TEAM_LOGOS 
 };
