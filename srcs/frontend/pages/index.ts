@@ -1,3 +1,4 @@
+// (Imports remain the same)
 import { renderPlayMenu } from './services/renderPlayMenu.js';
 import { renderSettingsPage } from './services/settings.js';
 import { renderTournamentsPage } from './services/tournament/tournaments.js';
@@ -10,9 +11,9 @@ import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
-import {Language} from '../types/language.js';
+import { Language } from '../types/language.js';
 
-// Button references
+// DOM references (unchanged)
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
 const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
@@ -29,6 +30,60 @@ const appDiv = document.getElementById('app') as HTMLDivElement;
 const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
 const languageOptions = document.getElementById('language-options') as HTMLDivElement;
 
+// 🔁 Navigation handler
+function navigateTo(path: string): void {
+	history.pushState({}, '', path);
+	renderRoute(path);
+}
+
+// 🧭 Handle back/forward buttons
+window.onpopstate = () => {
+	renderRoute(window.location.pathname);
+};
+
+// 🧭 Route rendering logic
+function renderRoute(path: string): void {
+	appDiv.innerHTML = '';
+
+	switch (path) {
+		case '/play':
+			renderPlayerSelection(appDiv);
+			break;
+		case '/settings':
+			renderSettingsPage(appDiv);
+			break;
+		case '/tournaments':
+			renderTournamentsPage(appDiv);
+			break;
+		case '/teams':
+			renderTeamsPage(appDiv);
+			break;
+		case '/login':
+			renderLoginForm(appDiv, updateUIBasedOnAuth);
+			break;
+		case '/register':
+			renderRegistrationForm(appDiv);
+			break;
+		case '/profile':
+			renderProfilePage(appDiv);
+			break;
+		case '/friends':
+			renderFriendRequestsPage(appDiv);
+			break;
+		case '/quick-play':
+			renderQuickGameSetup(appDiv);
+			break;
+		case '/matchmaking':
+			const playerId = Number(localStorage.getItem('playerId'));
+			const playerName = localStorage.getItem('playerName') || 'Unknown';
+			const difficulty = 'normal';
+			startMatchmaking(appDiv, playerId, playerName, difficulty);
+			break;
+		default:
+			appDiv.innerHTML = '<p>Welcome! Please select a menu option.</p>';
+			break;
+	}
+}
 
 // 🔄 Update UI based on login state
 function updateUIBasedOnAuth(): void {
@@ -36,7 +91,7 @@ function updateUIBasedOnAuth(): void {
 	const isLoggedIn = !!token;
 
 	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-	
+
 	if (isLoggedIn)
 		updateFriendRequestsBadge();
 
@@ -51,43 +106,22 @@ function updateUIBasedOnAuth(): void {
 	loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 	registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 
-	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 	if (isLoggedIn) {
 		updateFriendRequestsBadge();
 		setOnlineOnLoad();
 	}
 }
 
-// 🧠 Event Listeners
-playBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderPlayerSelection(appDiv);
-});
-
-settingsBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderSettingsPage(appDiv);
-});
-
-tournamentsBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderTournamentsPage(appDiv);
-});
-
-teamsBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderTeamsPage(appDiv);
-});
-
-loginBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderLoginForm(appDiv, updateUIBasedOnAuth);
-});
-
-registerBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderRegistrationForm(appDiv);
-});
+// 🧠 Event Listeners (Updated to use navigation)
+playBtn.addEventListener('click', () => navigateTo('/play'));
+settingsBtn.addEventListener('click', () => navigateTo('/settings'));
+tournamentsBtn.addEventListener('click', () => navigateTo('/tournaments'));
+teamsBtn.addEventListener('click', () => navigateTo('/teams'));
+loginBtn.addEventListener('click', () => navigateTo('/login'));
+registerBtn.addEventListener('click', () => navigateTo('/register'));
+profileBtn.addEventListener('click', () => navigateTo('/profile'));
+friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
+quickPlayBtn.addEventListener('click', () => navigateTo('/quick-play'));
 
 logoutBtn.addEventListener('click', () => {
 	localStorage.removeItem('authToken');
@@ -95,26 +129,9 @@ logoutBtn.addEventListener('click', () => {
 	updateUIBasedOnAuth();
 });
 
-profileBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderProfilePage(appDiv);
-});
-
-friendRequestsBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderFriendRequestsPage(appDiv);
-});
-
-quickPlayBtn.addEventListener('click', () => {
-	appDiv.innerHTML = '';
-	renderQuickGameSetup(appDiv);
-});
-
+// Matchmaking handled separately (since it uses localStorage data)
 matchmakingBtn.addEventListener('click', () => {
-	const playerId = Number(localStorage.getItem('playerId'));
-	const playerName = localStorage.getItem('playerName') || 'Unknown';
-	const difficulty = 'normal';
-	startMatchmaking(appDiv, playerId, playerName, difficulty);
+	navigateTo('/matchmaking');
 });
 
 // 🔔 Update friend requests badge
@@ -143,41 +160,34 @@ export async function updateFriendRequestsBadge() {
 	}
 }
 
-// In index.ts - replace the DOMContentLoaded section
+// 🌐 On page load
 document.addEventListener('DOMContentLoaded', async () => {
 	const token = localStorage.getItem('authToken');
 	if (token) {
-		// Verify token is still valid
 		try {
 			const response = await fetch('/api/protected', {
 				headers: { 'Authorization': `Bearer ${token}` }
 			});
 
 			if (response.ok) {
-				// Token is valid, start activity monitoring
 				const { startActivityMonitoring } = await import('./services/renderLoginForm.js');
 				startActivityMonitoring();
-
-				// Set user as online
 				await updateOnlineStatus(true);
-
-				// Update friend requests badge
 				updateFriendRequestsBadge();
 			} else {
-				// Token is invalid, remove it
 				localStorage.removeItem('authToken');
-				updateUIBasedOnAuth();
 			}
-		} 
-		catch (error) {
+		} catch (error) {
 			console.error('Error verifying token on page load:', error);
 			localStorage.removeItem('authToken');
-			updateUIBasedOnAuth();
 		}
 	}
+
+	updateUIBasedOnAuth();
+	renderRoute(window.location.pathname); // ← load initial route
 });
 
-// Add this helper function to index.ts
+// 🌐 Set online status
 async function updateOnlineStatus(isOnline: boolean) {
 	const token = localStorage.getItem('authToken');
 	if (!token) return;
@@ -209,18 +219,16 @@ async function setOnlineOnLoad() {
 			},
 			body: JSON.stringify({ online: true })
 		});
-	} 
-	catch (error) {
+	} catch (error) {
 		console.error('Failed to set online on load:', error);
 	}
 }
 
-// Toggle language options visibility
+// 🌐 Language
 languageBtn.addEventListener('click', () => {
 	languageOptions.style.display = languageOptions.style.display === 'none' ? 'block' : 'none';
 });
 
-// Handle language selection
 languageOptions.querySelectorAll('button').forEach(btn => {
 	btn.addEventListener('click', () => {
 		const selectedLang = btn.getAttribute('data-lang') || 'en';
@@ -229,7 +237,6 @@ languageOptions.querySelectorAll('button').forEach(btn => {
 		languageOptions.style.display = 'none';
 	});
 });
-
 
 function applyLanguage(lang: string) {
 	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
@@ -249,7 +256,6 @@ function applyLanguage(lang: string) {
 	languageBtn.textContent = t.language;
 }
 
-// 🚀 Initialize UI
+// 🚀 Apply language preference
 const storedLang = localStorage.getItem('preferredLanguage') || 'en';
 applyLanguage(storedLang);
-updateUIBasedOnAuth();

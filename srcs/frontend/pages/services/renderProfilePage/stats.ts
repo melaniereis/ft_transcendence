@@ -103,7 +103,7 @@ ${[
 		</div>
 	</div>
 	<div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;margin-bottom:20px;">
-<h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgFlameIcon()} ${t.activityHeatmap} (7 ${t.days})</h4>
+<h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgFlameIcon()} ${t.activityHeatmap}</h4>
 		<canvas id="activityHeatmap" width="600" height="100" style="width:100%;height:100px;background:${GRID_COLORS.bg};border-radius:8px"></canvas>
 	</div>
 	</div>

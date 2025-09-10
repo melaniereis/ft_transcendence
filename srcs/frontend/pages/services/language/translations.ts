@@ -306,7 +306,12 @@ export const translations = {
 		editAvatarBtn: "Editar Avatar",
 		changePasswordBtn: "Mudar palavra-passe",
 		saveBtn: "Guardar",
-		cancelBtn: "Cancelar"
+		cancelBtn: "Cancelar",
+		gameOver: 'Fim de Jogo',
+		mainMenu: 'Menu Principal',
+		restart: 'Reiniciar',
+		nextMatch: 'Próxima Partida',
+		failedToEnd: '❌ Falha ao finalizar o jogo',
 	},
 	es:{
 		play: "Jugar",
@@ -615,7 +620,12 @@ export const translations = {
 		editAvatarBtn: "Editar avatar",
 		changePasswordBtn: "Cambiar contraseña",
 		saveBtn: "Guardar",
-		cancelBtn: "Cancelar"
+		cancelBtn: "Cancelar",
+		gameOver: 'Juego Terminado',
+		mainMenu: 'Menú Principal',
+		restart: 'Reiniciar',
+		nextMatch: 'Siguiente Partido',
+		failedToEnd: '❌ Error al finalizar el juego',
 		},
 	en:{
 		play: "Play",
@@ -924,6 +934,11 @@ export const translations = {
 		editAvatarBtn: "Edit Avatar",
 		changePasswordBtn: "Change Password",
 		saveBtn: "Save",
-		cancelBtn: "Cancel"
+		cancelBtn: "Cancel",
+		gameOver: 'Game Over',
+		mainMenu: 'Main Menu',
+		restart: 'Restart',
+		nextMatch: 'Next Match',
+		failedToEnd: '❌ Failed to end game',
 	}
 };

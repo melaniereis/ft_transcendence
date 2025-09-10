@@ -1,36 +1,51 @@
-export async function endGame( score1: number, score2: number,
-canvas: HTMLCanvasElement, onRestart: (winnerId?: number) => void, player1Name: string,
-player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
+import { translations } from '../language/translations.js';
+
+export async function endGame(score1: number, score2: number, canvas: HTMLCanvasElement,
+onRestart: (winnerId?: number) => void, player1Name: string, player2Name: string,
+mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	let winnerId: number | undefined;
-	console.log("ESTE E O MODE CARALHES", mode);
-	if (gameId){
+
+	// 🌐 Get current language
+	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+		? localStorage.getItem('preferredLanguage')
+		: 'en') as keyof typeof translations;
+
+	const t = translations[lang];
+
+	console.log('🎮 Game mode:', mode);
+
+	if (gameId) {
 		try {
 			const res = await fetch(`/games/${gameId}/end`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ score_player1: score1, score_player2: score2 })
+				body: JSON.stringify({
+					score_player1: score1,
+					score_player2: score2
+				})
 			});
 			const data = await res.json();
 			winnerId = data.winner_id;
 			console.log('✅ Game ended. Winner:', winnerId);
-		} 
-		catch (err) {
-			console.error('❌ Failed to end game:', err);
+		} catch (err) {
+			console.error(t.failedToEnd, err);
 		}
 	}
-	const ctx = canvas.getContext('2d');
-	if (!ctx) 
-		return;
 
+	const ctx = canvas.getContext('2d');
+	if (!ctx) return;
+
+	// 🧹 Clear canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = '#000';
 	ctx.font = '24px Arial';
 	ctx.textAlign = 'center';
-	ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 40);
+
+	ctx.fillText(t.gameOver, canvas.width / 2, canvas.height / 2 - 40);
 	ctx.fillText(`${player1Name}: ${score1}`, canvas.width / 2, canvas.height / 2);
 	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 40);
 
-	// 🎯 Create centered button container
+	// 🎯 Create button container
 	const buttonContainer = document.createElement('div');
 	buttonContainer.style.position = 'absolute';
 	buttonContainer.style.top = '50%';
@@ -41,35 +56,39 @@ player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?
 	buttonContainer.style.gap = '20px';
 	buttonContainer.style.zIndex = '10';
 
-	// ▶️ Restart / Next Match button
+	// ▶️ Restart / Next Match Button
 	const restartBtn = document.createElement('button');
-	restartBtn.textContent = mode === 'tournament' ? 'Next Match' : 'Restart';
+	restartBtn.textContent = mode === 'tournament' ? t.nextMatch : t.restart;
 	restartBtn.style.padding = '10px 20px';
 	restartBtn.style.fontSize = '16px';
 	restartBtn.style.cursor = 'pointer';
 	buttonContainer.appendChild(restartBtn);
 
-
-	// 🏠 Menu button (only in single mode)
+	// 🏠 Menu Button (only in single or quick modes)
 	if (mode !== 'tournament') {
 		const menuBtn = document.createElement('button');
-		menuBtn.textContent = 'Main Menu';
+		menuBtn.textContent = t.mainMenu;
 		menuBtn.style.padding = '10px 20px';
 		menuBtn.style.fontSize = '16px';
 		menuBtn.style.cursor = 'pointer';
 		buttonContainer.appendChild(menuBtn);
 
 		menuBtn.onclick = () => {
-		buttonContainer.remove();
-		window.location.href = '/';
-		};
-		document.body.appendChild(buttonContainer);
-
-		restartBtn.onclick = () => {
 			buttonContainer.remove();
-			onRestart(winnerId);
+			window.location.href = '/';
 		};
 	}
-	else
+
+	// Append buttons to document
+	document.body.appendChild(buttonContainer);
+
+	restartBtn.onclick = () => {
+		buttonContainer.remove();
 		onRestart(winnerId);
+	};
+
+	// 🏁 If tournament mode, auto-call restart
+	if (mode === 'tournament') {
+		onRestart(winnerId);
+	}
 }
