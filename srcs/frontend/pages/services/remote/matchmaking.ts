@@ -9,13 +9,12 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export function startMatchmaking(appDiv: HTMLDivElement, playerId: number,
-playerName: string, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
+	playerName: string, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 	if (socket && socket.readyState === WebSocket.OPEN) {
 		console.log('🟢 Already connected to matchmaking');
 		return;
 	}
 
-	const t = translations[lang]; 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 	socket = new WebSocket(`${protocol}://${location.host}/matchmaking`);
 
@@ -38,60 +37,64 @@ function handleSocketOpen(playerId: number, playerName: string, difficulty: stri
 }
 
 function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, playerName: string,
-difficulty: string) {
+	difficulty: string) {
 	const data = JSON.parse(event.data);
 	console.log('Received WS message:', data);
 
 	switch (data.type) {
 		case 'chooseMaxGames':
 			renderGameSelectionUI(appDiv);
-		break;
+			break;
 
 		case 'waitingForGameSelection':
-			renderWaitingMessage(appDiv, t.matchmaking + ': ' + (t.waitingForOpponent));
-		break;
-
 		case 'waitingForOpponent':
-			renderWaitingMessage(appDiv, t.matchmaking + ': ' + (t.waitingForOpponent));
-		break;
+			renderWaitingMessage(appDiv, `${t.matchmaking}: ${t.waitingForOpponent}`);
+			break;
 
 		case 'ready':
-			renderMatchReadyScreen(appDiv, playerName, data.opponent, data.maxGames,() => {
+			renderMatchReadyScreen(appDiv, playerName, data.opponent, data.maxGames, () => {
 				console.log('Confirm ready clicked');
 				socket!.send(JSON.stringify({ type: 'confirmReady' }));
-				}
-			);
-		break;
+			});
+			break;
 
 		case 'start':
 			appDiv.innerHTML = '';
-			renderMultiplayerGame({container: appDiv, playerName, opponentName: data.opponent,
-			gameId: data.game_id, maxGames: data.maxGames,
-			difficulty: difficulty as 'easy' | 'normal' | 'hard' | 'crazy',});
-		break;
+			renderMultiplayerGame({
+				container: appDiv,
+				playerName,
+				opponentName: data.opponent,
+				gameId: data.game_id,
+				maxGames: data.maxGames,
+				difficulty: difficulty as 'easy' | 'normal' | 'hard' | 'crazy',
+			});
+			break;
 
 		case 'error':
 			console.error('⚠️ Server error:', data.message);
 			appDiv.innerHTML = `<p>${t.errorLoadingTournaments}: ${data.message}</p>`;
-		break;
+			break;
 
 		default:
-			console.warn('⚠️ Unknown message type:', data);
+			showGoBackToMainMenu(appDiv);
+			break;
 	}
 }
 
 function renderGameSelectionUI(appDiv: HTMLDivElement) {
 	console.log('Received chooseMaxGames');
 	appDiv.innerHTML = `
-		<p>${t.maxGamesLabel} (${3}–${11}):</p>
-		<select id="gameCountSelect">
-		<option value="3">3</option>
-		<option value="5">5</option>
-		<option value="7">7</option>
-		<option value="9">9</option>
-		<option value="11">11</option>
-		</select>
-		<button id="confirmMaxGames">${t.confirm}</button>
+		<div class="flex flex-col items-center justify-center p-6 space-y-6 bg-cover bg-center">
+			<p class="text-2xl font-bold text-black mb-6">${t.maxGamesLabel} (3–11):</p>
+			<select id="gameCountSelect" class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
+				<option value="3">3</option>
+				<option value="5">5</option>
+				<option value="7">7</option>
+				<option value="9">9</option>
+				<option value="11">11</option>
+			</select>
+			<button id="confirmMaxGames" class="w-full py-4 text-2xl font-bold text-black bg-gray-200 border border-gray-300 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">${t.confirm}</button>
+		</div>
 	`;
 	document.getElementById('confirmMaxGames')?.addEventListener('click', () => {
 		const select = document.getElementById('gameCountSelect') as HTMLSelectElement;
@@ -104,20 +107,35 @@ function renderGameSelectionUI(appDiv: HTMLDivElement) {
 function renderWaitingMessage(appDiv: HTMLDivElement, message: string) {
 	console.log(message);
 	appDiv.innerHTML = `
-		<p>⏳ ${message}</p>
-		<div class="loader"></div>
+		<div class="flex flex-col items-center justify-center space-y-4 p-6 bg-cover bg-center">
+			<p class="text-2xl font-bold text-black">${message}</p>
+			<div class="loader"></div>
+		</div>
+	`;
+}
+
+function showGoBackToMainMenu(appDiv: HTMLDivElement) {
+	console.warn('⚠️ Unknown message type received.');
+	appDiv.innerHTML = `
+		<div class="flex flex-col items-center justify-center p-6 space-y-4 bg-cover bg-center">
+			<p class="text-2xl font-bold text-black">${t.unknownError}</p>
+			<p class="text-xl text-gray-600">${t.goBackToMainMenu}</p>
+			<button onclick="window.location.href='/'" class="w-full py-4 text-2xl font-bold text-black bg-gray-200 border border-gray-300 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
+				${t.goBack}
+			</button>
+		</div>
 	`;
 }
 
 function handleSocketClose(appDiv: HTMLDivElement) {
 	console.warn('🔌 Disconnected from matchmaking server.');
-	appDiv.innerHTML = `<p>${t.matchmaking}: Disconnected.</p>`;
+	appDiv.innerHTML = `<p class="text-xl font-bold text-black">${t.matchmaking}: Disconnected.</p>`;
 	socket = null;
 }
 
 function handleSocketError(err: Event, appDiv: HTMLDivElement) {
 	console.error('❌ WebSocket error:', err);
-	appDiv.innerHTML = `<p>${t.connectionError}</p>`;
+	appDiv.innerHTML = `<p class="text-xl font-bold text-red-600">${t.connectionError}</p>`;
 	socket?.close();
 	socket = null;
 }

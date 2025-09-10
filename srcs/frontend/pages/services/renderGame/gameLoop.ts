@@ -28,7 +28,7 @@ onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', 
 
 			const score1 = left.score;
 			const score2 = right.score;
-			console.log("ESTE E O MODE CARALHES", mode);
+			console.log("GAME MODE! ", mode);
 			if (mode === 'single' || mode === 'quick') {
 				// Restart same game
 				endGame(score1, score2, canvas, () => {
@@ -43,9 +43,9 @@ onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', 
 				onGameEnd(score1, score2);
 		});
 
-		const bgImage = new Image();
-		bgImage.src = 'assets/gamebg.jpg';
-		renderFrame(ctx, canvas, left, right, ball, bgImage);
+		// const bgImage = new Image();
+		// bgImage.src = 'assets/gamebg.jpg';
+		renderFrame(ctx, canvas, left, right, ball);
 		animationId = requestAnimationFrame(loop);
 	}
 	loop();

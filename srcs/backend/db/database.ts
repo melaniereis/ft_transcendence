@@ -163,6 +163,10 @@ db.serialize(() => {
             date_played TEXT DEFAULT CURRENT_TIMESTAMP
         )`);
 
+    db.run(`INSERT OR IGNORE INTO hacktivists (members) VALUES ('')`);
+    db.run(`INSERT OR IGNORE INTO bug_busters (members) VALUES ('')`);
+    db.run(`INSERT OR IGNORE INTO logic_league (members) VALUES ('')`);
+    db.run(`INSERT OR IGNORE INTO code_alliance (members) VALUES ('')`);
 	console.log('📋 Database tables created successfully');
 });
 

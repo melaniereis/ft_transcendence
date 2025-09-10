@@ -33,13 +33,14 @@ export async function userRoutes(fastify: FastifyInstance) {
 		}
 	});
 
-	// Nova rota: buscar usuário por username (para o frontend)
-	fastify.get('/api/users/:username', async (request, reply) => {
+	fastify.get('/api/users/:username', {preHandler: authHook, handler: async (request, reply) => {
 		const { username } = request.params as { username: string };
 		const users = await getAllUsers();
 		const user = users.find((u: any) => u.username === username);
-		if (!user) return reply.status(404).send({ error: 'User not found' });
+		if (!user) 
+			return reply.status(404).send({ error: 'User not found' });
 		return reply.send(user);
+		}
 	});
 
 	fastify.delete('/users/:id', {

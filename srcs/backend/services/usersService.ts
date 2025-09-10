@@ -97,3 +97,17 @@ export async function deleteUser(id: number): Promise<void> {
     const query = `DELETE FROM users WHERE id = ?`;
     await runAsync(query, [id]);
 }
+
+export function getAllUsersFromTeam(teamName: string): Promise<User[]> {
+	const query = `SELECT * FROM users WHERE team = ?`;
+	return new Promise((resolve, reject) => {
+		db.all(query, [teamName], (err, rows) => {
+		if (err) {
+			console.error(`❌ Failed to fetch users for team ${teamName}:`, err.message);
+			reject(err);
+			return;
+		}
+		resolve(rows as User[]);
+		});
+	});
+}

@@ -101,9 +101,9 @@ async function start() {
 				console.warn('⚠️ Decrypted DB is empty. You may need to initialize it.');
 		}
 
-/*         console.log('📋 Initializing database...');
+        console.log('📋 Initializing database...');
 		await import('../backend/db/database.js');
-		console.log('✅ Database initialized');  */
+		console.log('✅ Database initialized');
 
 		await fastify.register(fastifyWebsocket);
 		await fastify.register(fastifyCors, { origin: true });

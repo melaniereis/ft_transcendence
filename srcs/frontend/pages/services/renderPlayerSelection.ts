@@ -7,30 +7,47 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		: 'en') as keyof typeof translations;
 	const t = translations[lang];
 
-	container.innerHTML = `<h2>${t.selectOpponentTitle}</h2>
-	<label>${t.opponentLabel}:
-		<select id="player1-select"></select>
-	</label>
-	<label>${t.maxGamesLabel}:
-		<select id="max-games-select">
-			<option value="3">3</option>
-			<option value="5">5</option>
-			<option value="7">7</option>
-			<option value="9">9</option>
-			<option value="11">11</option>
-		</select>
-	</label>
-	<label>${t.difficultyLabel}:
-		<select id="difficulty-select">
-			<option value="easy">Easy</option>
-			<option value="normal" selected>Normal</option>
-			<option value="hard">Hard</option>
-			<option value="crazy">Crazy</option>
-		</select>
-	</label>
-	<button id="start-game-btn">${t.startGame}</button>
-	<div id="selection-error" style="color:red;"></div>
-	<div id="verification-form"></div>
+	// Limpar conteúdo anterior
+	container.innerHTML = `
+		<div class="flex flex-col items-center justify-center h-screen p-6 bg-cover bg-center">
+			<h2 class="text-6xl font-bold text-black mb-8">${t.selectOpponentTitle}</h2>
+
+			<div class="bg-transparent p-8 rounded-lg shadow-xl space-y-6 w-full max-w-xl backdrop-blur-md">
+				<label class="text-2xl font-bold text-black block">
+					${t.opponentLabel}:
+					<select id="player1-select" class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
+					</select>
+				</label>
+
+				<label class="text-2xl font-bold text-black block">
+					${t.maxGamesLabel}:
+					<select id="max-games-select" class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
+						<option value="3">3</option>
+						<option value="5">5</option>
+						<option value="7">7</option>
+						<option value="9">9</option>
+						<option value="11">11</option>
+					</select>
+				</label>
+
+				<label class="text-2xl font-bold text-black block">
+					${t.difficultyLabel}:
+					<select id="difficulty-select" class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
+						<option value="easy">Easy</option>
+						<option value="normal" selected>Normal</option>
+						<option value="hard">Hard</option>
+						<option value="crazy">Crazy</option>
+					</select>
+				</label>
+
+				<button id="start-game-btn" class="w-full py-4 text-2xl font-bold text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
+					${t.startGame}
+				</button>
+
+				<div id="selection-error" class="text-red-600 text-xl"></div>
+				<div id="verification-form"></div>
+			</div>
+		</div>
 	`;
 
 	const player1Select = document.getElementById('player1-select') as HTMLSelectElement;
@@ -82,12 +99,11 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 		const opponent = users.find(u => u.id === opponentId);
 		verificationDiv.innerHTML = `
-			<h3>${t.verifyOpponent}: ${opponent.name} (${opponent.username})</h3>
-			<form id="verify-form">
-				<input type="text" name="username" placeholder="${t.verifyUsername}" required />
-				<input type="password" name="password" placeholder="${t.verifyPassword}" required />
-				<button type="submit">${t.verifyStart}</button>
-				<div class="result" style="color:red;"></div>
+			<h3 class="text-2xl font-bold text-black mb-4">${t.verifyOpponent}: ${opponent.name} (${opponent.username})</h3>
+			<form id="verify-form" class="space-y-4">
+				<input type="password" name="password" placeholder="${t.verifyPassword}" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" required />
+				<button type="submit" class="w-full py-4 text-2xl font-bold text-black bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 transition">${t.verifyStart}</button>
+				<div class="result text-red-600 text-xl"></div>
 			</form>
 		`;
 
@@ -97,24 +113,27 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		verifyForm.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const formData = new FormData(verifyForm);
-			const username = formData.get('username') as string;
 			const password = formData.get('password') as string;
 
 			try {
 				const res = await fetch('/api/login', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ username, password })
+					body: JSON.stringify({ username: opponentName, password })
 				});
 				const result = await res.json();
 
 				if (res.ok && result.user.id === opponentId) {
 					resultDiv.style.color = 'green';
 					resultDiv.textContent = t.verifySuccess;
-
+					
+					const token = localStorage.getItem('authToken');
 					const gameRes = await fetch('/games', {
 						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`
+						},
 						body: JSON.stringify({
 							player1_id: loggedInPlayerId,
 							player2_id: opponentId,

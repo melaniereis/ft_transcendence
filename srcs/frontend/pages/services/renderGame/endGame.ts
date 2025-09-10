@@ -1,8 +1,15 @@
 import { translations } from '../language/translations.js';
 
-export async function endGame(score1: number, score2: number, canvas: HTMLCanvasElement,
-onRestart: (winnerId?: number) => void, player1Name: string, player2Name: string,
-mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
+export async function endGame(
+	score1: number,
+	score2: number,
+	canvas: HTMLCanvasElement,
+	onRestart: (winnerId?: number) => void,
+	player1Name: string,
+	player2Name: string,
+	mode: 'single' | 'tournament' | 'quick' = 'single',
+	gameId?: number
+) {
 	let winnerId: number | undefined;
 
 	// 🌐 Get current language
@@ -12,17 +19,17 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 
 	const t = translations[lang];
 
-	console.log('🎮 Game mode:', mode);
+	console.log("🎮 Game mode:", mode);
 
 	if (gameId) {
 		try {
 			const res = await fetch(`/games/${gameId}/end`, {
 				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					score_player1: score1,
-					score_player2: score2
-				})
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+				},
+				body: JSON.stringify({ score_player1: score1, score_player2: score2 })
 			});
 			const data = await res.json();
 			winnerId = data.winner_id;
@@ -35,7 +42,6 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return;
 
-	// 🧹 Clear canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = '#000';
 	ctx.font = '24px Arial';
@@ -45,7 +51,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	ctx.fillText(`${player1Name}: ${score1}`, canvas.width / 2, canvas.height / 2);
 	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 40);
 
-	// 🎯 Create button container
+	// 🎯 Create centered button container
 	const buttonContainer = document.createElement('div');
 	buttonContainer.style.position = 'absolute';
 	buttonContainer.style.top = '50%';
@@ -56,7 +62,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	buttonContainer.style.gap = '20px';
 	buttonContainer.style.zIndex = '10';
 
-	// ▶️ Restart / Next Match Button
+	// ▶️ Restart / Next Match button
 	const restartBtn = document.createElement('button');
 	restartBtn.textContent = mode === 'tournament' ? t.nextMatch : t.restart;
 	restartBtn.style.padding = '10px 20px';
@@ -64,7 +70,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	restartBtn.style.cursor = 'pointer';
 	buttonContainer.appendChild(restartBtn);
 
-	// 🏠 Menu Button (only in single or quick modes)
+	// 🏠 Menu button (only in single mode)
 	if (mode !== 'tournament') {
 		const menuBtn = document.createElement('button');
 		menuBtn.textContent = t.mainMenu;
@@ -77,18 +83,14 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 			buttonContainer.remove();
 			window.location.href = '/';
 		};
-	}
 
-	// Append buttons to document
-	document.body.appendChild(buttonContainer);
+		document.body.appendChild(buttonContainer);
 
-	restartBtn.onclick = () => {
-		buttonContainer.remove();
-		onRestart(winnerId);
-	};
-
-	// 🏁 If tournament mode, auto-call restart
-	if (mode === 'tournament') {
+		restartBtn.onclick = () => {
+			buttonContainer.remove();
+			onRestart(winnerId);
+		};
+	} else {
 		onRestart(winnerId);
 	}
 }

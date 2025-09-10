@@ -17,6 +17,7 @@ Promise<number> {
 					resolve(this.lastID);
 			}
 		);
+		console.log("Creating game with:", { player1Id, player2Id, maxGames, timeStarted });
 	});
 }
 

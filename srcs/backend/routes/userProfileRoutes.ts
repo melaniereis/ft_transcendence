@@ -1,12 +1,7 @@
 //routes/userProfileRoutes.ts
 import { FastifyInstance } from 'fastify';
-import {
-	getUserProfile,
-	updateUserProfile,
-	updateOnlineStatus,
-	getUserWithStats,
-	changeUserPassword
-} from '../services/userProfileService.js';
+import {getUserProfile, updateUserProfile, updateOnlineStatus, getUserWithStats, changeUserPassword} 
+from '../services/userProfileService.js';
 import { verifyToken } from '../services/authService.js';
 import db from '../db/database.js';
 
@@ -226,23 +221,26 @@ export async function userProfileRoutes(fastify: FastifyInstance) {
 		try {
 			const userId = await verifyToken(token);
 			if (!userId) {
-				return reply.status(401).send({ error: 'Invalid token' });
+			return reply.status(401).send({ error: 'Invalid token' });
 			}
 
-			db.run(
-				`UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?`,
-				[userId],
-				function (err) {
-					if (err) {
-						console.error('Error updating last_seen:', err);
-						return reply.status(500).send({ error: 'Internal error' });
-					}
-					reply.send({ success: true });
+			// Promisify db.run to use await
+			await new Promise<void>((resolve, reject) => {
+			db.run(`UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?`, [userId], function (err) {
+				if (err) {
+				reject(err);
+				return;
 				}
-			);
-		} catch (err: any) {
-			console.error('Error:', err);
-			reply.status(500).send({ error: 'Internal server error' });
+				resolve();
+			});
+			});
+
+			// Send success response once db.run resolves
+			return reply.send({ success: true });
+
+		} catch (err) {
+			console.error('Error updating last_seen:', err);
+			return reply.status(500).send({ error: 'Internal server error' });
 		}
 	});
 }

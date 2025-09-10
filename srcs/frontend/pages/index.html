@@ -1,48 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Pong Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pong Game</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Reset body and html to prevent extra white space */
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background-color: black; 
+    }
+
+    .no-select {
+      user-select: none;
+    }
+
+    #app {
+      transition: opacity 0.5s ease-in-out, background-image 0.5s ease-in-out;
+      opacity: 1;
+      background-image: url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg");
+      min-height: 100%;
+      background-size: cover;
+      background-position: center;
+      color: black; /* Set text color to black inside app */
+    }
+
+    /* Fade-out effect */
+    #app.fade-out {
+      opacity: 50;
+    }
+
+    /* Optional: Add a little extra smoothness by applying background image fade-in delay */
+    #app.fade-in {
+      transition: opacity 1s ease-in-out 0.5s, background-image 0.5s ease-in-out;
+    }
+
+    /* Style for top bar buttons */
+    #top-bar .nav-btn {
+      font-size: 1.5rem; /* Default font size */
+      color: black; /* Font color set to black */
+      font-weight: bold; /* Make text bold */
+    }
+
+    #top-bar .nav-btn:hover {
+      font-size: 2rem; /* Hover effect, slightly larger text */
+      font-weight: bold; /* Ensure boldness on hover */
+    }
+
+    #top-bar .nav-btn.active {
+      font-size: 3rem; /* Active button, much larger text */
+      font-weight: bold; /* Ensure boldness when active */
+    }
+  </style>
 </head>
+<body class="m-0 h-screen bg-cover bg-center bg-no-repeat bg-fixed text-white">
+  <div id="top-bar" class="fixed top-0 left-0 w-full z-50 bg-transparent flex flex-wrap justify-center items-center gap-8 py-4 px-6 no-select">
+    <!-- Game Buttons -->
+    <button id="play-btn" class="nav-btn hidden">🎮 Play</button>
+    <button id="tournaments-btn" class="nav-btn hidden">🏆 Tournaments</button>
+    <button id="teams-btn" class="nav-btn hidden">👥 Teams</button>
+    <button id="matchmaking-btn" class="nav-btn hidden">🔗 Matchmaking</button>
+    
+    <!-- Auth Buttons -->
+    <button id="quick-play-btn" class="nav-btn">⚡ Quick Play</button>
+    <button id="login-btn" class="nav-btn">🔐 Login</button>
+    <button id="register-btn" class="nav-btn">📝 Register</button>
+    <button id="profile-btn" class="nav-btn hidden">👤 Profile</button>
 
-<body>
-	<h1>PONG!!!!</h1>
+    <!-- Friend Requests -->
+    <button id="friend-requests-btn" class="nav-btn relative hidden">
+      📧 Friend Requests
+      <span id="friend-requests-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">!</span>
+    </button>
+    <button id="settings-btn" class="nav-btn hidden">⚙️ Player Settings</button>
+    <button id="logout-btn" class="nav-btn hidden">🚪 Logout</button>
+    
+    <!-- Language Selector -->
+    <div class="relative">
+      <button id="language-btn" class="nav-btn">🌐 Language</button>
+      <div id="language-options" class="hidden absolute top-full mt-2 bg-white text-black rounded shadow-lg p-2 space-y-1 z-50 w-32">
+        <button data-lang="en" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">English</button>
+        <button data-lang="es" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Español</button>
+        <button data-lang="pt" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Português</button>
+      </div>
+    </div>
+  </div>
 
-	<!-- Buttons hidden by default unless login state is valid -->
-	<button id="play-btn" style="display: none;">Play</button>
-	<button id="settings-btn" style="display: none;">Player Settings</button>
-	<button id="tournaments-btn" style="display: none;">Tournaments</button>
-	<button id="teams-btn" style="display: none;">Teams</button>
-	<button id="matchmaking-btn" style="display: none;">Join Matchmaking</button>
+  <!-- Main App Content -->
+  <div id="app" class="pt-32 px-4 text-black">
 
-
-	<!-- Auth buttons -->
-	<button id="quick-play-btn">Quick Play</button>
-	<button id="login-btn">Login</button>
-	<button id="register-btn">Register</button>
-	<button id="logout-btn" style="display: none;">Logout</button>
-	<button id="profile-btn" style="display: none;">Profile</button>
-
-	<!-- 🔥 FRIEND REQUESTS NOTIFICATION -->
-	<button id="friend-requests-btn"
-		style="display: none; position: relative; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
-		📧 Friend Requests
-		<span id="friend-requests-badge"
-			style="display: none; position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; text-align: center; line-height: 20px;"></span>
-	</button>
-
-  	<button id="language-btn">🌐 Language</button>
-		<div id="language-options" style="display: none;">
-		<button data-lang="en">English</button>
-		<button data-lang="es">Español</button>
-		<button data-lang="pt">Português</button>
-		</div>
-
-  <div id="app"></div>
-
-	<script type="module" src="index.js"></script>
+  <!-- App Logic -->
+  <script type="module" src="index.js"></script>
 </body>
-
 </html>

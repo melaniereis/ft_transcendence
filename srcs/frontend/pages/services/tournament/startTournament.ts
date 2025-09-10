@@ -13,7 +13,10 @@ function shuffleArray<T>(array: T[]): T[] {
 	return result;
 }
 
-export async function startTournament(container: HTMLElement, tournament: any, selectedPlayers: any[]) {
+export async function startTournament(container: HTMLElement,tournament: any,
+	selectedPlayers: any[],
+	authToken: string  // <-- Auth token parameter added here
+) {
 	const { id } = tournament;
 
 	const shuffled = shuffleArray(selectedPlayers);
@@ -51,7 +54,8 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 	bracketWrapper.appendChild(canvas);
 
 	const ctx = canvas.getContext('2d');
-	if (!ctx) return;
+	if (!ctx) 
+		return;
 
 	const players = [
 		{ id: player1_id, name: getUserName(player1_id) },
@@ -62,126 +66,95 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 
 	const winners: { semifinal1?: number; semifinal2?: number; final?: number } = {};
 
+	const fetchGame = async (playerA: number, playerB: number) => {
+		console.log('authToken:', authToken);  // Add this line to debug
+		if (!authToken)
+			authToken = localStorage.getItem('authToken') || '';
+		const res = await fetch('/games', {
+			method: 'POST',
+			headers: { 
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${authToken}`
+			},
+			body: JSON.stringify({
+			player1_id: playerA,
+			player2_id: playerB,
+			max_games: maxGames,
+			time_started: new Date().toISOString()
+			})
+		});
+		return res.json();
+	};
+
 	// Semifinal 1
 	renderTournamentBracket(canvas, ctx, players, winners, async () => {
 		gameWrapper.innerHTML = '';
-		const game1Res = await fetch('/games', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				player1_id,
-				player2_id,
-				max_games: maxGames,
-				time_started: new Date().toISOString()
-			})
-		});
-		const game1 = await game1Res.json();
+		const game1 = await fetchGame(player1_id, player2_id);
 
 		renderGame(gameWrapper, getUserName(player1_id), getUserName(player2_id), maxGames,
-		difficulty, async (gameCanvas, score1, score2) => {
-				await endGame(
-					score1,
-					score2,
-					gameCanvas,
-					async (winner1Id) => {
-						if (!winner1Id) return alert('❌ Could not determine winner for Semifinal 1.');
-						await updateMatch(id, 'semifinal1', winner1Id);
-						winners.semifinal1 = winner1Id;
+			difficulty, async (gameCanvas, score1, score2) => {
+				await endGame(score1, score2, gameCanvas, async (winner1Id) => {
+					if (!winner1Id) 
+						return alert('❌ Could not determine winner for Semifinal 1.');
+					await updateMatch(id, 'semifinal1', winner1Id);
+					winners.semifinal1 = winner1Id;
 
-						// Semifinal 2
-						renderTournamentBracket(canvas, ctx, players, winners, async () => {
-							gameWrapper.innerHTML = '';
-							const game2Res = await fetch('/games', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({
-									player1_id: player3_id,
-									player2_id: player4_id,
-									max_games: maxGames,
-									time_started: new Date().toISOString()
-								})
-							});
-							const game2 = await game2Res.json();
+					// Semifinal 2
+					renderTournamentBracket(canvas, ctx, players, winners, async () => {
+						gameWrapper.innerHTML = '';
+						const game2 = await fetchGame(player3_id, player4_id);
 
-							renderGame(gameWrapper, getUserName(player3_id), getUserName(player4_id), maxGames,
-							difficulty,async (gameCanvas2, score3, score4) => {
-									await endGame(
-										score3,
-										score4,
-										gameCanvas2,
-										async (winner2Id) => {
-											if (!winner2Id) return alert('❌ Could not determine winner for Semifinal 2.');
-											await updateMatch(id, 'semifinal2', winner2Id);
-											winners.semifinal2 = winner2Id;
+						renderGame(gameWrapper, getUserName(player3_id), getUserName(player4_id), maxGames,
+							difficulty, async (gameCanvas2, score3, score4) => {
+								await endGame(score3, score4, gameCanvas2, async (winner2Id) => {
+									if (!winner2Id) 
+										return alert('❌ Could not determine winner for Semifinal 2.');
+									await updateMatch(id, 'semifinal2', winner2Id);
+									winners.semifinal2 = winner2Id;
 
-											// Final
-											renderTournamentBracket(canvas, ctx, players, winners, async () => {
-												gameWrapper.innerHTML = '';
-												const finalGameRes = await fetch('/games', {
-													method: 'POST',
-													headers: { 'Content-Type': 'application/json' },
-													body: JSON.stringify({
-														player1_id: winner1Id,
-														player2_id: winner2Id,
-														max_games: maxGames,
-														time_started: new Date().toISOString()
-													})
-												});
-												const finalGame = await finalGameRes.json();
+									// Final
+									renderTournamentBracket(canvas, ctx, players, winners, async () => {
+										gameWrapper.innerHTML = '';
+										const finalGame = await fetchGame(winners.semifinal1!, winners.semifinal2!);
 
-												renderGame(
-													gameWrapper,
-													getUserName(winner1Id),
-													getUserName(winner2Id),
-													maxGames,
-													difficulty,
-													async (finalCanvas, scoreF1, scoreF2) => {
-														await endGame(
-															scoreF1,
-															scoreF2,
-															finalCanvas,
-															async (finalWinnerId) => {
-																if (!finalWinnerId) {
-																	alert('❌ Could not determine winner for Final match. Tournament incomplete.');
-																	return;
-																}
-																await updateMatch(id, 'final', finalWinnerId);
-																winners.final = finalWinnerId;
+										renderGame(gameWrapper, getUserName(winners.semifinal1!), getUserName(winners.semifinal2!), maxGames, difficulty,
+											async (finalCanvas, scoreF1, scoreF2) => {
+												await endGame(scoreF1, scoreF2, finalCanvas, async (finalWinnerId) => {
+													if (!finalWinnerId) {
+														alert('❌ Could not determine winner for Final match. Tournament incomplete.');
+														return;
+													}
+													await updateMatch(id, 'final', finalWinnerId);
+													winners.final = finalWinnerId;
 
-																renderTournamentBracket(canvas, ctx, players, winners, () => {
-																	renderTournamentsPage(container as HTMLDivElement);
-																});
-															},
-															getUserName(winner1Id),
-															getUserName(winner2Id),
-															'tournament',
-															finalGame.game_id 
-														);
-													},
-													'tournament',
-													finalGame.game_id
-												);
-											});
-										},
-										getUserName(player3_id),
-										getUserName(player4_id),
-										'tournament',
-										game2.game_id 
-									);
+													renderTournamentBracket(canvas, ctx, players, winners, () => {
+														renderTournamentsPage(container as HTMLDivElement);
+													});
+												},
+												getUserName(winners.semifinal1!),
+												getUserName(winners.semifinal2!),
+												'tournament',
+												finalGame.game_id);
+											},
+											'tournament',
+											finalGame.game_id);
+									});
 								},
+								getUserName(player3_id),
+								getUserName(player4_id),
 								'tournament',
-								game2.game_id
-							);
-						});
-					},
-					getUserName(player1_id),
-					getUserName(player2_id),
-					'tournament',
-					game1.game_id 
-				);
+								game2.game_id);
+							},
+							'tournament',
+							game2.game_id);
+					});
+				},
+				getUserName(player1_id),
+				getUserName(player2_id),
+				'tournament',
+				game1.game_id);
 			},
 			'tournament',
-			game1.game_id
-		);
+			game1.game_id);
 	});
 }
