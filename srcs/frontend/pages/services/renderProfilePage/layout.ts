@@ -1,4 +1,3 @@
-// renderProfilePage/layout.ts
 import { Friend, Match, Profile, Stats } from './types.js';
 import { GRID_COLORS, svgUserIcon, svgFriendsIcon, svgBarChartIcon, svgMedalGold, svgOpponentIcon, svgChartIcon, svgFlameIcon, svgStarIcon } from './constants.js';
 import { header } from './header.js';
@@ -6,6 +5,13 @@ import { friendsList } from './friends.js';
 import { historyList, historyDetailed, historyAnalysis } from './history.js';
 import { statsOverview, statsPerformance, statsTrends } from './stats.js';
 import { modals } from './modals.js';
+import { translations } from '../language/translations.js';
+
+const lang = (['en','es','pt'].includes(localStorage.getItem('preferredLanguage') || '') 
+    ? localStorage.getItem('preferredLanguage') 
+    : 'en') as keyof typeof translations;
+const t = translations[lang];
+
 
 export function layout(profile: Profile, stats: Stats, history: Match[], friends: Friend[], statsTab: string, historyView: string, editMode: boolean, mainTab: string): string {
 	const responsiveStyles = `
@@ -421,216 +427,236 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
     </style>
 `;
 
-	return `${responsiveStyles}
-    <div class="petal">
-      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-      <span></span>
+return `
+  ${responsiveStyles}
+  <div class="petal">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span>
+  </div>
+  <main class="gris-main-card">
+    <div class="fixed-profile-header" style="background:linear-gradient(120deg,#f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 0 32px 0;gap:18px;min-height:100px;border-right:1.5px solid #e3e6f3;">
+      <div class="gris-avatar">
+        <img src="${profile.avatar_url}" alt="${t.avatarAlt}" />
+      </div>
+      <div class="gris-username">@${profile.username}</div>
+      <div class="gris-quote">${t.gentleHuesQuote}</div>
+      <div class="gris-divider"></div>
     </div>
-      <main class="gris-main-card">
-  <div class="fixed-profile-header" style="background:linear-gradient(120deg,#f4f6fa 60%, #b6a6ca33 100%, #7fc7d933 120%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 0 32px 0;gap:18px;min-height:100px;border-right:1.5px solid #e3e6f3;">
-          <div class="gris-avatar">
-            <img src="${profile.avatar_url}" alt="Avatar"/>
-          </div>
-          <div class="gris-username">@${profile.username}</div>
-          <div class="gris-quote">“The world is painted in gentle hues.”</div>
-          <div class="gris-divider"></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0;padding:48px 32px 32px 32px;">
-          <!-- Main Tabs -->
-          <div style="display:flex;gap:0;margin-bottom:32px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px #b6a6ca22;">
-            ${['profile', 'stats', 'history', 'friends'].map(tab => `
-              <button class="main-tab${tab === mainTab ? ' active' : ''}" data-main-tab="${tab}"
-      style="flex:1;padding:18px 0;border:none;background:${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'};
-        color:${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted};font-size:1.15rem;font-weight:700;
-        border-bottom:4px solid ${tab === mainTab ? GRID_COLORS.cool : 'transparent'};cursor:pointer;transition:all 0.2s"
-      onmouseover="this.style.background='${GRID_COLORS.cool}';this.style.color='#fff';this.style.boxShadow='0 2px 12px #7fc7d944';"
-      onmouseout="this.style.background='${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'}';this.style.color='${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted}';this.style.boxShadow='none';">
-                ${(tab === 'profile' ? `${svgUserIcon()} Profile` : tab === 'stats' ? `${svgBarChartIcon()} Statistics` : tab === 'history' ? `${svgMedalGold()} Match History` : `${svgOpponentIcon()} Friends`)}
-				</button>
-	`).join('')}
-          </div>
-          <!-- Tab Panels -->
-          <div class="tab-panel" id="profile-panel" style="display:${mainTab === 'profile' ? 'block' : 'none'}">
-            <div class="profile-timeline-bg${editMode ? ' edit-mode' : ''}" style="position:relative;min-height:420px;padding:0 0 24px 0;overflow:visible;">
-
+    <div style="display:flex;flex-direction:column;gap:0;padding:48px 32px 32px 32px;">
+      <!-- Main Tabs -->
+      <div style="display:flex;gap:0;margin-bottom:32px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px #b6a6ca22;">
+        ${['profile', 'stats', 'history', 'friends'].map(tab => `
+          <button class="main-tab${tab === mainTab ? ' active' : ''}" data-main-tab="${tab}"
+            style="flex:1;padding:18px 0;border:none;background:${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'};
+              color:${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted};font-size:1.15rem;font-weight:700;
+              border-bottom:4px solid ${tab === mainTab ? GRID_COLORS.cool : 'transparent'};cursor:pointer;transition:all 0.2s"
+            onmouseover="this.style.background='${GRID_COLORS.cool}';this.style.color='#fff';this.style.boxShadow='0 2px 12px #7fc7d944';"
+            onmouseout="this.style.background='${tab === mainTab ? GRID_COLORS.bg : '#f4f6fa'}';this.style.color='${tab === mainTab ? GRID_COLORS.primary : GRID_COLORS.muted}';this.style.boxShadow='none';">
+              ${(tab === 'profile' 
+                ? `${svgUserIcon()} ${t.tabProfile}` 
+                : tab === 'stats' 
+                  ? `${svgBarChartIcon()} ${t.tabStatistics}` 
+                  : tab === 'history' 
+                    ? `${svgMedalGold()} ${t.tabMatchHistory}` 
+                    : `${svgOpponentIcon()} ${t.tabFriends}`)}
+          </button>`).join('')}
+      </div>
+      <!-- Tab Panels -->
+      <div class="tab-panel" id="profile-panel" style="display:${mainTab === 'profile' ? 'block' : 'none'}">
+        <div class="profile-timeline-bg${editMode ? ' edit-mode' : ''}" style="position:relative;min-height:420px;padding:0 0 24px 0;overflow:visible;">
               <form id="profile-edit-form" class="profile-timeline-events${editMode ? ' edit-mode' : ''}" style="margin-top:0;display:flex;flex-direction:column;align-items:center;${editMode ? 'gap:8px;' : 'gap:32px;'}">
-                ${!editMode ? `<button id="edit-btn" class="gris-action-btn" title="Edit Profile" type="button"
-                  style="position:absolute;top:0;right:0;margin:12px 18px 0 0;padding:6px 10px;background:#fff6;border:2px solid #7fc7d9;border-radius:50%;box-shadow:0 2px 8px #7fc7d944;cursor:pointer;z-index:99;transition:background 0.18s, box-shadow 0.18s;min-width:unset;width:40px;height:40px;display:flex;align-items:center;justify-content:center;outline:none;"
-                  class="profile-edit-btn"
-                >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;pointer-events:none;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                </button>` : ''}
-                <style>
-                  .profile-edit-btn:hover {
-                    background: #e6f7fa !important;
-                    box-shadow: 0 4px 16px #7fc7d988 !important;
-                  }
-                </style>
-                ${editMode ? `
+              ${!editMode ? `<button id="edit-btn" class="gris-action-btn" title="${t.editProfileBtn}" type="button"
+                style="position:absolute;top:0;right:0;margin:12px 18px 0 0;padding:6px 10px;background:#fff6;border:2px solid #7fc7d9;border-radius:50%;box-shadow:0 2px 8px #7fc7d944;cursor:pointer;z-index:99;transition:background 0.18s, box-shadow 0.18s;min-width:unset;width:40px;height:40px;display:flex;align-items:center;justify-content:center;outline:none;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7fc7d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;pointer-events:none;">
+                  <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                </svg>
+              </button>` : ''}
+              <style>
+                .profile-edit-btn:hover {
+                  background: #e6f7fa !important;
+                  box-shadow: 0 4px 16px #7fc7d988 !important;
+                }
+              </style>
+              ${editMode ? `
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#7fc7d9 0%,#e6c79c 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #e6c79c55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.2s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#7fc7d9 0%,#e6c79c 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #e6c79c55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.2s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgStarIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#e6c79c11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <label for="username-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Username</label>
-                    <input id="username-input" type="text" value="${profile.username}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="24" placeholder="Username"/>
-                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">unique, for login</div>
-                    <label for="display-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Display Name</label>
-                    <input id="display-input" type="text" value="${profile.display_name || ''}" style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;" maxlength="32" placeholder="Display Name"/>
-                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">name shown to others</div>
-                    <label for="bio-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Bio</label>
-                    <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Write your story..."/>
+                    <label for="username-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">${t.labelUsername}</label>
+                    <input id="username-input" type="text" value="${profile.username}" maxlength="24" placeholder="${t.placeholderUsername}"
+                      style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;"/>
+                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">${t.uniqueForLogin}</div>
+                    <label for="display-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">${t.labelDisplayName}</label>
+                    <input id="display-input" type="text" value="${profile.display_name || ''}" maxlength="32" placeholder="${t.placeholderDisplayName}"
+                      style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;margin-bottom:2px;"/>
+                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">${t.nameShownToOthers}</div>
+                    <label for="bio-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">${t.labelBio}</label>
+                    <input id="bio-input" type="text" value="${profile.bio || ''}" maxlength="120" placeholder="${t.placeholderWriteYourStory}"
+                      style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;"/>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#e6c79c 0%,#7fc7d9 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #7fc7d955,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.5s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#e6c79c 0%,#7fc7d9 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #7fc7d955,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.5s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgUserIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#7fc7d911 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Joined the platform</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.joinedPlatform}</div>
                     <div style="font-size:0.92rem;color:#b6a6ca;">${profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#b6a6ca 0%,#e6c79c 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #b6a6ca55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.8s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#b6a6ca 0%,#e6c79c 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #b6a6ca55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.8s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgFriendsIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#b6a6ca11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Team</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.team}</div>
                     <div style="font-size:0.92rem;color:#b6a6ca;">${profile.team || '—'}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#a3d9b1 0%,#b6a6ca 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #a3d9b155,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 2.1s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#a3d9b1 0%,#b6a6ca 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #a3d9b155,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 2.1s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgChartIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#a3d9b111 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <label for="email-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Email</label>
-                    <input id="email-input" type="email" value="${profile.email || ''}" style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" placeholder="Email"/>
-                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">for notifications</div>
+                    <label for="email-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">${t.labelEmail}</label>
+                    <input id="email-input" type="email" value="${profile.email || ''}" placeholder="${t.placeholderEmail}"
+                      style="font-size:1.02rem;font-weight:700;color:#23272f;width:100%;background:transparent;border:none;outline:none;padding:2px 6px 2px 0;" />
+                    <div style="font-size:0.75rem;font-style:italic;color:#d1d1d1;margin-bottom:4px;">${t.forNotifications}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:18px;margin-bottom:10px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#4be17b 0%,#7fc7d9 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #4be17b55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.3s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#4be17b 0%,#7fc7d9 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #4be17b55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.3s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgFlameIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#4be17b11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Status</div>
-                    <div style="font-size:0.92rem;color:${profile.online_status ? '#4be17b' : '#b6a6ca'};font-weight:600;">${profile.online_status ? 'Online' : 'Offline'}</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.status}</div>
+                    <div style="font-size:0.92rem;color:${profile.online_status ? '#4be17b' : '#b6a6ca'};font-weight:600;">${profile.online_status ? t.online : t.offline}</div>
                   </div>
                 </div>
                 <div style="display:flex;gap:16px;margin-top:24px;margin-bottom:8px;flex-wrap:wrap;justify-content:center;">
-                  <button id="avatar-btn" type="button" style="background:#7fc7d9;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #7fc7d944;"><span style="vertical-align:middle;">${svgChartIcon()}</span> Edit Avatar</button>
+                  <button id="avatar-btn" type="button" style="background:#7fc7d9;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #7fc7d944;">
+                    <span style="vertical-align:middle;">${svgChartIcon()}</span> ${t.editAvatarBtn}
+                  </button>
                   <input id="avatar-url-input" type="hidden" value="${profile.avatar_url || ''}" />
-                  <button id="pass-btn" type="button" style="background:#e6c79c;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #e6c79c44;"><span style="vertical-align:middle;">${svgFlameIcon()}</span> Change Password</button>
-                  <button id="save-btn" type="submit" style="background:#00d563;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #00d56344;"><span style="vertical-align:middle;">${svgMedalGold()}</span> Save</button>
-                  <button id="cancel-btn" type="button" style="background:#9b59b6;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s"><span style="vertical-align:middle;">${svgUserIcon()}</span> Cancel</button>
+                  <button id="pass-btn" type="button" style="background:#e6c79c;color:#fff;border:none;padding:10px 20px;border-radius:18px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #e6c79c44;">
+                    <span style="vertical-align:middle;">${svgFlameIcon()}</span> ${t.changePasswordBtn}
+                  </button>
+                  <button id="save-btn" type="submit" style="background:#00d563;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.3s;box-shadow:0 2px 8px #00d56344;">
+                    <span style="vertical-align:middle;">${svgMedalGold()}</span> ${t.saveBtn}
+                  </button>
+                  <button id="cancel-btn" type="button" style="background:#9b59b6;color:#fff;border:none;padding:10px 24px;border-radius:20px;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.3s">
+                    <span style="vertical-align:middle;">${svgUserIcon()}</span> ${t.cancelBtn}
+                  </button>
                   <div id="save-error" style="color:#e84393;font-size:14px;font-weight:500"></div>
                 </div>
-                ` : `
+              ` : `
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#7fc7d9 0%,#e6c79c 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #e6c79c55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.2s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#7fc7d9 0%,#e6c79c 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #e6c79c55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.2s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgStarIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#e6c79c11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
                     <div style="font-size:1.12rem;font-weight:800;color:#23272f;letter-spacing:-1px;">${profile.display_name || profile.username}</div>
-                    <div style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;">${profile.bio || 'Write your story...'}</div>
+                    <div style="font-size:0.98rem;color:#b6a6ca;margin-top:2px;">${profile.bio || t.placeholderWriteYourStory}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#e6c79c 0%,#7fc7d9 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #7fc7d955,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.5s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#e6c79c 0%,#7fc7d9 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #7fc7d955,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.5s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgUserIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#7fc7d911 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Joined the platform</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.joinedPlatform}</div>
                     <div style="font-size:0.92rem;color:#b6a6ca;">${profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#b6a6ca 0%,#e6c79c 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #b6a6ca55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.8s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#b6a6ca 0%,#e6c79c 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #b6a6ca55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.8s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgFriendsIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#b6a6ca11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Team</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.team}</div>
                     <div style="font-size:0.92rem;color:#b6a6ca;">${profile.team || '—'}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#a3d9b1 0%,#b6a6ca 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #a3d9b155,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 2.1s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#a3d9b1 0%,#b6a6ca 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #a3d9b155,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 2.1s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgChartIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#a3d9b111 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Email</div>
-                    <div style="font-size:0.92rem;color:#b6a6ca;">${profile.email || 'Not provided'}</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.email}</div>
+                    <div style="font-size:0.92rem;color:#b6a6ca;">${profile.email || t.notProvided}</div>
                   </div>
                 </div>
                 <div class="timeline-event" style="position:relative;width:100%;max-width:380px;display:flex;align-items:center;gap:14px;">
-                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#4be17b 0%,#7fc7d9 80%,#fff0 100%);border-radius:50%;box-shadow:0 0 16px 4px #4be17b55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.3s infinite alternate;">
+                  <div class="timeline-dot-glow" style="width:32px;height:32px;background:radial-gradient(circle,#4be17b 0%,#7fc7d9 80%,#fff0 100%);
+                    border-radius:50%;box-shadow:0 0 16px 4px #4be17b55,0 0 0 2px #fff;display:flex;align-items:center;justify-content:center;z-index:2;animation:dotPulse 1.3s infinite alternate;">
                     <span style="display:block;width:22px;height:22px;">${svgFlameIcon()}</span>
                   </div>
                   <div style="background:linear-gradient(90deg,#fff 80%,#4be17b11 100%);border-radius:14px;padding:12px 18px;box-shadow:0 2px 8px #b6a6ca22;flex:1;">
-                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">Status</div>
-                    <div style="font-size:0.92rem;color:${profile.online_status ? '#4be17b' : '#b6a6ca'};font-weight:600;">${profile.online_status ? 'Online' : 'Offline'}</div>
+                    <div style="font-size:1.02rem;font-weight:700;color:#23272f;">${t.status}</div>
+                    <div style="font-size:0.92rem;color:${profile.online_status ? '#4be17b' : '#b6a6ca'};font-weight:600;">${profile.online_status ? t.online : t.offline}</div>
                   </div>
                 </div>
-                `}
-              </form>
-              <style>
-                @keyframes railGlow {
-                  0% { box-shadow:0 0 24px 4px #e6c79c44,0 0 0 2px #fff; }
-                  100% { box-shadow:0 0 48px 12px #7fc7d944,0 0 0 2px #fff; }
-                }
-                @keyframes dotPulse {
-                  0% { box-shadow:0 0 16px 4px #e6c79c55,0 0 0 2px #fff; filter:brightness(1.1) saturate(1.2); }
-                  100% { box-shadow:0 0 32px 12px #7fc7d955,0 0 0 2px #fff; filter:brightness(1.3) saturate(1.6) blur(1px); }
-                }
-              </style>
+              `}
+            </form>
+        </div>
+      </div>
+      <div class="tab-panel" id="stats-panel" style="display:${mainTab === 'stats' ? 'block' : 'none'}">
+        <div class="gris-section" id="stats-section">
+          <div class="gris-section-title">${t.statistics}</div>
+          <div class="gris-section-content" id="stats-content">
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+              <button class="stats-tab gris-action-btn" data-tab="overview" type="button" style="background:${statsTab === 'overview' ? '#7fc7d9' : '#b6a6ca'}">${t.overview}</button>
+              <button class="stats-tab gris-action-btn" data-tab="performance" type="button" style="background:${statsTab === 'performance' ? '#7fc7d9' : '#b6a6ca'}">${t.performance}</button>
+              <button class="stats-tab gris-action-btn" data-tab="trends" type="button" style="background:${statsTab === 'trends' ? '#7fc7d9' : '#b6a6ca'}">${t.trends}</button>
             </div>
-          </div>
-          <div class="tab-panel" id="stats-panel" style="display:${mainTab === 'stats' ? 'block' : 'none'}">
-            <div class="gris-section" id="stats-section">
-              <div class="gris-section-title">Statistics</div>
-              <div class="gris-section-content" id="stats-content">
-                <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
-                  <button class="stats-tab gris-action-btn" data-tab="overview" type="button" style="background:${statsTab === 'overview' ? '#7fc7d9' : '#b6a6ca'}">Overview</button>
-                  <button class="stats-tab gris-action-btn" data-tab="performance" type="button" style="background:${statsTab === 'performance' ? '#7fc7d9' : '#b6a6ca'}">Performance</button>
-                  <button class="stats-tab gris-action-btn" data-tab="trends" type="button" style="background:${statsTab === 'trends' ? '#7fc7d9' : '#b6a6ca'}">Trends</button>
-                </div>
-                <div id="stats-content-inner">Loading stats...</div>
-              </div>
-            </div>
-          </div>
-          <div class="tab-panel" id="history-panel" style="display:${mainTab === 'history' ? 'block' : 'none'}">
-            <div class="gris-section" id="history-section">
-              <div class="gris-section-title">Match History</div>
-              <div class="gris-section-content" id="history-content">
-                <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
-                  <button class="history-tab gris-action-btn" data-view="list" type="button" style="background:${historyView === 'list' ? '#7fc7d9' : '#b6a6ca'}">List</button>
-                  <button class="history-tab gris-action-btn" data-view="detailed" type="button" style="background:${historyView === 'detailed' ? '#7fc7d9' : '#b6a6ca'}">Detailed</button>
-                  <button class="history-tab gris-action-btn" data-view="analysis" type="button" style="background:${historyView === 'analysis' ? '#7fc7d9' : '#b6a6ca'}">Analysis</button>
-                 </div>
-                <div id="history-content-inner">Loading history...</div>
-              </div>
-            </div>
-          </div>
-          <div class="tab-panel" id="friends-panel" style="display:${mainTab === 'friends' ? 'block' : 'none'}">
-            <div class="gris-section" id="friends-section">
-              <div class="gris-section-title">Friends</div>
-              <div class="gris-section-content" id="friends-content">
-                <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
-					<label for="friend-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Friend Username</label>
-					<input id="friend-input" placeholder="Username..." style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
-					<button id="friend-add" class="gris-action-btn" title="Add Friend" type="submit">Add</button>
-				</form>
-                <div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff">.</div>
-                <div id="friends-container" style="margin:10px 0;text-align:center">Loading friends...</div>
-              </div>
-            </div>
+            <div id="stats-content-inner">${t.loadingStats}</div>
           </div>
         </div>
-        ${modals()}
-      </main>
+      </div>
+      <div class="tab-panel" id="history-panel" style="display:${mainTab === 'history' ? 'block' : 'none'}">
+        <div class="gris-section" id="history-section">
+          <div class="gris-section-title">${t.matchHistory}</div>
+          <div class="gris-section-content" id="history-content">
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+              <button class="history-tab gris-action-btn" data-view="list" type="button" style="background:${historyView === 'list' ? '#7fc7d9' : '#b6a6ca'}">${t.list}</button>
+              <button class="history-tab gris-action-btn" data-view="detailed" type="button" style="background:${historyView === 'detailed' ? '#7fc7d9' : '#b6a6ca'}">${t.detailed}</button>
+              <button class="history-tab gris-action-btn" data-view="analysis" type="button" style="background:${historyView === 'analysis' ? '#7fc7d9' : '#b6a6ca'}">${t.analysis}</button>
+            </div>
+            <div id="history-content-inner">${t.loadingHistory}</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="friends-panel" style="display:${mainTab === 'friends' ? 'block' : 'none'}">
+        <div class="gris-section" id="friends-section">
+          <div class="gris-section-title">${t.friends}</div>
+          <div class="gris-section-content" id="friends-content">
+            <form id="friend-form" style="display:flex;gap:10px;justify-content:flex-start;margin-bottom:10px;flex-wrap:wrap" autocomplete="off">
+              <label for="friend-input" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">${t.friendUsernameLabel}</label>
+              <input id="friend-input" placeholder="${t.friendUsernamePlaceholder}" style="flex:1;min-width:120px;max-width:180px;padding:8px;border:1.5px solid #b6a6ca;border-radius:8px;font-size:15px;background:rgba(255,255,255,0.7);font-family:'EB Garamond',serif;"/>
+              <button id="friend-add" class="gris-action-btn" title="${t.addFriendBtn}" type="submit">${t.addFriendBtn}</button>
+            </form>
+            <div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff">.</div>
+            <div id="friends-container" style="margin:10px 0;text-align:center">${t.loadingFriends}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${modals()}
+  </main>
+
     <script>
       // Animate petal background
       (function(){

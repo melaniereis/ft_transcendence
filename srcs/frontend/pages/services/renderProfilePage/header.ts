@@ -2,7 +2,6 @@ import { Profile } from './types.js';
 import { GRID_COLORS, TEAM_LOGOS, svgChartIcon } from './constants.js';
 import { translations } from '../language/translations.js'; // ✅ Added for localization
 
-// ✅ Determine language and translation object
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
 	: 'en') as keyof typeof translations;

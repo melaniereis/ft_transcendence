@@ -1,53 +1,58 @@
-// renderProfilePage/friends.ts
 import { Friend } from './types.js';
-import { GRID_COLORS, TEAM_LOGOS, svgChartIcon } from './constants.js';
+import { GRID_COLORS, TEAM_LOGOS } from './constants.js';
+import { translations } from '../language/translations.js';
 
 declare global {
-	interface Window {
-		state: any;
-		renderProfilePage?: (container: HTMLElement, onBadgeUpdate?: () => void) => void;
-		setupButtons?: () => void;
-	}
+  interface Window {
+    state: any;
+    renderProfilePage?: (container: HTMLElement, onBadgeUpdate?: () => void) => void;
+    setupButtons?: () => void;
+  }
 }
 
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
+  ? localStorage.getItem('preferredLanguage') 
+  : 'en') as keyof typeof translations;
+const t = translations[lang];
+
 export function friendsList(friends: Friend[]): string {
-	if (!friends || friends.length === 0) {
-		return `<div style="padding:32px 0;text-align:center;color:${GRID_COLORS.muted};font-size:16px;letter-spacing:0.5px;">No friends added yet</div>`;
-	}
+  if (!friends || friends.length === 0) {
+    return `<div style="padding:32px 0;text-align:center;color:${GRID_COLORS.muted};font-size:16px;letter-spacing:0.5px;">${t.noFriendsAddedYet}</div>`;
+  }
 
-	// Paginação: 10 por página, 2 colunas
-	const pageSize = 10;
-	const page = (window.state && typeof window.state.friendsPage === 'number') ? window.state.friendsPage : 0;
-	const totalPages = Math.ceil(friends.length / pageSize);
-	const start = page * pageSize;
-	const end = start + pageSize;
-	const pageFriends = friends.slice(start, end);
-	const col1 = pageFriends.slice(0, 5);
-	const col2 = pageFriends.slice(5, 10);
+  // Pagination: 10 per page, 2 columns
+  const pageSize = 10;
+  const page = (window.state && typeof window.state.friendsPage === 'number') ? window.state.friendsPage : 0;
+  const totalPages = Math.ceil(friends.length / pageSize);
+  const start = page * pageSize;
+  const end = start + pageSize;
+  const pageFriends = friends.slice(start, end);
+  const col1 = pageFriends.slice(0, 5);
+  const col2 = pageFriends.slice(5, 10);
 
-	function friendCard(f: any) {
-		const id = f.friend_id ?? f.id ?? f.userId ?? '';
-		const displayName = f.display_name || f.name || f.username || 'Unknown';
-		const username = f.username || '';
-		const avatar = f.avatar_url || '/assets/avatar/default.png';
-		const online = !!f.online_status;
-		const team = f.team ? f.team.toUpperCase() : '';
-		let teamLogo = '';
-		if (team && Object.prototype.hasOwnProperty.call(TEAM_LOGOS, team)) {
-			teamLogo = TEAM_LOGOS[team as keyof typeof TEAM_LOGOS];
-		}
-		return `
+  function friendCard(f: any) {
+    const id = f.friend_id ?? f.id ?? f.userId ?? '';
+    const displayName = f.display_name || f.name || f.username || t.unknown;
+    const username = f.username || '';
+    const avatar = f.avatar_url || '/assets/avatar/default.png';
+    const online = !!f.online_status;
+    const team = f.team ? f.team.toUpperCase() : '';
+    let teamLogo = '';
+    if (team && Object.prototype.hasOwnProperty.call(TEAM_LOGOS, team)) {
+      teamLogo = TEAM_LOGOS[team as keyof typeof TEAM_LOGOS];
+    }
+    return `
     <div class="friend-item amazing-friend-card" data-id="${id}" data-name="${displayName}">
       <div class="amazing-avatar-wrap">
-        <img src="${avatar}" width="56" height="56" class="amazing-avatar" alt="Avatar"/>
-        ${teamLogo ? `<img src="${teamLogo}" width="30" height="30" class="amazing-team-logo" alt="Team Logo"/>` : ''}
+        <img src="${avatar}" width="56" height="56" class="amazing-avatar" alt="${t.avatarAlt}"/>
+        ${teamLogo ? `<img src="${teamLogo}" width="30" height="30" class="amazing-team-logo" alt="${t.teamLogoAlt}"/>` : ''}
         <span class="amazing-status-dot" style="background:${online ? '#4be17b' : '#b6a6ca'};box-shadow:0 0 8px 2px ${online ? '#4be17b88' : '#b6a6ca55'}"></span>
       </div>
       <div class="amazing-friend-info">
         <div class="amazing-friend-name">${displayName}</div>
         <div class="amazing-friend-username">@${username}</div>
       </div>
-      <button class="remove-friend-btn amazing-remove-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}" title="Remove friend">
+      <button class="remove-friend-btn amazing-remove-btn" data-action="remove-friend" data-id="${id}" data-friend-id="${id}" data-name="${displayName}" data-friend-name="${displayName}" title="${t.removeFriendTitle}">
         <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff5c5c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></span>
       </button>
     </div>
@@ -182,52 +187,52 @@ export function friendsList(friends: Friend[]): string {
         background: #ff2d2d;
         box-shadow: 0 4px 16px #ff5c5c55;
       }
-    /* Editable input hover effect */
-    #profile-edit-form input[type="text"],
-    #profile-edit-form input[type="email"] {
-      transition: background 0.18s, box-shadow 0.18s;
-    }
-    #profile-edit-form input[type="text"]:hover,
-    #profile-edit-form input[type="email"]:hover,
-    #profile-edit-form input[type="text"]:focus,
-    #profile-edit-form input[type="email"]:focus {
-      background: #f4f6fa;
-      box-shadow: 0 2px 8px #b6a6ca33;
-      outline: none;
-    }
-    /* Button hover effects for edit section */
-    #avatar-btn:hover {
-      background: #a3e1f7 !important;
-      color: #23272f !important;
-      box-shadow: 0 4px 16px #7fc7d988 !important;
-    }
-    #pass-btn:hover {
-      background: #ffe6b3 !important;
-      color: #23272f !important;
-      box-shadow: 0 4px 16px #e6c79c88 !important;
-    }
-    #save-btn:hover {
-      background: #00e68a !important;
-      color: #fff !important;
-      box-shadow: 0 4px 16px #00d56388 !important;
-    }
-    #cancel-btn:hover {
-      background: #d1a3e6 !important;
-      color: #fff !important;
-      box-shadow: 0 4px 16px #9b59b688 !important;
-    }
+      /* Editable input hover effect */
+      #profile-edit-form input[type="text"],
+      #profile-edit-form input[type="email"] {
+        transition: background 0.18s, box-shadow 0.18s;
+      }
+      #profile-edit-form input[type="text"]:hover,
+      #profile-edit-form input[type="email"]:hover,
+      #profile-edit-form input[type="text"]:focus,
+      #profile-edit-form input[type="email"]:focus {
+        background: #f4f6fa;
+        box-shadow: 0 2px 8px #b6a6ca33;
+        outline: none;
+      }
+      /* Button hover effects for edit section */
+      #avatar-btn:hover {
+        background: #a3e1f7 !important;
+        color: #23272f !important;
+        box-shadow: 0 4px 16px #7fc7d988 !important;
+      }
+      #pass-btn:hover {
+        background: #ffe6b3 !important;
+        color: #23272f !important;
+        box-shadow: 0 4px 16px #e6c79c88 !important;
+      }
+      #save-btn:hover {
+        background: #00e68a !important;
+        color: #fff !important;
+        box-shadow: 0 4px 16px #00d56388 !important;
+      }
+      #cancel-btn:hover {
+        background: #d1a3e6 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 16px #9b59b688 !important;
+      }
     </style>
     `;
-	}
+  }
 
-	return `
+  return `
   <div style="max-width:700px;margin:0 auto;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div style="font-size:18px;font-weight:600;color:${GRID_COLORS.primary};letter-spacing:0.5px;">Your Friends <span style="font-size:13px;color:${GRID_COLORS.accent};font-weight:400">(${friends.length})</span></div>
+      <div style="font-size:18px;font-weight:600;color:${GRID_COLORS.primary};letter-spacing:0.5px;">${t.yourFriends} <span style="font-size:13px;color:${GRID_COLORS.accent};font-weight:400">(${friends.length})</span></div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button id="friends-prev" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === 0 ? 0.3 : 1};pointer-events:${page === 0 ? 'none' : 'auto'};transition:opacity 0.2s;">&#8592;</button>
+        <button id="friends-prev" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === 0 ? 0.3 : 1};pointer-events:${page === 0 ? 'none' : 'auto'};transition:opacity 0.2s;" aria-label="${t.prevPage}">&#8592;</button>
         <span style="font-size:13px;color:${GRID_COLORS.primary};font-weight:500;">${page + 1}/${totalPages}</span>
-        <button id="friends-next" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === totalPages - 1 ? 0.3 : 1};pointer-events:${page === totalPages - 1 ? 'none' : 'auto'};transition:opacity 0.2s;">&#8594;</button>
+        <button id="friends-next" style="background:${GRID_COLORS.accent};color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;opacity:${page === totalPages - 1 ? 0.3 : 1};pointer-events:${page === totalPages - 1 ? 'none' : 'auto'};transition:opacity 0.2s;" aria-label="${t.nextPage}">&#8594;</button>
       </div>
     </div>
     <div class="amazing-friends-grid">
@@ -238,64 +243,7 @@ export function friendsList(friends: Friend[]): string {
         ${col2.map(friendCard).join('')}
       </div>
     </div>
-    <style>
-      .amazing-friends-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-      }
-      @media (max-width: 700px) {
-        .amazing-friends-grid {
-          grid-template-columns: 1fr;
-        }
-        .amazing-friends-grid > div {
-          margin-bottom: 0;
-        }
-        .amazing-friend-card {
-          min-width: 0;
-          padding: 14px 10px 14px 10px;
-        }
-        .amazing-avatar {
-          width: 44px;
-          height: 44px;
-        }
-        .amazing-team-logo {
-          width: 22px;
-          height: 22px;
-        }
-        .amazing-friend-name {
-          font-size: 16px;
-        }
-        .amazing-friend-username {
-          font-size: 12px;
-        }
-      }
-      @media (max-width: 480px) {
-        .amazing-friends-grid {
-          grid-template-columns: 1fr;
-        }
-        .amazing-friend-card {
-          flex-direction: column;
-          align-items: flex-start;
-          padding: 10px 4px;
-        }
-        .amazing-avatar {
-          width: 36px;
-          height: 36px;
-        }
-        .amazing-team-logo {
-          width: 16px;
-          height: 16px;
-        }
-        .amazing-friend-name {
-          font-size: 14px;
-        }
-        .amazing-friend-username {
-          font-size: 11px;
-        }
-      }
-    </style>
   </div>
   <!-- Navigation controlled by event delegation in profile.ts -->
-`;
+  `;
 }

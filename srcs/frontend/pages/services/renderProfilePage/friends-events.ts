@@ -169,7 +169,7 @@ export function setupFriendsEvents(container: HTMLElement) {
 				rerenderFriends();
 				showInlineMessage('friend-msg', t.requestSent, '#28a745');
 			} catch (err: any) {
-				showInlineMessage('friend-msg', err?.message || t.failedToAddFriend, '#dc3545');
+				showInlineMessage('friend-msg', t.failedToAddFriend, '#dc3545');
 			} finally {
 				btn.disabled = false;
 				btn.textContent = t.addSymbol;

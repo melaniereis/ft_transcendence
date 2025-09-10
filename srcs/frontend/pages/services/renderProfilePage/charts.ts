@@ -1,6 +1,10 @@
 // renderProfilePage/charts.ts
 import { state } from './state.js';
-
+import { translations } from '../language/translations.js';
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+  ? localStorage.getItem('preferredLanguage')
+  : 'en') as keyof typeof translations;
+const t = translations[lang];
 /**
  * GRIS-inspired responsive charts with:
  * - HTML legends (accessible, copyable)
@@ -304,88 +308,85 @@ export function renderWinRateChart() {
 }
 
 export function renderPerformanceChart() {
-	const canvas = document.getElementById('performanceChart') as HTMLCanvasElement | null;
-	if (!canvas) return;
-	let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
-	try {
-		({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
-	} catch {
-		return;
+const canvas = document.getElementById('performanceChart') as HTMLCanvasElement | null;
+if (!canvas) return;
+let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+try {
+	({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+} catch {
+	return;
+}
+
+const matches = state.history.slice(-10).reverse();
+const paddingBottom = Math.max(22, Math.round(cssHeight * 0.12));
+const availableH = cssHeight - paddingBottom - 12;
+const barW = Math.max(8, cssWidth / Math.max(1, matches.length) - 10);
+const maxScore = Math.max(...matches.map(m => m.user_score), 20);
+
+const id = 'performanceChart';
+cancelAnim(id);
+
+function draw(progress: number) {
+	ctx.clearRect(0, 0, cssWidth, cssHeight);
+	// background
+	ctx.save();
+	ctx.globalAlpha = 0.7;
+	const bgGrad = ctx.createLinearGradient(0, 0, cssWidth, cssHeight);
+	bgGrad.addColorStop(0, '#f4f6fa');
+	bgGrad.addColorStop(1, '#e6c79c11');
+	ctx.fillStyle = bgGrad;
+	ctx.fillRect(0, 0, cssWidth, cssHeight);
+	ctx.restore();
+
+	if (!matches.length) {
+	ctx.fillStyle = '#696969';
+	ctx.font = '16px Inter, Arial, sans-serif';
+	ctx.textAlign = 'center';
+	ctx.fillText(t.noRecentMatches, cssWidth / 2, cssHeight / 2);
+	return;
 	}
 
-	const matches = state.history.slice(-10).reverse();
-	const paddingBottom = Math.max(22, Math.round(cssHeight * 0.12));
-	const availableH = cssHeight - paddingBottom - 12;
-	const barW = Math.max(8, cssWidth / Math.max(1, matches.length) - 10);
-	const maxScore = Math.max(...matches.map(m => m.user_score), 20);
+	matches.forEach((m, i) => {
+	const rawH = (m.user_score / maxScore) * (availableH - 8);
+	const h = rawH * progress;
+	const x = i * (barW + 10) + 8;
+	const y = cssHeight - paddingBottom - h;
 
-	const id = 'performanceChart';
-	cancelAnim(id);
-
-	function draw(progress: number) {
-		ctx.clearRect(0, 0, cssWidth, cssHeight);
-		// background
-		ctx.save();
-		ctx.globalAlpha = 0.7;
-		const bgGrad = ctx.createLinearGradient(0, 0, cssWidth, cssHeight);
-		bgGrad.addColorStop(0, '#f4f6fa');
-		bgGrad.addColorStop(1, '#e6c79c11');
-		ctx.fillStyle = bgGrad;
-		ctx.fillRect(0, 0, cssWidth, cssHeight);
-		ctx.restore();
-
-		if (!matches.length) {
-			ctx.fillStyle = '#696969';
-			ctx.font = '16px Inter, Arial, sans-serif';
-			ctx.textAlign = 'center';
-			ctx.fillText('No recent matches', cssWidth / 2, cssHeight / 2);
-			return;
-		}
-
-		matches.forEach((m, i) => {
-			const rawH = (m.user_score / maxScore) * (availableH - 8);
-			const h = rawH * progress;
-			const x = i * (barW + 10) + 8;
-			const y = cssHeight - paddingBottom - h;
-
-			const gradient = ctx.createLinearGradient(x, y, x, y + Math.max(6, h));
-			if (m.result === 'win') {
-				gradient.addColorStop(0, '#cfeff6');
-				gradient.addColorStop(1, '#7b93a4');
-			} else {
-				gradient.addColorStop(0, '#fff0d6');
-				gradient.addColorStop(1, '#b1715a');
-			}
-
-			ctx.save();
-			ctx.shadowColor = m.result === 'win' ? '#7fc7d9cc' : '#b1715a99';
-			ctx.shadowBlur = 18 * progress;
-			roundRect(ctx, x, y, barW, h, Math.min(10, barW / 1.3));
-			ctx.fillStyle = gradient;
-			ctx.fill();
-			ctx.strokeStyle = 'rgba(80,80,80,0.22)';
-			ctx.lineWidth = 1.5;
-			ctx.stroke();
-			ctx.shadowBlur = 0;
-			ctx.restore();
-
-			// animated highlight on hover (micro-interaction)
-			// (optional: can be added with event listeners if desired)
-
-			// label
-			ctx.fillStyle = '#2f4f4f';
-			ctx.font = '13px Inter, Arial, sans-serif';
-			ctx.textAlign = 'center';
-			ctx.fillText(String(m.user_score), x + barW / 2, cssHeight - 6);
-		});
+	const gradient = ctx.createLinearGradient(x, y, x, y + Math.max(6, h));
+	if (m.result === 'win') {
+		gradient.addColorStop(0, '#cfeff6');
+		gradient.addColorStop(1, '#7b93a4');
+	} else {
+		gradient.addColorStop(0, '#fff0d6');
+		gradient.addColorStop(1, '#b1715a');
 	}
 
-	animate(id, draw, 800);
+	ctx.save();
+	ctx.shadowColor = m.result === 'win' ? '#7fc7d9cc' : '#b1715a99';
+	ctx.shadowBlur = 18 * progress;
+	roundRect(ctx, x, y, barW, h, Math.min(10, barW / 1.3));
+	ctx.fillStyle = gradient;
+	ctx.fill();
+	ctx.strokeStyle = 'rgba(80,80,80,0.22)';
+	ctx.lineWidth = 1.5;
+	ctx.stroke();
+	ctx.shadowBlur = 0;
+	ctx.restore();
 
-	renderLegendHTML('performanceChart', [
-		{ label: 'Wins (high bars)', swatch: '#7b93a4' },
-		{ label: 'Losses (low bars)', swatch: '#b1715a' }
-	]);
+	// label
+	ctx.fillStyle = '#2f4f4f';
+	ctx.font = '13px Inter, Arial, sans-serif';
+	ctx.textAlign = 'center';
+	ctx.fillText(String(m.user_score), x + barW / 2, cssHeight - 6);
+	});
+}
+
+animate(id, draw, 800);
+
+renderLegendHTML('performanceChart', [
+	{ label: t.winsHighBars, swatch: '#7b93a4' },
+	{ label: t.lossesLowBars, swatch: '#b1715a' }
+]);
 }
 
 export function renderScoreDistribution() {
@@ -437,7 +438,7 @@ export function renderScoreDistribution() {
 	animate(id, draw, 650);
 
 	renderLegendHTML('scoreDistribution', [
-		{ label: 'Score frequency (how often)', swatch: '#72818a' }
+		{ label: t.scoreFrequency || 'Score frequency (how often)', swatch: '#72818a' }
 	]);
 }
 
@@ -495,8 +496,8 @@ export function renderTimeAnalysisChart() {
 	animate(id, draw, 700);
 
 	renderLegendHTML('timeAnalysisChart', [
-		{ label: 'Win rate (color)', swatch: 'gradient:linear-gradient(90deg,#91c27f,#9aa7b2)' },
-		{ label: 'Games played (bar height)', swatch: '#9aa7b2' }
+		{ label: t.winRateColor || "Win rate (color)", swatch: 'gradient:linear-gradient(90deg,#91c27f,#9aa7b2)' },
+		{ label: t.gamesPlayedBarHeight || "Games played (bar height)", swatch: '#9aa7b2' }
 	]);
 }
 
@@ -517,7 +518,7 @@ export function renderTrendsChart() {
 		ctx.fillStyle = '#696969';
 		ctx.font = '16px Inter, Arial, sans-serif';
 		ctx.textAlign = 'center';
-		ctx.fillText('Not enough data for trend analysis', cssWidth / 2, cssHeight / 2);
+		ctx.fillText(t.notEnoughDataForTrendAnalysis || 'Not enough data for trend analysis', cssWidth / 2, cssHeight / 2);
 		return;
 	}
 
@@ -583,99 +584,99 @@ export function renderTrendsChart() {
 	animate(id, draw, 900);
 
 	renderLegendHTML('trendsChart', [
-		{ label: 'Win-rate trend (progression)', swatch: '#89a9b7' }
+		{ label: t.winRateTrendProgression || 'Win-rate trend (progression)', swatch: '#89a9b7' }
 	]);
 }
 
 export function renderWeeklyChart() {
-	const canvas = document.getElementById('weeklyChart') as HTMLCanvasElement | null;
-	if (!canvas) return;
-	let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
-	try {
-		({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
-	} catch {
-		return;
-	}
+const canvas = document.getElementById('weeklyChart') as HTMLCanvasElement | null;
+if (!canvas) return;
+let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+try {
+	({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+} catch {
+	return;
+}
 
-	const now = new Date();
-	const weeks = Array.from({ length: 4 }, (_, idx) => {
-		const i = 3 - idx;
-		const start = new Date(now);
-		start.setDate(now.getDate() - (i + 1) * 7);
-		start.setHours(0, 0, 0, 0);
-		const end = new Date(now);
-		end.setDate(now.getDate() - i * 7);
-		end.setHours(0, 0, 0, 0);
-		const matches = state.history.filter(m => {
-			const d = new Date(m.date_played);
-			return d >= start && d < end;
-		});
-		const winsCount = matches.filter(m => m.result === 'win').length;
-		return { label: `Week ${idx + 1}`, games: matches.length, wins: winsCount };
+const now = new Date();
+const weeks = Array.from({ length: 4 }, (_, idx) => {
+	const i = 3 - idx;
+	const start = new Date(now);
+	start.setDate(now.getDate() - (i + 1) * 7);
+	start.setHours(0, 0, 0, 0);
+	const end = new Date(now);
+	end.setDate(now.getDate() - i * 7);
+	end.setHours(0, 0, 0, 0);
+	const matches = state.history.filter(m => {
+	const d = new Date(m.date_played);
+	return d >= start && d < end;
 	});
+	const winsCount = matches.filter(m => m.result === 'win').length;
+	return { label: `${t.weekLabel || 'Week'} ${idx + 1}`, games: matches.length, wins: winsCount };
+});
 
-	if (weeks.every(w => w.games === 0)) {
-		ctx.fillStyle = '#696969';
-		ctx.font = '14px Inter, Arial, sans-serif';
-		ctx.textAlign = 'center';
-		ctx.fillText('No matches in last 4 weeks', cssWidth / 2, cssHeight / 2);
-		// still render an empty legend
-		renderLegendHTML('weeklyChart', [
-			{ label: 'Gray: Total games', swatch: '#72818a' },
-			{ label: 'Soft blue: Wins', swatch: '#7b93a4' }
-		]);
-		return;
-	}
-
-	const barW = Math.max(18, cssWidth / weeks.length - 22);
-	const maxGames = Math.max(...weeks.map(w => w.games), 1);
-
-	const id = 'weeklyChart';
-	cancelAnim(id);
-
-	function draw(progress: number) {
-		ctx.clearRect(0, 0, cssWidth, cssHeight);
-
-		weeks.forEach((w, i) => {
-			const totalH = (w.games / maxGames) * (cssHeight - 40) * progress;
-			const winH = (w.wins / maxGames) * (cssHeight - 40) * progress;
-			const x = i * (barW + 22) + 8;
-			const yTotal = cssHeight - 24 - totalH;
-			const yWin = cssHeight - 24 - winH;
-
-			// total
-			const gGrad = ctx.createLinearGradient(x, yTotal, x, yTotal + Math.max(6, totalH));
-			gGrad.addColorStop(0, '#e6e6e6');
-			gGrad.addColorStop(1, '#72818a');
-			roundRect(ctx, x, yTotal, barW * 0.6, totalH, 6);
-			ctx.fillStyle = gGrad;
-			ctx.fill();
-			ctx.strokeStyle = 'rgba(80,80,80,0.18)';
-			ctx.stroke();
-
-			// wins overlay
-			const wX = x + barW * 0.4;
-			const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 24);
-			winsGrad.addColorStop(0, '#dff6fb');
-			winsGrad.addColorStop(1, '#7b93a4');
-			roundRect(ctx, wX, yWin, barW * 0.6, winH, 6);
-			ctx.fillStyle = winsGrad;
-			ctx.fill();
-			ctx.strokeRect(wX, yWin, barW * 0.6, winH);
-
-			ctx.fillStyle = '#2f4f4f';
-			ctx.font = '12px Inter, Arial, sans-serif';
-			ctx.textAlign = 'center';
-			ctx.fillText(w.label, x + barW / 2, cssHeight - 6);
-		});
-	}
-
-	animate(id, draw, 700);
-
+if (weeks.every(w => w.games === 0)) {
+	ctx.fillStyle = '#696969';
+	ctx.font = '14px Inter, Arial, sans-serif';
+	ctx.textAlign = 'center';
+	ctx.fillText(t.noMatchesLast4Weeks || 'No matches in last 4 weeks', cssWidth / 2, cssHeight / 2);
+	// still render an empty legend
 	renderLegendHTML('weeklyChart', [
-		{ label: 'Games (total per week)', swatch: '#72818a' },
-		{ label: 'Wins (per week)', swatch: '#7b93a4' }
+	{ label: t.grayTotalGames || 'Gray: Total games', swatch: '#72818a' },
+	{ label: t.softBlueWins || 'Soft blue: Wins', swatch: '#7b93a4' }
 	]);
+	return;
+}
+
+const barW = Math.max(18, cssWidth / weeks.length - 22);
+const maxGames = Math.max(...weeks.map(w => w.games), 1);
+
+const id = 'weeklyChart';
+cancelAnim(id);
+
+function draw(progress: number) {
+	ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+	weeks.forEach((w, i) => {
+	const totalH = (w.games / maxGames) * (cssHeight - 40) * progress;
+	const winH = (w.wins / maxGames) * (cssHeight - 40) * progress;
+	const x = i * (barW + 22) + 8;
+	const yTotal = cssHeight - 24 - totalH;
+	const yWin = cssHeight - 24 - winH;
+
+	// total
+	const gGrad = ctx.createLinearGradient(x, yTotal, x, yTotal + Math.max(6, totalH));
+	gGrad.addColorStop(0, '#e6e6e6');
+	gGrad.addColorStop(1, '#72818a');
+	roundRect(ctx, x, yTotal, barW * 0.6, totalH, 6);
+	ctx.fillStyle = gGrad;
+	ctx.fill();
+	ctx.strokeStyle = 'rgba(80,80,80,0.18)';
+	ctx.stroke();
+
+	// wins overlay
+	const wX = x + barW * 0.4;
+	const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 24);
+	winsGrad.addColorStop(0, '#dff6fb');
+	winsGrad.addColorStop(1, '#7b93a4');
+	roundRect(ctx, wX, yWin, barW * 0.6, winH, 6);
+	ctx.fillStyle = winsGrad;
+	ctx.fill();
+	ctx.strokeRect(wX, yWin, barW * 0.6, winH);
+
+	ctx.fillStyle = '#2f4f4f';
+	ctx.font = '12px Inter, Arial, sans-serif';
+	ctx.textAlign = 'center';
+	ctx.fillText(w.label, x + barW / 2, cssHeight - 6);
+	});
+}
+
+animate(id, draw, 700);
+
+renderLegendHTML('weeklyChart', [
+	{ label: t.gamesTotalPerWeek || 'Games (total per week)', swatch: '#72818a' },
+	{ label: t.winsPerWeek || 'Wins (per week)', swatch: '#7b93a4' }
+]);
 }
 
 export function renderActivityHeatmap() {
@@ -730,7 +731,7 @@ export function renderActivityHeatmap() {
 	animate(id, draw, 650);
 
 	renderLegendHTML('activityHeatmap', [
-		{ label: 'Activity (darker = more games)', swatch: '#b0cde6' }
+		{ label: t.activityDarkerMoreGames || 'Activity (darker = more games)',  swatch: '#b0cde6' }
 	]);
 }
 

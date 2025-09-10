@@ -8,9 +8,7 @@ import { rerenderFriends, setupFriendsEvents, setupFriendHoverEffects, setupRemo
 import { setupHistoryEvents } from './history-events.js';
 
 // Re-export everything from the split files
-export {setupFriendHoverEffects, setupRemoveFriendEvents,
-	render,
-	setupFriendsEvents,
+export {setupFriendHoverEffects, setupRemoveFriendEvents, render, setupFriendsEvents,
 	setupHistoryEvents,
 	rerenderFriends
 }

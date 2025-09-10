@@ -1,4 +1,4 @@
-import { translations } from './language/translations';
+import { translations } from './language/translations.js';
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')

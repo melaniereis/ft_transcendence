@@ -1,7 +1,6 @@
 import { updateFriendRequestsBadge } from '../index.js';
 import { translations } from './language/translations.js';
 
-// Get user language
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 ? localStorage.getItem('preferredLanguage') : 'en') as keyof typeof translations;
 const t = translations[lang];

@@ -5,7 +5,6 @@ import { renderAllCharts } from './charts.js';
 import { Match } from './types.js';
 import { translations } from '../language/translations.js';
 
-// ✅ Determine language and translation object
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
 	: 'en') as keyof typeof translations;
