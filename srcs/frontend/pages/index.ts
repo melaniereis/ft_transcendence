@@ -4,7 +4,7 @@ import { renderSettingsPage } from './services/settings.js';
 import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
-import { renderLoginForm, startActivityMonitoring } from './services/renderLoginForm.js';
+import {renderLoginForm} from './services/renderLoginForm.js'
 import { renderProfilePage } from './services/renderProfilePage/profile.js';
 import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 import { startMatchmaking } from './services/remote/matchmaking.js';
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        const { startActivityMonitoring } = await import('./services/renderLoginForm.js');
+        const { startActivityMonitoring } = await import('./services/activity.js');
         startActivityMonitoring();
         await updateOnlineStatus(true);
         updateFriendRequestsBadge();

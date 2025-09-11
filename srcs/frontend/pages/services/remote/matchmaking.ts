@@ -25,16 +25,22 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 }
 
 function handleSocketOpen(playerId: number, playerName: string, difficulty: string) {
-	console.log('✅ Connected to matchmaking server. Waiting for opponent...');
-	const payload = {
-		type: 'join',
-		id: playerId,
-		username: playerName,
-		difficulty
-	};
-	console.log('Sending join payload:', payload);
-	socket!.send(JSON.stringify(payload));
+  console.log('✅ Connected to matchmaking server. Waiting for opponent...');
+
+  const authToken = localStorage.getItem('authToken');
+
+  const payload = {
+    type: 'join',
+    id: playerId,
+    username: playerName,
+    difficulty,
+    authToken, 
+  };
+
+  console.log('Sending join payload:', payload);
+  socket!.send(JSON.stringify(payload));
 }
+
 
 function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, playerName: string,
 difficulty: string) {
@@ -84,17 +90,17 @@ difficulty: string) {
 function renderGameSelectionUI(appDiv: HTMLDivElement) {
 	console.log('Received chooseMaxGames');
 	appDiv.innerHTML = `
-		<div class="flex flex-col items-center justify-center p-6 bg-cover bg-center">
-			<div class="w-full max-w-md space-y-6 text-center">
-				<p class="text-2xl font-bold text-black mb-6">${t.maxGamesLabel} (3–11):</p>
-				<select id="gameCountSelect" class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
+		<div class="flex flex-col items-center justify-center min-h-screen p-6">
+			<div class="w-full max-w-md space-y-8 text-center rounded-xl shadow-lg p-8">
+				<p class="text-4xl font-extrabold text-gray-900 mb-6">${t.maxGamesLabel} (3–11):</p>
+				<select id="gameCountSelect" class="w-full p-5 mt-2 rounded-lg border border-gray-300 focus:ring-4 focus:ring-indigo-600 focus:outline-none bg-white text-2xl text-gray-900">
 					<option value="3">3</option>
 					<option value="5">5</option>
 					<option value="7">7</option>
 					<option value="9">9</option>
 					<option value="11">11</option>
 				</select>
-				<button id="confirmMaxGames" class="w-full py-4 text-2xl font-bold text-black bg-gray-200 border border-gray-300 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
+				<button id="confirmMaxGames" class="w-full py-5 mt-6 text-3xl font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition">
 					${t.confirm}
 				</button>
 			</div>
@@ -112,10 +118,10 @@ function renderGameSelectionUI(appDiv: HTMLDivElement) {
 function renderWaitingMessage(appDiv: HTMLDivElement, message: string) {
 	console.log(message);
 	appDiv.innerHTML = `
-		<div class="flex flex-col items-center justify-center space-y-4 p-6 bg-cover bg-center">
-			<div class="w-full max-w-md text-center">
-				<p class="text-2xl font-bold text-black">${message}</p>
-				<div class="loader"></div>
+		<div class="flex items-center justify-center min-h-screen p-6">
+			<div class="max-w-md text-center rounded-xl shadow-lg p-10">
+				<p class="text-5xl font-extrabold text-gray-900 mb-8">${message}</p>
+				<div class="loader mx-auto"></div>
 			</div>
 		</div>
 	`;
@@ -124,11 +130,11 @@ function renderWaitingMessage(appDiv: HTMLDivElement, message: string) {
 function showGoBackToMainMenu(appDiv: HTMLDivElement) {
 	console.warn('⚠️ Unknown message type received.');
 	appDiv.innerHTML = `
-		<div class="flex flex-col items-center justify-center p-6 space-y-4 bg-cover bg-center">
-			<div class="w-full max-w-md text-center space-y-4">
-				<p class="text-2xl font-bold text-black">${t.unknownError}</p>
-				<p class="text-xl text-gray-600">${t.goBackToMainMenu}</p>
-				<button onclick="window.location.href='/'" class="w-full py-4 text-2xl font-bold text-black bg-gray-200 border border-gray-300 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
+		<div class="flex items-center justify-center min-h-screen p-6">
+			<div class="max-w-md text-center rounded-xl shadow-lg p-10 space-y-8">
+				<p class="text-5xl font-extrabold text-gray-900">${t.unknownError}</p>
+				<p class="text-3xl text-gray-700">${t.goBackToMainMenu}</p>
+				<button onclick="window.location.href='/'" class="w-full py-5 text-3xl font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-400 transition">
 					${t.goBack}
 				</button>
 			</div>
@@ -139,9 +145,9 @@ function showGoBackToMainMenu(appDiv: HTMLDivElement) {
 function handleSocketClose(appDiv: HTMLDivElement) {
 	console.warn('🔌 Disconnected from matchmaking server.');
 	appDiv.innerHTML = `
-		<div class="flex items-center justify-center p-6 bg-cover bg-center">
-			<div class="w-full max-w-md text-center">
-				<p class="text-xl font-bold text-black">${t.matchmaking}: Disconnected.</p>
+		<div class="flex items-center justify-center min-h-screen p-6">
+			<div class="max-w-md text-center rounded-xl shadow-lg p-10">
+				<p class="text-4xl font-extrabold text-gray-900">${t.matchmaking}: Disconnected.</p>
 			</div>
 		</div>
 	`;
@@ -151,9 +157,9 @@ function handleSocketClose(appDiv: HTMLDivElement) {
 function handleSocketError(err: Event, appDiv: HTMLDivElement) {
 	console.error('❌ WebSocket error:', err);
 	appDiv.innerHTML = `
-		<div class="flex items-center justify-center p-6 bg-cover bg-center">
-			<div class="w-full max-w-md text-center">
-				<p class="text-xl font-bold text-red-600">${t.connectionError}</p>
+		<div class="flex items-center justify-center min-h-screen p-6">
+			<div class="max-w-md text-center rounded-xl shadow-lg p-10">
+				<p class="text-4xl font-extrabold text-red-600">${t.connectionError}</p>
 			</div>
 		</div>
 	`;

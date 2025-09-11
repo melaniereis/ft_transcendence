@@ -80,14 +80,16 @@ async function handleMessage(ws: AliveWebSocket, data: any, fastify: FastifyInst
 }
 
 function handleJoin(ws: AliveWebSocket, data: any) {
-	const { id, username, difficulty } = data;
-	if (typeof id !== 'number' || typeof username !== 'string') {
-		ws.send(JSON.stringify({ type: 'error', message: 'Invalid player data' }));
+	const { id, username, difficulty,authToken } = data;
+	if (typeof id !== 'number' || typeof username !== 'string' || typeof authToken !== 'string') {
+		ws.send(JSON.stringify({ type: 'error', message: 'Invalid player data or missing auth token' }));
 		return;
 	}
+
 	ws.playerId = id;
 	ws.username = username;
 	ws.difficulty = difficulty;
+	ws.authToken = authToken;
 
 	if (!waitingRoom.player1) {
 		waitingRoom.player1 = { id, username, difficulty, connection: ws };
@@ -136,15 +138,19 @@ async function handleConfirmReady(ws: AliveWebSocket, fastify: FastifyInstance) 
 }
 
 async function startGame(fastify: FastifyInstance) {
-	const p1 = waitingRoom.player1!;
-	const p2 = waitingRoom.player2!;
-	const maxGames = waitingRoom.maxGames!;
+  const p1 = waitingRoom.player1!;
+  const p2 = waitingRoom.player2!;
+  const maxGames = waitingRoom.maxGames!;
 
-	const response = await fastify.inject({
-		method: 'POST',
-		url: '/games',
-		payload: {player1_id: p1.id, player2_id: p2.id, max_games: maxGames, time_started: new Date().toISOString(),},
-	});
+  const response = await fastify.inject({
+    method: 'POST',
+    url: '/games',
+    headers: {
+      authorization: `Bearer ${p1.connection.authToken}`,  // use token from player1
+    },
+    payload: {player1_id: p1.id, player2_id: p2.id, max_games: maxGames, time_started: new Date().toISOString(),
+    },
+  });
 
 	let gameData;
 	try {

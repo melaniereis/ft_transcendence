@@ -50,7 +50,6 @@ function handleMessage(ws: AliveWebSocket, gameId: string, message: RawData) {
 	}
 }
 
-
 function handleJoin(ws: AliveWebSocket, gameId: string, data: any) {
 	ws.username = data.playerName;
 	let room = gameRooms.get(gameId);
@@ -149,21 +148,33 @@ function handleClose(ws: AliveWebSocket, gameId: string) {
 }
 
 function createNewRoom(ws: AliveWebSocket, maxScore: number = 5): GameRoom {
+	const canvasWidth = 1280;
+	const canvasHeight = 680;
+	const paddleHeight = 100;
+	const paddleWidth = 12;
+
 	return {
 		left: ws,
 		right: null,
-		ballX: 400,
-		ballY: 200,
+
+		// Ball starts at center
+		ballX: canvasWidth / 2,
+		ballY: canvasHeight / 2,
 		ballVX: 7,
 		ballVY: 5,
-		leftY: 160,
-		rightY: 160,
-		paddleHeight: 80,
-		paddleWidth: 10,
+
+		// Paddles start vertically centered
+		leftY: canvasHeight / 2 - paddleHeight / 2,
+		rightY: canvasHeight / 2 - paddleHeight / 2,
+
+		paddleHeight,
+		paddleWidth,
+
 		leftMovingUp: false,
 		leftMovingDown: false,
 		rightMovingUp: false,
 		rightMovingDown: false,
+
 		leftScore: 0,
 		rightScore: 0,
 		maxScore,

@@ -1,4 +1,5 @@
 import { translations } from "./language/translations.js";
+import {startActivityMonitoring} from "./activity.js"
 
 export function renderLoginForm(container: HTMLElement, onLoginSuccess: () => void): void {
 	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
@@ -68,106 +69,17 @@ export function renderLoginForm(container: HTMLElement, onLoginSuccess: () => vo
 				localStorage.setItem('playerId', result.user.id);
 				localStorage.setItem('playerName', result.user.username);
 				resultDiv.textContent = t.success;
+
+				// ✅ Start monitoring after token is saved
+				startActivityMonitoring();
+
 				onLoginSuccess();
 			} else {
 				resultDiv.textContent = t.invalid;
 			}
 		} catch (err) {
+			console.error('Login error:', err);
 			resultDiv.textContent = t.failed;
 		}
 	});
-}
-
-
-// Activity monitoring system
-let activityTimer: ReturnType<typeof setTimeout>;
-let isUserActive = true;
-
-export function startActivityMonitoring() {
-
-	updateOnlineStatus(true); // Set online on start
-
-	const ACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-	const UPDATE_INTERVAL = 30 * 1000; // 30 seconds
-
-	// Reset activity timer
-	function resetActivityTimer() {
-		clearTimeout(activityTimer);
-		if (!isUserActive) {
-			isUserActive = true;
-			updateOnlineStatus(true);
-		}
-
-		activityTimer = setTimeout(() => {
-			isUserActive = false;
-			updateOnlineStatus(false);
-		}, ACTIVITY_TIMEOUT);
-	}
-
-	// Track user activities
-	const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-	events.forEach(event => {
-		document.addEventListener(event, resetActivityTimer, true);
-	});
-
-	// Update last_seen periodically
-	setInterval(() => {
-		if (isUserActive) {
-			updateLastSeen();
-		}
-	}, UPDATE_INTERVAL);
-
-	// Handle page visibility
-	document.addEventListener('visibilitychange', () => {
-		if (document.hidden) {
-			updateOnlineStatus(false);
-		} else {
-			resetActivityTimer();
-		}
-	});
-
-	// Handle beforeunload (user closing browser/tab)
-	window.addEventListener('beforeunload', () => {
-		updateOnlineStatus(false);
-	});
-
-	// Start the timer
-	resetActivityTimer();
-}
-
-async function updateOnlineStatus(isOnline: boolean) {
-	const token = localStorage.getItem('authToken');
-	if (!token) return;
-
-	try {
-		await fetch('/api/profile/status', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`
-			},
-			body: JSON.stringify({ online: isOnline })
-		});
-		console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
-	} 
-	catch (error) {
-		console.error('Failed to update status:', error);
-	}
-}
-
-async function updateLastSeen() {
-	const token = localStorage.getItem('authToken');
-	if (!token) return;
-
-	try {
-		await fetch('/api/profile/update-last-seen', {
-			method: 'POST',
-			headers: {
-				'Authorization': `Bearer ${token}`
-			}
-		});
-	} 
-	catch (error) {
-		console.error('Failed to update last seen:', error);
-	}
 }
