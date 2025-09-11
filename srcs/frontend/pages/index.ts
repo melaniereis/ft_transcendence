@@ -59,9 +59,6 @@ function renderRoute(path: string): void {
     appDiv.classList.add('fade-in'); // Apply fade-in
 
     // After fade-in animation ends, remove fade-in class
-    setTimeout(() => {
-      appDiv.classList.remove('fade-in');
-    }, 1000); // Wait for 1s (matching opacity fade-in time)
 
     // Render the appropriate content
     switch (path) {
@@ -125,10 +122,10 @@ function setBackgroundForRoute(route: string): void {
       backgroundUrl = 'url("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/683320/ss_631d99cc6462cce94081032b7e600a6b87c3f7d3.1920x1080.jpg?t=1755285422")';
       break;
     case '/friend-requests':
-      backgroundUrl = 'url("https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/software/switch/70070000024948/a58ef68683b6fe60a74972d0233e05332c66fa59b95139ba634c4f29cc90f578")';
+      backgroundUrl = 'url("https://assetsio.gnwcdn.com/gris-header.jpg?width=1600&height=900&fit=crop&quality=100&format=png&enable=upscale&auto=webp")';
       break;
     case '/matchmaking':
-      backgroundUrl = 'url("https://www.thisiscolossal.com/wp-content/uploads/2018/09/Gris-1.jpg")';
+      backgroundUrl = 'url("https://assets.rockpapershotgun.com/images/2018/12/GRIS-a.jpg")';
       break;
     default:
       backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")'; // Default background
@@ -140,8 +137,6 @@ function setBackgroundForRoute(route: string): void {
   appDiv.style.backgroundSize = 'cover'; /* Ensure the image always covers the full background */
   appDiv.style.backgroundPosition = 'center'; /* Center the image */
 }
-
-
 
 // 🔄 Update UI based on login state
 function updateUIBasedOnAuth(): void {

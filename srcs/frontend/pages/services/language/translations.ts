@@ -337,7 +337,10 @@ export const translations = {
 		confirmDeleteUser: "Tem certeza de que deseja excluir o usuário '{username}'?",
 		notLoggedIn: "Você não está logado.",
 		failedToDeleteUser: "Falha ao excluir o usuário.",
-		loggedOutMessage: "Você foi desconectado."
+		loggedOutMessage: "Você foi desconectado.",
+		failedToFetchUser: "Falha ao obter os dados do utilizador. Por favor, tente novamente.",
+    	deleteUserWarning: "Tem a certeza de que deseja eliminar a sua conta? Esta ação é irreversível.",
+		confirmDeleteBtn: "Sim, eliminar a minha conta",
 	},
 	es:{
 		play: "Jugar",
@@ -677,7 +680,10 @@ export const translations = {
 		confirmDeleteUser: "¿Estás seguro de que quieres eliminar al usuario '{username}'?",
 		notLoggedIn: "No has iniciado sesión.",
 		failedToDeleteUser: "Error al eliminar el usuario.",
-		loggedOutMessage: "Has cerrado sesión."
+		loggedOutMessage: "Has cerrado sesión.",
+		failedToFetchUser: "No se pudo obtener los datos del usuario. Inténtalo de nuevo.",
+    	deleteUserWarning: "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
+		confirmDeleteBtn: "Sí, eliminar mi cuenta",
 	},
 	en:{
 		play: "Play",
@@ -1017,6 +1023,9 @@ export const translations = {
 		confirmDeleteUser: "Are you sure you want to delete the user '{username}'?",
 		notLoggedIn: "You are not logged in.",
 		failedToDeleteUser: "Failed to delete user.",
-		loggedOutMessage: "You have been logged out."
+		loggedOutMessage: "You have been logged out.",
+		failedToFetchUser: "Failed to fetch user data. Please try again.",
+    	deleteUserWarning: "Are you sure you want to delete your account? This action cannot be undone.",
+		confirmDeleteBtn: "Yes, delete my account"
 	}
 };

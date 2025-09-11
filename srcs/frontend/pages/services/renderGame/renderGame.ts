@@ -7,7 +7,7 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal',
 onGameEnd?: (canvas: HTMLCanvasElement, score1: number, score2: number) => void, 
 mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
     container.innerHTML = `
-        <canvas id="pong" width="1600" height="900" style="border:2px solid white; display:block; margin:auto;"></canvas>
+        <canvas id="pong" width="1280" height="680" style="border:2px solid white; display:block; margin:auto;"></canvas>
     `;
 
     const canvas = document.getElementById('pong') as HTMLCanvasElement;

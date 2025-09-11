@@ -12,7 +12,7 @@
         margin: 0;
         padding: 0;
         height: 100%;
-        background-color: black; 
+        background-color: black;
     }
 
     .no-select {
@@ -41,24 +41,25 @@
 
     /* Style for top bar buttons */
     #top-bar .nav-btn {
-      font-size: 1.5rem; /* Default font size */
-      color: black; /* Font color set to black */
-      font-weight: bold; /* Make text bold */
+    font-size: 2rem;       /* 👈 Always large */
+    color: black;
+    font-weight: bold;
+    transition: none;      /* 👈 Remove animation */
     }
 
     #top-bar .nav-btn:hover {
-      font-size: 2rem; /* Hover effect, slightly larger text */
-      font-weight: bold; /* Ensure boldness on hover */
+      /* 👇 Remove font-size change */
+      font-size: 2rem;
     }
 
     #top-bar .nav-btn.active {
-      font-size: 3rem; /* Active button, much larger text */
-      font-weight: bold; /* Ensure boldness when active */
+      font-size: 2rem;       /* 👈 Keep size consistent */
     }
+
   </style>
 </head>
 <body class="m-0 h-screen bg-cover bg-center bg-no-repeat bg-fixed text-white">
-  <div id="top-bar" class="fixed top-0 left-0 w-full z-50 bg-transparent flex flex-wrap justify-center items-center gap-8 py-4 px-6 no-select">
+  <div id="top-bar" class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-x-auto whitespace-nowrap flex justify-start items-center gap-4 py-4 px-6 no-select">
     <!-- Game Buttons -->
     <button id="play-btn" class="nav-btn hidden">🎮 Play</button>
     <button id="tournaments-btn" class="nav-btn hidden">🏆 Tournaments</button>
