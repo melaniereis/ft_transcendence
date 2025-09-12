@@ -96,6 +96,10 @@ function setupOptimizedKeyboardControls() {
 		// Help
 		if (e.key === 'h' || e.key === 'H') {
 			e.preventDefault();
+			if (!state.isPaused) {
+				state.isPaused = true;
+				updatePauseUI();
+			}
 			toggleHelpOverlay();
 		}
 	};
@@ -418,6 +422,11 @@ function toggleHelpOverlay() {
 		document.body.appendChild(helpOverlay);
 	} else {
 		helpOverlay.remove();
+		// Resume game when help is closed
+		if (state.isPaused && !state.isGameOver) {
+			state.isPaused = false;
+			updatePauseUI();
+		}
 	}
 }
 

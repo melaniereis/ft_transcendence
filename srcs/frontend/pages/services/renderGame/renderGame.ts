@@ -306,8 +306,22 @@ function initializeOptimizedEffects() {
 	atmosphereCanvas.width = window.innerWidth;
 	atmosphereCanvas.height = window.innerHeight;
 
-	// Lightweight particle system
-	class OptimizedParticle {
+
+	// Celestial color palette
+	const CELESTIAL_COLORS = [
+		'#b6a6ca', // lavender
+		'#7fc7d9', // blue
+		'#e6c79c', // gold
+		'#f7b267', // peach
+		'#fffbe6', // white
+		'#dab883', // gold
+		'#a3d9b1', // green
+		'#f4f6fa', // pale
+		'#faaca8', // pink
+	];
+
+	// Particle layers
+	class CelestialParticle {
 		x: number;
 		y: number;
 		vx: number;
@@ -315,67 +329,100 @@ function initializeOptimizedEffects() {
 		color: string;
 		radius: number;
 		opacity: number;
+		glow: boolean;
 		life: number;
 		maxLife: number;
+		shape: 'circle' | 'star' | 'moon';
 
-		constructor() {
+		constructor(layer: 'soft' | 'sharp') {
 			this.x = Math.random() * atmosphereCanvas.width;
 			this.y = Math.random() * atmosphereCanvas.height;
-			this.vx = (Math.random() - 0.5) * 0.5;
-			this.vy = (Math.random() - 0.5) * 0.5;
-
-			const colors = [GRIS_COLORS.acceptance, GRIS_COLORS.depression, GRIS_COLORS.bargaining];
-			this.color = colors[Math.floor(Math.random() * colors.length)];
-
-			this.radius = Math.random() * 40 + 20;
-			this.opacity = Math.random() * 0.3 + 0.1;
+			this.vx = (Math.random() - 0.5) * (layer === 'soft' ? 0.2 : 0.6);
+			this.vy = (Math.random() - 0.5) * (layer === 'soft' ? 0.2 : 0.6);
+			this.color = CELESTIAL_COLORS[Math.floor(Math.random() * CELESTIAL_COLORS.length)];
+			this.radius = layer === 'soft' ? Math.random() * 60 + 30 : Math.random() * 18 + 8;
+			this.opacity = layer === 'soft' ? Math.random() * 0.18 + 0.08 : Math.random() * 0.3 + 0.2;
+			this.glow = layer === 'soft';
 			this.life = 0;
-			this.maxLife = Math.random() * 3000 + 2000;
+			this.maxLife = Math.random() * 4000 + 2000;
+			// Occasionally spawn a star or moon
+			if (layer === 'sharp' && Math.random() < 0.08) {
+				this.shape = Math.random() < 0.5 ? 'star' : 'moon';
+			} else {
+				this.shape = 'circle';
+			}
 		}
 
 		update() {
 			this.x += this.vx;
 			this.y += this.vy;
 			this.life++;
-
 			// Wrap around screen
 			if (this.x < -this.radius) this.x = atmosphereCanvas.width + this.radius;
 			if (this.x > atmosphereCanvas.width + this.radius) this.x = -this.radius;
 			if (this.y < -this.radius) this.y = atmosphereCanvas.height + this.radius;
 			if (this.y > atmosphereCanvas.height + this.radius) this.y = -this.radius;
-
 			// Fade with age
 			const ageRatio = this.life / this.maxLife;
-			this.opacity = Math.max(0, 0.4 * (1 - ageRatio));
-
+			this.opacity = Math.max(0, (this.glow ? 0.18 : 0.3) * (1 - ageRatio));
 			return this.life < this.maxLife;
 		}
 
 		draw(ctx: CanvasRenderingContext2D) {
 			ctx.save();
 			ctx.globalAlpha = this.opacity;
-			ctx.globalCompositeOperation = 'multiply';
-
-			const gradient = ctx.createRadialGradient(
-				this.x, this.y, 0,
-				this.x, this.y, this.radius
-			);
-			gradient.addColorStop(0, this.color);
-			gradient.addColorStop(0.7, this.color + '66');
-			gradient.addColorStop(1, 'transparent');
-
-			ctx.fillStyle = gradient;
-			ctx.beginPath();
-			ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-			ctx.fill();
+			if (this.glow) {
+				ctx.shadowColor = this.color;
+				ctx.shadowBlur = 32;
+			} else {
+				ctx.shadowBlur = 0;
+			}
+			if (this.shape === 'circle') {
+				const gradient = ctx.createRadialGradient(
+					this.x, this.y, 0,
+					this.x, this.y, this.radius
+				);
+				gradient.addColorStop(0, this.color);
+				gradient.addColorStop(0.7, this.color + '66');
+				gradient.addColorStop(1, 'transparent');
+				ctx.globalCompositeOperation = this.glow ? 'lighter' : 'screen';
+				ctx.fillStyle = gradient;
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+				ctx.fill();
+			} else if (this.shape === 'star') {
+				ctx.globalCompositeOperation = 'screen';
+				ctx.fillStyle = this.color;
+				ctx.beginPath();
+				for (let i = 0; i < 5; i++) {
+					const angle = (Math.PI * 2 * i) / 5;
+					const x = this.x + Math.cos(angle) * this.radius;
+					const y = this.y + Math.sin(angle) * this.radius;
+					ctx.lineTo(x, y);
+				}
+				ctx.closePath();
+				ctx.fill();
+			} else if (this.shape === 'moon') {
+				ctx.globalCompositeOperation = 'screen';
+				ctx.fillStyle = this.color;
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, Math.PI * 0.25, Math.PI * 1.75);
+				ctx.arc(this.x + this.radius * 0.4, this.y, this.radius * 0.7, Math.PI * 1.75, Math.PI * 0.25, true);
+				ctx.closePath();
+				ctx.fill();
+			}
 			ctx.restore();
 		}
 	}
 
-	// Reduced particle count for performance
-	const particles: OptimizedParticle[] = [];
-	for (let i = 0; i < PERFORMANCE.maxParticles; i++) {
-		particles.push(new OptimizedParticle());
+	// Two layers: soft (glow, slow, big), sharp (no glow, fast, small)
+	const softParticles: CelestialParticle[] = [];
+	const sharpParticles: CelestialParticle[] = [];
+	for (let i = 0; i < Math.floor(PERFORMANCE.maxParticles * 0.6); i++) {
+		softParticles.push(new CelestialParticle('soft'));
+	}
+	for (let i = 0; i < Math.floor(PERFORMANCE.maxParticles * 0.7); i++) {
+		sharpParticles.push(new CelestialParticle('sharp'));
 	}
 
 	let animationId: number;
@@ -383,28 +430,65 @@ function initializeOptimizedEffects() {
 	function animateParticles() {
 		atmosphereCtx!.clearRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
 
-		// Subtle background gradient
+
+		// Celestial multi-stop gradient background
 		const gradient = atmosphereCtx!.createRadialGradient(
 			atmosphereCanvas.width / 2, atmosphereCanvas.height / 2, 0,
 			atmosphereCanvas.width / 2, atmosphereCanvas.height / 2, Math.max(atmosphereCanvas.width, atmosphereCanvas.height) / 2
 		);
-		gradient.addColorStop(0, GRIS_COLORS.background + 'CC');
-		gradient.addColorStop(1, GRIS_COLORS.surface + '99');
-
+		gradient.addColorStop(0, '#fffbe6'); // white
+		gradient.addColorStop(0.25, '#b6a6ca'); // lavender
+		gradient.addColorStop(0.45, '#7fc7d9'); // blue
+		gradient.addColorStop(0.65, '#e6c79c'); // gold
+		gradient.addColorStop(0.85, '#faaca8'); // pink
+		gradient.addColorStop(1, '#f4f6fa'); // pale
 		atmosphereCtx!.fillStyle = gradient;
 		atmosphereCtx!.fillRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
 
 
 
-		// Update and draw particles
-		for (let i = particles.length - 1; i >= 0; i--) {
-			const particle = particles[i];
+
+		// Draw particles behind everything
+		atmosphereCtx!.globalCompositeOperation = 'destination-over';
+		// Animate soft particles
+		for (let i = softParticles.length - 1; i >= 0; i--) {
+			const particle = softParticles[i];
 			if (!particle.update()) {
-				particles.splice(i, 1);
-				particles.push(new OptimizedParticle());
+				softParticles.splice(i, 1);
+				softParticles.push(new CelestialParticle('soft'));
 			} else {
 				particle.draw(atmosphereCtx!);
 			}
+		}
+		// Animate sharp particles
+		for (let i = sharpParticles.length - 1; i >= 0; i--) {
+			const particle = sharpParticles[i];
+			if (!particle.update()) {
+				sharpParticles.splice(i, 1);
+				sharpParticles.push(new CelestialParticle('sharp'));
+			} else {
+				particle.draw(atmosphereCtx!);
+			}
+		}
+
+		// Occasionally animate a faint light ray
+		if (Math.random() < 0.03) {
+			atmosphereCtx!.save();
+			atmosphereCtx!.globalAlpha = 0.12;
+			atmosphereCtx!.globalCompositeOperation = 'lighter';
+			const rayX = Math.random() * atmosphereCanvas.width;
+			const rayY = Math.random() * atmosphereCanvas.height;
+			const rayLength = Math.random() * 180 + 120;
+			const rayAngle = Math.random() * Math.PI * 2;
+			atmosphereCtx!.translate(rayX, rayY);
+			atmosphereCtx!.rotate(rayAngle);
+			const rayGradient = atmosphereCtx!.createLinearGradient(0, 0, rayLength, 0);
+			rayGradient.addColorStop(0, '#fffbe6');
+			rayGradient.addColorStop(0.5, '#e6c79c');
+			rayGradient.addColorStop(1, 'transparent');
+			atmosphereCtx!.fillStyle = rayGradient;
+			atmosphereCtx!.fillRect(0, -6, rayLength, 12);
+			atmosphereCtx!.restore();
 		}
 
 

@@ -15,12 +15,16 @@ export function drawRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
 		if (pattern) ctx.fillStyle = pattern;
 	}
 
-	// Subtle shadow
+	// Subtle shadow and black border
 	ctx.save();
 	ctx.shadowColor = GRIS_COLORS.muted;
 	ctx.shadowBlur = 8;
 	ctx.shadowOffsetY = 2;
 	ctx.fillRect(x, y, w, h);
+	// Black border
+	ctx.lineWidth = 1.1;
+	ctx.strokeStyle = '#000';
+	ctx.strokeRect(x, y, w, h);
 	ctx.restore();
 }
 
@@ -36,6 +40,10 @@ export function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, 
 	ctx.beginPath();
 	ctx.arc(x, y, r, 0, Math.PI * 2);
 	ctx.fill();
+	// Black border
+	ctx.lineWidth = 1.1;
+	ctx.strokeStyle = '#000';
+	ctx.stroke();
 
 	ctx.restore();
 }
@@ -53,6 +61,10 @@ export function drawNet(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement
 		// Minimal animation for performance
 		const offset = time ? Math.sin((i + time * 0.001) / 20) * 1 : 0;
 		ctx.fillRect(canvas.width / 2 - netWidth / 2 + offset, i, netWidth, netHeight);
+		// Black border
+		ctx.lineWidth = 1.1;
+		ctx.strokeStyle = '#000';
+		ctx.strokeRect(canvas.width / 2 - netWidth / 2 + offset, i, netWidth, netHeight);
 	}
 
 	ctx.restore();

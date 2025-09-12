@@ -10,10 +10,10 @@ export function renderFrame(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasEle
 	// Clear the canvas with a subtle gradient background
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	// Draw background gradient
+	// Draw background gradient with transparency
 	const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-	gradient.addColorStop(0, '#1a1a2e');
-	gradient.addColorStop(1, '#16213e');
+	gradient.addColorStop(0, 'rgba(26,26,46,0.35)');
+	gradient.addColorStop(1, 'rgba(22,33,62,0.18)');
 	ctx.fillStyle = gradient;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 

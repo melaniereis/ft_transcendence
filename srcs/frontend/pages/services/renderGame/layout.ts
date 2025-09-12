@@ -20,7 +20,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
 	return `
             <div class="gris-game-universe" style="
                 min-height: 100vh;
-                background: linear-gradient(120deg, #e9e4f0 0%, #f7f6fb 100%);
+                background: transparent;
                 padding: ${GRIS_SPACING[3]};
                 font-family: ${GRIS_TYPOGRAPHY.fonts.body};
                 position: relative;
@@ -31,7 +31,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                     position: fixed;
                     inset: 0;
                     pointer-events: none;
-                    z-index: 10;
+                    z-index: 0;
                 ">
                     <canvas id="gris-bg-particles" width="" height="" style="
                         position: absolute;
@@ -161,7 +161,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                         border-radius: 16px;
                         overflow: hidden;
                         box-shadow: 0 2px 12px rgba(44,34,84,0.10);
-                        background: linear-gradient(135deg, #b6a6ca 0%, #7fc7d9 100%);
+                        background: transparent;
                         width: 100%;
                         aspect-ratio: 5 / 3;
                         max-width: 900px;
