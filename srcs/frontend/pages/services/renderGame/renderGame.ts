@@ -287,14 +287,20 @@ function renderSettingsContent(): string {
 function initializeOptimizedEffects() {
 	console.log('🌟 Initializing background effects...');
 
-	const atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
+	let atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
 	if (!atmosphereCanvas) {
-		console.log('⚠️ Atmosphere canvas not found');
+		// Retry after short delay if canvas not found
+		setTimeout(initializeOptimizedEffects, 100);
+		console.log('⏳ Waiting for atmosphere canvas...');
 		return;
 	}
 
 	const atmosphereCtx = atmosphereCanvas.getContext('2d');
-	if (!atmosphereCtx) return;
+	if (!atmosphereCtx) {
+		setTimeout(initializeOptimizedEffects, 100);
+		console.log('⏳ Waiting for atmosphere canvas context...');
+		return;
+	}
 
 	// Set to window size, but consider clipping or making it container-bound if needed
 	atmosphereCanvas.width = window.innerWidth;
@@ -373,6 +379,7 @@ function initializeOptimizedEffects() {
 	}
 
 	let animationId: number;
+
 	function animateParticles() {
 		atmosphereCtx!.clearRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
 
@@ -387,6 +394,8 @@ function initializeOptimizedEffects() {
 		atmosphereCtx!.fillStyle = gradient;
 		atmosphereCtx!.fillRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
 
+
+
 		// Update and draw particles
 		for (let i = particles.length - 1; i >= 0; i--) {
 			const particle = particles[i];
@@ -397,6 +406,7 @@ function initializeOptimizedEffects() {
 				particle.draw(atmosphereCtx!);
 			}
 		}
+
 
 		animationId = requestAnimationFrame(animateParticles);
 	}

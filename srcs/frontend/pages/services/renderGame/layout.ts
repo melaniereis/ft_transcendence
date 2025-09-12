@@ -31,12 +31,13 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                     position: fixed;
                     inset: 0;
                     pointer-events: none;
-                    z-index: 0;
+                    z-index: 10;
                 ">
-                    <canvas id="gris-bg-particles" style="
+                    <canvas id="gris-bg-particles" width="" height="" style="
                         position: absolute;
                         inset: 0;
-                        opacity: 0.4;
+                        opacity: 0.5;
+                        background: transparent;
                     "></canvas>
                 </div>
 
@@ -47,13 +48,6 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                     position: relative;
                     z-index: 2;
                 ">
-                    <h1 style="
-                        color: ${GRIS_COLORS.primary};
-                        font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                        margin-bottom: ${GRIS_SPACING[2]};
-                        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    ">GRIS Pong</h1>
                     <div class="game-oracle" style="
                         color: ${GRIS_COLORS.secondary};
                         font-size: ${GRIS_TYPOGRAPHY.scale.base};

@@ -144,7 +144,7 @@ export const GRIS_SHADOWS = {
 // Performance Settings
 export const PERFORMANCE = {
 	lowFPSThreshold: 45,
-	maxParticles: 15,  // Reduced from original for better performance
+	maxParticles: 24,  // Slightly increased for richer effect
 	particleUpdateRate: 60,
 	enableComplexAnimations: true,
 	enableParticles: true,

@@ -26,8 +26,4 @@ export function renderFrame(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasEle
 
 	// Draw ball with glow effect
 	drawCircle(ctx, ball.x, ball.y, ball.radius, '#ffffff');
-
-	// Draw scores with elegant typography
-	drawText(ctx, left.score.toString(), canvas.width * 0.25, 50, '2rem', GRIS_COLORS.depression);
-	drawText(ctx, right.score.toString(), canvas.width * 0.75, 50, '2rem', GRIS_COLORS.acceptance);
 }
