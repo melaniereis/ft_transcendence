@@ -1,0 +1,4717 @@
+//renderGame/constants.ts
+
+
+// GRIS Emotional Color Journey - The Five Stages
+export const GRIS_COLORS = {
+    // === PRIMARY EMOTIONAL PALETTE ===
+    // Stage 1: Denial - The grey emptiness of loss
+    denial: '#f4f6fa',
+    denialDeep: '#e8eef2',
+    denialMist: '#f8f9fb',
+
+
+
+    // Stage 2: Anger - The red storm of emotion
+    anger: '#e67e80',
+    angerFlame: '#d45d5f',
+    angerEmber: '#f39b9d',
+
+
+
+    // Stage 3: Bargaining - The green hope of negotiation
+    bargaining: '#a3d9b1',
+    bargainingForest: '#8bc99c',
+    bargainingSpring: '#c1e6ca',
+
+
+
+    // Stage 4: Depression - The blue depths of sorrow
+    depression: '#7fc7d9',
+    depressionOcean: '#6bb5d0',
+    depressionSky: '#a8d8e6',
+
+
+
+    // Stage 5: Acceptance - The golden light of healing
+    acceptance: '#e6c79c',
+    acceptanceGold: '#dab883',
+    acceptanceWarm: '#f0d6b3',
+
+
+
+    // === SUPPORTING AESTHETIC PALETTE ===
+    primary: '#6b7a8f',      // Sophisticated slate
+    secondary: '#b6a6ca',    // Mystical lavender
+    tertiary: '#9eb3c2',     // Serene blue-gray
+
+
+
+    background: '#fffbe6',   // Warm paper white
+    surface: '#f8f9fb',      // Clean surface
+    overlay: '#ffffff',      // Pure overlay
+
+
+
+    muted: '#eaeaea',        // Soft neutral
+    accent: '#c7a8cc',       // Gentle purple
+    highlight: '#faf0e6',    // Warm highlight
+
+
+
+    success: '#a3d9b1',      // Natural success
+    warning: '#f2d089',      // Golden warning
+    error: '#faaca8',        // Soft error
+    info: '#b8d4f0',         // Calm info
+
+
+
+    // === ATMOSPHERIC GRADIENTS ===
+    gradients: {
+        // Primary emotional gradients
+        sunrise: 'linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%)',
+        ocean: 'linear-gradient(135deg, #7fc7d9 0%, #a8d8e6 50%, #c4e5f0 100%)',
+        forest: 'linear-gradient(135deg, #a3d9b1 0%, #c1e6ca 50%, #ddf2e2 100%)',
+        storm: 'linear-gradient(135deg, #e67e80 0%, #f39b9d 50%, #f8c4c6 100%)',
+        mist: 'linear-gradient(135deg, #f4f6fa 0%, #f8f9fb 50%, #ffffff 100%)',
+
+
+
+        // Mystical atmospheric effects
+        ethereal: 'radial-gradient(circle, rgba(255,251,230,0.95) 0%, rgba(244,246,250,0.8) 100%)',
+        cosmic: 'radial-gradient(ellipse at center, rgba(182,166,202,0.1) 0%, transparent 70%)',
+        aurora: 'linear-gradient(45deg, #7fc7d9 0%, #b6a6ca 25%, #e6c79c 50%, #a3d9b1 75%, #7fc7d9 100%)',
+
+
+
+        // Watercolor blends
+        watercolor1: 'radial-gradient(circle at 30% 20%, rgba(230,199,156,0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(127,199,217,0.2) 0%, transparent 50%)',
+        watercolor2: 'radial-gradient(circle at 20% 80%, rgba(163,217,177,0.25) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(182,166,202,0.2) 0%, transparent 50%)',
+        watercolor3: 'radial-gradient(circle at 50% 50%, rgba(244,246,250,0.9) 0%, rgba(255,251,230,0.7) 100%)',
+    },
+
+
+
+    // === SEMANTIC COLOR MAPPINGS ===
+    semantic: {
+        player1: '#7fc7d9',     // Ocean blue for player 1
+        player2: '#e6c79c',     // Warm gold for player 2
+        neutral: '#b6a6ca',     // Mystical lavender for neutrals
+        active: '#a3d9b1',      // Spring green for active states
+        inactive: '#eaeaea',    // Soft gray for inactive
+        danger: '#faaca8',      // Gentle coral for warnings
+    }
+};
+
+
+
+// GRIS-Inspired Watercolor SVG Library
+export const GRIS_ICONS = {
+    trophy: () => `
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="watercolorTrophy" x="-20%" y="-20%" width="140%" height="140%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise"/>
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2"/>
+                    <feGaussianBlur stdDeviation="0.5"/>
+                </filter>
+                <radialGradient id="trophyGlow" cx="50%" cy="30%" r="80%">
+                    <stop offset="0%" stop-color="${GRIS_COLORS.acceptance}"/>
+                    <stop offset="70%" stop-color="${GRIS_COLORS.acceptanceGold}"/>
+                    <stop offset="100%" stop-color="${GRIS_COLORS.acceptanceWarm}"/>
+                </radialGradient>
+            </defs>
+
+
+
+            <!-- Trophy base -->
+            <ellipse cx="20" cy="32" rx="10" ry="3" fill="${GRIS_COLORS.secondary}" opacity="0.4" filter="url(#watercolorTrophy)"/>
+
+
+
+            <!-- Trophy cup -->
+            <path d="M 12 16 Q 12 10 20 10 Q 28 10 28 16 L 26 26 Q 26 28 20 28 Q 14 28 14 26 L 12 16 Z"
+                  fill="url(#trophyGlow)" filter="url(#watercolorTrophy)"/>
+
+
+
+            <!-- Trophy handles -->
+            <path d="M 10 18 Q 6 18 6 22 Q 6 26 10 26" stroke="${GRIS_COLORS.secondary}" stroke-width="2" fill="none" opacity="0.7"/>
+            <path d="M 30 18 Q 34 18 34 22 Q 34 26 30 26" stroke="${GRIS_COLORS.secondary}" stroke-width="2" fill="none" opacity="0.7"/>
+
+
+
+            <!-- Mystical sparkles -->
+            <circle cx="24" cy="8" r="1.5" fill="${GRIS_COLORS.background}" opacity="0.8"/>
+            <circle cx="16" cy="12" r="1" fill="${GRIS_COLORS.background}" opacity="0.6"/>
+            <circle cx="28" cy="20" r="1.2" fill="${GRIS_COLORS.background}" opacity="0.7"/>
+        </svg>
+    `,
+
+
+
+    star: () => `
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="starGlow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                <radialGradient id="starRadial" cx="50%" cy="30%" r="70%">
+                    <stop offset="0%" stop-color="${GRIS_COLORS.acceptance}"/>
+                    <stop offset="100%" stop-color="${GRIS_COLORS.bargaining}"/>
+                </radialGradient>
+            </defs>
+
+
+
+            <path d="M 16 2 L 19.6 12.4 L 30.4 12.4 L 22 19.2 L 25.6 29.6 L 16 22.8 L 6.4 29.6 L 10 19.2 L 1.6 12.4 L 12.4 12.4 Z"
+                  fill="url(#starRadial)" filter="url(#starGlow)" opacity="0.9"/>
+
+
+
+            <!-- Inner sparkle -->
+            <circle cx="16" cy="16" r="4" fill="${GRIS_COLORS.background}" opacity="0.5"/>
+        </svg>
+    `,
+
+
+
+    heart: () => `
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="heartWater">
+                    <feTurbulence baseFrequency="0.03" numOctaves="2"/>
+                    <feDisplacementMap scale="1"/>
+                    <feGaussianBlur stdDeviation="0.5"/>
+                </filter>
+                <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="${GRIS_COLORS.error}"/>
+                    <stop offset="100%" stop-color="${GRIS_COLORS.acceptance}"/>
+                </linearGradient>
+            </defs>
+
+
+
+            <path d="M 16 28 C 16 28 4 20 4 12 C 4 8 7 5 11 5 C 13 5 15 6 16 8 C 17 6 19 5 21 5 C 25 5 28 8 28 12 C 28 20 16 28 16 28 Z"
+                  fill="url(#heartGrad)" filter="url(#heartWater)" opacity="0.8"/>
+
+
+
+            <!-- Heart highlight -->
+            <ellipse cx="12" cy="10" rx="3" ry="2" fill="${GRIS_COLORS.background}" opacity="0.4"/>
+        </svg>
+    `,
+
+
+
+    pause: () => `
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="pauseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="${GRIS_COLORS.depression}"/>
+                    <stop offset="100%" stop-color="${GRIS_COLORS.bargaining}"/>
+                </linearGradient>
+            </defs>
+
+
+
+            <circle cx="16" cy="16" r="14" fill="rgba(244,246,250,0.3)" opacity="0.5"/>
+            <rect x="10" y="8" width="4" height="16" rx="2" fill="url(#pauseGrad)"/>
+            <rect x="18" y="8" width="4" height="16" rx="2" fill="url(#pauseGrad)"/>
+        </svg>
+    `,
+
+
+
+    settings: () => `
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="settingsGrad">
+                    <stop offset="0%" stop-color="${GRIS_COLORS.secondary}"/>
+                    <stop offset="100%" stop-color="${GRIS_COLORS.acceptance}"/>
+                </radialGradient>
+            </defs>
+
+
+
+            <circle cx="16" cy="16" r="12" fill="rgba(182,166,202,0.15)" opacity="0.8"/>
+
+
+
+            <!-- Gear teeth -->
+            <circle cx="16" cy="4" r="2" fill="url(#settingsGrad)" opacity="0.7"/>
+            <circle cx="28" cy="16" r="2" fill="url(#settingsGrad)" opacity="0.7"/>
+            <circle cx="16" cy="28" r="2" fill="url(#settingsGrad)" opacity="0.7"/>
+            <circle cx="4" cy="16" r="2" fill="url(#settingsGrad)" opacity="0.7"/>
+
+
+
+            <!-- Center -->
+            <circle cx="16" cy="16" r="5" fill="${GRIS_COLORS.depression}" opacity="0.6"/>
+            <circle cx="16" cy="16" r="2" fill="${GRIS_COLORS.background}" opacity="0.9"/>
+        </svg>
+    `
+};
+
+
+
+// Professional Animation System
+export const GRIS_ANIMATIONS = {
+    // === TIMING CURVES ===
+    curves: {
+        // Organic, water-like movement
+        organic: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+        waterflow: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        gentle: 'cubic-bezier(0.77, 0.2, 0.25, 1)',
+
+
+
+        // Emotional progressions
+        grief: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        healing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+        acceptance: 'cubic-bezier(0.23, 1, 0.320, 1)',
+
+
+
+        // Utility curves
+        swift: 'cubic-bezier(0.2, 0.0, 0.38, 0.9)',
+        entrance: 'cubic-bezier(0.0, 0.0, 0.38, 0.9)',
+        exit: 'cubic-bezier(0.4, 0.0, 1, 1)',
+    },
+
+
+
+    // === DURATIONS ===
+    duration: {
+        instant: 150,       // Immediate feedback
+        swift: 300,         // Quick transitions
+        gentle: 600,        // Standard transitions
+        slow: 900,          // Thoughtful transitions
+        epic: 1200,         // Dramatic moments
+        ambient: 2000,      // Atmospheric effects
+        meditation: 4000,   // Breathing, ambient loops
+    },
+
+
+
+    // === PRESET ANIMATIONS ===
+    presets: {
+        fadeIn: 'opacity 600ms cubic-bezier(0.77, 0.2, 0.25, 1)',
+        slideUp: 'transform 600ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+        scaleIn: 'transform 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        watercolor: 'all 900ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        ethereal: 'all 1200ms cubic-bezier(0.23, 1, 0.320, 1)',
+        organic: 'transform 2000ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite',
+    }
+};
+
+
+
+// Professional Typography Scale
+export const GRIS_TYPOGRAPHY = {
+    fonts: {
+        display: "'Cormorant Garamond', 'Times New Roman', serif",
+        heading: "'Cormorant Garamond', 'Georgia', serif",
+        body: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+        mono: "'JetBrains Mono', 'Consolas', monospace",
+        decorative: "'Dancing Script', cursive",
+    },
+
+
+
+    // Modular scale based on 1.25 ratio (Major Third)
+    scale: {
+        '2xs': '0.64rem',   // 10.24px
+        xs: '0.8rem',       // 12.8px
+        sm: '0.9rem',       // 14.4px
+        base: '1rem',       // 16px
+        md: '1.125rem',     // 18px
+        lg: '1.25rem',      // 20px
+        xl: '1.563rem',     // 25px
+        '2xl': '1.953rem',  // 31.25px
+        '3xl': '2.441rem',  // 39px
+        '4xl': '3.052rem',  // 48.8px
+        '5xl': '3.815rem',  // 61px
+        '6xl': '4.768rem',  // 76.3px
+    },
+
+
+
+    weights: {
+        light: 300,
+        regular: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700,
+        black: 800,
+    },
+
+
+
+    leading: {
+        none: 1,
+        tight: 1.25,
+        snug: 1.375,
+        normal: 1.5,
+        relaxed: 1.625,
+        loose: 2,
+    },
+
+
+
+    tracking: {
+        tighter: '-0.05em',
+        tight: '-0.025em',
+        normal: '0em',
+        wide: '0.025em',
+        wider: '0.05em',
+        widest: '0.1em',
+    }
+};
+
+
+
+// Professional Spacing System (8px base grid)
+export const GRIS_SPACING = {
+    px: '1px',
+    0: '0',
+    0.5: '0.125rem',    // 2px
+    1: '0.25rem',       // 4px
+    1.5: '0.375rem',    // 6px
+    2: '0.5rem',        // 8px
+    2.5: '0.625rem',    // 10px
+    3: '0.75rem',       // 12px
+    3.5: '0.875rem',    // 14px
+    4: '1rem',          // 16px
+    5: '1.25rem',       // 20px
+    6: '1.5rem',        // 24px
+    7: '1.75rem',       // 28px
+    8: '2rem',          // 32px
+    9: '2.25rem',       // 36px
+    10: '2.5rem',       // 40px
+    11: '2.75rem',      // 44px
+    12: '3rem',         // 48px
+    14: '3.5rem',       // 56px
+    16: '4rem',         // 64px
+    20: '5rem',         // 80px
+    24: '6rem',         // 96px
+    28: '7rem',         // 112px
+    32: '8rem',         // 128px
+    36: '9rem',         // 144px
+    40: '10rem',        // 160px
+    44: '11rem',        // 176px
+    48: '12rem',        // 192px
+    52: '13rem',        // 208px
+    56: '14rem',        // 224px
+    60: '15rem',        // 240px
+    64: '16rem',        // 256px
+    72: '18rem',        // 288px
+    80: '20rem',        // 320px
+    96: '24rem',        // 384px
+};
+
+
+
+// Professional Shadow System
+export const GRIS_SHADOWS = {
+    // Subtle shadows for cards and elements
+    xs: '0 1px 2px 0 rgba(182, 166, 202, 0.05)',
+    sm: '0 1px 3px 0 rgba(182, 166, 202, 0.1), 0 1px 2px 0 rgba(182, 166, 202, 0.06)',
+    base: '0 4px 6px -1px rgba(182, 166, 202, 0.1), 0 2px 4px -1px rgba(182, 166, 202, 0.06)',
+    md: '0 10px 15px -3px rgba(182, 166, 202, 0.1), 0 4px 6px -2px rgba(182, 166, 202, 0.05)',
+    lg: '0 20px 25px -5px rgba(182, 166, 202, 0.1), 0 10px 10px -5px rgba(182, 166, 202, 0.04)',
+    xl: '0 25px 50px -12px rgba(182, 166, 202, 0.25)',
+    '2xl': '0 50px 100px -20px rgba(182, 166, 202, 0.25)',
+
+
+
+    // Colored emotional shadows
+    warm: '0 10px 30px rgba(230, 199, 156, 0.3)',
+    cool: '0 10px 30px rgba(127, 199, 217, 0.3)',
+    mystical: '0 15px 40px rgba(182, 166, 202, 0.4)',
+    ethereal: '0 20px 60px rgba(244, 246, 250, 0.8)',
+
+
+
+    // Inner shadows for depth
+    insetSoft: 'inset 0 2px 4px 0 rgba(182, 166, 202, 0.06)',
+    insetMedium: 'inset 0 2px 8px 0 rgba(182, 166, 202, 0.12)',
+
+
+
+    // Glowing effects
+    glow: '0 0 20px rgba(230, 199, 156, 0.5)',
+    glowBlue: '0 0 25px rgba(127, 199, 217, 0.6)',
+    glowPurple: '0 0 30px rgba(182, 166, 202, 0.5)',
+
+
+
+    // No shadow
+    none: 'none',
+};
+
+
+
+// Responsive Breakpoints
+export const GRIS_BREAKPOINTS = {
+    xs: '475px',
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px',
+    '3xl': '1800px',
+};
+
+
+
+// Z-Index Management
+export const GRIS_ZINDEX = {
+    hide: -1,
+    auto: 'auto',
+    base: 0,
+    docked: 10,
+    dropdown: 1000,
+    sticky: 1020,
+    banner: 1030,
+    overlay: 1040,
+    modal: 1050,
+    popover: 1060,
+    skipLink: 1070,
+    toast: 1080,
+    tooltip: 1090,
+};
+
+
+
+// Professional Blur Effects
+export const GRIS_BLUR = {
+    none: '0',
+    sm: '4px',
+    base: '8px',
+    md: '12px',
+    lg: '16px',
+    xl: '24px',
+    '2xl': '40px',
+    '3xl': '64px',
+};
+
+
+
+// Opacity Scale
+export const GRIS_OPACITY = {
+    0: '0',
+    5: '0.05',
+    10: '0.1',
+    20: '0.2',
+    25: '0.25',
+    30: '0.3',
+    40: '0.4',
+    50: '0.5',
+    60: '0.6',
+    70: '0.7',
+    75: '0.75',
+    80: '0.8',
+    90: '0.9',
+    95: '0.95',
+    100: '1',
+};
+
+
+
+// GRIS-Specific Aesthetic Values
+export const GRIS_AESTHETIC = {
+    // Border radius for organic feel
+    radius: {
+        none: '0',
+        sm: '0.375rem',
+        base: '0.5rem',
+        md: '0.75rem',
+        lg: '1rem',
+        xl: '1.5rem',
+        '2xl': '2rem',
+        '3xl': '3rem',
+        full: '9999px',
+    },
+
+
+
+    // Backdrop filters
+    backdrop: {
+        blur: 'blur(8px)',
+        blurSm: 'blur(4px)',
+        blurMd: 'blur(12px)',
+        blurLg: 'blur(16px)',
+        blurXl: 'blur(24px)',
+    },
+
+
+
+    // Aspect ratios
+    aspect: {
+        square: '1 / 1',
+        video: '16 / 9',
+        golden: '1.618 / 1',
+        portrait: '3 / 4',
+        landscape: '4 / 3',
+    },
+
+
+
+    // Transition timing for UI states
+    transition: {
+        all: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+        colors: 'color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+        opacity: 'opacity 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+        shadow: 'box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+};
+
+
+
+// Export comprehensive design system
+export const GRIS_DESIGN_SYSTEM = {
+    colors: GRIS_COLORS,
+    icons: GRIS_ICONS,
+    animations: GRIS_ANIMATIONS,
+    typography: GRIS_TYPOGRAPHY,
+    spacing: GRIS_SPACING,
+    shadows: GRIS_SHADOWS,
+    breakpoints: GRIS_BREAKPOINTS,
+    zIndex: GRIS_ZINDEX,
+    blur: GRIS_BLUR,
+    opacity: GRIS_OPACITY,
+    aesthetic: GRIS_AESTHETIC,
+};
+import { GRIS_COLORS } from './constants.js';
+import { showEmotionalFeedback } from './events.js';
+import { state } from './state.js';
+import { updateScoreDisplay } from './gameControls.js';
+
+
+let confettiStop: (() => void) | null = null;
+function launchConfetti(winnerName: string) {
+    // Simple confetti animation using canvas
+    const confettiCanvas = document.createElement('canvas');
+    confettiCanvas.id = 'gris-confetti-canvas';
+    confettiCanvas.style.position = 'fixed';
+    confettiCanvas.style.top = '0';
+    confettiCanvas.style.left = '0';
+    confettiCanvas.style.width = '100vw';
+    confettiCanvas.style.height = '100vh';
+    confettiCanvas.style.pointerEvents = 'none';
+    confettiCanvas.style.zIndex = '10000';
+    document.body.appendChild(confettiCanvas);
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    const ctx = confettiCanvas.getContext('2d');
+    const colors = [GRIS_COLORS.acceptance, GRIS_COLORS.depression, GRIS_COLORS.bargaining, GRIS_COLORS.secondary];
+    const confetti = Array.from({ length: 80 }, () => ({
+        x: Math.random() * confettiCanvas.width,
+        y: Math.random() * -confettiCanvas.height,
+        r: 6 + Math.random() * 8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: 2 + Math.random() * 3,
+        dx: Math.random() * 2 - 1
+    }));
+    let running = true;
+    function draw() {
+        if (!ctx || !running) return;
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confetti.forEach(c => {
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+            ctx.fillStyle = c.color;
+            ctx.globalAlpha = 0.7;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            c.y += c.speed;
+            c.x += c.dx;
+            if (c.y > confettiCanvas.height) c.y = -10;
+            if (c.x < 0) c.x = confettiCanvas.width;
+            if (c.x > confettiCanvas.width) c.x = 0;
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+    confettiStop = () => {
+        running = false;
+        confettiCanvas.remove();
+    };
+}
+
+
+export function renderEndGameModal(score1: number, score2: number, player1Name: string, player2Name: string, mode: 'single' | 'tournament' | 'quick', onRestart: (winnerId?: number) => void, winnerId?: number) {
+    // Remove any previous modal
+    const oldModal = document.getElementById('gris-endgame-modal');
+    if (oldModal) oldModal.remove();
+    if (document.getElementById('gris-confetti-canvas')) document.getElementById('gris-confetti-canvas')?.remove();
+
+
+    // Determine winner
+    let winner: string | null = null;
+    if (score1 > score2) winner = player1Name;
+    else if (score2 > score1) winner = player2Name;
+
+
+    // Create GRIS-inspired modal overlay
+    const modal = document.createElement('div');
+    modal.id = 'gris-endgame-modal';
+    modal.className = 'gris-game-modal modal-animated';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'radial-gradient(ellipse at center, rgba(186,189,221,0.85) 0%, rgba(127,199,217,0.7) 100%)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
+
+
+    // Modal content
+    const content = document.createElement('div');
+    content.style.background = 'rgba(255,255,255,0.92)';
+    content.style.borderRadius = '2rem';
+    content.style.boxShadow = '0 8px 32px rgba(127,199,217,0.25), 0 1.5px 0 rgba(186,189,221,0.15)';
+    content.style.padding = '3rem 2.5rem';
+    content.style.textAlign = 'center';
+    content.style.minWidth = '340px';
+    content.style.maxWidth = '90vw';
+    content.style.fontFamily = '"Montserrat", "Arial", sans-serif';
+
+
+    // Title
+    const title = document.createElement('h2');
+    title.textContent = 'Game Over';
+    title.style.fontSize = '2.2rem';
+    title.style.marginBottom = '1.5rem';
+    title.style.letterSpacing = '0.08em';
+    title.style.color = '#7fc7d9';
+    title.style.textShadow = '0 2px 12px #b6a6ca44';
+    content.appendChild(title);
+
+
+    // Scores
+    const scoreBox = document.createElement('div');
+    scoreBox.style.marginBottom = '2rem';
+    scoreBox.style.fontSize = '1.3rem';
+    scoreBox.style.color = '#4a4a6a';
+    scoreBox.innerHTML = `<strong${winner === player1Name ? ' style="color:#b6a6ca;font-size:1.5em;text-shadow:0 0 12px #7fc7d9;"' : ''}>${player1Name}:</strong> ${score1}<br><strong${winner === player2Name ? ' style="color:#b6a6ca;font-size:1.5em;text-shadow:0 0 12px #7fc7d9;"' : ''}>${player2Name}:</strong> ${score2}`;
+    content.appendChild(scoreBox);
+
+
+    // Winner confetti
+    if (winner) launchConfetti(winner);
+
+
+    // Buttons
+    const buttonRow = document.createElement('div');
+    buttonRow.style.display = 'flex';
+    buttonRow.style.justifyContent = 'center';
+    buttonRow.style.gap = '1.5rem';
+    buttonRow.style.marginTop = '1.5rem';
+
+
+    const restartBtn = document.createElement('button');
+    restartBtn.textContent = mode === 'tournament' ? 'Next Match' : 'Restart';
+    restartBtn.className = 'gris-game-modal-close';
+    restartBtn.style.padding = '0.7rem 2.2rem';
+    restartBtn.style.fontSize = '1.1rem';
+    restartBtn.style.borderRadius = '1rem';
+    restartBtn.style.border = 'none';
+    restartBtn.style.background = 'linear-gradient(90deg, #b6a6ca 0%, #7fc7d9 100%)';
+    restartBtn.style.color = '#fff';
+    restartBtn.style.fontWeight = 'bold';
+    restartBtn.style.boxShadow = '0 2px 8px #b6a6ca33';
+    restartBtn.style.cursor = 'pointer';
+    buttonRow.appendChild(restartBtn);
+
+
+    if (mode !== 'tournament') {
+        const menuBtn = document.createElement('button');
+        menuBtn.textContent = 'Main Menu';
+        menuBtn.className = 'gris-game-modal-close';
+        menuBtn.style.padding = '0.7rem 2.2rem';
+        menuBtn.style.fontSize = '1.1rem';
+        menuBtn.style.borderRadius = '1rem';
+        menuBtn.style.border = 'none';
+        menuBtn.style.background = 'linear-gradient(90deg, #7fc7d9 0%, #b6a6ca 100%)';
+        menuBtn.style.color = '#fff';
+        menuBtn.style.fontWeight = 'bold';
+        menuBtn.style.boxShadow = '0 2px 8px #7fc7d933';
+        menuBtn.style.cursor = 'pointer';
+        buttonRow.appendChild(menuBtn);
+
+
+        menuBtn.onclick = () => {
+            modal.remove();
+            document.body.style.overflow = '';
+            if (confettiStop) confettiStop();
+            window.location.href = '/';
+        };
+    }
+
+
+    restartBtn.onclick = () => {
+        modal.remove();
+        document.body.style.overflow = '';
+        // Reset round and scores for next game
+        state.round++;
+        state.score1 = 0;
+        state.score2 = 0;
+        if (state.player1) state.player1.score = 0;
+        if (state.player2) state.player2.score = 0;
+        // Update score and round display
+        updateScoreDisplay(0, 0);
+        const roundEl = document.querySelector('.game-oracle');
+        if (roundEl) roundEl.textContent = `Round ${state.round} â€¢ ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
+        if (confettiStop) confettiStop();
+        onRestart(winnerId);
+    };
+
+
+    content.appendChild(buttonRow);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+
+    // Prevent scrolling/interactions with rest of page
+    document.body.style.overflow = 'hidden';
+
+
+    // Emotional feedback
+    showEmotionalFeedback('Game Over', GRIS_COLORS.depression);
+}
+
+
+export async function endGame(score1: number, score2: number,
+    canvas: HTMLCanvasElement, onRestart: (winnerId?: number) => void, player1Name: string,
+    player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
+    let winnerId: number | undefined;
+    if (gameId) {
+        try {
+            const res = await fetch(`/games/${gameId}/end`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ score_player1: score1, score_player2: score2 })
+            });
+            const data = await res.json();
+            winnerId = data.winner_id;
+        }
+        catch (err) {
+            console.error('Failed to end game:', err);
+        }
+    }
+    renderEndGameModal(score1, score2, player1Name, player2Name, mode, onRestart, winnerId);
+}
+
+import { state } from './state.js';
+import { GRIS_COLORS, GRIS_ANIMATIONS, GRIS_TYPOGRAPHY, GRIS_SHADOWS } from './constants.js';
+
+
+
+/**
+ * REVOLUTIONARY GRIS-inspired event system
+ * - Emotional feedback with watercolor animations
+ * - Mystical UI state transitions
+ * - Outstanding accessibility and mobile support
+ * - Ethereal interaction patterns
+ */
+
+
+
+export function setupGameEvents(container: HTMLElement) {
+    // Enhanced keyboard controls with emotional feedback
+    setupMysticalKeyboardControls();
+
+
+
+    // Beautiful touch events for mobile
+    setupEtherealTouchEvents(container);
+
+
+
+    // Outstanding click interactions
+    setupSpectacularClickEvents(container);
+
+
+
+    // Responsive window events
+    setupAdaptiveWindowEvents();
+
+
+
+    // Accessibility enhancements
+    setupAccessibilityFeatures(container);
+}
+
+
+
+function setupMysticalKeyboardControls() {
+    window.addEventListener('keydown', (e) => {
+        // Pause/Resume with emotional transition
+        if (e.key === 'Escape') {
+            state.isPaused = !state.isPaused;
+            updatePauseUI();
+            showEmotionalFeedback(
+                state.isPaused ? 'Time Stands Still...' : 'Flow Resumes...',
+                state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance,
+                state.isPaused ? 'pause' : 'resume',
+                true
+            );
+            triggerMysticalPauseEffect();
+        }
+
+
+
+        // Dynamic font scaling for accessibility
+        if (e.key === '=' || e.key === '+') {
+            adjustMysticalFontSize(1);
+            showEmotionalFeedback('Text Grows Larger', GRIS_COLORS.success);
+        }
+
+
+
+        if (e.key === '-' || e.key === '_') {
+            adjustMysticalFontSize(-1);
+            showEmotionalFeedback('Text Becomes Smaller', GRIS_COLORS.info);
+        }
+
+
+
+        // Theme switching with emotional colors
+        if (e.key === 't' || e.key === 'T') {
+            toggleEmotionalTheme();
+        }
+
+
+
+        // Help overlay with beautiful design
+        if (e.key === 'h' || e.key === 'H') {
+            toggleElegantHelpOverlay();
+        }
+
+
+        // Screenshot mode for sharing beautiful moments
+        if (e.key === 's' && e.ctrlKey) {
+            e.preventDefault();
+            captureBeautifulMoment();
+        }
+    });
+}
+
+
+
+function setupEtherealTouchEvents(container: HTMLElement) {
+    let touchStartY = 0;
+    let touchStartX = 0;
+
+
+
+    container.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        touchStartY = touch.clientY;
+        touchStartX = touch.clientX;
+
+
+
+        const target = e.target as HTMLElement;
+
+
+
+        // Mystical button interactions
+        if (target.classList.contains('gris-game-pause-btn')) {
+            state.isPaused = !state.isPaused;
+            updatePauseUI();
+            showEmotionalFeedback(
+                state.isPaused ? 'Peaceful Pause' : 'Graceful Return',
+                state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance
+            );
+            triggerHapticFeedback('gentle');
+            triggerMysticalPauseEffect();
+        }
+
+
+
+        // Add mystical touch ripple effect
+        createTouchRipple(touch.clientX, touch.clientY, target);
+    }, { passive: false });
+
+
+
+    container.addEventListener('touchmove', (e) => {
+        const target = e.target as HTMLElement;
+
+
+
+        // Prevent scroll during game interactions
+        if (target.closest('.game-arena') || target.closest('.player-sanctuary')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+
+
+    // Gesture recognition for enhanced interaction
+    container.addEventListener('touchend', (e) => {
+        const touch = e.changedTouches[0];
+        const deltaY = touch.clientY - touchStartY;
+        const deltaX = touch.clientX - touchStartX;
+
+
+
+        // Sanctuary magic trigger
+        if (Math.abs(deltaY) < 20 && Math.abs(deltaX) > 20) {
+            const target = e.target as HTMLElement;
+            if (target.closest('.player-sanctuary')) {
+                const sanctuary = target.closest('.player-sanctuary') as HTMLElement;
+                triggerSanctuaryMagic(sanctuary);
+            }
+
+
+
+            // Canvas interaction effects
+            if (target.closest('.canvas-container')) {
+                triggerCanvasAura();
+            }
+
+
+
+            // Achievement card interactions
+            if (target.closest('.achievement-crystal')) {
+                const crystal = target.closest('.achievement-crystal') as HTMLElement;
+                triggerCrystalResonance(crystal);
+            }
+        }
+    });
+}
+
+
+
+function setupSpectacularClickEvents(container: HTMLElement) {
+    container.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+
+
+
+        // Mystical pause button
+        if (target.classList.contains('gris-game-pause-btn')) {
+            state.isPaused = !state.isPaused;
+            updatePauseUI();
+            showEmotionalFeedback(
+                state.isPaused ? 'Entering Meditation...' : 'Awakening to Action...',
+                state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance,
+                state.isPaused ? 'pause' : 'resume'
+            );
+            triggerMysticalPauseEffect();
+        }
+
+
+
+        // Modal close with graceful transitions
+        if (target.classList.contains('gris-game-modal-close')) {
+            state.showModals = false;
+            updateModalsUI();
+            showEmotionalFeedback('Returning to the Journey', GRIS_COLORS.secondary);
+        }
+
+
+
+        // Player sanctuary interactions
+        if (target.closest('.player-sanctuary')) {
+            const sanctuary = target.closest('.player-sanctuary') as HTMLElement;
+            triggerSanctuaryMagic(sanctuary);
+        }
+
+
+
+        // Canvas interaction effects
+        if (target.closest('.canvas-container')) {
+            triggerCanvasAura();
+        }
+
+
+
+        // Achievement card interactions
+        if (target.closest('.achievement-crystal')) {
+            const crystal = target.closest('.achievement-crystal') as HTMLElement;
+            triggerCrystalResonance(crystal);
+        }
+    });
+}
+
+
+
+function setupAdaptiveWindowEvents() {
+    // Responsive layout adjustments
+    window.addEventListener('resize', () => {
+        updateResponsiveLayout();
+        updateParticleSystem();
+    });
+
+
+
+    // Visibility changes with graceful pausing
+    window.addEventListener('visibilitychange', () => {
+        if (document.hidden && !state.isPaused && !state.isGameOver) {
+            state.isPaused = true;
+            updatePauseUI();
+            showEmotionalFeedback('Paused - Window Hidden', GRIS_COLORS.muted);
+        }
+    });
+
+
+
+    // Performance monitoring
+    window.addEventListener('blur', () => {
+        if (!state.isPaused) {
+            // Reduce animation intensity when not focused
+            document.body.classList.add('reduced-motion');
+        }
+    });
+
+
+
+    window.addEventListener('focus', () => {
+        document.body.classList.remove('reduced-motion');
+    });
+}
+
+
+
+function setupAccessibilityFeatures(container: HTMLElement) {
+    // Enhanced keyboard navigation
+    const focusableElements = container.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+
+
+    focusableElements.forEach((element) => {
+        element.addEventListener('focus', () => {
+            (element as HTMLElement).style.outline = `3px solid ${GRIS_COLORS.acceptance}`;
+            (element as HTMLElement).style.outlineOffset = '2px';
+        });
+
+
+
+        element.addEventListener('blur', () => {
+            (element as HTMLElement).style.outline = 'none';
+        });
+    });
+
+
+
+    // Screen reader announcements
+    const announcer = document.createElement('div');
+    announcer.id = 'gris-announcer';
+    announcer.setAttribute('aria-live', 'polite');
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.style.cssText = `
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    `;
+    document.body.appendChild(announcer);
+
+
+
+    // Announce score changes
+    const originalUpdateScore = state.updateScore || (() => { });
+    state.updateScore = (player1Score: number, player2Score: number) => {
+        originalUpdateScore(player1Score, player2Score);
+        announcer.textContent = `Score update: ${state.player1?.nickname} ${player1Score}, ${state.player2?.nickname} ${player2Score}`;
+    };
+}
+
+
+
+// Enhanced UI update functions with spectacular animations
+function updatePauseUI() {
+    const pauseOverlay = document.getElementById('gris-game-pause-overlay');
+    if (pauseOverlay) {
+        if (state.isPaused) {
+            pauseOverlay.style.display = 'flex';
+            pauseOverlay.style.opacity = '0';
+            pauseOverlay.style.transform = 'scale(0.95)';
+
+
+
+            requestAnimationFrame(() => {
+                pauseOverlay.style.transition = `all ${GRIS_ANIMATIONS.duration.gentle}ms ${GRIS_ANIMATIONS.curves.organic}`;
+                pauseOverlay.style.opacity = '1';
+                pauseOverlay.style.transform = 'scale(1)';
+            });
+
+
+
+            // Add mystical breathing animation
+            pauseOverlay.style.animation = 'pauseBreathing 4s ease-in-out infinite alternate';
+        } else {
+            pauseOverlay.style.transition = `all ${GRIS_ANIMATIONS.duration.swift}ms ${GRIS_ANIMATIONS.curves.organic}`;
+            pauseOverlay.style.opacity = '0';
+            pauseOverlay.style.transform = 'scale(0.95)';
+
+
+
+            setTimeout(() => {
+                pauseOverlay.style.display = 'none';
+                pauseOverlay.style.animation = 'none';
+            }, GRIS_ANIMATIONS.duration.swift);
+        }
+    }
+}
+
+
+
+function updateModalsUI() {
+    const modals = document.querySelectorAll('.gris-game-modal');
+    modals.forEach(modal => {
+        const modalEl = modal as HTMLElement;
+        if (state.showModals) {
+            modalEl.style.display = 'flex';
+            modalEl.style.opacity = '0';
+            modalEl.style.transform = 'scale(0.8) translateY(20px)';
+
+
+
+            requestAnimationFrame(() => {
+                modalEl.style.transition = `all ${GRIS_ANIMATIONS.duration.gentle}ms ${GRIS_ANIMATIONS.curves.grief}`;
+                modalEl.style.opacity = '1';
+                modalEl.style.transform = 'scale(1) translateY(0)';
+            });
+        } else {
+            modalEl.style.transition = `all ${GRIS_ANIMATIONS.duration.swift}ms ${GRIS_ANIMATIONS.curves.organic}`;
+            modalEl.style.opacity = '0';
+            modalEl.style.transform = 'scale(0.9) translateY(-20px)';
+
+
+
+            setTimeout(() => {
+                modalEl.style.display = 'none';
+            }, GRIS_ANIMATIONS.duration.swift);
+        }
+    });
+}
+
+
+
+// Spectacular feedback system
+export function showEmotionalFeedback(
+    message: string,
+    color: string,
+    soundType?: string,
+    haptic: boolean = false
+) {
+    let feedbackEl = document.getElementById('gris-emotional-feedback');
+
+
+
+    if (!feedbackEl) {
+        feedbackEl = document.createElement('div');
+        feedbackEl.id = 'gris-emotional-feedback';
+        feedbackEl.setAttribute('role', 'status');
+        feedbackEl.setAttribute('aria-live', 'polite');
+
+
+
+        Object.assign(feedbackEl.style, {
+            position: 'fixed',
+            bottom: '3rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: `linear-gradient(135deg, ${color} 0%, ${GRIS_COLORS.background} 100%)`,
+            color: '#fff',
+            padding: '1.2rem 2.5rem',
+            borderRadius: '2rem',
+            zIndex: '4000',
+            fontSize: GRIS_TYPOGRAPHY.scale.lg,
+            fontFamily: GRIS_TYPOGRAPHY.fonts.display,
+            fontWeight: GRIS_TYPOGRAPHY.weights.semibold,
+            boxShadow: GRIS_SHADOWS.mystical,
+            backdropFilter: 'blur(20px)',
+            border: `2px solid ${color}55`,
+            letterSpacing: GRIS_TYPOGRAPHY.tracking.wide,
+            textAlign: 'center',
+            maxWidth: '450px',
+            wordWrap: 'break-word',
+            animation: 'none'
+        });
+
+
+
+        document.body.appendChild(feedbackEl);
+    }
+
+
+
+    // Update content and styling
+    feedbackEl.textContent = message;
+    feedbackEl.style.background = `linear-gradient(135deg, ${color} 0%, ${GRIS_COLORS.background} 100%)`;
+    feedbackEl.style.borderColor = `${color}55`;
+    feedbackEl.style.display = 'block';
+    feedbackEl.style.opacity = '0';
+    feedbackEl.style.transform = 'translateX(-50%) translateY(30px) scale(0.9)';
+
+
+
+    // Spectacular entrance animation
+    requestAnimationFrame(() => {
+        feedbackEl!.style.transition = `all ${GRIS_ANIMATIONS.duration.gentle}ms ${GRIS_ANIMATIONS.curves.grief}`;
+        feedbackEl!.style.opacity = '1';
+        feedbackEl!.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+    });
+
+
+
+    // Play contextual sound
+    if (soundType) {
+        playEmotionalSound(soundType);
+    }
+
+
+
+    // Haptic feedback
+    if (haptic) {
+        triggerHapticFeedback('gentle');
+    }
+
+
+
+    // Graceful exit
+    setTimeout(() => {
+        if (feedbackEl) {
+            feedbackEl.style.transition = `all ${GRIS_ANIMATIONS.duration.slow}ms ${GRIS_ANIMATIONS.curves.organic}`;
+            feedbackEl.style.opacity = '0';
+            feedbackEl.style.transform = 'translateX(-50%) translateY(-30px) scale(0.9)';
+
+
+
+            setTimeout(() => {
+                feedbackEl!.style.display = 'none';
+            }, GRIS_ANIMATIONS.duration.slow);
+        }
+    }, 3500);
+}
+
+
+
+// Mystical animation triggers
+export function triggerScoreAnimation() {
+    state.animationFlags.scoreUpdate = true;
+
+
+
+    // Spectacular score ripple effect
+    const canvas = document.getElementById('pong') as HTMLCanvasElement;
+    if (canvas) {
+        canvas.style.animation = 'scoreEruption 1.2s cubic-bezier(.68,-0.55,.265,1.55)';
+        setTimeout(() => {
+            canvas.style.animation = '';
+        }, 1200);
+    }
+
+
+
+    // Update score displays with magical effects
+    const scoreDisplays = document.querySelectorAll('.mystical-score, .score-crystal');
+    scoreDisplays.forEach((display, index) => {
+        const element = display as HTMLElement;
+        element.style.animation = `scoreTransform 1s ${GRIS_ANIMATIONS.curves.grief} ${index * 0.1}s`;
+    });
+
+
+
+    setTimeout(() => {
+        state.animationFlags.scoreUpdate = false;
+    }, 1200);
+}
+
+
+
+function triggerMysticalPauseEffect() {
+    const gameArea = document.querySelector('.game-arena') as HTMLElement;
+    const playerSanctuaries = document.querySelectorAll('.player-sanctuary');
+
+
+
+    if (gameArea) {
+        if (state.isPaused) {
+            gameArea.style.filter = 'blur(3px) grayscale(40%) brightness(0.6)';
+            gameArea.style.transform = 'scale(0.98)';
+        } else {
+            gameArea.style.filter = 'blur(0px) grayscale(0%) brightness(1)';
+            gameArea.style.transform = 'scale(1)';
+        }
+        gameArea.style.transition = `all ${GRIS_ANIMATIONS.duration.gentle}ms ${GRIS_ANIMATIONS.curves.organic}`;
+    }
+
+
+
+    playerSanctuaries.forEach(sanctuary => {
+        const element = sanctuary as HTMLElement;
+        if (state.isPaused) {
+            element.style.filter = 'saturate(0.7) brightness(0.8)';
+            element.style.transform = 'scale(0.98)';
+        } else {
+            element.style.filter = 'saturate(1) brightness(1)';
+            element.style.transform = 'scale(1)';
+        }
+        element.style.transition = `all ${GRIS_ANIMATIONS.duration.gentle}ms ${GRIS_ANIMATIONS.curves.organic}`;
+    });
+}
+
+
+
+function triggerSanctuaryMagic(sanctuary: HTMLElement) {
+    // Add mystical glow effect
+    sanctuary.style.animation = 'sanctuaryAwaken 1.5s ease-out';
+
+
+
+    setTimeout(() => {
+        sanctuary.style.animation = '';
+    }, 1500);
+
+
+
+    showEmotionalFeedback('Sanctuary Awakened', GRIS_COLORS.acceptance, 'achieve');
+}
+
+
+
+function triggerCanvasAura() {
+    const canvas = document.getElementById('pong');
+    if (canvas) {
+        canvas.style.animation = 'canvasAura 2s ease-out';
+        setTimeout(() => {
+            canvas.style.animation = '';
+        }, 2000);
+    }
+}
+
+
+
+function triggerCrystalResonance(crystal: HTMLElement) {
+    crystal.style.animation = 'crystalResonance 0.8s cubic-bezier(.68,-0.55,.265,1.55)';
+
+
+
+    setTimeout(() => {
+        crystal.style.animation = '';
+    }, 800);
+}
+
+
+
+// Utility functions
+function adjustMysticalFontSize(delta: number) {
+    const currentSize = parseInt(getComputedStyle(document.body).fontSize);
+    const newSize = Math.max(12, Math.min(24, currentSize + delta));
+    document.body.style.fontSize = newSize + 'px';
+}
+
+
+
+function toggleEmotionalTheme() {
+    document.body.classList.toggle('gris-dark-theme');
+    const isDark = document.body.classList.contains('gris-dark-theme');
+    showEmotionalFeedback(
+        isDark ? 'Embracing the Night...' : 'Welcoming the Dawn...',
+        isDark ? GRIS_COLORS.depression : GRIS_COLORS.acceptance,
+        'settings'
+    );
+}
+
+
+
+function toggleElegantHelpOverlay() {
+    let helpOverlay = document.getElementById('gris-help-overlay');
+
+
+
+    if (!helpOverlay) {
+        helpOverlay = document.createElement('div');
+        helpOverlay.id = 'gris-help-overlay';
+        helpOverlay.style.cssText = `
+            position: fixed;
+            inset: 0;
+            background: ${GRIS_COLORS.gradients.ethereal};
+            backdrop-filter: blur(20px);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        `;
+
+
+
+        helpOverlay.innerHTML = `
+            <div style="
+                background: rgba(255,255,255,0.95);
+                border-radius: 2rem;
+                padding: 3rem;
+                max-width: 600px;
+                box-shadow: ${GRIS_SHADOWS['2xl']};
+                font-family: ${GRIS_TYPOGRAPHY.fonts.display};
+            ">
+                <h2 style="
+                    color: ${GRIS_COLORS.primary};
+                    font-size: ${GRIS_TYPOGRAPHY.scale['3xl']};
+                    margin-bottom: 2rem;
+                    text-align: center;
+                ">Game Controls</h2>
+                <div style="
+                    display: grid;
+                    gap: 1rem;
+                    color: ${GRIS_COLORS.secondary};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+                ">
+                    <div><kbd>ESC</kbd> - Pause/Resume</div>
+                    <div><kbd>TAB</kbd> - Toggle Statistics</div>
+                    <div><kbd>+/-</kbd> - Adjust Font Size</div>
+                    <div><kbd>T</kbd> - Toggle Theme</div>
+                    <div><kbd>H</kbd> - Toggle Help</div>
+                    <div><kbd>Ctrl+S</kbd> - Capture Moment</div>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" style="
+                    margin-top: 2rem;
+                    width: 100%;
+                    padding: 1rem;
+                    background: ${GRIS_COLORS.gradients.sunrise};
+                    border: none;
+                    border-radius: 1rem;
+                    color: white;
+                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+                    cursor: pointer;
+                ">Close</button>
+            </div>
+        `;
+
+
+
+        document.body.appendChild(helpOverlay);
+    } else {
+        helpOverlay.remove();
+    }
+}
+
+
+function captureBeautifulMoment() {
+    const canvas = document.getElementById('pong') as HTMLCanvasElement;
+    if (!canvas) {
+        showEmotionalFeedback('No game canvas found.', GRIS_COLORS.depression, 'settings', true);
+        return;
+    }
+    const image = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = image;
+    link.download = `gris_moment_${Date.now()}.png`;
+    link.click();
+    showEmotionalFeedback('Moment Captured âœ¨', GRIS_COLORS.success, 'achieve', true);
+}
+
+
+
+function updateResponsiveLayout() {
+    const canvas = document.getElementById('pong') as HTMLCanvasElement;
+    if (canvas) {
+        const container = canvas.parentElement;
+        if (container) {
+            const containerWidth = container.clientWidth - 80;
+            const aspectRatio = 5 / 3;
+            const maxWidth = 1000;
+
+
+
+            const width = Math.min(containerWidth, maxWidth);
+            const height = width / aspectRatio;
+
+
+
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+
+
+
+            // Update canvas resolution for crisp rendering
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+
+
+
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.scale(dpr, dpr);
+            }
+        }
+    }
+}
+
+
+function updateParticleSystem() {
+    const particleCanvas = document.getElementById('gris-bg-particles');
+    if (particleCanvas) {
+        const canvas = particleCanvas as HTMLCanvasElement;
+        // Use logical pixels, not physical
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        // Don't scale by DPR
+    }
+}
+
+
+function createTouchRipple(x: number, y: number, element: HTMLElement) {
+    const ripple = document.createElement('div');
+    ripple.style.cssText = `
+        position: absolute;
+        border-radius: 50%;
+        background: ${GRIS_COLORS.acceptance}44;
+        pointer-events: none;
+        transform: scale(0);
+        animation: touchRipple 0.8s ease-out;
+        left: ${x}px;
+        top: ${y}px;
+        width: 60px;
+        height: 60px;
+        margin-left: -30px;
+        margin-top: -30px;
+        z-index: 1000;
+    `;
+
+
+
+    document.body.appendChild(ripple);
+
+
+
+    setTimeout(() => {
+        ripple.remove();
+    }, 800);
+}
+
+
+
+function playEmotionalSound(type: string) {
+    const soundMap: Record<string, string> = {
+        pause: '/assets/sounds/pause.mp3',
+        resume: '/assets/sounds/resume.mp3',
+        stats: '/assets/sounds/stats.mp3',
+        score: '/assets/sounds/score.mp3',
+        win: '/assets/sounds/win.mp3',
+        achieve: '/assets/sounds/achieve.mp3',
+        settings: '/assets/sounds/settings.mp3'
+    };
+
+
+
+    const src = soundMap[type];
+    if (src) {
+        const audio = new Audio(src);
+        audio.volume = 0.2;
+        audio.play().catch(() => { });
+    }
+}
+
+
+
+function triggerHapticFeedback(intensity: 'gentle' | 'medium' | 'strong') {
+    if (navigator.vibrate) {
+        const patterns = {
+            gentle: [25],
+            medium: [40, 15, 40],
+            strong: [60, 30, 60, 30, 60]
+        };
+        navigator.vibrate(patterns[intensity]);
+    }
+}
+
+
+
+// Add revolutionary CSS animations
+const revolutionaryStyles = document.createElement('style');
+revolutionaryStyles.textContent = `
+    @keyframes pauseBreathing {
+        from { backdrop-filter: blur(15px); }
+        to { backdrop-filter: blur(25px); }
+    }
+
+
+
+    @keyframes scoreEruption {
+        0% { transform: scale(1) rotate(0deg); }
+        30% { transform: scale(1.05) rotate(2deg); }
+        60% { transform: scale(0.98) rotate(-1deg); }
+        100% { transform: scale(1) rotate(0deg); }
+    }
+
+
+
+    @keyframes scoreTransform {
+        0% { transform: scale(1) rotateY(0deg); }
+        50% { transform: scale(1.1) rotateY(10deg); }
+        100% { transform: scale(1) rotateY(0deg); }
+    }
+
+
+
+    @keyframes sanctuaryAwaken {
+        0% { transform: scale(1); filter: brightness(1); }
+        50% { transform: scale(1.03); filter: brightness(1.2); }
+        100% { transform: scale(1); filter: brightness(1); }
+    }
+
+
+
+    @keyframes canvasAura {
+        0% { box-shadow: ${GRIS_SHADOWS.mystical}; }
+        50% { box-shadow: ${GRIS_SHADOWS['2xl']}; }
+        100% { box-shadow: ${GRIS_SHADOWS.mystical}; }
+    }
+
+
+
+    @keyframes crystalResonance {
+        0% { transform: scale(1) rotate(0deg); }
+        30% { transform: scale(1.05) rotate(2deg); }
+        70% { transform: scale(0.98) rotate(-1deg); }
+        100% { transform: scale(1) rotate(0deg); }
+    }
+
+
+
+    @keyframes touchRipple {
+        from {
+            transform: scale(0);
+            opacity: 1;
+        }
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+
+
+
+    /* Dark theme support */
+    .gris-dark-theme .player-sanctuary,
+    .gris-dark-theme .game-arena,
+    .gris-dark-theme .mystical-dashboard {
+        background: linear-gradient(135deg, rgba(35, 39, 47, 0.95) 0%, rgba(53, 59, 72, 0.9) 100%);
+        color: #f4f6fa;
+        border-color: rgba(107, 122, 143, 0.3);
+    }
+
+
+
+    .gris-dark-theme .gris-atmosphere .watercolor-base {
+        background: linear-gradient(135deg, #1a1d23 0%, #2c3442 50%, #3a4553 100%);
+    }
+
+
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+        .reduced-motion *,
+        .reduced-motion *::before,
+        .reduced-motion *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+
+
+    /* High contrast support */
+    @media (prefers-contrast: high) {
+        .player-sanctuary,
+        .game-arena,
+        .mystical-dashboard {
+            border-width: 3px;
+            border-color: #000;
+        }
+    }
+`;
+
+
+
+document.head.appendChild(revolutionaryStyles);
+
+// Gris-inspired artistic canvas utilities
+import { GRIS_COLORS } from './constants.js';
+
+
+// Draw a watercolor rectangle with optional gradient and soft shadow
+export function drawRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill: string | HTMLImageElement) {
+    if (typeof fill === 'string') {
+        // Watercolor gradient background
+        const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+        gradient.addColorStop(0, GRIS_COLORS.background);
+        gradient.addColorStop(0.5, fill);
+        gradient.addColorStop(1, GRIS_COLORS.surface);
+        ctx.fillStyle = gradient;
+    } else {
+        const pattern = ctx.createPattern(fill, 'repeat');
+        if (pattern)
+            ctx.fillStyle = pattern;
+    }
+    // Soft shadow for poetic effect
+    ctx.save();
+    ctx.shadowColor = GRIS_COLORS.muted;
+    ctx.shadowBlur = 16;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+}
+
+
+// Draw a glowing watercolor ball
+export function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string) {
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
+
+// Draw a mystical net with animated watercolor effect
+export function drawNet(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time?: number) {
+    const netWidth = 4;
+    const netHeight = 20;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.shadowColor = GRIS_COLORS.secondary;
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = GRIS_COLORS.tertiary;
+    for (let i = 0; i < canvas.height; i += netHeight * 2) {
+        // Animate net with gentle vertical shimmer
+        const offset = time ? Math.sin((i + time / 10) / 18) * 2 : 0;
+        ctx.fillRect(canvas.width / 2 - netWidth / 2 + offset, i, netWidth, netHeight);
+    }
+    ctx.restore();
+}
+
+
+// Responsive canvas size with poetic aspect ratio
+export function setResponsiveCanvasSize(canvas: HTMLCanvasElement) {
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.min(window.innerWidth * 0.92, 980);
+    const height = Math.min(window.innerHeight * 0.62, 580);
+
+
+    // Set actual canvas size
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+
+    // Set display size
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+
+
+    // Scale the context to match device pixel ratio
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform before scaling
+        ctx.scale(dpr, dpr);
+    }
+
+
+    // Accessibility: add aria-label for screen readers
+    canvas.setAttribute('aria-label', 'Gris-inspired poetic game canvas');
+}
+
+//renderGame/gameControls.ts
+import { Paddle } from './types.js';
+
+
+
+export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number) {
+    const keysPressed: Record<string, boolean> = {};
+
+
+
+    window.addEventListener('keydown', (e) => {
+        keysPressed[e.key] = true;
+        leftPaddle.dy = keysPressed[leftPaddle.upKey] ? -paddleSpeed : keysPressed[leftPaddle.downKey] ? paddleSpeed : 0;
+        rightPaddle.dy = keysPressed[rightPaddle.upKey] ? -paddleSpeed : keysPressed[rightPaddle.downKey] ? paddleSpeed : 0;
+        // Prevent default for paddle control keys
+        if ([leftPaddle.upKey, leftPaddle.downKey, rightPaddle.upKey, rightPaddle.downKey].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+    window.addEventListener('keyup', (e) => {
+        keysPressed[e.key] = false;
+        leftPaddle.dy = keysPressed[leftPaddle.upKey] ? -paddleSpeed : keysPressed[leftPaddle.downKey] ? paddleSpeed : 0;
+        rightPaddle.dy = keysPressed[rightPaddle.upKey] ? -paddleSpeed : keysPressed[rightPaddle.downKey] ? paddleSpeed : 0;
+    });
+    // Touch controls for mobile
+    const upBtn = document.getElementById('touch-up');
+    const downBtn = document.getElementById('touch-down');
+    if (upBtn && downBtn) {
+        upBtn.addEventListener('touchstart', () => { leftPaddle.dy = -paddleSpeed; });
+        upBtn.addEventListener('touchend', () => { leftPaddle.dy = 0; });
+        downBtn.addEventListener('touchstart', () => { leftPaddle.dy = paddleSpeed; });
+        downBtn.addEventListener('touchend', () => { leftPaddle.dy = 0; });
+    }
+}
+
+
+// Utility to update score display in DOM
+export function updateScoreDisplay(score1: number, score2: number) {
+    const leftScoreEl = document.querySelector('.mystical-score.left-score');
+    const rightScoreEl = document.querySelector('.mystical-score.right-score');
+    if (leftScoreEl) leftScoreEl.textContent = score1.toString();
+    if (rightScoreEl) rightScoreEl.textContent = score2.toString();
+}
+
+//renderGame/gameLogic.ts
+import { Paddle, Ball } from './types.js';
+import { state } from './state.js';
+import { renderGameLayout } from './layout.js';
+import { updateScoreDisplay } from './gameControls.js';
+
+
+
+export function resetBall(ball: Ball, canvas: HTMLCanvasElement, speed: number) {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    ball.speed = speed;
+    ball.dx = speed * (Math.random() > 0.5 ? 1 : -1);
+    ball.dy = speed * (Math.random() * 2 - 1);
+}
+
+
+
+export function updatePaddle(paddle: Paddle, canvas: HTMLCanvasElement, gameEnded: boolean) {
+    if (gameEnded)
+        return;
+    paddle.y += paddle.dy;
+    if (paddle.y < 0)
+        paddle.y = 0;
+    if (paddle.y + paddle.height > canvas.height)
+        paddle.y = canvas.height - paddle.height;
+}
+const SPEED_INCREMENT = 0.2;
+const MAX_SPEED = 20;
+
+
+
+export function updateBall(ball: Ball, leftPaddle: Paddle, rightPaddle: Paddle,
+    canvas: HTMLCanvasElement, maxGames: number, onGameEnd: () => void) {
+    // Move the ball
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+
+
+    // Bounce off top/bottom walls
+    if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+        ball.dy = -ball.dy;
+        ball.speed += SPEED_INCREMENT;
+    }
+
+
+
+    // Left paddle collision
+    if (ball.x - ball.radius < leftPaddle.x + leftPaddle.width &&
+        ball.x - ball.radius > leftPaddle.x && ball.y > leftPaddle.y &&
+        ball.y < leftPaddle.y + leftPaddle.height) {
+        ball.dx = -ball.dx;
+        ball.speed += SPEED_INCREMENT;
+    }
+
+
+
+    // Right paddle collision
+    if (ball.x + ball.radius > rightPaddle.x &&
+        ball.x + ball.radius < rightPaddle.x + rightPaddle.width &&
+        ball.y > rightPaddle.y && ball.y < rightPaddle.y + rightPaddle.height) {
+        ball.dx = -ball.dx;
+        ball.speed += SPEED_INCREMENT;
+    }
+
+
+
+    // Score conditions
+    if (ball.x + ball.radius < 0) {
+        rightPaddle.score++;
+        resetBall(ball, canvas, ball.initialSpeed); // reset to initial speed
+        state.score1 = leftPaddle.score;
+        state.score2 = rightPaddle.score;
+        updateScoreDisplay(state.score1, state.score2);
+        if (state.container) {
+            state.container.innerHTML = renderGameLayout({
+                player1: state.player1,
+                player2: state.player2,
+                score1: state.score1,
+                score2: state.score2,
+                round: state.round,
+                mode: state.mode,
+                avatar1: state.avatar1,
+                avatar2: state.avatar2,
+                canvasId: 'pong',
+                showControls: true,
+                modalsHtml: ''
+            });
+        }
+    }
+    else if (ball.x - ball.radius > canvas.width) {
+        leftPaddle.score++;
+        resetBall(ball, canvas, ball.initialSpeed);
+        state.score1 = leftPaddle.score;
+        state.score2 = rightPaddle.score;
+        updateScoreDisplay(state.score1, state.score2);
+        if (state.container) {
+            state.container.innerHTML = renderGameLayout({
+                player1: state.player1,
+                player2: state.player2,
+                score1: state.score1,
+                score2: state.score2,
+                round: state.round,
+                mode: state.mode,
+                avatar1: state.avatar1,
+                avatar2: state.avatar2,
+                canvasId: 'pong',
+                showControls: true,
+                modalsHtml: ''
+            });
+        }
+    }
+
+
+
+    // End game check
+    const totalGames = leftPaddle.score + rightPaddle.score;
+    if (totalGames >= maxGames)
+        onGameEnd();
+}
+
+//renderGame/gameLoop.ts
+
+
+
+import { Paddle, Ball } from './types.js';
+import { updateBall, updatePaddle, resetBall } from './gameLogic.js';
+import { endGame } from './endGame.js';
+import { renderFrame } from './renderFrame.js';
+import { state } from './state.js';
+
+
+
+type GameMode = 'single' | 'tournament' | 'quick';
+
+
+
+export function startGameLoop(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
+    left: Paddle, right: Paddle, ball: Ball, maxGames: number,
+    onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', gameId?: number) {
+    let gameEnded = false;
+    let animationId: number;
+
+
+
+    function stopGameLoop() {
+        gameEnded = true;
+        cancelAnimationFrame(animationId);
+    }
+
+
+
+    function loop() {
+        if (gameEnded)
+            return;
+
+
+        if (state.isPaused) {
+            animationId = requestAnimationFrame(loop);
+            return;
+        }
+
+
+        updatePaddle(left, canvas, gameEnded);
+        updatePaddle(right, canvas, gameEnded);
+
+
+
+        updateBall(ball, left, right, canvas, maxGames, () => {
+            stopGameLoop();
+
+
+
+            const score1 = left.score;
+            const score2 = right.score;
+            console.log("ESTE E O MODE CARALHES", mode);
+            if (mode === 'single' || mode === 'quick') {
+                // Restart same game
+                endGame(score1, score2, canvas, () => {
+                    left.score = 0;
+                    right.score = 0;
+                    resetBall(ball, canvas, ball.initialSpeed);
+                    gameEnded = false;
+                    loop();
+                }, left.nickname, right.nickname, mode, gameId);
+            }
+            else
+                onGameEnd(score1, score2);
+        });
+
+
+
+        const bgImage = new Image();
+        bgImage.src = 'assets/gamebg3.jpg';
+        renderFrame(ctx, canvas, left, right, ball, bgImage);
+        animationId = requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+
+//renderGame/modals.ts
+
+
+
+/**
+ * Gris-inspired modals for game UI
+ * - Pause overlay
+ * - Achievements modal
+ * - Game settings modal
+ */
+
+
+
+export function renderPauseModal(): string {
+    return `
+           <div id="gris-game-pause-overlay" class="gris-game-modal modal-animated" style="display:none;position:fixed;inset:0;background:rgba(112,128,144,0.65);z-index:2000;justify-content:center;align-items:center;">
+               <audio id="pause-sound" src="/assets/sounds/pause.mp3" preload="auto"></audio>
+               <div style="background:linear-gradient(120deg,#f4f6fa 0%,#e6c79c 60%,#b6a6ca 100%);padding:4vw 3vw;border-radius:2.8vw;box-shadow:0 1.6vw 6.4vw #b6a6ca33;max-width:32vw;width:98vw;text-align:center;animation:modalEntry 1.1s cubic-bezier(.77,.2,.25,1);font-family:'Cormorant Garamond',serif;">
+                   <h2 style="color:#7fc7d9;font-size:clamp(24px,3vw,38px);margin-bottom:2vw;letter-spacing:1px;font-family:'Cormorant Garamond',serif;">Game Paused</h2>
+                   <button class="gris-game-pause-btn" style="background:linear-gradient(90deg,#7fc7d9 0%,#e6c79c 100%);color:#fff;border:none;padding:1.4vw 3.6vw;border-radius:1.8vw;font-size:clamp(16px,2vw,22px);font-weight:600;cursor:pointer;box-shadow:0 0.6vw 1.8vw #7fc7d955;transition:background .3s;font-family:'Cormorant Garamond',serif;letter-spacing:1px;">Resume</button>
+               </div>
+           </div>
+    `;
+}
+
+
+
+
+export function renderAchievementsModal(achievements: string[]): string {
+    return `
+               <div id="gris-game-achievements-modal" class="gris-game-modal modal-animated" style="display:none;position:fixed;inset:0;background:rgba(230,199,156,0.55);z-index:2000;justify-content:center;align-items:center;">
+                   <audio id="achieve-sound" src="/assets/sounds/achieve.mp3" preload="auto"></audio>
+                   <div style="background:linear-gradient(120deg,#fffbe6 0%,#e6c79c 60%,#b6a6ca 100%);padding:4vw 3vw;border-radius:3.2vw;box-shadow:0 2.4vw 8vw #e6c79c33;max-width:98vw;width:100%;max-width:32vw;text-align:center;animation:modalEntry 1.1s cubic-bezier(.77,.2,.25,1);font-family:'Cormorant Garamond',serif;position:relative;">
+                       <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:linear-gradient(120deg,#fffbe6 0%,#e6c79c 100%);opacity:0.18;border-radius:3.2vw;"></div>
+                       <h2 style="color:#e6c79c;font-size:clamp(20px,2.8vw,32px);margin-bottom:1.8vw;letter-spacing:1px;font-family:'Cormorant Garamond',serif;position:relative;z-index:1;">Achievements</h2>
+                       <ul style="list-style:none;padding:0;margin:0;font-size:clamp(14px,1.6vw,20px);color:#6b7a8f;font-family:'Cormorant Garamond',serif;position:relative;z-index:1;">
+                           ${achievements.length ? achievements.map(a => `<li style="margin-bottom:1.2vw;">${a}</li>`).join('') : '<li style="color:#b6a6ca;">No achievements yet.</li>'}
+                       </ul>
+                       <button class="gris-game-modal-close" style="background:linear-gradient(90deg,#b6a6ca 0%,#e6c79c 100%);color:#fff;border:none;padding:1.2vw 3.2vw;border-radius:1.6vw;font-size:clamp(14px,1.8vw,18px);font-weight:500;cursor:pointer;box-shadow:0 0.4vw 1.6vw #b6a6ca22;margin-top:2.2vw;transition:background .3s;font-family:'Cormorant Garamond',serif;letter-spacing:1px;position:relative;z-index:1;">Close</button>
+                   </div>
+               </div>
+        `;
+}
+
+
+
+
+export function renderSettingsModal(settingsHtml: string): string {
+    return `
+           <div id="gris-game-settings-modal" class="gris-game-modal modal-animated" style="display:none;position:fixed;inset:0;background:rgba(127,199,217,0.45);z-index:2000;justify-content:center;align-items:center;">
+               <audio id="settings-sound" src="/assets/sounds/settings.mp3" preload="auto"></audio>
+               <div style="background:linear-gradient(120deg,#b6a6ca 0%,#fffbe6 100%);padding:4vw 3vw;border-radius:3.2vw;box-shadow:0 2.4vw 8vw #7fc7d933;max-width:98vw;width:100%;max-width:32vw;text-align:center;animation:modalEntry 1.1s cubic-bezier(.77,.2,.25,1);font-family:'Cormorant Garamond',serif;position:relative;">
+                   <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:linear-gradient(120deg,#b6a6ca 0%,#fffbe6 100%);opacity:0.18;border-radius:3.2vw;"></div>
+                   <h2 style="color:#7fc7d9;font-size:clamp(20px,2.8vw,32px);margin-bottom:1.8vw;letter-spacing:1px;font-family:'Cormorant Garamond',serif;position:relative;z-index:1;">Settings</h2>
+                   <div style="position:relative;z-index:1;">${settingsHtml}</div>
+                   <button class="gris-game-modal-close" style="background:linear-gradient(90deg,#7fc7d9 0%,#b6a6ca 100%);color:#fff;border:none;padding:1.2vw 3.2vw;border-radius:1.6vw;font-size:clamp(14px,1.8vw,18px);font-weight:500;cursor:pointer;box-shadow:0 0.4vw 1.6vw #7fc7d922;margin-top:2.2vw;transition:background .3s;font-family:'Cormorant Garamond',serif;letter-spacing:1px;position:relative;z-index:1;">Close</button>
+               </div>
+           </div>
+    `;
+}
+
+//renderGame/renderFrame.ts
+
+
+import { Paddle, Ball } from './types.js';
+import { drawRect, drawCircle, drawNet } from './gameCanvas.js';
+import { GRIS_COLORS } from './constants.js';
+
+
+export function renderFrame(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement,
+    left: Paddle, right: Paddle, ball: Ball, background?: HTMLImageElement) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (background) {
+        ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    }
+    drawNet(ctx, canvas);
+    drawRect(ctx, left.x, left.y, left.width, left.height, GRIS_COLORS.primary);
+    drawRect(ctx, right.x, right.y, right.width, right.height, GRIS_COLORS.primary);
+    drawCircle(ctx, ball.x, ball.y, ball.radius, GRIS_COLORS.primary);
+}
+
+//renderGamre/renderGame.ts
+
+
+import { createBall, createPaddles } from './setupGame.js';
+import { Ball } from './types.js';
+import { startGameLoop } from './gameLoop.js';
+import { setupControls } from './gameControls.js';
+import { renderGameLayout } from './layout.js';
+import { renderPauseModal, renderAchievementsModal, renderSettingsModal } from './modals.js';
+import { state } from './state.js';
+import { setupGameEvents, triggerScoreAnimation } from './events.js';
+import { GRIS_COLORS, GRIS_ANIMATIONS, GRIS_TYPOGRAPHY, GRIS_SHADOWS, GRIS_ICONS } from './constants.js';
+
+
+
+/**
+ * REVOLUTIONARY GRIS-inspired game renderer
+ * - Spectacular new layout with mystical player sanctuaries
+ * - Ethereal watercolor aesthetics with emotional progression
+ * - Outstanding animations and particle systems
+ * - Professional responsive design
+ * - Immersive ambient soundscape
+ * - Pure artistic excellence - this is not basic anymore!
+ */
+
+
+
+export function renderGame(
+    container: HTMLElement,
+    player1Name: string,
+    player2Name: string,
+    maxGames: number,
+    difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal',
+    onGameEnd?: (canvas: HTMLCanvasElement, score1: number, score2: number) => void,
+    mode: 'single' | 'tournament' | 'quick' = 'single',
+    gameId?: number,
+    avatar1?: string,
+    avatar2?: string
+) {
+    console.log('Ã°Å¸Å½Â¨ Initializing GRIS-inspired spectacular game interface...');
+
+
+
+    // Initialize revolutionary game state
+    initializeSpectacularGameState(player1Name, player2Name, maxGames, mode, gameId, avatar1, avatar2);
+
+
+
+    // Render the REVOLUTIONARY layout
+    container.innerHTML = renderGameLayout({
+        player1: state.player1!,
+        player2: state.player2!,
+        score1: state.score1,
+        score2: state.score2,
+        round: state.round,
+        mode: state.mode,
+        avatar1: state.player1?.avatarUrl,
+        avatar2: state.player2?.avatarUrl,
+        canvasId: 'pong',
+        showControls: true,
+        modalsHtml: renderSpectacularModals()
+    });
+
+
+    // Initialize breathtaking background effects
+    setTimeout(() => initializeSpectacularEffects(), 150);
+
+
+
+    // Setup mystical ambient soundscape
+    initializeMysticalSoundscape();
+
+
+
+    // Setup revolutionary canvas and game mechanics
+    const canvas = document.getElementById('pong') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+
+
+
+    // Make canvas magnificently responsive
+    setSpectacularCanvasSize(canvas);
+    window.addEventListener('resize', () => setSpectacularCanvasSize(canvas));
+
+
+
+    // Create game entities with GRIS aesthetics
+    const [leftPaddle, rightPaddle] = createPaddles(canvas, player1Name, player2Name);
+    const ball = createBall(canvas, difficulty);
+    state.ball = ball;
+
+
+
+    // Setup outstanding controls and events
+    setupControls(leftPaddle, rightPaddle, 6);
+    setupGameEvents(container);
+
+
+
+    // Begin the SPECTACULAR countdown
+    startMysticalCountdown(canvas, ctx, leftPaddle, rightPaddle, ball, maxGames, onGameEnd, mode, gameId);
+}
+
+
+
+function initializeSpectacularGameState(
+    player1Name: string,
+    player2Name: string,
+    maxGames: number,
+    mode: any,
+    gameId?: number,
+    avatar1?: string,
+    avatar2?: string
+) {
+    // Initialize ethereal player entities
+    state.player1 = {
+        nickname: player1Name,
+        avatarUrl: avatar1 || '/assets/avatar/default.png',
+        x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
+        upKey: 'w', downKey: 's'
+    };
+
+
+
+    state.player2 = {
+        nickname: player2Name,
+        avatarUrl: avatar2 || '/assets/avatar/default.png',
+        x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
+        upKey: 'ArrowUp', downKey: 'ArrowDown'
+    };
+
+
+
+    // Reset mystical game state
+    state.score1 = 0;
+    state.score2 = 0;
+    state.round = 1;
+    state.maxRounds = maxGames;
+    state.mode = mode;
+    state.gameId = gameId;
+    state.isPaused = false;
+    state.isGameOver = false;
+    state.showModals = false;
+
+
+
+    // Initialize animation flags
+    state.animationFlags = {
+        headerFadeIn: true,
+        canvasEntry: true,
+        scoreUpdate: false,
+    };
+
+
+
+    // Set mystical atmosphere
+    state.atmosphere = {
+        mistLevel: 0.4,
+        gradient: GRIS_COLORS.gradients.ethereal,
+        glow: true,
+        soundscape: '/assets/sounds/ambient.mp3',
+    };
+
+
+
+    console.log('Ã¢Å“Â¨ Game state initialized with GRIS aesthetic');
+}
+
+
+
+function renderSpectacularModals(): string {
+    return [
+        renderPauseModal(),
+        renderAchievementsModal([]),
+        renderSettingsModal(renderSpectacularSettingsContent())
+    ].join('');
+}
+
+
+
+function renderSpectacularSettingsContent(): string {
+    return `
+        <div class="gris-spectacular-settings" style="
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            color: ${GRIS_COLORS.primary};
+            font-family: ${GRIS_TYPOGRAPHY.fonts.body};
+        ">
+            <!-- Audio Section -->
+            <div class="setting-realm">
+                <label for="mystical-volume" style="
+                    display: block;
+                    margin-bottom: 1rem;
+                    font-family: ${GRIS_TYPOGRAPHY.fonts.display};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+                    font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
+                    color: ${GRIS_COLORS.acceptance};
+                ">Mystical Audio Volume</label>
+                <div style="position: relative;">
+                    <input type="range" id="mystical-volume" min="0" max="100" value="30" style="
+                        width: 100%;
+                        height: 12px;
+                        border-radius: 6px;
+                        background: ${GRIS_COLORS.gradients.ocean};
+                        outline: none;
+                        cursor: pointer;
+                        -webkit-appearance: none;
+                    ">
+                </div>
+            </div>
+
+
+
+            <!-- Visual Effects -->
+            <div class="setting-realm">
+                <label for="ethereal-effects" style="
+                    display: block;
+                    margin-bottom: 1rem;
+                    font-family: ${GRIS_TYPOGRAPHY.fonts.display};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+                    font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
+                    color: ${GRIS_COLORS.depression};
+                ">Ethereal Visual Effects</label>
+                <select id="ethereal-effects" style="
+                    width: 100%;
+                    padding: 1rem;
+                    border: 2px solid ${GRIS_COLORS.secondary};
+                    border-radius: 1rem;
+                    background: ${GRIS_COLORS.surface};
+                    color: ${GRIS_COLORS.primary};
+                    font-family: ${GRIS_TYPOGRAPHY.fonts.body};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.base};
+                ">
+                    <option value="minimal">Gentle Minimalism</option>
+                    <option value="balanced" selected>Balanced Beauty</option>
+                    <option value="spectacular">Spectacular Immersion</option>
+                </select>
+            </div>
+
+
+
+            <!-- Accessibility -->
+            <div class="setting-realm">
+                <label style="
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    cursor: pointer;
+                    font-family: ${GRIS_TYPOGRAPHY.fonts.display};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+                    font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
+                    color: ${GRIS_COLORS.bargaining};
+                ">
+                    <input type="checkbox" id="mystical-haptics" checked style="
+                        width: 20px;
+                        height: 20px;
+                        accent-color: ${GRIS_COLORS.acceptance};
+                        border-radius: 4px;
+                    ">
+                    Mystical Haptic Feedback
+                </label>
+            </div>
+
+
+
+            <!-- Emotional Theme -->
+            <div class="setting-realm">
+                <label for="emotional-theme" style="
+                    display: block;
+                    margin-bottom: 1rem;
+                    font-family: ${GRIS_TYPOGRAPHY.fonts.display};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+                    font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
+                    color: ${GRIS_COLORS.secondary};
+                ">Emotional Color Journey</label>
+                <select id="emotional-theme" style="
+                    width: 100%;
+                    padding: 1rem;
+                    border: 2px solid ${GRIS_COLORS.acceptance};
+                    border-radius: 1rem;
+                    background: ${GRIS_COLORS.background};
+                    color: ${GRIS_COLORS.primary};
+                    font-family: ${GRIS_TYPOGRAPHY.fonts.body};
+                    font-size: ${GRIS_TYPOGRAPHY.scale.base};
+                ">
+                    <option value="denial">Denial - Grey Mists</option>
+                    <option value="anger">Anger - Crimson Storms</option>
+                    <option value="bargaining" selected>Bargaining - Emerald Hope</option>
+                    <option value="depression">Depression - Ocean Depths</option>
+                    <option value="acceptance">Acceptance - Golden Dawn</option>
+                </select>
+            </div>
+        </div>
+    `;
+}
+
+
+
+function initializeSpectacularEffects() {
+    console.log('ðŸŒŸ Initializing spectacular background effects...');
+
+
+    const atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
+    if (!atmosphereCanvas) {
+        console.log('âš ï¸ Atmosphere canvas not found, creating...');
+        return;
+    }
+
+
+    const atmosphereCtx = atmosphereCanvas.getContext('2d');
+    if (!atmosphereCtx) return;
+
+
+    // Set logical canvas size, not physical
+    atmosphereCanvas.width = window.innerWidth;
+    atmosphereCanvas.height = window.innerHeight;
+
+
+
+    // Revolutionary particle system
+    class SpectacularParticle {
+        x: number;
+        y: number;
+        vx: number;
+        vy: number;
+        color: string;
+        radius: number;
+        opacity: number;
+        age: number;
+        maxAge: number;
+        rotationSpeed: number;
+        rotation: number;
+
+
+
+        constructor() {
+            this.x = Math.random() * (atmosphereCanvas ? atmosphereCanvas.width : window.innerWidth);
+            this.y = Math.random() * (atmosphereCanvas ? atmosphereCanvas.height : window.innerHeight);
+            this.vx = (Math.random() - 0.5) * 0.8;
+            this.vy = (Math.random() - 0.5) * 0.8;
+
+
+
+            // GRIS emotional color palette
+            const emotionalColors = [
+                GRIS_COLORS.acceptance,
+                GRIS_COLORS.depression,
+                GRIS_COLORS.bargaining,
+                GRIS_COLORS.secondary,
+                GRIS_COLORS.background,
+                GRIS_COLORS.acceptanceGold
+            ];
+            this.color = emotionalColors[Math.floor(Math.random() * emotionalColors.length)];
+
+
+
+            this.radius = Math.random() * 60 + 30;
+            this.opacity = Math.random() * 0.4 + 0.1;
+            this.age = 0;
+            this.maxAge = Math.random() * 2000 + 3000;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+            this.rotation = 0;
+        }
+
+
+
+        update() {
+            // Organic movement
+            this.x += this.vx;
+            this.y += this.vy;
+            this.age++;
+            this.rotation += this.rotationSpeed;
+
+
+
+            // Boundary wrapping with mystical transition
+            if (this.x < -this.radius) this.x = atmosphereCanvas.width + this.radius;
+            if (this.x > atmosphereCanvas.width + this.radius) this.x = -this.radius;
+            if (this.y < -this.radius) this.y = atmosphereCanvas.height + this.radius;
+            if (this.y > atmosphereCanvas.height + this.radius) this.y = -this.radius;
+
+
+
+            // Emotional aging with opacity fade
+            const ageRatio = this.age / this.maxAge;
+            this.opacity = Math.max(0, 0.5 * (1 - ageRatio));
+
+
+
+            // Gentle size breathing
+            const breathe = 1 + Math.sin(this.age * 0.01) * 0.1;
+            this.radius = this.radius * breathe;
+
+
+
+            return this.age < this.maxAge;
+        }
+
+
+
+        draw(ctx: CanvasRenderingContext2D) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.globalAlpha = this.opacity;
+
+
+
+            // Create mystical radial gradient
+            const gradient = ctx.createRadialGradient(
+                this.x, this.y, 0,
+                this.x, this.y, this.radius
+            );
+            gradient.addColorStop(0, this.color);
+            gradient.addColorStop(0.4, this.color + '66');
+            gradient.addColorStop(0.8, this.color + '22');
+            gradient.addColorStop(1, 'transparent');
+
+
+
+            ctx.fillStyle = gradient;
+
+
+
+            // Draw organic particle
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+
+
+            ctx.restore();
+        }
+    }
+
+
+
+    // Initialize spectacular particle system
+    const spectacularParticles: SpectacularParticle[] = [];
+    for (let i = 0; i < 35; i++) {
+        spectacularParticles.push(new SpectacularParticle());
+    }
+
+
+
+    function animateSpectacularParticles() {
+        atmosphereCtx!.clearRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
+
+
+
+        // Mystical atmospheric background
+        const atmosphereGradient = atmosphereCtx!.createRadialGradient(
+            atmosphereCanvas.width / 2, atmosphereCanvas.height / 2, 0,
+            atmosphereCanvas.width / 2, atmosphereCanvas.height / 2, Math.max(atmosphereCanvas.width, atmosphereCanvas.height) / 2
+        );
+        atmosphereGradient.addColorStop(0, GRIS_COLORS.background + 'EE');
+        atmosphereGradient.addColorStop(0.5, GRIS_COLORS.surface + 'CC');
+        atmosphereGradient.addColorStop(1, GRIS_COLORS.acceptance + '44');
+
+
+
+        atmosphereCtx!.fillStyle = atmosphereGradient;
+        atmosphereCtx!.fillRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
+
+
+
+        // Update and draw particles
+        for (let i = spectacularParticles.length - 1; i >= 0; i--) {
+            const particle = spectacularParticles[i];
+            if (!particle.update()) {
+                spectacularParticles.splice(i, 1);
+                spectacularParticles.push(new SpectacularParticle());
+            } else {
+                particle.draw(atmosphereCtx!);
+            }
+        }
+
+
+
+        requestAnimationFrame(animateSpectacularParticles);
+    }
+
+
+
+    animateSpectacularParticles();
+    console.log('Ã°Å¸Å½Â¨ Spectacular particle system initialized');
+
+
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+        atmosphereCanvas.width = window.innerWidth;
+        atmosphereCanvas.height = window.innerHeight;
+    });
+}
+
+
+
+function initializeMysticalSoundscape() {
+    console.log('Ã°Å¸Å½Âµ Initializing mystical soundscape...');
+
+
+
+    let ambientAudio = document.getElementById('gris-mystical-ambient') as HTMLAudioElement | null;
+
+
+
+    if (!ambientAudio) {
+        ambientAudio = document.createElement('audio');
+        ambientAudio.id = 'gris-mystical-ambient';
+        ambientAudio.src = '/assets/sounds/ambient.mp3';
+        ambientAudio.loop = true;
+        ambientAudio.volume = 0.15; // Gentle volume
+        ambientAudio.style.display = 'none';
+        document.body.appendChild(ambientAudio);
+
+
+
+        // Graceful audio initialization
+        const playPromise = ambientAudio.play();
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('ðŸ”Š Mystical soundscape started');
+                    fadeInAudio(ambientAudio as HTMLAudioElement, 0.15, 3000);
+                })
+                .catch(() => {
+                    console.log('ðŸ”Š Mystical soundscape will start on user interaction');
+                });
+        }
+    } else if (ambientAudio.paused) {
+        ambientAudio.play().catch(() => {
+            console.log('ðŸ”Š Could not resume mystical soundscape');
+        });
+    }
+}
+
+
+
+function startMysticalCountdown(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    leftPaddle: any,
+    rightPaddle: any,
+    ball: any,
+    maxGames: number,
+    onGameEnd: any,
+    mode: any,
+    gameId?: number
+) {
+    console.log('ðŸ”Š Starting mystical countdown...');
+
+
+
+    let countdown = 3;
+    const bg = new Image();
+    bg.src = 'assets/gamebg3.jpg';
+
+
+
+    // Emotional states for countdown
+    const emotionalCountdowns = [
+        {
+            color: GRIS_COLORS.acceptance,
+            message: 'Prepare Your Spirit',
+            gradient: GRIS_COLORS.gradients.sunrise
+        },
+        {
+            color: GRIS_COLORS.bargaining,
+            message: 'Feel the Flow',
+            gradient: GRIS_COLORS.gradients.forest
+        },
+        {
+            color: GRIS_COLORS.depression,
+            message: 'Trust Your Instincts',
+            gradient: GRIS_COLORS.gradients.ocean
+        }
+    ];
+
+
+
+    bg.onload = () => {
+        function drawSpectacularCountdown() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+
+            // Mystical background
+            ctx.save();
+            ctx.globalAlpha = 0.8;
+            if (bg.complete) {
+                ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+            }
+            ctx.restore();
+
+
+
+            // Emotional gradient overlay
+            const currentEmotion = emotionalCountdowns[countdown - 1] || emotionalCountdowns[0];
+            const gradient = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0,
+                canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) / 1.5
+            );
+            gradient.addColorStop(0, currentEmotion.color + '88');
+            gradient.addColorStop(0.7, currentEmotion.color + '44');
+            gradient.addColorStop(1, GRIS_COLORS.background + '22');
+
+
+
+            ctx.save();
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+
+
+            // Spectacular typography
+            ctx.save();
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = currentEmotion.color;
+            ctx.shadowBlur = 50;
+            ctx.font = `bold ${Math.min(canvas.width / 6, 150)}px '${GRIS_TYPOGRAPHY.fonts.display.split(',')[0]}'`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+
+
+            // Main countdown number with ethereal glow
+            const numberY = canvas.height / 2 - 30;
+            ctx.fillText(countdown.toString(), canvas.width / 2, numberY);
+
+
+
+            // Mystical message
+            ctx.font = `${Math.min(canvas.width / 25, 40)}px '${GRIS_TYPOGRAPHY.fonts.display.split(',')[0]}'`;
+            ctx.fillStyle = currentEmotion.color;
+            ctx.shadowBlur = 30;
+            const messageY = canvas.height / 2 + 80;
+            ctx.fillText(currentEmotion.message, canvas.width / 2, messageY);
+
+
+
+            // Floating particles around number
+            const particleCount = 8;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (i / particleCount) * Math.PI * 2;
+                const distance = 100 + Math.sin(Date.now() * 0.01 + i) * 20;
+                const particleX = canvas.width / 2 + Math.cos(angle) * distance;
+                const particleY = numberY + Math.sin(angle) * distance;
+
+
+
+                ctx.beginPath();
+                ctx.arc(particleX, particleY, 6, 0, Math.PI * 2);
+                ctx.fillStyle = currentEmotion.color + '99';
+                ctx.fill();
+            }
+
+
+
+            ctx.restore();
+
+
+
+            // Play ethereal transition sound
+            playCountdownSound();
+        }
+
+
+
+        function startSpectacularCountdown() {
+            drawSpectacularCountdown();
+
+
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+
+
+
+                if (countdown > 0) {
+                    drawSpectacularCountdown();
+                } else {
+                    clearInterval(countdownInterval);
+                    console.log(' Starting spectacular game loop...');
+
+
+
+                    // Begin the magnificent game
+                    if (!leftPaddle || !rightPaddle || !ball) {
+                        throw new Error('Paddle(s) or ball not initialized');
+                    }
+                    if (!ball) {
+                        throw new Error('Ball is not initialized');
+                    }
+                    // TypeScript runtime check ensures ball is not null
+                    startGameLoop(
+                        canvas,
+                        ctx,
+                        leftPaddle,
+                        rightPaddle,
+                        ball as Ball,
+                        maxGames,
+                        (score1: number, score2: number) => {
+                            state.score1 = score1;
+                            state.score2 = score2;
+
+
+
+                            // Update stats with spectacular animations
+                            triggerScoreAnimation();
+
+
+
+                            if (onGameEnd) onGameEnd(canvas, score1, score2);
+                        },
+                        mode,
+                        gameId
+                    );
+                }
+            }, 1400); // Slightly slower for emotional impact
+        }
+
+
+
+        startSpectacularCountdown();
+    };
+
+
+
+    bg.onerror = () => {
+        console.log('Background image failed to load, starting without it');
+        startSpectacularCountdown();
+    };
+}
+
+
+
+function setSpectacularCanvasSize(canvas: HTMLCanvasElement) {
+    const container = canvas.parentElement;
+    if (!container) return;
+
+
+    const containerWidth = container.clientWidth - 100; // Account for padding
+    const aspectRatio = 5 / 3; // More cinematic aspect ratio
+    const maxWidth = 1000;
+
+
+    const width = Math.min(containerWidth, maxWidth);
+    const height = width / aspectRatio;
+
+
+    // Set display size with CSS
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+
+
+    // Set canvas internal size to logical pixels, not physical
+    // The browser will handle DPR scaling automatically
+    canvas.width = width;
+    canvas.height = height;
+
+
+    // REMOVE the DPR scaling from context - let the browser handle it
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        // Reset any previous transforms
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+
+    console.log(`ðŸ–¼ï¸ Canvas resized to ${width}x${height}`);
+}
+
+
+
+function playCountdownSound() {
+    const audio = new Audio('/assets/sounds/countdown.mp3');
+    audio.volume = 0.12;
+    audio.play().catch(() => {
+        console.log('Could not play countdown sound');
+    });
+}
+
+
+
+function fadeInAudio(audio: HTMLAudioElement, targetVolume: number, duration: number) {
+    const startVolume = 0;
+    const volumeStep = targetVolume / (duration / 50);
+
+
+
+    audio.volume = startVolume;
+
+
+
+    const fadeInterval = setInterval(() => {
+        if (audio.volume < targetVolume) {
+            audio.volume = Math.min(audio.volume + volumeStep, targetVolume);
+        } else {
+            clearInterval(fadeInterval);
+            console.log('Audio fade-in complete');
+        }
+    }, 50);
+}
+
+
+
+// Add spectacular responsive styles
+const spectacularStyles = document.createElement('style');
+spectacularStyles.textContent = `
+    /* Import magnificent fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+
+
+    /* Core spectacular animations */
+    @keyframes statUpdate {
+        0% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.05) rotate(1deg); }
+        100% { transform: scale(1) rotate(0deg); }
+    }
+
+
+
+    /* Enhanced mobile responsiveness */
+    @media (max-width: 768px) {
+        .gris-game-universe {
+            padding: 1.5rem !important;
+            gap: 1.5rem !important;
+        }
+
+
+
+        .player-sanctuary,
+        .game-arena,
+        .mystical-dashboard {
+            padding: 2rem !important;
+            border-radius: 2rem !important;
+        }
+    }
+
+
+
+    @media (max-width: 480px) {
+        .gris-game-universe {
+            padding: 1rem !important;
+            gap: 1rem !important;
+        }
+
+
+
+        .player-sanctuary,
+        .game-arena,
+        .mystical-dashboard {
+            padding: 1.5rem !important;
+            border-radius: 1.5rem !important;
+        }
+
+
+
+        .ethereal-header {
+            margin-bottom: 1rem !important;
+        }
+    }
+
+
+
+    /* Performance optimizations */
+    .floating-particle,
+    .mystical-ring,
+    .sanctuary-orb,
+    .achievement-crystal {
+        will-change: transform, opacity;
+        transform: translateZ(0); /* Force GPU acceleration */
+    }
+
+
+
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+
+
+    /* Beautiful selection */
+    ::selection {
+        background: ${GRIS_COLORS.acceptance}44;
+        color: ${GRIS_COLORS.primary};
+    }
+
+
+
+    /* Custom input styling for settings */
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: ${GRIS_COLORS.acceptance};
+        cursor: pointer;
+        box-shadow: 0 4px 12px ${GRIS_COLORS.acceptance}66;
+    }
+
+
+
+    input[type="range"]::-moz-range-thumb {
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: ${GRIS_COLORS.acceptance};
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 4px 12px ${GRIS_COLORS.acceptance}66;
+    }
+`;
+
+
+
+document.head.appendChild(spectacularStyles);
+
+
+
+console.log('ðŸ”Š SPECTACULAR GRIS-inspired game renderer initialized!');
+console.log('âœ¨ This is no longer basic - this is OUTSTANDING!');
+function startSpectacularCountdown() {
+    let countdown = 3;
+    const canvas = document.getElementById('pong') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const emotionalCountdowns = [
+        {
+            color: GRIS_COLORS.acceptance,
+            message: 'Prepare Your Spirit',
+            gradient: GRIS_COLORS.gradients.sunrise
+        },
+        {
+            color: GRIS_COLORS.bargaining,
+            message: 'Feel the Flow',
+            gradient: GRIS_COLORS.gradients.forest
+        },
+        {
+            color: GRIS_COLORS.depression,
+            message: 'Trust Your Instincts',
+            gradient: GRIS_COLORS.gradients.ocean
+        }
+    ];
+
+
+
+    function drawCountdown() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+
+        const currentEmotion = emotionalCountdowns[countdown - 1] || emotionalCountdowns[0];
+        const gradient = ctx.createRadialGradient(
+            canvas.width / 2, canvas.height / 2, 0,
+            canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) / 1.5
+        );
+        gradient.addColorStop(0, currentEmotion.color + '88');
+        gradient.addColorStop(0.7, currentEmotion.color + '44');
+        gradient.addColorStop(1, GRIS_COLORS.background + '22');
+
+
+
+        ctx.save();
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+
+
+
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = currentEmotion.color;
+        ctx.shadowBlur = 50;
+        ctx.font = `bold ${Math.min(canvas.width / 6, 150)}px '${GRIS_TYPOGRAPHY.fonts.display.split(',')[0]}'`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const numberY = canvas.height / 2 - 30;
+        ctx.fillText(countdown.toString(), canvas.width / 2, numberY);
+
+
+
+        ctx.font = `${Math.min(canvas.width / 25, 40)}px '${GRIS_TYPOGRAPHY.fonts.display.split(',')[0]}'`;
+        ctx.fillStyle = currentEmotion.color;
+        ctx.shadowBlur = 30;
+        const messageY = canvas.height / 2 + 80;
+        ctx.fillText(currentEmotion.message, canvas.width / 2, messageY);
+
+
+
+        const particleCount = 8;
+        for (let i = 0; i < particleCount; i++) {
+            const angle = (i / particleCount) * Math.PI * 2;
+            const distance = 100 + Math.sin(Date.now() * 0.01 + i) * 20;
+            const particleX = canvas.width / 2 + Math.cos(angle) * distance;
+            const particleY = numberY + Math.sin(angle) * distance;
+
+
+
+            ctx.beginPath();
+            ctx.arc(particleX, particleY, 6, 0, Math.PI * 2);
+            ctx.fillStyle = currentEmotion.color + '99';
+            ctx.fill();
+        }
+        ctx.restore();
+
+
+
+        playCountdownSound();
+    }
+
+
+
+    drawCountdown();
+
+
+
+    const interval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+            drawCountdown();
+        } else {
+            clearInterval(interval);
+            // Start the game loop after countdown
+            const leftPaddle = state.player1;
+            const rightPaddle = state.player2;
+            const ball = state.ball;
+            if (!leftPaddle || !rightPaddle || !ball) {
+                throw new Error('Paddle(s) or ball not initialized');
+            }
+            startGameLoop(
+                canvas,
+                ctx,
+                leftPaddle,
+                rightPaddle,
+                ball as Ball,
+                state.maxRounds,
+                (score1: number, score2: number) => {
+                    state.score1 = score1;
+                    state.score2 = score2;
+                    triggerScoreAnimation();
+                },
+                state.mode,
+                state.gameId
+            );
+        }
+    }, 1400);
+}
+
+//renderGame/setupGame.ts
+
+
+
+import { Paddle, Ball } from './types.js';
+
+
+
+export function createPaddles(canvas: HTMLCanvasElement, player1: string, player2: string): [Paddle, Paddle] {
+    return [
+        {
+            x: 10,
+            y: canvas.height / 2 - 40,
+            width: 10,
+            height: 80,
+            dy: 0,
+            score: 0,
+            upKey: 'w',
+            downKey: 's',
+            nickname: player1,
+        },
+        {
+            x: canvas.width - 20,
+            y: canvas.height / 2 - 40,
+            width: 10,
+            height: 80,
+            dy: 0,
+            score: 0,
+            upKey: 'ArrowUp',
+            downKey: 'ArrowDown',
+            nickname: player2,
+        }
+    ];
+}
+
+
+
+export function createBall(canvas: HTMLCanvasElement, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): Ball {
+    const baseSpeed = {
+        easy: 2,
+        normal: 5,
+        hard: 8,
+        crazy: 12
+    }[difficulty];
+
+
+
+    return {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 8,
+        speed: baseSpeed,
+        initialSpeed: baseSpeed,
+        dx: baseSpeed * (Math.random() > 0.5 ? 1 : -1),
+        dy: baseSpeed * (Math.random() * 2 - 1),
+    };
+}
+
+//renderGame/state.ts
+
+
+
+import type { Paddle, Ball } from './types.js';
+
+
+
+/**
+ * Gris-inspired watercolor state
+ * - Holds the soul of the game: players, scores, round, mode, UI, animation flags
+ * - Extensible for painterly overlays, misty gradients, and poetic transitions
+ * - Designed for clarity, emotion, and beauty across all devices
+ */
+
+
+
+/**
+ * Gris-inspired poetic game state
+ * - Tracks players, scores, round, mode, UI, animation flags
+ * - Designed for clarity, emotion, and beauty
+ */
+export type GameMode = 'single' | 'tournament' | 'quick'; // poetic modes
+
+
+
+/**
+ * Extendable atmospheric settings for Gris-inspired effects
+ */
+export interface Atmosphere {
+    mistLevel?: number; // 0-1, watercolor mist overlay
+    gradient?: string; // CSS gradient for painterly backgrounds
+    glow?: boolean; // soft glow effect
+    soundscape?: string; // ambient soundscape
+}
+
+
+
+export interface GameState {
+    /** left paddle, poetic hero */
+    player1: Paddle | null;
+    /** right paddle, poetic rival */
+    player2: Paddle | null;
+    /** watercolor avatar */
+    avatar1?: string;
+    /** watercolor avatar */
+    avatar2?: string;
+    /** left score */
+    score1: number;
+    /** right score */
+    score2: number;
+    /** current round */
+    round: number;
+    /** total rounds */
+    maxRounds: number;
+    /** game mode */
+    mode: GameMode;
+    /** poetic ball */
+    ball: Ball | null;
+    /** pause state */
+    isPaused: boolean;
+    /** game over state */
+    isGameOver: boolean;
+    /** modals */
+    showModals: boolean;
+    animationFlags: {
+        /** poetic header */
+        headerFadeIn: boolean;
+        /** canvas entry */
+        canvasEntry: boolean;
+        /** score update */
+        scoreUpdate: boolean;
+    };
+    /** main container */
+    container?: HTMLElement;
+    /** game id */
+    gameId?: number;
+    /** atmospheric painterly overlays */
+    atmosphere?: Atmosphere;
+    /** update score */
+    updateScore: (player1Score: number, player2Score: number) => void;
+}
+
+
+
+export const state: GameState = {
+    player1: null,
+    player2: null,
+    avatar1: undefined,
+    avatar2: undefined,
+    score1: 0,
+    score2: 0,
+    round: 1,
+    maxRounds: 3,
+    mode: 'single',
+    ball: null,
+    isPaused: false,
+    isGameOver: false,
+    showModals: false,
+    animationFlags: {
+        headerFadeIn: true,
+        canvasEntry: true,
+        scoreUpdate: false,
+    },
+    container: undefined,
+    gameId: undefined,
+    atmosphere: {
+        mistLevel: 0.3,
+        gradient: 'linear-gradient(120deg, #b6a6ca 0%, #fffbe6 100%)',
+        glow: true,
+        soundscape: '/assets/sounds/ambient.mp3',
+    },
+    updateScore(player1Score: number, player2Score: number) {
+        this.score1 = player1Score;
+        this.score2 = player2Score;
+    },
+}
+
+//renderGame/types.ts
+
+
+
+/**
+ * Gris-inspired poetic type definitions for game entities
+ * - Designed for clarity, emotion, and beauty
+ */
+
+
+export interface Paddle {
+    // X position
+    x: number;
+    // Y position
+    y: number;
+    // Paddle width
+    width: number;
+    // Paddle height
+    height: number;
+    // Vertical speed
+    dy: number;
+    // Current score
+    score: number;
+    // Up key
+    upKey: string;
+    // Down key
+    downKey: string;
+    // Player nickname
+    nickname: string;
+    // Watercolor avatar URL
+    avatarUrl?: string;
+}
+
+
+
+export interface Ball {
+    // X position
+    x: number;
+    // Y position
+    y: number;
+    // Ball radius
+    radius: number;
+    // Current speed
+    speed: number;
+    // Initial speed
+    initialSpeed: number;
+    // Horizontal speed
+    dx: number;
+    // Vertical speed
+    dy: number;
+}
+
+
+
+export interface Achievement {
+    // Achievement ID
+    id: string;
+    // Achievement name
+    name: string;
+    // Achievement description
+    description: string;
+    // Achievement icon
+    icon?: string;
+    // Unlocked status
+    unlocked: boolean;
+}
+
+
+
+export interface GameStats {
+    // Score progression
+    scores: number[];
+    // Win rate (0..1)
+    winRate: number;
+    // Win streak
+    streak: number;
+    // Achievements
+    achievements: Achievement[];
+}
+
+
+
+export interface PlayerProfile {
+    // Player nickname
+    nickname: string;
+    // Watercolor avatar URL
+    avatarUrl?: string;
+    // Team name
+    team?: string;
+    // Achievements
+    achievements?: Achievement[];
+}
+
+//renderGame/utils.ts
+
+
+
+import { GRIS_COLORS } from './constants.js';
+
+
+
+/**
+ * Safe audio playback utility for browser compatibility
+ */
+export function safeAudioPlay(audio: HTMLAudioElement) {
+    // Use global safePlayAudio if available, else fallback
+    if (typeof (window as any).safePlayAudio === 'function') {
+        (window as any).safePlayAudio(audio);
+    } else {
+        audio.play().catch(() => { });
+    }
+}
+
+
+
+/**
+ * Gris-inspired poetic utility functions for game UI
+ * - Gentle feedback, elegant DOM helpers, emotional cues
+ */
+export function setHTML(el: HTMLElement, html: string) {
+    // Set inner HTML with poetic intent
+    el.innerHTML = html;
+}
+
+
+
+export function showNotification(message: string, color: string = GRIS_COLORS.acceptance, sound?: string, vibrate?: boolean) {
+    // Show poetic notification with gentle feedback
+    let notif = document.getElementById('gris-game-notification');
+    if (!notif) {
+        notif = document.createElement('div');
+        notif.id = 'gris-game-notification';
+        notif.style.position = 'fixed';
+        notif.style.top = '3vw';
+        notif.style.right = '3vw';
+        notif.style.background = color;
+        notif.style.color = '#fff';
+        notif.style.padding = '1.8vw 3.6vw';
+        notif.style.borderRadius = '1.6vw';
+        notif.style.zIndex = '3000';
+        notif.style.fontSize = 'clamp(16px,2vw,22px)';
+        notif.style.fontFamily = 'Cormorant Garamond,serif';
+        notif.style.boxShadow = '0 0.8vw 3.2vw #7fc7d955';
+        document.body.appendChild(notif);
+    }
+    notif.textContent = message;
+    notif.style.background = color;
+    notif.style.display = 'block';
+    notif.style.opacity = '0.96';
+    if (sound) {
+        const audio = new Audio(sound);
+        audio.volume = 0.25;
+        safeAudioPlay(audio);
+    }
+    if (vibrate && navigator.vibrate) {
+        navigator.vibrate([60, 30, 60]);
+    }
+    setTimeout(() => { notif.style.opacity = '0'; notif.style.display = 'none'; }, 3200);
+}
+
+
+
+
+export function showInlineMessage(id: string, message: string, color: string = GRIS_COLORS.acceptance, sound?: string, vibrate?: boolean) {
+    // Show inline poetic message with gentle feedback
+    const msgEl = document.getElementById(id) as HTMLElement | null;
+    if (!msgEl) return;
+    msgEl.textContent = message;
+    msgEl.style.color = color;
+    msgEl.style.fontFamily = 'Cormorant Garamond,serif';
+    msgEl.style.fontSize = '20px';
+    msgEl.style.opacity = '0.96';
+    if (sound) {
+        const audio = new Audio(sound);
+        audio.volume = 0.25;
+        safeAudioPlay(audio);
+    }
+    if (vibrate && navigator.vibrate) {
+        navigator.vibrate([40, 20, 40]);
+    }
+    setTimeout(() => { msgEl.textContent = ''; msgEl.style.opacity = '0'; }, 2600);
+}
+
+
+
+export function playGameSound(type: 'score' | 'win' | 'pause' | 'achieve' | 'settings') {
+    const soundMap: Record<string, string> = {
+        score: '/assets/sounds/score.mp3',
+        win: '/assets/sounds/win.mp3',
+        pause: '/assets/sounds/pause.mp3',
+        achieve: '/assets/sounds/achieve.mp3',
+        settings: '/assets/sounds/settings.mp3',
+    };
+    const src = soundMap[type];
+    if (src) {
+        const audio = new Audio(src);
+        audio.volume = 0.25;
+        safeAudioPlay(audio);
+    }
+    if (type === 'win' && navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 200]);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pong Game</title>
+</head>
+
+
+<body>
+    <h1>PONG!!!!</h1>
+
+
+    <!-- Main menu buttons (hidden by default) -->
+    <button id="play-btn" style="display: none;">Play</button>
+    <button id="profile-btn" style="display: none;">Profile</button>
+    <button id="teams-btn" style="display: none;">Teams</button>
+    <button id="settings-btn" style="display: none;">Settings</button>
+    <button id="friend-requests-btn"
+        style="display: none; position: relative; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">ðŸ“§
+        Friend Requests
+        <span id="friend-requests-badge"
+            style="display: none; position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; text-align: center; line-height: 20px;"></span>
+    </button>
+    <button id="language-btn" style="display: none;">ðŸŒ Language</button>
+    <button id="logout-btn" style="display: none;">Logout</button>
+
+
+    <!-- Play menu buttons (hidden by default) -->
+    <button id="tournaments-btn" style="display: none;">Tournament</button>
+    <button id="matchmaking-btn" style="display: none;">Matchmaking</button>
+    <button id="quick-play-btn" style="display: none;">Quick Play</button>
+    <button id="select-opponent-btn" style="display: none;">Select Opponent</button>
+    <button id="back-btn" style="display: none;">Back</button>
+
+
+    <!-- Auth buttons (visible when logged out) -->
+    <button id="login-btn" style="display: none;">Login</button>
+    <button id="register-btn" style="display: none;">Register</button>
+
+
+    <div id="language-options" style="display: none;">
+        <button data-lang="en">English</button>
+        <button data-lang="es">EspaÃ±ol</button>
+        <button data-lang="pt">PortuguÃªs</button>
+    </div>
+
+
+    <div id="opponent-options" style="display: none;">
+        <button data-opponent="local">Local</button>
+        <button data-opponent="remote">Remote</button>
+    </div>
+    <div id="local-options" style="display: none;">
+        <button data-local="quick-play-btn">Quick Play</button>
+        <button data-local="custom-game-btn">Select Opponent</button>
+        <button data-local="tournaments-btn">Tournaments</button>
+        <button data-local="back-btn">Back</button>
+    </div>
+    <div id="remote-options" style="display: none;">
+        <button data-remote="matchmaking-btn">Matchmaking</button>
+        <button data-remote="back-btn">Back</button>
+    </div>
+
+
+    <div id="app"></div>
+
+
+    <script type="module" src="index.js"></script>
+</body>
+
+
+</html>
+
+import { renderPlayMenu } from './services/renderPlayMenu.js';
+import { renderSettingsPage } from './services/settings.js';
+import { renderTournamentsPage } from './services/tournament/tournaments.js';
+import { renderTeamsPage } from './services/teams.js';
+import { renderRegistrationForm } from './services/renderRegistrationForm.js';
+import { renderLoginForm, startActivityMonitoring } from './services/renderLoginForm.js';
+import { renderProfilePage } from './services/renderProfilePage/profile.js';
+import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
+import { startMatchmaking } from './services/remote/matchmaking.js';
+import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
+import { renderPlayerSelection } from './services/renderPlayerSelection.js';
+import { translations } from './services/language/translations.js';
+import type { Language } from '../types/language';
+
+
+// Button references
+const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
+const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
+const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
+const teamsBtn = document.getElementById('teams-btn') as HTMLButtonElement;
+const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
+const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+const registerBtn = document.getElementById('register-btn') as HTMLButtonElement;
+const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
+const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
+const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
+const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
+const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
+const appDiv = document.getElementById('app') as HTMLDivElement;
+const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+const languageOptions = document.getElementById('language-options') as HTMLDivElement;
+
+
+
+// ðŸ”„ Update UI based on login state
+function updateUIBasedOnAuth(): void {
+    const token = localStorage.getItem('authToken');
+    const isLoggedIn = !!token;
+
+
+    friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+
+
+    if (isLoggedIn)
+        updateFriendRequestsBadge();
+
+
+    playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    matchmakingBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+
+
+    loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+    registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+
+
+    friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    if (isLoggedIn) {
+        updateFriendRequestsBadge();
+        setOnlineOnLoad();
+    }
+}
+
+
+// MENU STATE
+enum MenuState {
+    Main = 'main',
+    Play = 'play',
+    Local = 'local',
+    Remote = 'remote'
+}
+let menuState: MenuState = MenuState.Main;
+
+
+function updateMenuUI(): void {
+    // Hide all buttons and option containers first
+    [playBtn, quickPlayBtn, loginBtn, registerBtn, logoutBtn, profileBtn, teamsBtn, settingsBtn, friendRequestsBtn, languageBtn, tournamentsBtn, matchmakingBtn].forEach(btn => {
+        if (btn) btn.style.display = 'none';
+    });
+    const opponentOptions = document.getElementById('opponent-options') as HTMLDivElement;
+    const localOptions = document.getElementById('local-options') as HTMLDivElement;
+    const remoteOptions = document.getElementById('remote-options') as HTMLDivElement;
+    if (opponentOptions) opponentOptions.style.display = 'none';
+    if (localOptions) localOptions.style.display = 'none';
+    if (remoteOptions) remoteOptions.style.display = 'none';
+
+
+    const token = localStorage.getItem('authToken');
+    const isLoggedIn = !!token;
+
+
+    if (!isLoggedIn) {
+        // Not logged in: main menu
+        if (menuState === MenuState.Main) {
+            playBtn.style.display = 'inline-block';
+            loginBtn.style.display = 'inline-block';
+            registerBtn.style.display = 'inline-block';
+            languageBtn.style.display = 'inline-block';
+        } else if (menuState === MenuState.Play) {
+            quickPlayBtn.style.display = 'inline-block';
+            playBtn.style.display = 'inline-block'; // Back to main
+        }
+    } else {
+        if (menuState === MenuState.Main) {
+            playBtn.style.display = 'inline-block';
+            profileBtn.style.display = 'inline-block';
+            teamsBtn.style.display = 'inline-block';
+            settingsBtn.style.display = 'inline-block';
+            friendRequestsBtn.style.display = 'inline-block';
+            languageBtn.style.display = 'inline-block';
+            logoutBtn.style.display = 'inline-block';
+        } else if (menuState === MenuState.Play) {
+            if (opponentOptions) opponentOptions.style.display = 'block';
+            playBtn.style.display = 'inline-block'; // Back to main
+            // Attach listeners for local/remote buttons
+            const localBtn = document.querySelector('[data-opponent="local"]') as HTMLButtonElement;
+            if (localBtn) {
+                localBtn.onclick = () => {
+                    menuState = MenuState.Local;
+                    appDiv.innerHTML = '';
+                    renderPlayerSelection(appDiv);
+                    updateMenuUI();
+                };
+            }
+            const remoteBtn = document.querySelector('[data-opponent="remote"]') as HTMLButtonElement;
+            if (remoteBtn) {
+                remoteBtn.onclick = () => {
+                    menuState = MenuState.Remote;
+                    appDiv.innerHTML = '';
+                    updateMenuUI();
+                };
+            }
+        } else if (menuState === MenuState.Local) {
+            if (localOptions) localOptions.style.display = 'block';
+            playBtn.style.display = 'inline-block'; // Back to Play
+            // Attach listeners for local options
+            const quickPlayLocalBtn = document.querySelector('[data-local="quick-play-btn"]') as HTMLButtonElement;
+            if (quickPlayLocalBtn) {
+                quickPlayLocalBtn.onclick = () => {
+                    appDiv.innerHTML = '';
+                    renderQuickGameSetup(appDiv);
+                };
+            }
+            const selectOpponentLocalBtn = document.querySelector('[data-local="custom-game-btn"]') as HTMLButtonElement;
+            if (selectOpponentLocalBtn) {
+                selectOpponentLocalBtn.onclick = () => {
+                    appDiv.innerHTML = '';
+                    renderPlayerSelection(appDiv);
+                };
+            }
+            const tournamentsLocalBtn = document.querySelector('[data-local="tournaments-btn"]') as HTMLButtonElement;
+            if (tournamentsLocalBtn) {
+                tournamentsLocalBtn.onclick = () => {
+                    appDiv.innerHTML = '';
+                    renderTournamentsPage(appDiv);
+                };
+            }
+            const localBackBtn = document.querySelector('[data-local="back-btn"]') as HTMLButtonElement;
+            if (localBackBtn) {
+                localBackBtn.onclick = () => {
+                    menuState = MenuState.Play;
+                    appDiv.innerHTML = '';
+                    updateMenuUI();
+                };
+            }
+        } else if (menuState === MenuState.Remote) {
+            if (remoteOptions) remoteOptions.style.display = 'block';
+            playBtn.style.display = 'inline-block'; // Back to Play
+            // Attach listeners for remote options
+            const matchmakingRemoteBtn = document.querySelector('[data-remote="matchmaking-btn"]') as HTMLButtonElement;
+            if (matchmakingRemoteBtn) {
+                matchmakingRemoteBtn.onclick = () => {
+                    const playerId = Number(localStorage.getItem('playerId'));
+                    const playerName = localStorage.getItem('playerName') || 'Unknown';
+                    const difficulty = 'normal';
+                    startMatchmaking(appDiv, playerId, playerName, difficulty);
+                };
+            }
+            const remoteBackBtn = document.querySelector('[data-remote="back-btn"]') as HTMLButtonElement;
+            if (remoteBackBtn) {
+                remoteBackBtn.onclick = () => {
+                    menuState = MenuState.Play;
+                    appDiv.innerHTML = '';
+                    updateMenuUI();
+                };
+            }
+        }
+    }
+}
+
+
+// ðŸ§  Event Listeners
+playBtn.addEventListener('click', () => {
+    if (!localStorage.getItem('authToken')) {
+        if (menuState === MenuState.Main) {
+            menuState = MenuState.Play;
+            appDiv.innerHTML = '';
+            renderQuickGameSetup(appDiv); // Show quick play setup for logged out
+        } else {
+            menuState = MenuState.Main;
+            appDiv.innerHTML = '';
+        }
+    } else {
+        if (menuState === MenuState.Main) {
+            menuState = MenuState.Play;
+            appDiv.innerHTML = '';
+            // Show local/remote options
+        } else if (menuState === MenuState.Play) {
+            menuState = MenuState.Main;
+            appDiv.innerHTML = '';
+        } else {
+            menuState = MenuState.Play;
+            appDiv.innerHTML = '';
+        }
+    }
+    updateMenuUI();
+});
+// Opponent options event listeners
+const localBtn = document.querySelector('[data-opponent="local"]');
+if (localBtn) {
+    localBtn.addEventListener('click', () => {
+        menuState = MenuState.Local;
+        appDiv.innerHTML = '';
+        renderPlayerSelection(appDiv); // Show select opponent
+        updateMenuUI();
+    });
+}
+const remoteBtn = document.querySelector('[data-opponent="remote"]');
+if (remoteBtn) {
+    remoteBtn.addEventListener('click', () => {
+        menuState = MenuState.Remote;
+        appDiv.innerHTML = '';
+        // Show matchmaking button
+        updateMenuUI();
+    });
+}
+// Local options event listeners
+const localBackBtn = document.querySelector('[data-local="back-btn"]');
+if (localBackBtn) {
+    localBackBtn.addEventListener('click', () => {
+        menuState = MenuState.Play;
+        appDiv.innerHTML = '';
+        updateMenuUI();
+    });
+}
+// Remote options event listeners
+const remoteBackBtn = document.querySelector('[data-remote="back-btn"]');
+if (remoteBackBtn) {
+    remoteBackBtn.addEventListener('click', () => {
+        menuState = MenuState.Play;
+        appDiv.innerHTML = '';
+        updateMenuUI();
+    });
+}
+settingsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderSettingsPage(appDiv);
+});
+tournamentsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderTournamentsPage(appDiv);
+});
+teamsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderTeamsPage(appDiv);
+});
+loginBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderLoginForm(appDiv, () => {
+        menuState = MenuState.Main;
+        updateUIBasedOnAuth();
+        updateMenuUI();
+    });
+});
+registerBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderRegistrationForm(appDiv);
+});
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('authToken');
+    appDiv.innerHTML = '<p>You have been logged out.</p>';
+    menuState = MenuState.Main;
+    updateUIBasedOnAuth();
+    updateMenuUI();
+});
+profileBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderProfilePage(appDiv);
+});
+friendRequestsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderFriendRequestsPage(appDiv);
+});
+quickPlayBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderQuickGameSetup(appDiv);
+});
+matchmakingBtn.addEventListener('click', () => {
+    const playerId = Number(localStorage.getItem('playerId'));
+    const playerName = localStorage.getItem('playerName') || 'Unknown';
+    const difficulty = 'normal';
+    startMatchmaking(appDiv, playerId, playerName, difficulty);
+});
+
+
+// ðŸ”” Update friend requests badge
+export async function updateFriendRequestsBadge() {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+
+    try {
+        const response = await fetch('/api/friends/pending', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+
+        if (response.ok) {
+            const data = await response.json();
+            const pendingCount = data.pending?.length || 0;
+
+
+            if (pendingCount > 0) {
+                friendRequestsBadge.textContent = pendingCount.toString();
+                friendRequestsBadge.style.display = 'block';
+            } else {
+                friendRequestsBadge.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error updating friend requests badge:', error);
+    }
+}
+
+
+// In index.ts - replace the DOMContentLoaded section
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        // Verify token is still valid
+        try {
+            const response = await fetch('/api/protected', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+
+            if (response.ok) {
+                // Token is valid, start activity monitoring
+                const { startActivityMonitoring } = await import('./services/renderLoginForm.js');
+                startActivityMonitoring();
+
+
+                // Set user as online
+                await updateOnlineStatus(true);
+
+
+                // Update friend requests badge
+                updateFriendRequestsBadge();
+            } else {
+                // Token is invalid, remove it
+                localStorage.removeItem('authToken');
+                updateUIBasedOnAuth();
+            }
+        }
+        catch (error) {
+            console.error('Error verifying token on page load:', error);
+            localStorage.removeItem('authToken');
+            updateUIBasedOnAuth();
+        }
+    }
+});
+
+
+// Add this helper function to index.ts
+async function updateOnlineStatus(isOnline: boolean) {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+
+    try {
+        await fetch('/api/profile/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ online: isOnline })
+        });
+        console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
+    } catch (error) {
+        console.error('Failed to update status:', error);
+    }
+}
+
+
+async function setOnlineOnLoad() {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+    try {
+        await fetch('/api/profile/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ online: true })
+        });
+    }
+    catch (error) {
+        console.error('Failed to set online on load:', error);
+    }
+}
+
+
+// Toggle language options visibility
+languageBtn.addEventListener('click', () => {
+    languageOptions.style.display = languageOptions.style.display === 'none' ? 'block' : 'none';
+});
+
+
+// Handle language selection
+languageOptions.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const selectedLang = btn.getAttribute('data-lang') || 'en';
+        localStorage.setItem('preferredLanguage', selectedLang);
+        applyLanguage(selectedLang);
+        languageOptions.style.display = 'none';
+    });
+});
+
+
+
+function applyLanguage(lang: string) {
+    const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
+    const t = translations[safeLang];
+
+
+    playBtn.textContent = t.play;
+    settingsBtn.textContent = t.settings;
+    tournamentsBtn.textContent = t.tournaments;
+    teamsBtn.textContent = t.teams;
+    loginBtn.textContent = t.login;
+    logoutBtn.textContent = t.logout;
+    registerBtn.textContent = t.register;
+    profileBtn.textContent = t.profile;
+    friendRequestsBtn.textContent = t.friendRequests;
+    quickPlayBtn.textContent = t.quickPlay;
+    matchmakingBtn.textContent = t.matchmaking;
+    languageBtn.textContent = t.language;
+}
+
+
+// ðŸš€ Initialize UI
+const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+applyLanguage(storedLang);
+updateUIBasedOnAuth();
+updateMenuUI();
+
+
+// Ambient music initialization (Gris-inspired)
+(function initAmbientMusic() {
+    let ambientAudio = document.getElementById('gris-game-ambient-audio') as HTMLAudioElement | null;
+    if (!ambientAudio) {
+        ambientAudio = document.createElement('audio');
+        ambientAudio.id = 'gris-game-ambient-audio';
+        ambientAudio.src = '/assets/sounds/ambient.mp3';
+        ambientAudio.loop = true;
+        ambientAudio.volume = 0.18;
+        ambientAudio.style.display = 'none';
+        document.body.appendChild(ambientAudio);
+        ambientAudio.play();
+    } else if (ambientAudio.paused) {
+        ambientAudio.play();
+    }
+})();
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pong Game</title>
+</head>
+
+
+<body>
+    <h1>PONG!!!!</h1>
+
+
+    <!-- Main menu buttons (hidden by default) -->
+    <button id="play-btn" style="display: none;">Play</button>
+    <button id="profile-btn" style="display: none;">Profile</button>
+    <button id="teams-btn" style="display: none;">Teams</button>
+    <button id="settings-btn" style="display: none;">Settings</button>
+    <button id="friend-requests-btn"
+        style="display: none; position: relative; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">ðŸ“§
+        Friend Requests
+        <span id="friend-requests-badge"
+            style="display: none; position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; text-align: center; line-height: 20px;"></span>
+    </button>
+    <button id="language-btn" style="display: none;">ðŸŒ Language</button>
+    <button id="logout-btn" style="display: none;">Logout</button>
+
+
+    <!-- Play menu buttons (hidden by default) -->
+    <button id="tournaments-btn" style="display: none;">Tournament</button>
+    <button id="matchmaking-btn" style="display: none;">Matchmaking</button>
+    <button id="quick-play-btn" style="display: none;">Quick Play</button>
+    <button id="select-opponent-btn" style="display: none;">Select Opponent</button>
+    <button id="back-btn" style="display: none;">Back</button>
+
+
+    <!-- Auth buttons (visible when logged out) -->
+    <button id="login-btn" style="display: none;">Login</button>
+    <button id="register-btn" style="display: none;">Register</button>
+
+
+    <div id="language-options" style="display: none;">
+        <button data-lang="en">English</button>
+        <button data-lang="es">EspaÃ±ol</button>
+        <button data-lang="pt">PortuguÃªs</button>
+    </div>
+
+
+    <div id="opponent-options" style="display: none;">
+        <button data-opponent="local">Local</button>
+        <button data-opponent="remote">Remote</button>
+    </div>
+    <div id="local-options" style="display: none;">
+        <button data-local="quick-play-btn">Quick Play</button>
+        <button data-local="custom-game-btn">Select Opponent</button>
+        <button data-local="tournaments-btn">Tournaments</button>
+        <button data-local="back-btn">Back</button>
+    </div>
+    <div id="remote-options" style="display: none;">
+        <button data-remote="matchmaking-btn">Matchmaking</button>
+        <button data-remote="back-btn">Back</button>
+    </div>
+
+
+    <div id="app"></div>
+
+
+    <script type="module" src="index.js"></script>
+</body>
+
+
+</html>
+
+import { renderPlayMenu } from './services/renderPlayMenu.js';
+import { renderSettingsPage } from './services/settings.js';
+import { renderTournamentsPage } from './services/tournament/tournaments.js';
+import { renderTeamsPage } from './services/teams.js';
+import { renderRegistrationForm } from './services/renderRegistrationForm.js';
+import { renderLoginForm, startActivityMonitoring } from './services/renderLoginForm.js';
+import { renderProfilePage } from './services/renderProfilePage/profile.js';
+import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
+import { startMatchmaking } from './services/remote/matchmaking.js';
+import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
+import { renderPlayerSelection } from './services/renderPlayerSelection.js';
+import { translations } from './services/language/translations.js';
+import type { Language } from '../types/language';
+
+
+// Button references
+const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
+const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
+const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
+const teamsBtn = document.getElementById('teams-btn') as HTMLButtonElement;
+const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
+const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+const registerBtn = document.getElementById('register-btn') as HTMLButtonElement;
+const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
+const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
+const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
+const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
+const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
+const appDiv = document.getElementById('app') as HTMLDivElement;
+const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+const languageOptions = document.getElementById('language-options') as HTMLDivElement;
+
+
+
+// ðŸ”„ Update UI based on login state
+function updateUIBasedOnAuth(): void {
+    const token = localStorage.getItem('authToken');
+    const isLoggedIn = !!token;
+
+
+    friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+
+
+    if (isLoggedIn)
+        updateFriendRequestsBadge();
+
+
+    playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    matchmakingBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+
+
+    loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+    registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+
+
+    friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+    if (isLoggedIn) {
+        updateFriendRequestsBadge();
+        setOnlineOnLoad();
+    }
+}
+
+
+// MENU STATE
+enum MenuState {
+    Main = 'main',
+    Play = 'play',
+    Local = 'local',
+    Remote = 'remote'
+}
+let menuState: MenuState = MenuState.Main;
+
+
+function updateMenuUI(): void {
+    // Hide all buttons and option containers first
+    [playBtn, quickPlayBtn, loginBtn, registerBtn, logoutBtn, profileBtn, teamsBtn, settingsBtn, friendRequestsBtn, languageBtn, tournamentsBtn, matchmakingBtn].forEach(btn => {
+        if (btn) btn.style.display = 'none';
+    });
+    const opponentOptions = document.getElementById('opponent-options') as HTMLDivElement;
+    const localOptions = document.getElementById('local-options') as HTMLDivElement;
+    const remoteOptions = document.getElementById('remote-options') as HTMLDivElement;
+    if (opponentOptions) opponentOptions.style.display = 'none';
+    if (localOptions) localOptions.style.display = 'none';
+    if (remoteOptions) remoteOptions.style.display = 'none';
+
+
+    const token = localStorage.getItem('authToken');
+    const isLoggedIn = !!token;
+
+
+    if (!isLoggedIn) {
+        // Not logged in: main menu
+        if (menuState === MenuState.Main) {
+            playBtn.style.display = 'inline-block';
+            loginBtn.style.display = 'inline-block';
+            registerBtn.style.display = 'inline-block';
+            languageBtn.style.display = 'inline-block';
+        } else if (menuState === MenuState.Play) {
+            quickPlayBtn.style.display = 'inline-block';
+            playBtn.style.display = 'inline-block'; // Back to main
+        }
+    } else {
+        if (menuState === MenuState.Main) {
+            playBtn.style.display = 'inline-block';
+            profileBtn.style.display = 'inline-block';
+            teamsBtn.style.display = 'inline-block';
+            settingsBtn.style.display = 'inline-block';
+            friendRequestsBtn.style.display = 'inline-block';
+            languageBtn.style.display = 'inline-block';
+            logoutBtn.style.display = 'inline-block';
+        } else if (menuState === MenuState.Play) {
+            if (opponentOptions) opponentOptions.style.display = 'block';
+            playBtn.style.display = 'inline-block'; // Back to main
+            // Attach listeners for local/remote buttons
+            const localBtn = document.querySelector('[data-opponent="local"]') as HTMLButtonElement;
+            if (localBtn) {
+                localBtn.onclick = () => {
+                    menuState = MenuState.Local;
+                    appDiv.innerHTML = '';
+                    renderPlayerSelection(appDiv);
+                    updateMenuUI();
+                };
+            }
+            const remoteBtn = document.querySelector('[data-opponent="remote"]') as HTMLButtonElement;
+            if (remoteBtn) {
+                remoteBtn.onclick = () => {
+                    menuState = MenuState.Remote;
+                    appDiv.innerHTML = '';
+                    updateMenuUI();
+                };
+            }
+        } else if (menuState === MenuState.Local) {
+            if (localOptions) localOptions.style.display = 'block';
+            playBtn.style.display = 'inline-block'; // Back to Play
+            // Attach listeners for local options
+            const quickPlayLocalBtn = document.querySelector('[data-local="quick-play-btn"]') as HTMLButtonElement;
+            if (quickPlayLocalBtn) {
+                quickPlayLocalBtn.onclick = () => {
+                    appDiv.innerHTML = '';
+                    renderQuickGameSetup(appDiv);
+                };
+            }
+            const selectOpponentLocalBtn = document.querySelector('[data-local="custom-game-btn"]') as HTMLButtonElement;
+            if (selectOpponentLocalBtn) {
+                selectOpponentLocalBtn.onclick = () => {
+                    appDiv.innerHTML = '';
+                    renderPlayerSelection(appDiv);
+                };
+            }
+            const tournamentsLocalBtn = document.querySelector('[data-local="tournaments-btn"]') as HTMLButtonElement;
+            if (tournamentsLocalBtn) {
+                tournamentsLocalBtn.onclick = () => {
+                    appDiv.innerHTML = '';
+                    renderTournamentsPage(appDiv);
+                };
+            }
+            const localBackBtn = document.querySelector('[data-local="back-btn"]') as HTMLButtonElement;
+            if (localBackBtn) {
+                localBackBtn.onclick = () => {
+                    menuState = MenuState.Play;
+                    appDiv.innerHTML = '';
+                    updateMenuUI();
+                };
+            }
+        } else if (menuState === MenuState.Remote) {
+            if (remoteOptions) remoteOptions.style.display = 'block';
+            playBtn.style.display = 'inline-block'; // Back to Play
+            // Attach listeners for remote options
+            const matchmakingRemoteBtn = document.querySelector('[data-remote="matchmaking-btn"]') as HTMLButtonElement;
+            if (matchmakingRemoteBtn) {
+                matchmakingRemoteBtn.onclick = () => {
+                    const playerId = Number(localStorage.getItem('playerId'));
+                    const playerName = localStorage.getItem('playerName') || 'Unknown';
+                    const difficulty = 'normal';
+                    startMatchmaking(appDiv, playerId, playerName, difficulty);
+                };
+            }
+            const remoteBackBtn = document.querySelector('[data-remote="back-btn"]') as HTMLButtonElement;
+            if (remoteBackBtn) {
+                remoteBackBtn.onclick = () => {
+                    menuState = MenuState.Play;
+                    appDiv.innerHTML = '';
+                    updateMenuUI();
+                };
+            }
+        }
+    }
+}
+
+
+// ðŸ§  Event Listeners
+playBtn.addEventListener('click', () => {
+    if (!localStorage.getItem('authToken')) {
+        if (menuState === MenuState.Main) {
+            menuState = MenuState.Play;
+            appDiv.innerHTML = '';
+            renderQuickGameSetup(appDiv); // Show quick play setup for logged out
+        } else {
+            menuState = MenuState.Main;
+            appDiv.innerHTML = '';
+        }
+    } else {
+        if (menuState === MenuState.Main) {
+            menuState = MenuState.Play;
+            appDiv.innerHTML = '';
+            // Show local/remote options
+        } else if (menuState === MenuState.Play) {
+            menuState = MenuState.Main;
+            appDiv.innerHTML = '';
+        } else {
+            menuState = MenuState.Play;
+            appDiv.innerHTML = '';
+        }
+    }
+    updateMenuUI();
+});
+// Opponent options event listeners
+const localBtn = document.querySelector('[data-opponent="local"]');
+if (localBtn) {
+    localBtn.addEventListener('click', () => {
+        menuState = MenuState.Local;
+        appDiv.innerHTML = '';
+        renderPlayerSelection(appDiv); // Show select opponent
+        updateMenuUI();
+    });
+}
+const remoteBtn = document.querySelector('[data-opponent="remote"]');
+if (remoteBtn) {
+    remoteBtn.addEventListener('click', () => {
+        menuState = MenuState.Remote;
+        appDiv.innerHTML = '';
+        // Show matchmaking button
+        updateMenuUI();
+    });
+}
+// Local options event listeners
+const localBackBtn = document.querySelector('[data-local="back-btn"]');
+if (localBackBtn) {
+    localBackBtn.addEventListener('click', () => {
+        menuState = MenuState.Play;
+        appDiv.innerHTML = '';
+        updateMenuUI();
+    });
+}
+// Remote options event listeners
+const remoteBackBtn = document.querySelector('[data-remote="back-btn"]');
+if (remoteBackBtn) {
+    remoteBackBtn.addEventListener('click', () => {
+        menuState = MenuState.Play;
+        appDiv.innerHTML = '';
+        updateMenuUI();
+    });
+}
+settingsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderSettingsPage(appDiv);
+});
+tournamentsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderTournamentsPage(appDiv);
+});
+teamsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderTeamsPage(appDiv);
+});
+loginBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderLoginForm(appDiv, () => {
+        menuState = MenuState.Main;
+        updateUIBasedOnAuth();
+        updateMenuUI();
+    });
+});
+registerBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderRegistrationForm(appDiv);
+});
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('authToken');
+    appDiv.innerHTML = '<p>You have been logged out.</p>';
+    menuState = MenuState.Main;
+    updateUIBasedOnAuth();
+    updateMenuUI();
+});
+profileBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderProfilePage(appDiv);
+});
+friendRequestsBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderFriendRequestsPage(appDiv);
+});
+quickPlayBtn.addEventListener('click', () => {
+    appDiv.innerHTML = '';
+    renderQuickGameSetup(appDiv);
+});
+matchmakingBtn.addEventListener('click', () => {
+    const playerId = Number(localStorage.getItem('playerId'));
+    const playerName = localStorage.getItem('playerName') || 'Unknown';
+    const difficulty = 'normal';
+    startMatchmaking(appDiv, playerId, playerName, difficulty);
+});
+
+
+// ðŸ”” Update friend requests badge
+export async function updateFriendRequestsBadge() {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+
+    try {
+        const response = await fetch('/api/friends/pending', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+
+        if (response.ok) {
+            const data = await response.json();
+            const pendingCount = data.pending?.length || 0;
+
+
+            if (pendingCount > 0) {
+                friendRequestsBadge.textContent = pendingCount.toString();
+                friendRequestsBadge.style.display = 'block';
+            } else {
+                friendRequestsBadge.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error updating friend requests badge:', error);
+    }
+}
+
+
+// In index.ts - replace the DOMContentLoaded section
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        // Verify token is still valid
+        try {
+            const response = await fetch('/api/protected', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+
+            if (response.ok) {
+                // Token is valid, start activity monitoring
+                const { startActivityMonitoring } = await import('./services/renderLoginForm.js');
+                startActivityMonitoring();
+
+
+                // Set user as online
+                await updateOnlineStatus(true);
+
+
+                // Update friend requests badge
+                updateFriendRequestsBadge();
+            } else {
+                // Token is invalid, remove it
+                localStorage.removeItem('authToken');
+                updateUIBasedOnAuth();
+            }
+        }
+        catch (error) {
+            console.error('Error verifying token on page load:', error);
+            localStorage.removeItem('authToken');
+            updateUIBasedOnAuth();
+        }
+    }
+});
+
+
+// Add this helper function to index.ts
+async function updateOnlineStatus(isOnline: boolean) {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+
+    try {
+        await fetch('/api/profile/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ online: isOnline })
+        });
+        console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
+    } catch (error) {
+        console.error('Failed to update status:', error);
+    }
+}
+
+
+async function setOnlineOnLoad() {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+    try {
+        await fetch('/api/profile/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ online: true })
+        });
+    }
+    catch (error) {
+        console.error('Failed to set online on load:', error);
+    }
+}
+
+
+// Toggle language options visibility
+languageBtn.addEventListener('click', () => {
+    languageOptions.style.display = languageOptions.style.display === 'none' ? 'block' : 'none';
+});
+
+
+// Handle language selection
+languageOptions.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const selectedLang = btn.getAttribute('data-lang') || 'en';
+        localStorage.setItem('preferredLanguage', selectedLang);
+        applyLanguage(selectedLang);
+        languageOptions.style.display = 'none';
+    });
+});
+
+
+
+function applyLanguage(lang: string) {
+    const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
+    const t = translations[safeLang];
+
+
+    playBtn.textContent = t.play;
+    settingsBtn.textContent = t.settings;
+    tournamentsBtn.textContent = t.tournaments;
+    teamsBtn.textContent = t.teams;
+    loginBtn.textContent = t.login;
+    logoutBtn.textContent = t.logout;
+    registerBtn.textContent = t.register;
+    profileBtn.textContent = t.profile;
+    friendRequestsBtn.textContent = t.friendRequests;
+    quickPlayBtn.textContent = t.quickPlay;
+    matchmakingBtn.textContent = t.matchmaking;
+    languageBtn.textContent = t.language;
+}
+
+
+// ðŸš€ Initialize UI
+const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+applyLanguage(storedLang);
+updateUIBasedOnAuth();
+updateMenuUI();
+
+
+// Ambient music initialization (Gris-inspired)
+(function initAmbientMusic() {
+    let ambientAudio = document.getElementById('gris-game-ambient-audio') as HTMLAudioElement | null;
+    if (!ambientAudio) {
+        ambientAudio = document.createElement('audio');
+        ambientAudio.id = 'gris-game-ambient-audio';
+        ambientAudio.src = '/assets/sounds/ambient.mp3';
+        ambientAudio.loop = true;
+        ambientAudio.volume = 0.18;
+        ambientAudio.style.display = 'none';
+        document.body.appendChild(ambientAudio);
+        ambientAudio.play();
+    } else if (ambientAudio.paused) {
+        ambientAudio.play();
+    }
+})();
