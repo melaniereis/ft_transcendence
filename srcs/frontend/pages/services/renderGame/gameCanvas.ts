@@ -75,27 +75,51 @@ export function drawText(ctx: CanvasRenderingContext2D, text: string, x: number,
 	ctx.restore();
 }
 
-// Responsive canvas size with optimization
+// Updated setOptimizedCanvasSize for better responsiveness
 export function setOptimizedCanvasSize(canvas: HTMLCanvasElement) {
 	const container = canvas.parentElement;
 	if (!container) return;
 
-	const containerWidth = container.clientWidth - 40;
+	const containerStyles = window.getComputedStyle(container);
+	const paddingLeft = parseFloat(containerStyles.paddingLeft || '0');
+	const paddingRight = parseFloat(containerStyles.paddingRight || '0');
+	const paddingTop = parseFloat(containerStyles.paddingTop || '0');
+	const paddingBottom = parseFloat(containerStyles.paddingBottom || '0');
+
+	const containerWidth = container.clientWidth - paddingLeft - paddingRight;
+	const containerHeight = container.clientHeight - paddingTop - paddingBottom;
+
 	const aspectRatio = 5 / 3;
-	const maxWidth = 800;
+	const maxWidth = Math.min(window.innerWidth * 0.95, 1200);
 
-	const width = Math.min(containerWidth, maxWidth);
-	const height = width / aspectRatio;
+	// Calculate width and height to fit container while maintaining aspect ratio
+	let width = Math.min(containerWidth * 0.95, maxWidth);
+	let height = width / aspectRatio;
 
-	// Set display size
+	// Adjust if height exceeds container height
+	const maxHeight = containerHeight * 0.95;
+	if (height > maxHeight) {
+		height = maxHeight;
+		width = height * aspectRatio;
+	}
+
+	// Ensure width doesn't exceed container after adjustment
+	if (width > containerWidth * 0.95) {
+		width = containerWidth * 0.95;
+		height = width / aspectRatio;
+	}
+
+	// Apply styles
 	canvas.style.width = width + 'px';
 	canvas.style.height = height + 'px';
+	canvas.style.maxWidth = maxWidth + 'px';
+	canvas.style.display = 'block';
+	canvas.style.margin = '0 auto';
 
-	// Set canvas internal size (no DPR scaling for performance)
+	// Set internal canvas resolution
 	canvas.width = width;
 	canvas.height = height;
 
-	// No context scaling needed
 	const ctx = canvas.getContext('2d');
 	if (ctx) {
 		ctx.imageSmoothingEnabled = true;

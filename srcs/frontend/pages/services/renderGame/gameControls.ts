@@ -1,6 +1,20 @@
+// Bloqueia scroll das setas ArrowUp/ArrowDown em toda a página
+window.addEventListener('keydown', function (e) {
+	if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+		e.preventDefault();
+		document.body.style.overflow = 'hidden';
+	}
+}, { passive: false });
+
+window.addEventListener('keyup', function (e) {
+	if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+		document.body.style.overflow = '';
+	}
+}, { passive: false });
 //renderGame/gameControls.ts
 
 import { Paddle } from './types.js';
+import { state } from './state.js';
 
 const controlState = {
 	keys: {} as Record<string, boolean>,
@@ -13,23 +27,21 @@ export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 	cleanupControls();
 
 	const keyDownHandler = (e: KeyboardEvent) => {
-		controlState.keys[e.key] = true;
+		const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+		controlState.keys[key] = true;
 		updatePaddleMovement(leftPaddle, rightPaddle, paddleSpeed);
-
-		// Prevent default for paddle control keys
-		if ([leftPaddle.upKey, leftPaddle.downKey, rightPaddle.upKey, rightPaddle.downKey].includes(e.key)) {
-			e.preventDefault();
-		}
 	};
 
 	const keyUpHandler = (e: KeyboardEvent) => {
-		controlState.keys[e.key] = false;
+		const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+		controlState.keys[key] = false;
 		updatePaddleMovement(leftPaddle, rightPaddle, paddleSpeed);
 	};
 
-	// Add event listeners with cleanup tracking
-	addEventListenerWithCleanup(window, 'keydown', keyDownHandler as EventListener);
-	addEventListenerWithCleanup(window, 'keyup', keyUpHandler as EventListener);
+	window.addEventListener('keydown', keyDownHandler as EventListener, { passive: false });
+	controlState.eventListeners.push({ element: window, event: 'keydown', handler: keyDownHandler as EventListener });
+	window.addEventListener('keyup', keyUpHandler as EventListener, { passive: false });
+	controlState.eventListeners.push({ element: window, event: 'keyup', handler: keyUpHandler as EventListener });
 
 	// Mobile touch controls
 	setupTouchControls(leftPaddle, rightPaddle, paddleSpeed);
@@ -42,9 +54,9 @@ function addEventListenerWithCleanup(element: Element | Window, event: string, h
 
 function updatePaddleMovement(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number) {
 	// Left paddle movement
-	if (controlState.keys[leftPaddle.upKey]) {
+	if (controlState.keys[leftPaddle.upKey.toLowerCase()]) {
 		leftPaddle.dy = -paddleSpeed;
-	} else if (controlState.keys[leftPaddle.downKey]) {
+	} else if (controlState.keys[leftPaddle.downKey.toLowerCase()]) {
 		leftPaddle.dy = paddleSpeed;
 	} else {
 		leftPaddle.dy = 0;
@@ -182,6 +194,9 @@ export function cleanupControls() {
 	});
 	controlState.eventListeners = [];
 
+	// Restore scroll
+	document.body.style.overflow = '';
+
 	// Clear key state
 	controlState.keys = {};
 
@@ -194,19 +209,29 @@ export function cleanupControls() {
 
 // Utility to update score display in DOM
 export function updateScoreDisplay(score1: number, score2: number) {
+	// Update round number in top bar
+	const roundEl = document.querySelector('.game-oracle');
+	if (roundEl && typeof state.round === 'number' && state.mode) {
+		roundEl.textContent = `Round ${state.round} • ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
+	}
+
+	// Update player section scores (top bar)
+	const leftPlayerScore = document.querySelector('.player-sanctuary.left-sanctuary span:last-child');
+	const rightPlayerScore = document.querySelector('.player-sanctuary.right-sanctuary span:last-child');
+	if (leftPlayerScore) leftPlayerScore.textContent = score1.toString();
+	if (rightPlayerScore) rightPlayerScore.textContent = score2.toString();
+
+	// Canvas scores (legacy, if used)
 	const leftScoreEl = document.querySelector('.mystical-score.left-score');
 	const rightScoreEl = document.querySelector('.mystical-score.right-score');
 
 	if (leftScoreEl) {
 		leftScoreEl.textContent = score1.toString();
-		// Add score update animation
 		leftScoreEl.classList.add('score-update');
 		setTimeout(() => leftScoreEl.classList.remove('score-update'), 300);
 	}
-
 	if (rightScoreEl) {
 		rightScoreEl.textContent = score2.toString();
-		// Add score update animation
 		rightScoreEl.classList.add('score-update');
 		setTimeout(() => rightScoreEl.classList.remove('score-update'), 300);
 	}

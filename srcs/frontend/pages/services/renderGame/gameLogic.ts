@@ -4,12 +4,13 @@ import { Paddle, Ball } from './types.js';
 import { state } from './state.js';
 import { updateScoreDisplay } from './gameControls.js';
 
-export function resetBall(ball: Ball, canvas: HTMLCanvasElement, speed: number) {
+export function resetBall(ball: Ball, canvas: HTMLCanvasElement, initialSpeed: number) {
 	ball.x = canvas.width / 2;
 	ball.y = canvas.height / 2;
-	ball.speed = speed;
-	ball.dx = speed * (Math.random() > 0.5 ? 1 : -1);
-	ball.dy = speed * (Math.random() * 2 - 1);
+	ball.speed = initialSpeed;
+	ball.dx = initialSpeed * (Math.random() > 0.5 ? 1 : -1);
+	ball.dy = initialSpeed * (Math.random() * 2 - 1);
+	ball.radius = Math.max(4, canvas.width * 0.01); // Ensure radius updates if resized during reset
 }
 
 export function updatePaddle(paddle: Paddle, canvas: HTMLCanvasElement, gameEnded: boolean) {

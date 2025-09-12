@@ -2,6 +2,7 @@
 
 import { Paddle, Ball } from './types.js';
 import { updateBall, updatePaddle, resetBall } from './gameLogic.js';
+import { updateScoreDisplay } from './gameControls.js';
 import { endGame } from './endGame.js';
 import { renderFrame } from './renderFrame.js';
 import { state } from './state.js';
@@ -59,6 +60,10 @@ export function startGameLoop(
 					// Reset for new game
 					left.score = 0;
 					right.score = 0;
+					state.score1 = 0;
+					state.score2 = 0;
+					state.round++;
+					updateScoreDisplay(0, 0);
 					resetBall(ball, canvas, ball.initialSpeed);
 					gameEnded = false;
 					lastTime = 0;

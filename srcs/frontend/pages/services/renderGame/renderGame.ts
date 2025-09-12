@@ -19,6 +19,9 @@ import { setOptimizedCanvasSize } from './gameCanvas.js';
  * - Proper cleanup to prevent memory leaks
  */
 
+
+// Persistente para garantir que sempre cancelemos o loop anterior
+let stopGameLoop: (() => void) | null = null;
 let gameCleanupFunction: (() => void) | null = null;
 
 export function renderGame(
@@ -71,23 +74,89 @@ export function renderGame(
 	// Make canvas responsive
 	setOptimizedCanvasSize(canvas);
 
+	// Create game entities (agora persistentes)
+	// Se já existirem, apenas atualize propriedades
+	let leftPaddle, rightPaddle, ball;
+	if (state.player1 && state.player2 && state.ball) {
+		leftPaddle = state.player1;
+		rightPaddle = state.player2;
+		ball = state.ball;
+	} else {
+		[leftPaddle, rightPaddle] = createPaddles(canvas, player1Name, player2Name);
+		ball = createBall(canvas, difficulty);
+		state.player1 = leftPaddle;
+		state.player2 = rightPaddle;
+		state.ball = ball;
+	}
+
 	let resizeTimeout: number | null = null;
 	const resizeHandler = () => {
-		if (resizeTimeout) return;
+		if (resizeTimeout) {
+			clearTimeout(resizeTimeout);
+		}
 		resizeTimeout = window.setTimeout(() => {
+			// Store old dimensions
+			const oldWidth = canvas.width;
+			const oldHeight = canvas.height;
+
+			// Update canvas size
 			setOptimizedCanvasSize(canvas);
+
+			const newWidth = canvas.width;
+			const newHeight = canvas.height;
+
+			if (newWidth === 0 || newHeight === 0 || oldWidth === 0 || oldHeight === 0) {
+				resizeTimeout = null;
+				return;
+			}
+
+			// Scale factors
+			const scaleX = newWidth / oldWidth;
+			const scaleY = newHeight / oldHeight;
+
+			// Responsive paddle margin
+			const paddleMargin = Math.max(5, newWidth * 0.02);
+
+			// Only update if all entities exist
+			if (state.player1 && state.player2 && state.ball) {
+				// Update left paddle
+				state.player1.x = paddleMargin;
+				state.player1.width = Math.max(5, newWidth * 0.012);
+				state.player1.height = Math.max(30, newHeight * 0.15);
+				state.player1.y = Math.max(0, Math.min(state.player1.y * scaleY, newHeight - state.player1.height));
+
+				// Update right paddle
+				state.player2.width = state.player1.width;
+				state.player2.height = state.player1.height;
+				state.player2.x = newWidth - state.player2.width - paddleMargin;
+				state.player2.y = Math.max(0, Math.min(state.player2.y * scaleY, newHeight - state.player2.height));
+
+				// Update ball
+				state.ball.radius = Math.max(4, newWidth * 0.01);
+				state.ball.x = Math.max(state.ball.radius + paddleMargin, Math.min(state.ball.x * scaleX, newWidth - state.ball.radius - paddleMargin));
+				state.ball.y = Math.max(state.ball.radius, Math.min(state.ball.y * scaleY, newHeight - state.ball.radius));
+
+				// Scale speeds to maintain relative feel
+				state.ball.dx *= scaleX;
+				state.ball.dy *= scaleY;
+
+				// Re-attach controls to paddles after resize
+				cleanupControls();
+				setupControls(state.player1, state.player2, 6);
+			}
+
+			// Clear and let game loop redraw
+			ctx.clearRect(0, 0, newWidth, newHeight);
+
 			resizeTimeout = null;
-		}, 100);
+		}, 150);
 	};
 	window.addEventListener('resize', resizeHandler);
 
-	// Create game entities
-	const [leftPaddle, rightPaddle] = createPaddles(canvas, player1Name, player2Name);
-	const ball = createBall(canvas, difficulty);
-	state.ball = ball;
-
 	// Setup controls and events
-	setupControls(leftPaddle, rightPaddle, 6);
+	if (state.player1 && state.player2) {
+		setupControls(state.player1, state.player2, 6);
+	}
 	setupGameEvents(container);
 
 	// Setup cleanup function
@@ -95,6 +164,7 @@ export function renderGame(
 		cleanupControls();
 		cleanupGameEvents();
 		window.removeEventListener('resize', resizeHandler);
+		if (typeof stopGameLoop === 'function') stopGameLoop();
 
 		// Remove background canvas
 		const bgCanvas = document.getElementById('gris-bg-particles');
@@ -224,7 +294,7 @@ function initializeOptimizedEffects() {
 	const atmosphereCtx = atmosphereCanvas.getContext('2d');
 	if (!atmosphereCtx) return;
 
-	// Set canvas size
+	// Set to window size, but consider clipping or making it container-bound if needed
 	atmosphereCanvas.width = window.innerWidth;
 	atmosphereCanvas.height = window.innerHeight;
 
@@ -332,11 +402,20 @@ function initializeOptimizedEffects() {
 	animateParticles();
 	console.log('✨ Background effects initialized');
 
-	// Cleanup on resize
-	window.addEventListener('resize', () => {
+	// Update on resize
+	const resizeBg = () => {
 		atmosphereCanvas.width = window.innerWidth;
 		atmosphereCanvas.height = window.innerHeight;
-	});
+	};
+	window.addEventListener('resize', resizeBg);
+
+	// Add to existing cleanup
+	const originalCleanup = gameCleanupFunction;
+	gameCleanupFunction = () => {
+		cancelAnimationFrame(animationId);
+		window.removeEventListener('resize', resizeBg);
+		if (originalCleanup) originalCleanup();
+	};
 }
 
 function startOptimizedCountdown(
@@ -399,7 +478,7 @@ function startOptimizedCountdown(
 				console.log('🚀 Starting game loop...');
 
 				// Start the game
-				const gameLoopCleanup = startGameLoop(
+				stopGameLoop = startGameLoop(
 					canvas,
 					ctx,
 					leftPaddle,
@@ -415,13 +494,6 @@ function startOptimizedCountdown(
 					mode,
 					gameId
 				);
-
-				// Add game loop cleanup to main cleanup
-				const originalCleanup = gameCleanupFunction;
-				gameCleanupFunction = () => {
-					if (gameLoopCleanup) gameLoopCleanup();
-					if (originalCleanup) originalCleanup();
-				};
 			}
 		}, 1000);
 	}

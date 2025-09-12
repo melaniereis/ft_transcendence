@@ -18,190 +18,189 @@ export interface GameLayoutConfig {
 
 export function renderGameLayout(config: GameLayoutConfig): string {
 	return `
-        <div class="gris-game-universe" style="
-            min-height: 100vh;
-            background: ${GRIS_COLORS.gradients.ethereal};
-            padding: ${GRIS_SPACING[4]};
-            font-family: ${GRIS_TYPOGRAPHY.fonts.body};
-            position: relative;
-            overflow: hidden;
-        ">
-            <!-- Optimized Background -->
-            <div class="gris-atmosphere" style="
-                position: fixed;
-                inset: 0;
-                pointer-events: none;
-                z-index: 0;
+            <div class="gris-game-universe" style="
+                min-height: 100vh;
+                background: ${GRIS_COLORS.gradients.ethereal};
+                padding: ${GRIS_SPACING[2]};
+                font-family: ${GRIS_TYPOGRAPHY.fonts.body};
+                position: relative;
+                overflow: hidden;
             ">
-                <canvas id="gris-bg-particles" style="
-                    position: absolute;
+                <!-- Optimized Background -->
+                <div class="gris-atmosphere" style="
+                    position: fixed;
                     inset: 0;
-                    opacity: 0.4;
-                "></canvas>
-            </div>
-
-            <!-- Game Header -->
-            <div class="ethereal-header" style="
-                text-align: center;
-                margin-bottom: ${GRIS_SPACING[6]};
-                position: relative;
-                z-index: 2;
-            ">
-                <h1 style="
-                    color: ${GRIS_COLORS.primary};
-                    font-size: ${GRIS_TYPOGRAPHY.scale['3xl']};
-                    font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                    margin-bottom: ${GRIS_SPACING[3]};
-                    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                ">GRIS Pong</h1>
-                <div class="game-oracle" style="
-                    color: ${GRIS_COLORS.secondary};
-                    font-size: ${GRIS_TYPOGRAPHY.scale.lg};
-                    font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
-                ">Round ${config.round} • ${config.mode.charAt(0).toUpperCase() + config.mode.slice(1)}</div>
-            </div>
-
-            <!-- Responsive Game Layout -->
-            <div class="game-constellation" style="
-                display: grid;
-                grid-template-columns: 1fr 2fr 1fr;
-                gap: ${GRIS_SPACING[4]};
-                max-width: 1200px;
-                margin: 0 auto;
-                position: relative;
-                z-index: 2;
-            ">
-                <!-- Player 1 Sanctuary -->
-                <div class="player-sanctuary left-sanctuary" style="
-                    background: ${GRIS_COLORS.gradients.ocean};
-                    border-radius: ${GRIS_SPACING[3]};
-                    padding: ${GRIS_SPACING[4]};
-                    box-shadow: ${GRIS_SHADOWS.lg};
-                    backdrop-filter: blur(10px);
-                    border: 2px solid rgba(127, 199, 217, 0.3);
-                    transition: transform 0.3s ease;
+                    pointer-events: none;
+                    z-index: 0;
                 ">
-                    <div class="player-avatar" style="
-                        width: 60px;
-                        height: 60px;
-                        border-radius: 50%;
-                        background: ${GRIS_COLORS.surface};
-                        margin: 0 auto ${GRIS_SPACING[3]};
-                        border: 3px solid ${GRIS_COLORS.depression};
-                        background-image: url('${config.player1.avatarUrl || '/assets/avatar/default.png'}');
-                        background-size: cover;
-                        background-position: center;
-                    "></div>
-                    <h3 style="
-                        text-align: center;
-                        color: ${GRIS_COLORS.background};
-                        font-size: ${GRIS_TYPOGRAPHY.scale.lg};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
-                        margin-bottom: ${GRIS_SPACING[2]};
-                        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-                    ">${config.player1.nickname}</h3>
-                    <div class="mystical-score left-score" style="
-                        text-align: center;
-                        font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                        color: ${GRIS_COLORS.background};
-                        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                        transition: transform 0.3s ease;
-                    ">${config.score1}</div>
+                    <canvas id="gris-bg-particles" style="
+                        position: absolute;
+                        inset: 0;
+                        opacity: 0.4;
+                    "></canvas>
                 </div>
 
-                <!-- Game Arena -->
-                <div class="game-arena" style="
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: ${GRIS_SPACING[3]};
-                    padding: ${GRIS_SPACING[4]};
-                    box-shadow: ${GRIS_SHADOWS.xl};
-                    backdrop-filter: blur(15px);
-                    border: 2px solid rgba(255, 255, 255, 0.2);
+                <!-- Game Header -->
+                <div class="ethereal-header" style="
+                    text-align: center;
+                    margin-bottom: ${GRIS_SPACING[4]};
+                    position: relative;
+                    z-index: 2;
+                ">
+                    <h1 style="
+                        color: ${GRIS_COLORS.primary};
+                        font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
+                        font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
+                        margin-bottom: ${GRIS_SPACING[2]};
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    ">GRIS Pong</h1>
+                    <div class="game-oracle" style="
+                        color: ${GRIS_COLORS.secondary};
+                        font-size: ${GRIS_TYPOGRAPHY.scale.base};
+                        font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
+                    ">Round ${config.round} • ${config.mode.charAt(0).toUpperCase() + config.mode.slice(1)}</div>
+                </div>
+
+                <!-- Players Top Bar -->
+                <div class="gris-players-topbar" style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    max-width: 900px;
+                    margin: 0 auto 12px auto;
+                    gap: 8px;
+                ">
+                    <div class="player-sanctuary left-sanctuary" style="
+                        background: ${GRIS_COLORS.gradients.ocean};
+                        border-radius: 16px;
+                        padding: 8px 12px;
+                        min-width: 120px;
+                        max-width: 45%;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <div class="player-avatar" style="
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            background: ${GRIS_COLORS.surface};
+                            border: 2px solid ${GRIS_COLORS.depression};
+                            background-image: url('${config.player1.avatarUrl || '/assets/avatar/default.png'}');
+                            background-size: cover;
+                            background-position: center;
+                        "></div>
+                        <span style="
+                            color: ${GRIS_COLORS.background};
+                            font-size: 1rem;
+                            font-weight: 600;
+                            margin-right: 8px;
+                        ">${config.player1.nickname}</span>
+                        <span style="
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            color: ${GRIS_COLORS.background};
+                            margin-left: auto;
+                        ">${config.score1}</span>
+                    </div>
+                    <div class="player-sanctuary right-sanctuary" style="
+                        background: ${GRIS_COLORS.gradients.sunrise};
+                        border-radius: 16px;
+                        padding: 8px 12px;
+                        min-width: 120px;
+                        max-width: 45%;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <div class="player-avatar" style="
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            background: ${GRIS_COLORS.surface};
+                            border: 2px solid ${GRIS_COLORS.acceptance};
+                            background-image: url('${config.player2.avatarUrl || '/assets/avatar/default.png'}');
+                            background-size: cover;
+                            background-position: center;
+                        "></div>
+                        <span style="
+                            color: ${GRIS_COLORS.primary};
+                            font-size: 1rem;
+                            font-weight: 600;
+                            margin-right: 8px;
+                        ">${config.player2.nickname}</span>
+                        <span style="
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            color: ${GRIS_COLORS.primary};
+                            margin-left: auto;
+                        ">${config.score2}</span>
+                    </div>
+                </div>
+
+                <!-- Game Arena Centralizada -->
+                <div class="gris-game-arena" style="
+                    width: 100%;
+                    max-width: 900px;
+                    margin: 0 auto;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: ${GRIS_SPACING[3]};
+                    justify-content: center;
+                    background: rgba(255,255,255,0.08);
+                    border-radius: 18px;
+                    box-shadow: ${GRIS_SHADOWS.xl};
+                    padding: 16px;
                 ">
                     <div class="canvas-container" style="
                         position: relative;
-                        border-radius: ${GRIS_SPACING[2]};
+                        border-radius: 12px;
                         overflow: hidden;
                         box-shadow: ${GRIS_SHADOWS.cool};
                         background: linear-gradient(135deg, #000 0%, #1a1a2e 100%);
+                        width: 100%;
+                        aspect-ratio: 5 / 3;
+                        max-width: 900px;
+                        min-width: 400px;
+                        min-height: 240px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     ">
                         <canvas id="${config.canvasId}" width="800" height="480" style="
                             display: block;
+                            width: 100%;
+                            height: 100%;
                             max-width: 100%;
-                            height: auto;
+                            max-height: 100%;
                         "></canvas>
                     </div>
 
                     ${config.showControls ? `
                         <div class="mystical-controls" style="
                             display: flex;
-                            gap: ${GRIS_SPACING[3]};
-                            margin-top: ${GRIS_SPACING[2]};
+                            gap: 16px;
+                            margin-top: 12px;
                         ">
                             <button class="gris-game-pause-btn" style="
                                 background: ${GRIS_COLORS.gradients.mist};
                                 border: 2px solid ${GRIS_COLORS.secondary};
-                                border-radius: ${GRIS_SPACING[2]};
-                                padding: ${GRIS_SPACING[2]} ${GRIS_SPACING[4]};
+                                border-radius: 8px;
+                                padding: 8px 16px;
                                 color: ${GRIS_COLORS.primary};
-                                font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
+                                font-weight: 600;
                                 cursor: pointer;
                                 transition: all 0.3s ease;
                                 box-shadow: ${GRIS_SHADOWS.sm};
-                                font-size: ${GRIS_TYPOGRAPHY.scale.base};
+                                font-size: 1rem;
                             ">⏸️ Pause</button>
                         </div>
                     ` : ''}
                 </div>
 
-                <!-- Player 2 Sanctuary -->
-                <div class="player-sanctuary right-sanctuary" style="
-                    background: ${GRIS_COLORS.gradients.sunrise};
-                    border-radius: ${GRIS_SPACING[3]};
-                    padding: ${GRIS_SPACING[4]};
-                    box-shadow: ${GRIS_SHADOWS.lg};
-                    backdrop-filter: blur(10px);
-                    border: 2px solid rgba(230, 199, 156, 0.3);
-                    transition: transform 0.3s ease;
-                ">
-                    <div class="player-avatar" style="
-                        width: 60px;
-                        height: 60px;
-                        border-radius: 50%;
-                        background: ${GRIS_COLORS.surface};
-                        margin: 0 auto ${GRIS_SPACING[3]};
-                        border: 3px solid ${GRIS_COLORS.acceptance};
-                        background-image: url('${config.player2.avatarUrl || '/assets/avatar/default.png'}');
-                        background-size: cover;
-                        background-position: center;
-                    "></div>
-                    <h3 style="
-                        text-align: center;
-                        color: ${GRIS_COLORS.primary};
-                        font-size: ${GRIS_TYPOGRAPHY.scale.lg};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
-                        margin-bottom: ${GRIS_SPACING[2]};
-                        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                    ">${config.player2.nickname}</h3>
-                    <div class="mystical-score right-score" style="
-                        text-align: center;
-                        font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                        color: ${GRIS_COLORS.primary};
-                        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                        transition: transform 0.3s ease;
-                    ">${config.score2}</div>
-                </div>
+                <!-- Modals Container -->
+                ${config.modalsHtml}
             </div>
-
-            <!-- Modals Container -->
-            ${config.modalsHtml}
-        </div>
 
         <!-- Optimized Responsive Styles -->
         <style>
