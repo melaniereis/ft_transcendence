@@ -113,50 +113,62 @@ export function renderEndGameModal(
 	modal.id = 'gris-endgame-modal';
 	modal.className = 'gris-game-modal';
 	modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(182, 166, 202, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        backdrop-filter: blur(10px);
-    `;
+		   position: fixed;
+		   top: 0;
+		   left: 0;
+		   width: 100vw;
+		   height: 100vh;
+		   background: rgba(182, 166, 202, 0.7);
+		   display: flex;
+		   align-items: center;
+		   justify-content: center;
+		   z-index: 9999;
+		   backdrop-filter: blur(16px) brightness(0.98);
+		   animation: fadeInModal 0.4s cubic-bezier(.4,2,.3,1) both;
+	   `;
+	// Add fade-in animation
+	const style = document.createElement('style');
+	style.textContent = `@keyframes fadeInModal { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }`;
+	document.head.appendChild(style);
 
 	// Modal content
 	const content = document.createElement('div');
 	content.style.cssText = `
-        background: white;
-        border-radius: 1.5rem;
-        box-shadow: ${GRIS_SHADOWS.xl};
-        padding: 2rem;
-        text-align: center;
-        min-width: 300px;
-        max-width: 90vw;
-        font-family: ${GRIS_TYPOGRAPHY.fonts.body};
-    `;
+		   background: rgba(255,255,255,0.98);
+		   border-radius: 2rem;
+		   box-shadow: 0 8px 32px 0 rgba(44, 34, 84, 0.18), 0 1.5px 8px 0 rgba(44,34,84,0.10);
+		   padding: 2.5rem 2rem;
+		   text-align: center;
+		   min-width: 320px;
+		   max-width: 96vw;
+		   font-family: ${GRIS_TYPOGRAPHY.fonts.body};
+		   backdrop-filter: blur(2px);
+	   `;
 
 	// Title
 	const title = document.createElement('h2');
 	title.textContent = t.gameOver;
 	title.style.cssText = `
-        font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
-        margin-bottom: 1.5rem;
-        color: ${GRIS_COLORS.primary};
-        font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-    `;
+		   font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
+		   margin-bottom: 1.5rem;
+		   color: ${GRIS_COLORS.primary};
+		   font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
+		   letter-spacing: 0.03em;
+		   text-shadow: 0 2px 8px rgba(44,34,84,0.08);
+	   `;
 	content.appendChild(title);
 
 	// Scores
 	const scoreBox = document.createElement('div');
 	scoreBox.style.cssText = `
-        margin-bottom: 2rem;
-        font-size: ${GRIS_TYPOGRAPHY.scale.lg};
-        color: ${GRIS_COLORS.secondary};
-    `;
+		   margin-bottom: 2.2rem;
+		   font-size: ${GRIS_TYPOGRAPHY.scale.lg};
+		   color: ${GRIS_COLORS.secondary};
+		   display: flex;
+		   flex-direction: column;
+		   gap: 0.5rem;
+		   align-items: center;
+	   `;
 	scoreBox.innerHTML = `
         <div style="${winner === player1Name ? `color: ${GRIS_COLORS.acceptance}; font-weight: bold;` : ''}">${player1Name}: ${score1}</div>
         <div style="${winner === player2Name ? `color: ${GRIS_COLORS.acceptance}; font-weight: bold;` : ''}">${player2Name}: ${score2}</div>
@@ -169,32 +181,36 @@ export function renderEndGameModal(
 	// Buttons
 	const buttonRow = document.createElement('div');
 	buttonRow.style.cssText = `
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 1.5rem;
-    `;
+		   display: flex;
+		   flex-wrap: wrap;
+		   justify-content: center;
+		   gap: 1.2rem;
+		   margin-top: 2.2rem;
+	   `;
 
 	const restartBtn = document.createElement('button');
 	restartBtn.textContent = mode === 'tournament' ? t.nextMatch : t.restart;
 	restartBtn.className = 'gris-game-modal-close';
 	restartBtn.style.cssText = `
-        padding: 0.75rem 1.5rem;
-        font-size: ${GRIS_TYPOGRAPHY.scale.base};
-        border-radius: 0.75rem;
-        border: none;
-        background: ${GRIS_COLORS.acceptance};
-        color: white;
-        font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    `;
+		   padding: 0.85rem 2.2rem;
+		   font-size: 1.15rem;
+		   border-radius: 1rem;
+		   border: none;
+		   background: linear-gradient(90deg, ${GRIS_COLORS.acceptance} 60%, ${GRIS_COLORS.acceptanceGold} 100%);
+		   color: #fff;
+		   font-weight: 600;
+		   box-shadow: 0 2px 8px rgba(44,34,84,0.10);
+		   cursor: pointer;
+		   transition: background 0.2s, box-shadow 0.2s;
+	   `;
 
 	restartBtn.onmouseover = () => {
-		restartBtn.style.backgroundColor = GRIS_COLORS.acceptanceGold;
+		restartBtn.style.background = `linear-gradient(90deg, ${GRIS_COLORS.acceptanceGold} 60%, ${GRIS_COLORS.acceptance} 100%)`;
+		restartBtn.style.boxShadow = '0 4px 16px rgba(44,34,84,0.18)';
 	};
 	restartBtn.onmouseout = () => {
-		restartBtn.style.backgroundColor = GRIS_COLORS.acceptance;
+		restartBtn.style.background = `linear-gradient(90deg, ${GRIS_COLORS.acceptance} 60%, ${GRIS_COLORS.acceptanceGold} 100%)`;
+		restartBtn.style.boxShadow = '0 2px 8px rgba(44,34,84,0.10)';
 	};
 
 	buttonRow.appendChild(restartBtn);
@@ -204,22 +220,25 @@ export function renderEndGameModal(
 		menuBtn.textContent = t.mainMenu;
 		menuBtn.className = 'gris-game-modal-close';
 		menuBtn.style.cssText = `
-            padding: 0.75rem 1.5rem;
-            font-size: ${GRIS_TYPOGRAPHY.scale.base};
-            border-radius: 0.75rem;
-            border: none;
-            background: ${GRIS_COLORS.secondary};
-            color: white;
-            font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        `;
+			   padding: 0.85rem 2.2rem;
+			   font-size: 1.15rem;
+			   border-radius: 1rem;
+			   border: none;
+			   background: linear-gradient(90deg, ${GRIS_COLORS.secondary} 60%, ${GRIS_COLORS.primary} 100%);
+			   color: #fff;
+			   font-weight: 600;
+			   box-shadow: 0 2px 8px rgba(44,34,84,0.10);
+			   cursor: pointer;
+			   transition: background 0.2s, box-shadow 0.2s;
+		   `;
 
 		menuBtn.onmouseover = () => {
-			menuBtn.style.backgroundColor = GRIS_COLORS.primary;
+			menuBtn.style.background = `linear-gradient(90deg, ${GRIS_COLORS.primary} 60%, ${GRIS_COLORS.secondary} 100%)`;
+			menuBtn.style.boxShadow = '0 4px 16px rgba(44,34,84,0.18)';
 		};
 		menuBtn.onmouseout = () => {
-			menuBtn.style.backgroundColor = GRIS_COLORS.secondary;
+			menuBtn.style.background = `linear-gradient(90deg, ${GRIS_COLORS.secondary} 60%, ${GRIS_COLORS.primary} 100%)`;
+			menuBtn.style.boxShadow = '0 2px 8px rgba(44,34,84,0.10)';
 		};
 
 		buttonRow.appendChild(menuBtn);

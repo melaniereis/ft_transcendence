@@ -20,8 +20,8 @@ export function renderGameLayout(config: GameLayoutConfig): string {
 	return `
             <div class="gris-game-universe" style="
                 min-height: 100vh;
-                background: ${GRIS_COLORS.gradients.ethereal};
-                padding: ${GRIS_SPACING[2]};
+                background: linear-gradient(120deg, #e9e4f0 0%, #f7f6fb 100%);
+                padding: ${GRIS_SPACING[3]};
                 font-family: ${GRIS_TYPOGRAPHY.fonts.body};
                 position: relative;
                 overflow: hidden;
@@ -65,75 +65,85 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                 <div class="gris-players-topbar" style="
                     display: flex;
                     justify-content: space-between;
-                    align-items: center;
+                    align-items: stretch;
                     max-width: 900px;
-                    margin: 0 auto 12px auto;
-                    gap: 8px;
+                    margin: 0 auto 18px auto;
+                    gap: 18px;
                 ">
                     <div class="player-sanctuary left-sanctuary" style="
-                        background: ${GRIS_COLORS.gradients.ocean};
-                        border-radius: 16px;
-                        padding: 8px 12px;
-                        min-width: 120px;
+                        background: linear-gradient(120deg, #7fc7d9 0%, #b6a6ca 100%);
+                        border-radius: 20px;
+                        padding: 16px 18px;
+                        min-width: 140px;
                         max-width: 45%;
                         display: flex;
                         align-items: center;
-                        gap: 8px;
+                        gap: 14px;
+                        box-shadow: 0 2px 12px rgba(44,34,84,0.08);
+                        border: 1.5px solid #b6a6ca;
                     ">
                         <div class="player-avatar" style="
-                            width: 32px;
-                            height: 32px;
+                            width: 44px;
+                            height: 44px;
                             border-radius: 50%;
-                            background: ${GRIS_COLORS.surface};
-                            border: 2px solid ${GRIS_COLORS.depression};
+                            background: #fff;
+                            border: 2.5px solid ${GRIS_COLORS.depression};
+                            box-shadow: 0 1px 6px rgba(44,34,84,0.10);
                             background-image: url('${config.player1.avatarUrl || '/assets/avatar/default.png'}');
                             background-size: cover;
                             background-position: center;
                         "></div>
                         <span style="
-                            color: ${GRIS_COLORS.background};
-                            font-size: 1rem;
-                            font-weight: 600;
-                            margin-right: 8px;
+                            color: #2c2254;
+                            font-size: 1.08rem;
+                            font-weight: 700;
+                            margin-right: 10px;
+                            letter-spacing: 0.02em;
                         ">${config.player1.nickname}</span>
                         <span style="
-                            font-size: 1.2rem;
+                            font-size: 1.32rem;
                             font-weight: bold;
-                            color: ${GRIS_COLORS.background};
+                            color: #2c2254;
                             margin-left: auto;
+                            text-shadow: 0 1px 6px rgba(44,34,84,0.10);
                         ">${config.score1}</span>
                     </div>
                     <div class="player-sanctuary right-sanctuary" style="
-                        background: ${GRIS_COLORS.gradients.sunrise};
-                        border-radius: 16px;
-                        padding: 8px 12px;
-                        min-width: 120px;
+                        background: linear-gradient(120deg, #f7b267 0%, #b6a6ca 100%);
+                        border-radius: 20px;
+                        padding: 16px 18px;
+                        min-width: 140px;
                         max-width: 45%;
                         display: flex;
                         align-items: center;
-                        gap: 8px;
+                        gap: 14px;
+                        box-shadow: 0 2px 12px rgba(44,34,84,0.08);
+                        border: 1.5px solid #f7b267;
                     ">
                         <div class="player-avatar" style="
-                            width: 32px;
-                            height: 32px;
+                            width: 44px;
+                            height: 44px;
                             border-radius: 50%;
-                            background: ${GRIS_COLORS.surface};
-                            border: 2px solid ${GRIS_COLORS.acceptance};
+                            background: #fff;
+                            border: 2.5px solid ${GRIS_COLORS.acceptance};
+                            box-shadow: 0 1px 6px rgba(44,34,84,0.10);
                             background-image: url('${config.player2.avatarUrl || '/assets/avatar/default.png'}');
                             background-size: cover;
                             background-position: center;
                         "></div>
                         <span style="
-                            color: ${GRIS_COLORS.primary};
-                            font-size: 1rem;
-                            font-weight: 600;
-                            margin-right: 8px;
+                            color: #2c2254;
+                            font-size: 1.08rem;
+                            font-weight: 700;
+                            margin-right: 10px;
+                            letter-spacing: 0.02em;
                         ">${config.player2.nickname}</span>
                         <span style="
-                            font-size: 1.2rem;
+                            font-size: 1.32rem;
                             font-weight: bold;
-                            color: ${GRIS_COLORS.primary};
+                            color: #2c2254;
                             margin-left: auto;
+                            text-shadow: 0 1px 6px rgba(44,34,84,0.10);
                         ">${config.score2}</span>
                     </div>
                 </div>
@@ -147,17 +157,17 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    background: rgba(255,255,255,0.08);
-                    border-radius: 18px;
-                    box-shadow: ${GRIS_SHADOWS.xl};
-                    padding: 16px;
+                    background: linear-gradient(120deg, #fffbe6 0%, #e9e4f0 100%);
+                    border-radius: 24px;
+                    box-shadow: 0 4px 24px 0 rgba(44,34,84,0.10);
+                    padding: 28px 18px;
                 ">
                     <div class="canvas-container" style="
                         position: relative;
-                        border-radius: 12px;
+                        border-radius: 16px;
                         overflow: hidden;
-                        box-shadow: ${GRIS_SHADOWS.cool};
-                        background: linear-gradient(135deg, #000 0%, #1a1a2e 100%);
+                        box-shadow: 0 2px 12px rgba(44,34,84,0.10);
+                        background: linear-gradient(135deg, #b6a6ca 0%, #7fc7d9 100%);
                         width: 100%;
                         aspect-ratio: 5 / 3;
                         max-width: 900px;
