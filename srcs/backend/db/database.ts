@@ -25,7 +25,7 @@ db.serialize(() => {
             password TEXT NOT NULL,
             name TEXT NOT NULL,
             team TEXT,
-        bio TEXT,
+            bio TEXT,
             display_name TEXT,
             email TEXT UNIQUE,
             avatar_url TEXT DEFAULT '/assets/avatar/default.png',

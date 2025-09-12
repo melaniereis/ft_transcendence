@@ -56,8 +56,19 @@ export function gamesThisWeek(history: Match[]): number {
 	return history.filter(m => new Date(m.date_played) >= weekAgo).length;
 }
 
-export function mostActiveTime(history: Match[]): 'Morning' | 'Afternoon' | 'Evening' | 'Night' | 'N/A' {
-	if (!history.length) return 'N/A';
+import { translations } from '../language/translations.js';
+export function getCurrentTranslations() {
+	const supportedLangs = ['en', 'es', 'pt'];
+	const lang = (supportedLangs.includes(localStorage.getItem('preferredLanguage') || '')
+		? localStorage.getItem('preferredLanguage')
+		: 'en') as keyof typeof translations;
+	return translations[lang];
+}
+
+export function mostActiveTime(history: Match[]): string {
+	const t = getCurrentTranslations();
+
+	if (!history.length) return t.notAvailable;
 	const buckets = { morning: 0, afternoon: 0, evening: 0, night: 0 };
 	for (const m of history) {
 		const h = new Date(m.date_played).getHours();
@@ -68,33 +79,45 @@ export function mostActiveTime(history: Match[]): 'Morning' | 'Afternoon' | 'Eve
 	}
 	const arr = Object.entries(buckets).sort((a, b) => b[1] - a[1]);
 	const key = (arr[0]?.[0] ?? 'morning') as keyof typeof buckets;
-	return key.charAt(0).toUpperCase() + key.slice(1) as any;
+	return t[key] ?? key;
 }
 
 export function bestPlayingDay(history: Match[]): string {
-	if (!history.length) return 'N/A';
+	const t = getCurrentTranslations();
+	if (!history.length) return t.notAvailable;
+
 	const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 	const dayStats: Record<string, { wins: number; total: number }> = {};
+
 	for (const m of history) {
 		const d = days[new Date(m.date_played).getDay()];
 		dayStats[d] ??= { wins: 0, total: 0 };
 		dayStats[d].total++;
 		if (m.result === 'win') dayStats[d].wins++;
 	}
+
 	const best = Object.entries(dayStats)
 		.map(([day, s]) => ({ day, rate: s.total ? s.wins / s.total : 0 }))
 		.sort((a, b) => b.rate - a.rate)[0];
-	return best?.day ?? 'N/A';
+
+	const bestDay = best?.day ?? 'Sunday';
+	return t.daysOfWeek?.[bestDay as keyof typeof t.daysOfWeek] ?? bestDay;
 }
 
-export function currentMomentum(history: Match[]): 'Hot Streak' | 'Positive' | 'Stable' | 'Recovery Mode' | 'Building' {
-	if (history.length < 5) return 'Building';
+
+export function currentMomentum(history: Match[]): string {
+	const t = getCurrentTranslations();
+
+	if (history.length < 5) 
+		return t.momentumBuilding;
 	const recent = history.slice(-5);
 	const wins = recent.filter(m => m.result === 'win').length;
-	if (wins >= 4) return 'Hot Streak';
-	if (wins >= 3) return 'Positive';
-	if (wins === 2) return 'Stable';
-	return 'Recovery Mode';
+
+	if (wins >= 4) return t.momentumHotStreak;
+	if (wins >= 3) return t.momentumPositive;
+	if (wins === 2) return t.momentumStable;
+	return t.momentumRecovery;
+
 }
 
 export function efficiencyScore(stats: Stats): number {

@@ -1,19 +1,19 @@
-// (Imports remain the same)
+// Imports (unchanged)
 import { renderPlayMenu } from './services/renderPlayMenu.js';
 import { renderSettingsPage } from './services/settings.js';
 import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
 import { renderRegistrationForm } from './services/renderRegistrationForm.js';
-import { renderLoginForm, startActivityMonitoring } from './services/renderLoginForm.js';
+import { renderLoginForm } from './services/renderLoginForm.js';
 import { renderProfilePage } from './services/renderProfilePage/profile.js';
 import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 import { startMatchmaking } from './services/remote/matchmaking.js';
-import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
+import { renderQuickGameSetup } from './services/quickGame/quickGame.js';
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
 import { Language } from '../types/language.js';
 
-// DOM references (unchanged)
+// DOM references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
 const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
@@ -30,37 +30,28 @@ const appDiv = document.getElementById('app') as HTMLDivElement;
 const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
 const languageOptions = document.getElementById('language-options') as HTMLDivElement;
 
-// 🔁 Navigation handler
+// Navigation handler
 function navigateTo(path: string): void {
   history.pushState({}, '', path);
   renderRoute(path);
 }
 
-// 🧭 Handle back/forward buttons
+// Handle back/forward browser buttons
 window.onpopstate = () => {
   renderRoute(window.location.pathname);
 };
 
-// 🧭 Route rendering logic with smooth background change
-// Route rendering logic with fade-out and fade-in background effect
+// Route rendering with fade effect and background change
 function renderRoute(path: string): void {
-  appDiv.innerHTML = ''; // Clear current content
-
-  // Start fade-out before changing background
+  appDiv.innerHTML = ''; // Clear existing content
   appDiv.classList.add('fade-out');
 
-  // After the fade-out animation is completed, change the background
   setTimeout(() => {
-    // Change the background based on the current route
     setBackgroundForRoute(path);
 
-    // Wait for the background change to finish and fade-in the new content
-    appDiv.classList.remove('fade-out'); // Remove fade-out class
-    appDiv.classList.add('fade-in'); // Apply fade-in
+    appDiv.classList.remove('fade-out');
+    appDiv.classList.add('fade-in');
 
-    // After fade-in animation ends, remove fade-in class
-
-    // Render the appropriate content
     switch (path) {
       case '/play':
         renderPlayerSelection(appDiv);
@@ -75,7 +66,12 @@ function renderRoute(path: string): void {
         renderTeamsPage(appDiv);
         break;
       case '/login':
-        renderLoginForm(appDiv, updateUIBasedOnAuth);
+        renderLoginForm(appDiv, async () => {
+          updateUIBasedOnAuth();
+          await updateFriendRequestsBadge();
+          await setOnlineOnLoad();
+          navigateTo('/');
+        });
         break;
       case '/register':
         renderRegistrationForm(appDiv);
@@ -96,21 +92,42 @@ function renderRoute(path: string): void {
         startMatchmaking(appDiv, playerId, playerName, difficulty);
         break;
       default:
-        appDiv.innerHTML = '<p>Welcome! Please select a menu option.</p>';
-        break;
+        appDiv.innerHTML = `
+          <div style="
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+          ">
+            <h1 style="
+              font-size: 4rem;
+              font-weight: 900;
+              text-transform: uppercase;
+              color: #f0f0f0;
+              text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+              letter-spacing: 0.15em;
+              max-width: 800px;
+              line-height: 1.2;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            ">
+              Welcome to GRIS PONG!<br />
+            </h1>
+          </div>
+        `;
+      break;
     }
-  }, 1000); // Delay background change to sync with fade-out duration
+  }, 1000); // Sync with fade duration
 }
 
-// Function to set background based on route
-// Function to set background based on route
+// Set background image for route
 function setBackgroundForRoute(route: string): void {
-  let backgroundUrl = ''; // Default background
+  let backgroundUrl = '';
 
-  // Set the background URL based on the current route
   switch (route) {
     case '/play':
-      backgroundUrl = 'url("https://geekculture.co/wp-content/uploads/2018/08/Screen-Shot-2018-08-14-at-12.03.49-PM.jpg")';
+      backgroundUrl = 'url("https://i.gzn.jp/img/2018/12/23/nintendo-switch-gris/s00009.png")';
       break;
     case '/settings':
       backgroundUrl = 'url("https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg")';
@@ -128,24 +145,21 @@ function setBackgroundForRoute(route: string): void {
       backgroundUrl = 'url("https://assets.rockpapershotgun.com/images/2018/12/GRIS-a.jpg")';
       break;
     default:
-      backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")'; // Default background
+      backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")';
   }
 
-  // Apply the new background with transition effect
   appDiv.style.transition = 'background-image 1s ease-in-out';
   appDiv.style.backgroundImage = backgroundUrl;
-  appDiv.style.backgroundSize = 'cover'; /* Ensure the image always covers the full background */
-  appDiv.style.backgroundPosition = 'center'; /* Center the image */
+  appDiv.style.backgroundSize = 'cover';
+  appDiv.style.backgroundPosition = 'center';
 }
 
-// 🔄 Update UI based on login state
+// Update UI elements based on login state
 function updateUIBasedOnAuth(): void {
   const token = localStorage.getItem('authToken');
   const isLoggedIn = !!token;
 
-  // Show/hide buttons based on login state
   friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
-
   playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
   settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
   tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
@@ -154,7 +168,6 @@ function updateUIBasedOnAuth(): void {
   profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
   matchmakingBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 
-  // Quick Play button should only be visible when NOT logged in
   quickPlayBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 
   loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
@@ -166,7 +179,7 @@ function updateUIBasedOnAuth(): void {
   }
 }
 
-// 🌐 On page load
+// On page load initialization
 document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('authToken');
   if (token) {
@@ -190,32 +203,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   updateUIBasedOnAuth();
-  renderRoute(window.location.pathname); // ← load initial route
+  renderRoute(window.location.pathname);
 });
 
-// 🧭 Event Listeners for Navigation
+// Event listeners for navigation buttons
 playBtn.addEventListener('click', () => navigateTo('/play'));
 settingsBtn.addEventListener('click', () => navigateTo('/settings'));
 tournamentsBtn.addEventListener('click', () => navigateTo('/tournaments'));
 teamsBtn.addEventListener('click', () => navigateTo('/teams'));
-loginBtn.addEventListener('click', () => navigateTo('/login'));
+loginBtn.addEventListener('click', () => {renderLoginForm(appDiv, () => {
+    updateUIBasedOnAuth(); 
+    navigateTo('/');  
+  });
+});
 registerBtn.addEventListener('click', () => navigateTo('/register'));
 profileBtn.addEventListener('click', () => navigateTo('/profile'));
 friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
 quickPlayBtn.addEventListener('click', () => navigateTo('/quick-play'));
-
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('authToken');
   appDiv.innerHTML = '<p>You have been logged out.</p>';
   updateUIBasedOnAuth();
 });
-
-// Matchmaking handled separately (since it uses localStorage data)
 matchmakingBtn.addEventListener('click', () => {
   navigateTo('/matchmaking');
 });
 
-// 🔔 Update friend requests badge
+// Update friend requests badge
 export async function updateFriendRequestsBadge() {
   const token = localStorage.getItem('authToken');
   if (!token) return;
@@ -241,7 +255,7 @@ export async function updateFriendRequestsBadge() {
   }
 }
 
-// 🌐 Set online status
+// Update online status
 async function updateOnlineStatus(isOnline: boolean) {
   const token = localStorage.getItem('authToken');
   if (!token) return;
@@ -278,6 +292,7 @@ async function setOnlineOnLoad() {
   }
 }
 
+// Language toggle handlers
 languageBtn.addEventListener('click', () => {
   const isHidden = getComputedStyle(languageOptions).display === 'none';
   languageOptions.style.display = isHidden ? 'block' : 'none';
@@ -310,6 +325,6 @@ function applyLanguage(lang: string) {
   languageBtn.innerHTML = `🌐 ${t.language}`;
 }
 
-// 🚀 Apply language preference
+// Apply preferred language on load
 const storedLang = localStorage.getItem('preferredLanguage') || 'en';
 applyLanguage(storedLang);

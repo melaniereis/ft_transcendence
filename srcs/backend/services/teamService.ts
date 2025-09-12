@@ -3,17 +3,17 @@ import { TeamStats } from '../types/team.js';
 import { getUserStatsById } from './statsService.js';
 import { getUserById, getAllUsersFromTeam } from './usersService.js';
 
-
-// 💡 Optional: normalize team name to table name
+// 💡 Normalized team name to table name (case insensitive)
 function mapTeamToTable(team: string): string | null {
 	const mapping: Record<string, string> = {
-		Hacktivists: 'hacktivists',
-		'Bug Busters': 'bug_busters',
-		'Logic League': 'logic_league',
-		'Code Alliance': 'code_alliance',
+		'hacktivists': 'hacktivists',
+		'bug busters': 'bug_busters',
+		'logic league': 'logic_league',
+		'code alliance': 'code_alliance',
 	};
 
-	return mapping[team] || null;
+	const normalizedTeam = team.toLowerCase();
+	return mapping[normalizedTeam] || null;
 }
 
 export async function syncUserStatsToTeam(userId: number): Promise<void> {
@@ -31,7 +31,7 @@ export async function syncUserStatsToTeam(userId: number): Promise<void> {
 		}
 
 		// Get all users in the same team
-		const teamUsers = await getAllUsersFromTeam(user.team); // You must implement this if not already
+		const teamUsers = await getAllUsersFromTeam(user.team);
 		if (!teamUsers.length) return;
 
 		// Aggregate stats
@@ -65,14 +65,8 @@ export async function syncUserStatsToTeam(userId: number): Promise<void> {
 
 		const teamRow = teamRows[0]; // Assuming one row per team
 
-		await updateTeamMember(
-			teamTable,
-			teamRow.id,
-			memberNames,
-			totalVictories,
-			totalTournamentsWon,
-			totalDefeats,
-			winRate
+		await updateTeamMember(teamTable,teamRow.id,memberNames,
+		totalVictories, totalTournamentsWon,totalDefeats,winRate
 		);
 
 		console.log(`✅ Team '${user.team}' updated successfully`);
@@ -147,4 +141,42 @@ tournaments_won: number, defeats: number, win_rate: number): Promise<void> {
 export function deleteTeamMember(table: string, id: number): Promise<void> {
 	const query = `DELETE FROM ${table} WHERE id = ?`;
 	return runAsync(query, [id]);
+}
+
+// Updated addMemberToTeam to normalize team string to table name internally
+export async function addMemberToTeam(team: string, newMember: string): Promise<void> {
+	const table = mapTeamToTable(team);
+	if (!table) {
+		throw new Error(`No matching table found for team: ${team}`);
+	}
+
+	const currentMembers = await getTeamMembersString(team);
+	let membersArray: string[] = [];
+
+	if (currentMembers) {
+		membersArray = currentMembers.split(',').map(m => m.trim());
+	}
+
+	if (!membersArray.includes(newMember)) {
+		membersArray.push(newMember);
+		const updatedMembers = membersArray.join(', ');
+		const query = `UPDATE ${table} SET members = ? WHERE id = 1`;
+		await runAsync(query, [updatedMembers]);
+		console.log(`✅ Added member '${newMember}' to team '${team}'`);
+	} 
+	else {
+		console.log(`ℹ️ Member '${newMember}' already in team '${team}'`);
+	}
+}
+
+// Similarly update getTeamMembersString
+export async function getTeamMembersString(team: string): Promise<string | null> {
+	const table = mapTeamToTable(team);
+	if (!table) {
+		throw new Error(`No matching table found for team: ${team}`);
+	}
+
+	const query = `SELECT members FROM ${table} LIMIT 1`;
+	const row = await getAsync<{ members: string }>(query);
+	return row ? row.members : null;
 }

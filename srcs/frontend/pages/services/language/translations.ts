@@ -339,8 +339,28 @@ export const translations = {
 		failedToDeleteUser: "Falha ao excluir o usuário.",
 		loggedOutMessage: "Você foi desconectado.",
 		failedToFetchUser: "Falha ao obter os dados do utilizador. Por favor, tente novamente.",
-    	deleteUserWarning: "Tem a certeza de que deseja eliminar a sua conta? Esta ação é irreversível.",
+		deleteUserWarning: "Tem a certeza de que deseja eliminar a sua conta? Esta ação é irreversível.",
 		confirmDeleteBtn: "Sim, eliminar a minha conta",
+		timesOfDay: {
+			Morning: "Manhã",
+			Afternoon: "Tarde",
+			Evening: "Noite",
+			Night: "Madrugada",
+			'N/A': "N/D"
+		},
+		daysOfWeek: {
+			Sunday: "Domingo",
+			Monday: "Segunda",
+			Tuesday: "Terça",
+			Wednesday: "Quarta",
+			Thursday: "Quinta",
+			Friday: "Sexta",
+			Saturday: "Sábado"
+		},
+		legendWins: "Vitórias (seus triunfos)",
+		legendLosses: "Derrotas (suas perdas)",
+		daysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+		passwordStrengthError:"A palavra-passe deve ter pelo menos 8 caracteres e incluir pelo menos uma letra maiúscula, um número e um carácter especial."
 	},
 	es:{
 		play: "Jugar",
@@ -682,8 +702,28 @@ export const translations = {
 		failedToDeleteUser: "Error al eliminar el usuario.",
 		loggedOutMessage: "Has cerrado sesión.",
 		failedToFetchUser: "No se pudo obtener los datos del usuario. Inténtalo de nuevo.",
-    	deleteUserWarning: "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
+		deleteUserWarning: "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
 		confirmDeleteBtn: "Sí, eliminar mi cuenta",
+		timesOfDay: {
+			Morning: "Mañana",
+			Afternoon: "Tarde",
+			Evening: "Noche",
+			Night: "Madrugada",
+			'N/A': "N/D"
+		},
+		daysOfWeek: {
+			Sunday: "Domingo",
+			Monday: "Lunes",
+			Tuesday: "Martes",
+			Wednesday: "Miércoles",
+			Thursday: "Jueves",
+			Friday: "Viernes",
+			Saturday: "Sábado"
+		},
+		legendWins: "Victorias (tus triunfos)",
+		legendLosses: "Derrotas (tus fracasos)",
+		daysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+		passwordStrengthError: "La contraseña debe tener al menos 8 caracteres e incluir al menos una letra mayúscula, un número y un carácter especial.",
 	},
 	en:{
 		play: "Play",
@@ -1025,7 +1065,27 @@ export const translations = {
 		failedToDeleteUser: "Failed to delete user.",
 		loggedOutMessage: "You have been logged out.",
 		failedToFetchUser: "Failed to fetch user data. Please try again.",
-    	deleteUserWarning: "Are you sure you want to delete your account? This action cannot be undone.",
-		confirmDeleteBtn: "Yes, delete my account"
+		deleteUserWarning: "Are you sure you want to delete your account? This action cannot be undone.",
+		confirmDeleteBtn: "Yes, delete my account",
+		timesOfDay: {
+			Morning: "Morning",
+			Afternoon: "Afternoon",
+			Evening: "Evening",
+			Night: "Night",
+			'N/A': "N/A"
+		},
+		daysOfWeek: {
+			Sunday: "Sunday",
+			Monday: "Monday",
+			Tuesday: "Tuesday",
+			Wednesday: "Wednesday",
+			Thursday: "Thursday",
+			Friday: "Friday",
+			Saturday: "Saturday"
+		},
+		legendWins: "Wins (your victories)",
+		legendLosses: "Losses (your defeats)",
+		daysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+		passwordStrengthError: "Password must be at least 8 characters and include at least one uppercase letter, one number, and one special character.",
 	}
 };

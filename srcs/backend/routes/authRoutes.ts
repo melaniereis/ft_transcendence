@@ -1,36 +1,48 @@
 import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
 import { registerUser, loginUser, verifyToken } from '../services/authService.js';
 import { LoginRequest, RegisterRequest } from '../types/login.js';
+import * as TeamService from '../services/teamService.js';
 
 export async function authRoutes(fastify: FastifyInstance) {
 	// User Registration
 	fastify.post('/api/register', async (req: FastifyRequest, reply: FastifyReply) => {
 		try {
-			const { username, password, name, team, display_name, email } = req.body as RegisterRequest;
+			const { username, password, name, team, display_name, email } = req.body as {
+			username: string;
+			password: string;
+			name: string;
+			team: string;
+			display_name?: string;
+			email?: string;
+			};
 
-			// Simple validation
 			if (!username || !password || !name || !team) {
 				return reply.status(400).send({
 					error: 'Required fields: username, password, name, team'
 				});
 			}
 
-			const result = await registerUser({
-				username,
-				password,
-				name,
-				team,
-				display_name,
-				email
-			});
+			// Register user
+			const result = await registerUser({ username, password, name, team, display_name, email });
+
+			// Add user to team members string (update the single row)
+			await TeamService.addMemberToTeam(team, username);
+
+			// Confirm addition
+			const updatedMembers = await TeamService.getTeamMembersString(team);
+			if (updatedMembers && updatedMembers.split(',').map(m => m.trim()).includes(username)) {
+			console.log(`✅ User '${username}' successfully added to team '${team}'`);
+			} else {
+			console.error(`❌ Failed to confirm user '${username}' in team '${team}'`);
+			}
 
 			reply.send({ success: true, userId: result.id });
-		}
+		} 
 		catch (err: any) {
 			console.error('Registration error:', err);
 			reply.status(400).send({
-				error: 'Registration failed',
-				details: err.message
+			error: 'Registration failed',
+			details: err.message
 			});
 		}
 	});

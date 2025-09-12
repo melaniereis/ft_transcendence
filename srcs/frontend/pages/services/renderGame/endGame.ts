@@ -34,7 +34,8 @@ export async function endGame(
 			const data = await res.json();
 			winnerId = data.winner_id;
 			console.log('✅ Game ended. Winner:', winnerId);
-		} catch (err) {
+		} 
+		catch (err) {
 			console.error(t.failedToEnd, err);
 		}
 	}

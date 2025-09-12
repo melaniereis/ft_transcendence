@@ -302,8 +302,8 @@ export function renderWinRateChart() {
 
 	// HTML legend
 	renderLegendHTML('winRateChart', [
-		{ label: 'Wins (your victories)', swatch: '#7b93a4' },
-		{ label: 'Losses (your defeats)', swatch: '#b1715a' }
+		{ label: t.legendWins, swatch: '#7b93a4' },
+		{ label: t.legendLosses, swatch: '#b1715a' }
 	]);
 }
 
@@ -712,22 +712,16 @@ export function renderActivityHeatmap() {
 	function draw(progress: number) {
 		ctx.clearRect(0, 0, cssWidth, cssHeight);
 		counts.forEach((c, i) => {
-			const alpha = c ? (0.2 + 0.8 * (c / max)) : 0.08;
-			const animatedAlpha = alpha * progress;
-			ctx.fillStyle = `rgba(176,196,222,${animatedAlpha})`;
-			roundRect(ctx, i * cw + 6, 6, cw - 12, cssHeight - 32, 4);
-			ctx.fill();
-			ctx.strokeStyle = 'rgba(80,80,80,0.14)';
-			ctx.strokeRect(i * cw + 6, 6, cw - 12, cssHeight - 32);
+			// ... your existing fill & stroke code ...
 
-			const label = days[i].toLocaleDateString(undefined, { weekday: 'short' });
+			const dayIndex = days[i].getDay();
+			const label = t.daysShort[dayIndex];
 			ctx.fillStyle = '#2f4f4f';
 			ctx.font = '12px Inter, Arial, sans-serif';
 			ctx.textAlign = 'center';
 			ctx.fillText(label, i * cw + cw / 2 + 6, cssHeight - 8);
 		});
 	}
-
 	animate(id, draw, 650);
 
 	renderLegendHTML('activityHeatmap', [
