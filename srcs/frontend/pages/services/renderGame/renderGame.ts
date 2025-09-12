@@ -159,6 +159,8 @@ export function renderGame(
 	}
 	setupGameEvents(container);
 
+	// Pause/Resume centralizado via events.ts
+
 	// Setup cleanup function
 	gameCleanupFunction = () => {
 		cleanupControls();

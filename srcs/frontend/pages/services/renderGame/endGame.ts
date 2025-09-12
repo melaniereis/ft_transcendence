@@ -65,14 +65,14 @@ function launchOptimizedConfetti(winnerName: string) {
 
 	draw();
 
-	// Auto cleanup after 3 seconds
-	setTimeout(() => {
+	// Confetti só para manualmente
+	(window as any).stopConfetti = () => {
 		running = false;
 		if (confettiAnimationId) {
 			cancelAnimationFrame(confettiAnimationId);
 		}
 		confettiCanvas.remove();
-	}, 3000);
+	};
 }
 
 export function renderEndGameModal(
@@ -84,6 +84,13 @@ export function renderEndGameModal(
 	onRestart: (winnerId?: number) => void,
 	winnerId?: number
 ) {
+
+	// Só mostra modal se o jogo ainda está ativo
+	const gameContainer = document.getElementById('pong');
+	if (!gameContainer || !document.body.contains(gameContainer)) {
+		return;
+	}
+
 	// Remove any previous modal
 	const oldModal = document.getElementById('gris-endgame-modal');
 	if (oldModal) oldModal.remove();
@@ -220,6 +227,7 @@ export function renderEndGameModal(
 		menuBtn.onclick = () => {
 			modal.remove();
 			document.body.style.overflow = '';
+			if ((window as any).stopConfetti) (window as any).stopConfetti();
 			window.location.href = '/';
 		};
 	}
@@ -227,6 +235,7 @@ export function renderEndGameModal(
 	restartBtn.onclick = () => {
 		modal.remove();
 		document.body.style.overflow = '';
+		if ((window as any).stopConfetti) (window as any).stopConfetti();
 		onRestart(winnerId);
 	};
 
