@@ -7,18 +7,15 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export async function renderTournamentsPage(container: HTMLDivElement) {
-	// Set container style for consistent layout
-	container.className = 'flex flex-col items-center justify-center min-h-screen p-8 bg-transparent rounded-lg shadow-lg';
-
-	// Header
-	container.innerHTML = `<h2 class="text-3xl font-bold text-black mb-4">${t.tournaments}</h2>`; // Adjusted margin for title to move closer to the top
-
 	const token = localStorage.getItem('authToken');
 	const loggedInPlayerId = Number(localStorage.getItem('playerId'));
 	if (!token || !loggedInPlayerId) {
-		container.innerHTML += `<p class="text-red-600 font-bold">${t.loginRequired}</p>`;
+		container.innerHTML = `<p>${t.loginRequired}</p>`;
 		return;
 	}
+	container.className = 'flex flex-col items-center justify-center min-h-screen p-8 bg-transparent rounded-lg shadow-lg';
+
+	container.innerHTML = `<h2 class="text-3xl font-bold text-black mb-4">${t.tournaments}</h2>`;
 
 	// Fetch all registered users
 	let users: any[] = [];

@@ -1,5 +1,6 @@
 import { translations } from './language/translations.js';
 import { renderLoginForm } from './renderLoginForm.js';
+import { navigateTo } from '../index.js';
 
 export function renderRegistrationForm(container: HTMLElement): void {
 	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
@@ -111,11 +112,8 @@ export function renderRegistrationForm(container: HTMLElement): void {
 
 				form.reset();
 
-				// ✅ Wait a moment, then show login screen
 				setTimeout(() => {
-					renderLoginForm(container, () => {
-						console.log('🔓 Logged in successfully after registration');
-					});
+					navigateTo('/login');
 				}, 1000);
 			} 
 			else {

@@ -6,6 +6,11 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export function renderSettingsPage(container: HTMLElement) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        container.innerHTML = `<p>${t.loginRequired}</p>`;
+        return;
+    }
     container.innerHTML = `
        <div class="settings-container min-h-screen flex flex-col px-6">
             <!-- Top title, closer to top but with margin -->

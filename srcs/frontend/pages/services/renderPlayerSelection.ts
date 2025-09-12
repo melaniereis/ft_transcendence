@@ -6,7 +6,12 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		? localStorage.getItem('preferredLanguage')
 		: 'en') as keyof typeof translations;
 	const t = translations[lang];
-
+	const token = localStorage.getItem('authToken');
+	if (!token) {
+		container.innerHTML = `<p>${t.loginRequired}</p>`;
+		return;
+	}
+	
 	// Limpar conteúdo anterior
 	container.innerHTML = `
 		<div class="flex flex-col items-center justify-center h-screen p-6 bg-cover bg-center">

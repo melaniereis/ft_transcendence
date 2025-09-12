@@ -10,9 +10,14 @@ const t = translations[lang];
 
 export function startMatchmaking(appDiv: HTMLDivElement, playerId: number, playerName: string,
 difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
-	if (socket && socket.readyState === WebSocket.OPEN) {
-		console.log('🟢 Already connected to matchmaking');
+	const token = localStorage.getItem('authToken');
+	if (!token) {
+		appDiv.innerHTML = `<p>${t.loginRequired}</p>`;
 		return;
+	}
+	if (socket && socket.readyState === WebSocket.OPEN) {
+		console.log('🟠 Existing socket — closing and reconnecting to prevent stale state...');
+		socket.close();
 	}
 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';

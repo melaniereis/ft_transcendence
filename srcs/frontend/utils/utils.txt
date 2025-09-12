@@ -1,3 +1,0 @@
-#TODO
-
-- Frontend helpers (Input validation, responsive checks for all devices(FireFox and others))
