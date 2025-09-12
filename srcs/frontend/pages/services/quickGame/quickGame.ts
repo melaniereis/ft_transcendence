@@ -41,6 +41,13 @@ export function renderQuickGameSetup(container: HTMLElement) {
 
 	const startGameBtn = document.getElementById('start-game-btn') as HTMLButtonElement;
 	const errorDiv = document.getElementById('selection-error') as HTMLDivElement;
+	const aiCheckbox = document.getElementById('ai-opponent') as HTMLInputElement;
+	const player2Input = document.getElementById('player2-name') as HTMLInputElement;
+
+	aiCheckbox.addEventListener('change', () => {
+		player2Input.value = aiCheckbox.checked ? 'AI Bot' : '';
+		player2Input.readOnly = aiCheckbox.checked;
+	});
 
 	startGameBtn.addEventListener('click', () => {
 		const player1Name = (document.getElementById('player1-name') as HTMLInputElement).value.trim();
@@ -51,11 +58,24 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			| 'normal'
 			| 'hard'
 			| 'crazy';
+		const isAI = aiCheckbox.checked;
 
-		if (!player1Name || !player2Name || player1Name === player2Name) {
+		if (!player1Name)
+		{
+			errorDiv.textContent = t.invalidOpponent || 'Please enter a player 1 name.';
+			return;
+			}
+		if (!isAI && !player2Name)
+		{
+			errorDiv.textContent = t.invalidOpponent || 'Please enter a player 2 name or select AI opponent.';
+			return;
+		}
+		if (!isAI && player1Name === player2Name)
+		{
 			errorDiv.textContent = t.invalidOpponent || 'Please enter two different player names.';
 			return;
 		}
+
 		container.innerHTML = '';
 		renderGame(container, player1Name, player2Name, maxGames, difficulty, undefined, 'quick', undefined);
 	});

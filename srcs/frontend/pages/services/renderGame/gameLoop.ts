@@ -2,14 +2,19 @@ import { Paddle, Ball } from './types';
 import { updateBall, updatePaddle, resetBall } from './gameLogic.js';
 import { endGame } from './endGame.js';
 import { renderFrame } from './renderFrame.js';
+import { updateAIPaddle } from './aiLogic.ts';
 
 type GameMode = 'single' | 'tournament' | 'quick';
 
 export function startGameLoop(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
 left: Paddle, right: Paddle, ball: Ball, maxGames: number,
-onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', gameId?: number) {
+onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', gameId?: number, isAI: boolean = false) {
 	let gameEnded = false;
 	let animationId: number;
+
+	// AI state (only if true)
+	let lastAIUpdate = Date.now();
+	let aiTargetY = canvas.height / 2 - right.height / 2; //Initial target = center
 
 	function stopGameLoop() {
 		gameEnded = true;
@@ -21,7 +26,21 @@ onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', 
 			return;
 
 		updatePaddle(left, canvas, gameEnded);
-		updatePaddle(right, canvas, gameEnded);
+		if (isAI)
+		{
+			const { updatedTargetY, updatedLastAIUpdate } = updateAIPaddle(
+				right,
+				ball,
+				canvas,
+				currentTime,
+				lastAIUpdate,
+				aiTargetY
+			);
+			aiTargetY = updatedTargetY;
+			lastAIUpdate = updatedLastAIUpdate;
+		}
+		else
+			updatePaddle(right, canvas, gameEnded);
 
 		updateBall(ball, left, right, canvas, maxGames, () => {
 			stopGameLoop();
@@ -36,6 +55,8 @@ onGameEnd: (score1: number, score2: number) => void, mode: GameMode = 'single', 
 				right.score = 0;
 				resetBall(ball, canvas, ball.initialSpeed);
 				gameEnded = false;
+				lastAIUpdate = Date.now();
+				aiTargetY = canvas.height / 2 - right.height / 2;
 				loop();
 				}, left.nickname, right.nickname, mode, gameId);
 			}

@@ -5,7 +5,7 @@ import { setupControls } from './gameControls.js';
 export function renderGame(container: HTMLElement, player1Name: string, player2Name: string,maxGames: number, 
 difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal',
 onGameEnd?: (canvas: HTMLCanvasElement, score1: number, score2: number) => void, 
-mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
+mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, isAI: boolean = false) {
     container.innerHTML = `
         <canvas id="pong" width="1280" height="680" style="border:2px solid white; display:block; margin:auto;"></canvas>
     `;
@@ -19,7 +19,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
     const [leftPaddle, rightPaddle] = createPaddles(canvas, player1Name, player2Name);
     const ball = createBall(canvas, difficulty);
 
-    setupControls(leftPaddle, rightPaddle, 6);
+    setupControls(leftPaddle, rightPaddle, 6, isAI);
 
     let countdown = 3;
     let countdownInterval: number | null = null;
@@ -55,7 +55,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
                 if (onGameEnd) 
                 onGameEnd(canvas, score1, score2);
             },
-            mode, gameId
+            mode, gameId, isAI
             );
         }
         }, 1000);

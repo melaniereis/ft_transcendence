@@ -51,6 +51,9 @@ export async function endGame(
 	ctx.fillText(`${player1Name}: ${score1}`, canvas.width / 2, canvas.height / 2);
 	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 40);
 
+	if (isAI && winnerId !== undefined)
+		ctx.fillText(winnerId === 1 ? t.youBeatAI : t.aiWins, canvas.width / 2, canvas.height / 2 + 60);
+
 	// 🎯 Create centered button container
 	const buttonContainer = document.createElement('div');
 	buttonContainer.style.position = 'absolute';
