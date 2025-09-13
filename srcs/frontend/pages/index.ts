@@ -111,7 +111,7 @@ function setBackgroundForRoute(route: string): void {
 	// Set the background URL based on the current route
 	switch (route) {
 		case '/play':
-			backgroundUrl = 'url("https://geekculture.co/wp-content/uploads/2018/08/Screen-Shot-2018-08-14-at-12.03.49-PM.jpg")';
+			backgroundUrl = 'url("assets/Background3.jpg")';
 			break;
 		case '/settings':
 			backgroundUrl = 'url("https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg")';
@@ -132,11 +132,27 @@ function setBackgroundForRoute(route: string): void {
 			backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")'; // Default background
 	}
 
-	// Apply the new background with transition effect
+	// Apply the new background with transition effect and overlay for transparency
 	appDiv.style.transition = 'background-image 1s ease-in-out';
 	appDiv.style.backgroundImage = backgroundUrl;
-	appDiv.style.backgroundSize = 'cover'; /* Ensure the image always covers the full background */
-	appDiv.style.backgroundPosition = 'center'; /* Center the image */
+	appDiv.style.backgroundSize = 'cover';
+	appDiv.style.backgroundPosition = 'center';
+	appDiv.style.backgroundRepeat = 'no-repeat';
+	appDiv.style.position = 'relative';
+
+	// Add a semi-transparent overlay for dreamy effect
+	let overlay = document.getElementById('dreamy-bg-overlay');
+	if (!overlay) {
+		overlay = document.createElement('div');
+		overlay.id = 'dreamy-bg-overlay';
+		overlay.style.position = 'absolute';
+		overlay.style.inset = '0';
+		overlay.style.pointerEvents = 'none';
+		overlay.style.zIndex = '0';
+		appDiv.appendChild(overlay);
+	}
+	overlay.style.background = 'radial-gradient(circle at 60% 30%, rgba(255,255,255,0.18) 0%, rgba(182,166,202,0.12) 40%, rgba(44,34,84,0.08) 100%)';
+	overlay.style.transition = 'background 1s';
 }
 
 // 🔄 Update UI based on login state
@@ -190,6 +206,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	}
 
+	// Inject global font (Inter, EB Garamond)
+	if (!document.getElementById('gris-font-link')) {
+		const fontLink = document.createElement('link');
+		fontLink.id = 'gris-font-link';
+		fontLink.rel = 'stylesheet';
+		fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=EB+Garamond:wght@400;600;700&display=swap';
+		document.head.appendChild(fontLink);
+		const fontStyle = document.createElement('style');
+		fontStyle.textContent = `
+			html, body, #app, .cloud-bg, .selection-panel, h1, h2, h3, h4, h5, h6, label, select, button, input, div, span, p {
+				font-family: 'Inter', 'EB Garamond', serif !important;
+			}
+		`;
+		document.head.appendChild(fontStyle);
+	}
 	updateUIBasedOnAuth();
 	renderRoute(window.location.pathname); // ← load initial route
 });

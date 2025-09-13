@@ -16,7 +16,6 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	container.style.backdropFilter = 'blur(8px)';
 
 	// Header
-	container.innerHTML = `<h2 style="font-size:2.2rem;font-weight:700;color:${GRIS_COLORS.primary};margin-bottom:2rem;font-family:'Poppins',sans-serif;letter-spacing:0.03em;text-shadow:0 2px 8px rgba(44,34,84,0.10);">${t.tournaments}</h2>`;
 
 	const token = localStorage.getItem('authToken');
 	const loggedInPlayerId = Number(localStorage.getItem('playerId'));

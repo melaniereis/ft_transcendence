@@ -38,7 +38,6 @@ export function showNotification(
             border-radius: 0.5rem;
             z-index: 3000;
             font-size: 1rem;
-            font-family: Arial, sans-serif;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transform: translateX(100%);
             transition: transform 0.3s ease;

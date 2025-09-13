@@ -22,7 +22,6 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                 min-height: 100vh;
                 background: transparent;
                 padding: ${GRIS_SPACING[3]};
-                font-family: ${GRIS_TYPOGRAPHY.fonts.body};
                 position: relative;
                 overflow: hidden;
             ">

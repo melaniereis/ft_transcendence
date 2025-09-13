@@ -141,7 +141,6 @@ export function renderEndGameModal(
 		   text-align: center;
 		   min-width: 320px;
 		   max-width: 96vw;
-		   font-family: ${GRIS_TYPOGRAPHY.fonts.body};
 		   backdrop-filter: blur(2px);
 	   `;
 

@@ -289,7 +289,6 @@ export function showOptimizedFeedback(message: string, color: string) {
             border-radius: 1rem;
             z-index: 4000;
             font-size: ${GRIS_TYPOGRAPHY.scale.base};
-            font-family: ${GRIS_TYPOGRAPHY.fonts.body};
             font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
             box-shadow: ${GRIS_SHADOWS.lg};
             max-width: 300px;

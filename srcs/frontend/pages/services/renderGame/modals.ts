@@ -29,7 +29,6 @@ export function renderPauseModal(): string {
                 text-align: center;
                 min-width: 300px;
                 max-width: 90vw;
-                font-family: ${GRIS_TYPOGRAPHY.fonts.body};
             ">
                 <h2 style="
                     color: ${GRIS_COLORS.primary};

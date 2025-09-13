@@ -89,6 +89,10 @@
 		// Start playing automatically (some browsers may require user interaction)
 		audio.volume = 0.5;
 		audio.play().catch(() => { });
+		// Ensure playback after first user interaction
+		document.body.addEventListener('click', () => {
+			audio.play();
+		}, { once: true });
 	</script>
 	<div id="top-bar"
 		class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-x-auto whitespace-nowrap flex justify-start items-center gap-4 py-4 px-6 no-select">
