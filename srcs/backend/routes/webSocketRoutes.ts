@@ -14,6 +14,16 @@ export async function websocketMatchmakingRoutes(fastify: FastifyInstance) {
 	fastify.addHook('onClose', () => clearInterval(heartbeatInterval));
 
 	fastify.get('/matchmaking', { websocket: true }, (ws: AliveWebSocket, req: FastifyRequest) => {
+		const url = new URL(req.raw.url ?? '', `http://${req.headers.host}`);
+		const token = url.searchParams.get('token');
+
+		if (!token ){
+			ws.close(4001, 'Invalid or missing token');
+			return;
+		}
+
+		ws.token = token;
+
 		initializeConnection(ws);
 
 		ws.on('message', async (message: RawData) => {
@@ -143,7 +153,15 @@ async function startGame(fastify: FastifyInstance) {
 	const response = await fastify.inject({
 		method: 'POST',
 		url: '/games',
-		payload: {player1_id: p1.id, player2_id: p2.id, max_games: maxGames, time_started: new Date().toISOString(),},
+		headers: {
+			Authorization: `Bearer ${p1.connection.token}`
+		},
+		payload: {
+			player1_id: p1.id,
+			player2_id: p2.id,
+			max_games: maxGames,
+			time_started: new Date().toISOString(),
+		},
 	});
 
 	let gameData;

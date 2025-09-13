@@ -9,10 +9,10 @@
   <style>
     /* Reset body and html to prevent extra white space */
     html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        background-color: black;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: black;
     }
 
     .no-select {
@@ -31,7 +31,7 @@
 
     /* Fade-out effect */
     #app.fade-out {
-      opacity: 50;
+      opacity: 0.5; /* Fixed opacity value */
     }
 
     /* Optional: Add a little extra smoothness by applying background image fade-in delay */
@@ -41,10 +41,10 @@
 
     /* Style for top bar buttons */
     #top-bar .nav-btn {
-    font-size: 2rem;       /* 👈 Always large */
-    color: black;
-    font-weight: bold;
-    transition: none;      /* 👈 Remove animation */
+      font-size: 2rem;       /* 👈 Always large */
+      color: black;
+      font-weight: bold;
+      transition: none;      /* 👈 Remove animation */
     }
 
     #top-bar .nav-btn:hover {
@@ -55,11 +55,10 @@
     #top-bar .nav-btn.active {
       font-size: 2rem;       /* 👈 Keep size consistent */
     }
-
   </style>
 </head>
 <body class="m-0 h-screen bg-cover bg-center bg-no-repeat bg-fixed text-white">
-  <div id="top-bar" class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-x-auto whitespace-nowrap flex justify-start items-center gap-4 py-4 px-6 no-select">
+  <div id="top-bar" class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-visible whitespace-nowrap flex justify-start items-center gap-4 py-6 px-6 no-select">
     <!-- Game Buttons -->
     <button id="play-btn" class="nav-btn hidden">🎮 Play</button>
     <button id="tournaments-btn" class="nav-btn hidden">🏆 Tournaments</button>
@@ -81,7 +80,6 @@
     <button id="logout-btn" class="nav-btn hidden">🚪 Logout</button>
     
     <!-- Language Selector -->
-    <!-- Language Selector -->
     <div class="relative inline-block">
       <button id="language-btn" class="nav-btn">🌐 Language</button>
       <div id="language-options" class="hidden absolute top-full left-0 mt-2 bg-white text-black rounded shadow-lg p-2 space-y-1 z-[9999] w-32">
@@ -90,10 +88,12 @@
         <button data-lang="pt" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Português</button>
       </div>
     </div>
-  </div>
+  </div> <!-- Close #top-bar -->
 
   <!-- Main App Content -->
   <div id="app" class="pt-32 px-4 text-black">
+    <!-- Dynamic content will be rendered here -->
+  </div>
 
   <!-- App Logic -->
   <script type="module" src="index.js"></script>

@@ -21,7 +21,8 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 	}
 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-	socket = new WebSocket(`${protocol}://${location.host}/matchmaking`);
+	socket = new WebSocket(`${protocol}://${location.host}/matchmaking?token=${encodeURIComponent(token ?? '')}`);
+
 
 	socket.onopen = () => handleSocketOpen(playerId, playerName, difficulty);
 	socket.onmessage = (event) => handleSocketMessage(event, appDiv, playerName, difficulty);
@@ -30,15 +31,17 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 }
 
 function handleSocketOpen(playerId: number, playerName: string, difficulty: string) {
-	console.log('✅ Connected to matchmaking server. Waiting for opponent...');
-	const payload = {
-		type: 'join',
-		id: playerId,
-		username: playerName,
-		difficulty
-	};
-	console.log('Sending join payload:', payload);
-	socket!.send(JSON.stringify(payload));
+  console.log('✅ Connected to matchmaking server. Waiting for opponent...');
+  const token = localStorage.getItem('authToken');
+  const payload = {
+    type: 'join',
+    id: playerId,
+    username: playerName,
+    difficulty,
+    token // add the token here
+  };
+  console.log('Sending join payload:', payload);
+  socket!.send(JSON.stringify(payload));
 }
 
 function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, playerName: string,
