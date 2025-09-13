@@ -81,7 +81,7 @@ function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, player
 
 		case 'error':
 			console.error('⚠️ Server error:', data.message);
-			appDiv.innerHTML = `<p>${t.errorLoadingTournaments}: ${data.message}</p>`;
+			appDiv.innerHTML = `<p>${t.errorLoading}: ${data.message}</p>`;
 			break;
 
 		default:
