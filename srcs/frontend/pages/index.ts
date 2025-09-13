@@ -244,7 +244,7 @@ friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
 logoutBtn.addEventListener('click', () => {
 	localStorage.removeItem('authToken');
 	updateUIBasedOnAuth();
-	renderRoute('/');
+	navigateTo('/');
 });
 
 if (loginBtn) loginBtn.addEventListener('click', () => navigateTo('/login'));
