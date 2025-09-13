@@ -13,7 +13,11 @@ const teams = [
 ];
 
 export async function renderTeamsPage(container: HTMLElement) {
-    // 💮 Add global petals if not already added
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        container.innerHTML = `<p>${t.loginRequired}</p>`;
+        return;
+    }
     if (!document.getElementById('global-petals')) {
         const petalsContainer = document.createElement('div');
         petalsContainer.id = 'global-petals';

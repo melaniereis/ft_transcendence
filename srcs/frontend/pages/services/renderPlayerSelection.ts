@@ -6,7 +6,12 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		? localStorage.getItem('preferredLanguage')
 		: 'en') as keyof typeof translations;
 	const t = translations[lang];
-
+	const token = localStorage.getItem('authToken');
+	if (!token) {
+		container.innerHTML = `<p>${t.loginRequired}</p>`;
+		return;
+	}
+	
 	// Limpar conteúdo anterior
 	container.innerHTML = `
 		<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">

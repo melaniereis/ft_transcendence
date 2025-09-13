@@ -1,5 +1,5 @@
 // srcs/frontend/pages/index.ts
-// (Imports remain the same)
+// Imports (unchanged)
 import { renderPlayMenu } from './services/renderPlayMenu.js';
 import { renderSettingsPage } from './services/settings.js';
 import { renderTournamentsPage } from './services/tournament/tournaments.js';
@@ -9,12 +9,12 @@ import { renderLoginForm } from './services/renderLoginForm.js'
 import { renderProfilePage } from './services/renderProfilePage/profile.js';
 import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
 import { startMatchmaking } from './services/remote/matchmaking.js';
-import { renderQuickGameSetup } from './services/quickGame/quickGame.js'
+import { renderQuickGameSetup } from './services/quickGame/quickGame.js';
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
 import { Language } from '../types/language.js';
 
-// DOM references (unchanged)
+// DOM references
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
 const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
@@ -31,19 +31,18 @@ const appDiv = document.getElementById('app') as HTMLDivElement;
 const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
 const languageOptions = document.getElementById('language-options') as HTMLDivElement;
 
-// 🔁 Navigation handler
-function navigateTo(path: string): void {
+// Navigation handler
+export function navigateTo(path: string): void {
 	history.pushState({}, '', path);
 	renderRoute(path);
 }
 
-// 🧭 Handle back/forward buttons
+// Handle back/forward browser buttons
 window.onpopstate = () => {
 	renderRoute(window.location.pathname);
 };
 
-// 🧭 Route rendering logic with smooth background change
-// Route rendering logic with fade-out and fade-in background effect
+// Route rendering with fade effect and background change
 function renderRoute(path: string): void {
 	appDiv.innerHTML = ''; // Clear current content
 
@@ -76,7 +75,12 @@ function renderRoute(path: string): void {
 				renderTeamsPage(appDiv);
 				break;
 			case '/login':
-				renderLoginForm(appDiv, updateUIBasedOnAuth);
+				renderLoginForm(appDiv, async () => {
+					updateUIBasedOnAuth();
+					await updateFriendRequestsBadge();
+					await setOnlineOnLoad();
+					navigateTo('/');
+				});
 				break;
 			case '/register':
 				renderRegistrationForm(appDiv);
@@ -97,21 +101,43 @@ function renderRoute(path: string): void {
 				startMatchmaking(appDiv, playerId, playerName, difficulty);
 				break;
 			default:
-				appDiv.innerHTML = '<p>Welcome! Please select a menu option.</p>';
+				appDiv.innerHTML = `
+        <div style="
+          display: flex;
+          height: 100vh;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          padding: 0 20px;
+        ">
+          <h1 style="
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+            letter-spacing: 0.15em;
+            max-width: 800px;
+            line-height: 1.2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          ">
+            Welcome to GRIS PONG!<br />
+          </h1>
+        </div>
+        `;
 				break;
 		}
-	}, 1000); // Delay background change to sync with fade-out duration
+	}, 500);
 }
 
-// Function to set background based on route
-// Function to set background based on route
+// Set background image for route
 function setBackgroundForRoute(route: string): void {
 	let backgroundUrl = ''; // Default background
 
 	// Set the background URL based on the current route
 	switch (route) {
 		case '/play':
-			backgroundUrl = 'url("assets/Background3.jpg")';
+			backgroundUrl = 'url("https://geekculture.co/wp-content/uploads/2018/08/Screen-Shot-2018-08-14-at-12.03.49-PM.jpg")';
 			break;
 		case '/settings':
 			backgroundUrl = 'url("https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg")';
@@ -132,30 +158,14 @@ function setBackgroundForRoute(route: string): void {
 			backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")'; // Default background
 	}
 
-	// Apply the new background with transition effect and overlay for transparency
+	// Apply the new background with transition effect
 	appDiv.style.transition = 'background-image 1s ease-in-out';
 	appDiv.style.backgroundImage = backgroundUrl;
-	appDiv.style.backgroundSize = 'cover';
-	appDiv.style.backgroundPosition = 'center';
-	appDiv.style.backgroundRepeat = 'no-repeat';
-	appDiv.style.position = 'relative';
-
-	// Add a semi-transparent overlay for dreamy effect
-	let overlay = document.getElementById('dreamy-bg-overlay');
-	if (!overlay) {
-		overlay = document.createElement('div');
-		overlay.id = 'dreamy-bg-overlay';
-		overlay.style.position = 'absolute';
-		overlay.style.inset = '0';
-		overlay.style.pointerEvents = 'none';
-		overlay.style.zIndex = '0';
-		appDiv.appendChild(overlay);
-	}
-	overlay.style.background = 'radial-gradient(circle at 60% 30%, rgba(255,255,255,0.18) 0%, rgba(182,166,202,0.12) 40%, rgba(44,34,84,0.08) 100%)';
-	overlay.style.transition = 'background 1s';
+	appDiv.style.backgroundSize = 'cover'; /* Ensure the image always covers the full background */
+	appDiv.style.backgroundPosition = 'center'; /* Center the image */
 }
 
-// 🔄 Update UI based on login state
+// Update UI elements based on login state
 function updateUIBasedOnAuth(): void {
 	const token = localStorage.getItem('authToken');
 	const isLoggedIn = !!token;
@@ -183,7 +193,7 @@ function updateUIBasedOnAuth(): void {
 	}
 }
 
-// 🌐 On page load
+// On page load initialization
 document.addEventListener('DOMContentLoaded', async () => {
 	const token = localStorage.getItem('authToken');
 	if (token) {
@@ -206,48 +216,81 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	}
 
-	// Inject global font (Inter, EB Garamond)
-	if (!document.getElementById('gris-font-link')) {
-		const fontLink = document.createElement('link');
-		fontLink.id = 'gris-font-link';
-		fontLink.rel = 'stylesheet';
-		fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=EB+Garamond:wght@400;600;700&display=swap';
-		document.head.appendChild(fontLink);
-		const fontStyle = document.createElement('style');
-		fontStyle.textContent = `
-			html, body, #app, .cloud-bg, .selection-panel, h1, h2, h3, h4, h5, h6, label, select, button, input, div, span, p {
-				font-family: 'Inter', 'EB Garamond', serif !important;
-			}
-		`;
-		document.head.appendChild(fontStyle);
-	}
 	updateUIBasedOnAuth();
 	renderRoute(window.location.pathname); // ← load initial route
 });
 
-// 🧭 Event Listeners for Navigation
+// Event listeners for navigation buttons
 playBtn.addEventListener('click', () => navigateTo('/play'));
 settingsBtn.addEventListener('click', () => navigateTo('/settings'));
 tournamentsBtn.addEventListener('click', () => navigateTo('/tournaments'));
 teamsBtn.addEventListener('click', () => navigateTo('/teams'));
-loginBtn.addEventListener('click', () => navigateTo('/login'));
+loginBtn.addEventListener('click', () => {
+	renderLoginForm(appDiv, () => {
+		updateUIBasedOnAuth();
+		navigateTo('/');
+	});
+});
 registerBtn.addEventListener('click', () => navigateTo('/register'));
 profileBtn.addEventListener('click', () => navigateTo('/profile'));
 friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
 quickPlayBtn.addEventListener('click', () => navigateTo('/quick-play'));
-
 logoutBtn.addEventListener('click', () => {
 	localStorage.removeItem('authToken');
 	appDiv.innerHTML = '<p>You have been logged out.</p>';
 	updateUIBasedOnAuth();
 });
-
-// Matchmaking handled separately (since it uses localStorage data)
 matchmakingBtn.addEventListener('click', () => {
 	navigateTo('/matchmaking');
 });
 
-// 🔔 Update friend requests badge
+// Language toggle handlers
+languageBtn.addEventListener('click', (e) => {
+	e.stopPropagation(); // Prevent document click from immediately hiding dropdown
+	languageOptions.classList.toggle('hidden');
+});
+
+// Language option buttons click handler
+languageOptions.querySelectorAll('button').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang') || 'en';
+		localStorage.setItem('preferredLanguage', selectedLang);
+		applyLanguage(selectedLang);
+		languageOptions.classList.add('hidden'); // Hide dropdown after selection
+	});
+});
+
+// Close language dropdown on outside click
+document.addEventListener('click', (e) => {
+	if (!languageOptions.contains(e.target as Node) && e.target !== languageBtn) {
+		languageOptions.classList.add('hidden');
+	}
+});
+
+// Apply language function
+function applyLanguage(lang: string) {
+	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
+	const t = translations[safeLang];
+
+	playBtn.innerHTML = `🎮 ${t.play}`;
+	settingsBtn.innerHTML = `⚙️ ${t.settings}`;
+	tournamentsBtn.innerHTML = `🏆 ${t.tournaments}`;
+	teamsBtn.innerHTML = `👥 ${t.teams}`;
+	loginBtn.innerHTML = `🔑 ${t.login}`;
+	logoutBtn.innerHTML = `🚪 ${t.logout}`;
+	registerBtn.innerHTML = `📝 ${t.register}`;
+	profileBtn.innerHTML = `👤 ${t.profile}`;
+	friendRequestsBtn.innerHTML = `🤝 ${t.friendRequests}`;
+	quickPlayBtn.innerHTML = `⚡ ${t.quickPlay}`;
+	matchmakingBtn.innerHTML = `🎯 ${t.matchmaking}`;
+	languageBtn.innerHTML = `🌐 ${t.language}`;
+}
+
+// On load, apply preferred language
+const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+applyLanguage(storedLang);
+
+// Export friend requests badge update function
 export async function updateFriendRequestsBadge() {
 	const token = localStorage.getItem('authToken');
 	if (!token) return;
@@ -273,7 +316,7 @@ export async function updateFriendRequestsBadge() {
 	}
 }
 
-// 🌐 Set online status
+// Update online status
 async function updateOnlineStatus(isOnline: boolean) {
 	const token = localStorage.getItem('authToken');
 	if (!token) return;
@@ -323,25 +366,3 @@ languageOptions.querySelectorAll('button').forEach(btn => {
 		languageOptions.style.display = 'none';
 	});
 });
-
-function applyLanguage(lang: string) {
-	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
-	const t = translations[safeLang];
-
-	playBtn.innerHTML = `🎮 ${t.play}`;
-	settingsBtn.innerHTML = `⚙️ ${t.settings}`;
-	tournamentsBtn.innerHTML = `🏆 ${t.tournaments}`;
-	teamsBtn.innerHTML = `👥 ${t.teams}`;
-	loginBtn.innerHTML = `🔑 ${t.login}`;
-	logoutBtn.innerHTML = `🚪 ${t.logout}`;
-	registerBtn.innerHTML = `📝 ${t.register}`;
-	profileBtn.innerHTML = `👤 ${t.profile}`;
-	friendRequestsBtn.innerHTML = `🤝 ${t.friendRequests}`;
-	quickPlayBtn.innerHTML = `⚡ ${t.quickPlay}`;
-	matchmakingBtn.innerHTML = `🎯 ${t.matchmaking}`;
-	languageBtn.innerHTML = `🌐 ${t.language}`;
-}
-
-// 🚀 Apply language preference
-const storedLang = localStorage.getItem('preferredLanguage') || 'en';
-applyLanguage(storedLang);

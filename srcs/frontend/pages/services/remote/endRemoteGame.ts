@@ -3,25 +3,28 @@ export function endGame(score1: number, score2: number, canvas: HTMLCanvasElemen
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return;
 
-	// Fill background
+	// Clear canvas and display scores
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = '#000';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 	// Display final score
 	ctx.fillStyle = '#fff';
 	ctx.textAlign = 'center';
-
-	ctx.font = '48px Arial';
-	ctx.fillText('🎮 Game Over', canvas.width / 2, canvas.height / 2 - 80);
-
-	ctx.font = '32px Arial';
+	ctx.fillText('🎮 Game Over', canvas.width / 2, canvas.height / 2 - 60);
 	ctx.fillText(`${player1Name}: ${score1}`, canvas.width / 2, canvas.height / 2 - 20);
-	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 30);
+	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 20);
+
+	// Make sure canvas parent container is positioned relatively
+	const parent = canvas.parentElement;
+	if (!parent)
+		return;
+	parent.style.position = parent.style.position || 'relative';
 
 	// Create button container
 	const buttonContainer = document.createElement('div');
 	buttonContainer.style.position = 'absolute';
-	buttonContainer.style.top = '60%';
+	buttonContainer.style.top = '60%'; // relative to parent container
 	buttonContainer.style.left = '50%';
 	buttonContainer.style.transform = 'translate(-50%, -50%)';
 	buttonContainer.style.display = 'flex';
@@ -42,11 +45,11 @@ export function endGame(score1: number, score2: number, canvas: HTMLCanvasElemen
 
 	menuBtn.onclick = () => {
 		buttonContainer.remove();
-		window.location.href = '/'; // Adjust if needed
+		window.location.href = '/'; // Change path if needed
 	};
 
 	buttonContainer.appendChild(menuBtn);
 
-	// Prefer attaching to canvas container
-	canvas.parentElement?.appendChild(buttonContainer);
+	// Append the button container to the canvas parent (not directly to body)
+	parent.appendChild(buttonContainer);
 }

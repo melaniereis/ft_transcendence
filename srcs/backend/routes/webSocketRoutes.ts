@@ -14,13 +14,23 @@ export async function websocketMatchmakingRoutes(fastify: FastifyInstance) {
 	fastify.addHook('onClose', () => clearInterval(heartbeatInterval));
 
 	fastify.get('/matchmaking', { websocket: true }, (ws: AliveWebSocket, req: FastifyRequest) => {
+		const url = new URL(req.raw.url ?? '', `http://${req.headers.host}`);
+		const token = url.searchParams.get('token');
+
+		if (!token) {
+			ws.close(4001, 'Invalid or missing token');
+			return;
+		}
+
+		ws.token = token;
+
 		initializeConnection(ws);
 
 		ws.on('message', async (message: RawData) => {
 			try {
 				const data = JSON.parse(message.toString());
 				await handleMessage(ws, data, fastify);
-			} 
+			}
 			catch (err) {
 				console.error('❌ Error handling matchmaking message:', err);
 				ws.send(JSON.stringify({ type: 'error', message: 'Internal server error' }));
@@ -31,7 +41,7 @@ export async function websocketMatchmakingRoutes(fastify: FastifyInstance) {
 
 function runHeartbeat() {
 	[waitingRoom.player1, waitingRoom.player2].forEach((player) => {
-		if (!player) 
+		if (!player)
 			return;
 		const ws = player.connection;
 		if (!ws.isAlive) {
@@ -80,7 +90,7 @@ async function handleMessage(ws: AliveWebSocket, data: any, fastify: FastifyInst
 }
 
 function handleJoin(ws: AliveWebSocket, data: any) {
-	const { id, username, difficulty,authToken } = data;
+	const { id, username, difficulty, authToken } = data;
 	if (typeof id !== 'number' || typeof username !== 'string' || typeof authToken !== 'string') {
 		ws.send(JSON.stringify({ type: 'error', message: 'Invalid player data or missing auth token' }));
 		return;
@@ -89,13 +99,13 @@ function handleJoin(ws: AliveWebSocket, data: any) {
 	ws.playerId = id;
 	ws.username = username;
 	ws.difficulty = difficulty;
-	ws.authToken = authToken;
+	ws.token = authToken;
 
 	if (!waitingRoom.player1) {
 		waitingRoom.player1 = { id, username, difficulty, connection: ws };
 		ws.send(JSON.stringify({ type: 'chooseMaxGames' }));
 		console.log(`🧍 Player 1 joined matchmaking: ${username}`);
-	} 
+	}
 	else if (!waitingRoom.player2) {
 		waitingRoom.player2 = { id, username, difficulty, connection: ws };
 		if (waitingRoom.maxGames)
@@ -138,24 +148,28 @@ async function handleConfirmReady(ws: AliveWebSocket, fastify: FastifyInstance) 
 }
 
 async function startGame(fastify: FastifyInstance) {
-  const p1 = waitingRoom.player1!;
-  const p2 = waitingRoom.player2!;
-  const maxGames = waitingRoom.maxGames!;
+	const p1 = waitingRoom.player1!;
+	const p2 = waitingRoom.player2!;
+	const maxGames = waitingRoom.maxGames!;
 
-  const response = await fastify.inject({
-    method: 'POST',
-    url: '/games',
-    headers: {
-      authorization: `Bearer ${p1.connection.authToken}`,  // use token from player1
-    },
-    payload: {player1_id: p1.id, player2_id: p2.id, max_games: maxGames, time_started: new Date().toISOString(),
-    },
-  });
+	const response = await fastify.inject({
+		method: 'POST',
+		url: '/games',
+		headers: {
+			Authorization: `Bearer ${p1.connection.token}`
+		},
+		payload: {
+			player1_id: p1.id,
+			player2_id: p2.id,
+			max_games: maxGames,
+			time_started: new Date().toISOString(),
+		},
+	});
 
 	let gameData;
 	try {
 		gameData = JSON.parse(response.body);
-	} 
+	}
 	catch {
 		sendErrorToBoth('Game creation failed');
 		return;

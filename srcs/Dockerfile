@@ -4,6 +4,8 @@ WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package*.json ./
+RUN apt-get update && apt-get install -y gnupg ca-certificates curl
+
 RUN npm install
 
 # Optional: upgrade npm

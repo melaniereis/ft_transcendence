@@ -8,7 +8,7 @@ export interface AliveWebSocket extends WsWebSocket {
 	gameId?: string;
 	confirmed?: boolean;
 	selectedMaxGames?: number;
-	authToken?: string;
+	token?: string;
 }
 
 export type PlayerData = {

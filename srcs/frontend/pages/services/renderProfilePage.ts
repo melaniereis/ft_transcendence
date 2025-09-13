@@ -1,10 +1,16 @@
-// services/renderProfilePage.ts
 import { updateFriendRequestsBadge } from '../index.js';
+import { translations } from './language/translations.js';
+
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+  ? localStorage.getItem('preferredLanguage')
+  : 'en') as keyof typeof translations;
+const t = translations[lang];
+
 
 export async function renderProfilePage(container: HTMLElement) {
   const token = localStorage.getItem('authToken');
   if (!token) {
-    container.innerHTML = '<p>Please log in to view your profile.</p>';
+    container.innerHTML = `<p>${t.loginRequired}</p>`;
     return;
   }
 

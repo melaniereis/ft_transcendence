@@ -95,7 +95,7 @@
 		}, { once: true });
 	</script>
 	<div id="top-bar"
-		class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-x-auto whitespace-nowrap flex justify-start items-center gap-4 py-4 px-6 no-select">
+		class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-visible whitespace-nowrap flex justify-start items-center gap-4 py-6 px-6 no-select">
 		<!-- Game Buttons -->
 		<button id="play-btn" class="nav-btn hidden">🎮 Play</button>
 		<button id="tournaments-btn" class="nav-btn hidden">🏆 Tournaments</button>
@@ -118,22 +118,24 @@
 		<button id="logout-btn" class="nav-btn hidden">🚪 Logout</button>
 
 		<!-- Language Selector -->
-		<div class="relative">
+		<div class="relative inline-block">
 			<button id="language-btn" class="nav-btn">🌐 Language</button>
 			<div id="language-options"
-				class="hidden absolute top-full mt-2 bg-white text-black rounded shadow-lg p-2 space-y-1 z-50 w-32">
+				class="hidden absolute top-full left-0 mt-2 bg-white text-black rounded shadow-lg p-2 space-y-1 z-[9999] w-32">
 				<button data-lang="en" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">English</button>
 				<button data-lang="es" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Español</button>
 				<button data-lang="pt" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Português</button>
 			</div>
 		</div>
-	</div>
+	</div> <!-- Close #top-bar -->
 
 	<!-- Main App Content -->
 	<div id="app" class="pt-32 px-4 text-black">
+		<!-- Dynamic content will be rendered here -->
+	</div>
 
-		<!-- App Logic -->
-		<script type="module" src="index.js"></script>
+	<!-- App Logic -->
+	<script type="module" src="index.js"></script>
 </body>
 
 </html>

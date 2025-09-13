@@ -21,7 +21,7 @@ if (!recent.length) {
 	`;
 }
 return `
-	<div>s
+	<div>
 	<style>
 	/* styles omitted for brevity */
 	</style>

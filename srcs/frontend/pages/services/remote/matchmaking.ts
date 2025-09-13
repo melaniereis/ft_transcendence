@@ -9,14 +9,20 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export function startMatchmaking(appDiv: HTMLDivElement, playerId: number, playerName: string,
-difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
-	if (socket && socket.readyState === WebSocket.OPEN) {
-		console.log('🟢 Already connected to matchmaking');
+	difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
+	const token = localStorage.getItem('authToken');
+	if (!token) {
+		appDiv.innerHTML = `<p>${t.loginRequired}</p>`;
 		return;
+	}
+	if (socket && socket.readyState === WebSocket.OPEN) {
+		console.log('🟠 Existing socket — closing and reconnecting to prevent stale state...');
+		socket.close();
 	}
 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-	socket = new WebSocket(`${protocol}://${location.host}/matchmaking`);
+	socket = new WebSocket(`${protocol}://${location.host}/matchmaking?token=${encodeURIComponent(token ?? '')}`);
+
 
 	socket.onopen = () => handleSocketOpen(playerId, playerName, difficulty);
 	socket.onmessage = (event) => handleSocketMessage(event, appDiv, playerName, difficulty);
@@ -25,25 +31,22 @@ difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 }
 
 function handleSocketOpen(playerId: number, playerName: string, difficulty: string) {
-  console.log('✅ Connected to matchmaking server. Waiting for opponent...');
-
-  const authToken = localStorage.getItem('authToken');
-
-  const payload = {
-    type: 'join',
-    id: playerId,
-    username: playerName,
-    difficulty,
-    authToken, 
-  };
-
-  console.log('Sending join payload:', payload);
-  socket!.send(JSON.stringify(payload));
+	console.log('✅ Connected to matchmaking server. Waiting for opponent...');
+	const token = localStorage.getItem('authToken');
+	const payload = {
+		type: 'join',
+		id: playerId,
+		username: playerName,
+		difficulty,
+		token // add the token here
+	};
+	console.log('Sending join payload:', payload);
+	socket!.send(JSON.stringify(payload));
 }
 
 
 function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, playerName: string,
-difficulty: string) {
+	difficulty: string) {
 	const data = JSON.parse(event.data);
 	console.log('Received WS message:', data);
 

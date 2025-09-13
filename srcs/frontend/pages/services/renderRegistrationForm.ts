@@ -1,69 +1,131 @@
 import { translations } from './language/translations.js';
+import { renderLoginForm } from './renderLoginForm.js';
+import { navigateTo } from '../index.js';
 
 export function renderRegistrationForm(container: HTMLElement): void {
-const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
-	? localStorage.getItem('preferredLanguage')
-	: 'en') as keyof typeof translations;
-const t = translations[lang];
+	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+		? localStorage.getItem('preferredLanguage')
+		: 'en') as keyof typeof translations;
+	const t = translations[lang];
 
-container.innerHTML = `
-	<h2>${t.registerTitle}</h2>
-	<form id="register-form">
-	<label>
-		${t.name}:
-		<input type="text" id="name" required />
-	</label>
-	<label>
-		${t.username}:
-		<input type="text" id="username" required />
-	</label>
-	<label>
-		${t.team}:
-		<select id="team" required>
-		<option value="">${t.selectTeam}</option>
-		<option value="HACKTIVISTS">HACKTIVISTS</option>
-		<option value="BUG BUSTERS">BUG BUSTERS</option>
-		<option value="LOGIC LEAGUE">LOGIC LEAGUE</option>
-		<option value="CODE ALLIANCE">CODE ALLIANCE</option>
-		</select>
-	</label>
-	<label>
-		${t.password}:
-		<input type="password" id="password" required />
-	</label>
-	<button type="submit">${t.register}</button>
-	</form>
-	<div id="register-result"></div>
-`;
+	container.innerHTML = `
+		<div class="flex flex-col items-center justify-center h-screen p-6 bg-cover bg-center">
+		<h2 class="text-6xl font-bold text-black mb-8">${t.registerTitle}</h2>
 
-const form = document.getElementById('register-form') as HTMLFormElement;
-const resultDiv = document.getElementById('register-result') as HTMLDivElement;
+		<div class="bg-transparent p-8 rounded-lg shadow-xl space-y-6 w-full max-w-xl backdrop-blur-md">
+			<form id="register-form" class="space-y-6">
+			
+			<label class="text-2xl font-bold text-black block">
+				${t.name}:
+				<input type="text" id="name" required
+				class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
+			</label>
 
-form.addEventListener('submit', async (e: Event) => {
-	e.preventDefault();
+			<label class="text-2xl font-bold text-black block">
+				${t.username}:
+				<input type="text" id="username" required
+				class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
+			</label>
 
-	const name = (document.getElementById('name') as HTMLInputElement).value;
-	const username = (document.getElementById('username') as HTMLInputElement).value;
-	const team = (document.getElementById('team') as HTMLSelectElement).value;
-	const password = (document.getElementById('password') as HTMLInputElement).value;
+			<label class="text-2xl font-bold text-black block">
+				${t.email} (optional):
+				<input type="email" id="email" 
+				class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
+			</label>
 
-	const data = { name, username, team, password };
+			<label class="text-2xl font-bold text-black block">
+				${t.team}:
+				<select id="team" required
+				class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
+				<option value="">${t.selectTeam}</option>
+				<option value="HACKTIVISTS">HACKTIVISTS</option>
+				<option value="BUG BUSTERS">BUG BUSTERS</option>
+				<option value="LOGIC LEAGUE">LOGIC LEAGUE</option>
+				<option value="CODE ALLIANCE">CODE ALLIANCE</option>
+				</select>
+			</label>
 
-	try {
-	const res = await fetch('/api/register', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
-	});
+			<label class="text-2xl font-bold text-black block">
+				${t.password}:
+				<input type="password" id="password" required
+				class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
+			</label>
 
-	const result = await res.json();
-	resultDiv.textContent = result.success
-		? `${t.registrationSuccess} ${result.userId}`
-		: `${t.registrationError} ${result.error}`;
-	form.reset();
-	} 
-	catch (err) {
-	resultDiv.textContent = t.registrationFailed;
+			<div id="password-error" class="text-red-600 text-lg"></div>
+
+			<button type="submit"
+				class="w-full py-4 text-2xl font-bold text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
+				${t.register}
+			</button>
+			</form>
+
+			<div id="register-result" class="text-xl text-red-600 mt-4 text-center"></div>
+		</div>
+		</div>
+	`;
+
+	function isStrongPassword(pw: string): boolean {
+		const minLength = pw.length >= 8;
+		const hasNumber = /\d/.test(pw);
+		const hasSpecial = /[^A-Za-z0-9]/.test(pw);
+		const hasUppercase = /[A-Z]/.test(pw);
+		return minLength && hasNumber && hasSpecial && hasUppercase;
 	}
-});
+
+	const form = document.getElementById('register-form') as HTMLFormElement;
+	const resultDiv = document.getElementById('register-result') as HTMLDivElement;
+	const passwordErrorDiv = document.getElementById('password-error') as HTMLDivElement;
+
+	form.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+
+		const name = (document.getElementById('name') as HTMLInputElement).value.trim();
+		const username = (document.getElementById('username') as HTMLInputElement).value.trim();
+		const team = (document.getElementById('team') as HTMLSelectElement).value;
+		const password = (document.getElementById('password') as HTMLInputElement).value;
+		const email = (document.getElementById('email') as HTMLInputElement).value.trim();
+
+		passwordErrorDiv.textContent = '';
+		resultDiv.textContent = '';
+
+		if (!isStrongPassword(password)) {
+			passwordErrorDiv.textContent = t.passwordStrengthError || 
+				'Password must be at least 8 characters and include a number, a special character, and an uppercase letter.';
+			return;
+		}
+
+		const data = { name, username, team, password, email };
+
+		try {
+			const res = await fetch('/api/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(data),
+			});
+
+			const result = await res.json();
+
+			if (result.success) {
+				resultDiv.textContent = `${t.registrationSuccess} ${result.userId}`;
+				resultDiv.classList.remove('text-red-600');
+				resultDiv.classList.add('text-green-600');
+
+				form.reset();
+
+				setTimeout(() => {
+					navigateTo('/login');
+				}, 1000);
+			} 
+			else {
+				resultDiv.textContent = `${t.registrationError} ${result.error}`;
+				resultDiv.classList.remove('text-green-600');
+				resultDiv.classList.add('text-red-600');
+			}
+		} 
+		catch (err) {
+			resultDiv.textContent = t.registrationFailed || 'Registration failed. Please try again.';
+			resultDiv.classList.remove('text-green-600');
+			resultDiv.classList.add('text-red-600');
+		}
+	});
 }
