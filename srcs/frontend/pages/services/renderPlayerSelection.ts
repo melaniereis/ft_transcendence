@@ -11,7 +11,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		container.innerHTML = `<p>${t.loginRequired}</p>`;
 		return;
 	}
-	
+
 	// Limpar conteúdo anterior
 	container.innerHTML = `
 		<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">
@@ -217,29 +217,30 @@ export async function renderPlayerSelection(container: HTMLElement) {
 		if (!canvas) return;
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+		canvas.style.willChange = 'transform';
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
-		// Sparkles
-		const sparkles = Array.from({ length: 32 }, () => ({
+		// Sparkles (reduced for performance)
+		const sparkles = Array.from({ length: 18 }, () => ({
 			x: Math.random() * canvas.width,
 			y: Math.random() * canvas.height,
 			r: 1.5 + Math.random() * 2.5,
 			dx: (Math.random() - 0.5) * 0.4,
 			dy: (Math.random() - 0.5) * 0.4,
 			alpha: 0.7 + Math.random() * 0.3,
-			color: `rgba(${200 + Math.floor(Math.random() * 55)},${180 + Math.floor(Math.random() * 55)},${255},` // dreamy blue
+			color: `rgba(${200 + Math.floor(Math.random() * 55)},${180 + Math.floor(Math.random() * 55)},255,`
 		}));
 
-		// Stars
-		const stars = Array.from({ length: 48 }, () => ({
+		// Stars (reduced for performance)
+		const stars = Array.from({ length: 24 }, () => ({
 			x: Math.random() * canvas.width,
 			y: Math.random() * canvas.height,
 			r: 0.7 + Math.random() * 1.6,
 			baseAlpha: 0.5 + Math.random() * 0.5,
 			twinkleSpeed: 0.008 + Math.random() * 0.012,
 			twinklePhase: Math.random() * Math.PI * 2,
-			color: `rgba(255,255,255,` // soft white
+			color: `rgba(255,255,255,`
 		}));
 
 		function draw() {

@@ -136,9 +136,6 @@ function setBackgroundForRoute(route: string): void {
 
 	// Set the background URL based on the current route
 	switch (route) {
-		case '/play':
-			backgroundUrl = 'url("https://geekculture.co/wp-content/uploads/2018/08/Screen-Shot-2018-08-14-at-12.03.49-PM.jpg")';
-			break;
 		case '/settings':
 			backgroundUrl = 'url("https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg")';
 			break;
@@ -149,7 +146,7 @@ function setBackgroundForRoute(route: string): void {
 			backgroundUrl = 'url("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/683320/ss_631d99cc6462cce94081032b7e600a6b87c3f7d3.1920x1080.jpg?t=1755285422")';
 			break;
 		case '/friend-requests':
-			backgroundUrl = 'url("https://assetsio.gnwcdn.com/gris-header.jpg?width=1600&height=900&fit=crop&quality=100&format=png&enable=upscale&auto=webp")';
+			backgroundUrl = 'url("assets/Background4.jpg")';
 			break;
 		case '/matchmaking':
 			backgroundUrl = 'url("https://assets.rockpapershotgun.com/images/2018/12/GRIS-a.jpg")';

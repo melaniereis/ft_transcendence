@@ -61,6 +61,18 @@ export function renderGame(
 		modalsHtml: renderModals()
 	});
 
+	// Add will-change: transform for GPU acceleration
+	setTimeout(() => {
+		const gameCanvas = document.getElementById('pong');
+		if (gameCanvas) {
+			(gameCanvas as HTMLCanvasElement).style.willChange = 'transform';
+		}
+		const bgCanvas = document.getElementById('gris-bg-particles');
+		if (bgCanvas) {
+			(bgCanvas as HTMLCanvasElement).style.willChange = 'transform';
+		}
+	}, 200);
+
 	// Store container reference for cleanup
 	state.container = container;
 
@@ -416,12 +428,13 @@ function initializeOptimizedEffects() {
 	}
 
 	// Two layers: soft (glow, slow, big), sharp (no glow, fast, small)
+	const MAX_PARTICLES = Math.min(PERFORMANCE.maxParticles, 120); // Cap for performance
 	const softParticles: CelestialParticle[] = [];
 	const sharpParticles: CelestialParticle[] = [];
-	for (let i = 0; i < Math.floor(PERFORMANCE.maxParticles * 0.6); i++) {
+	for (let i = 0; i < Math.floor(MAX_PARTICLES * 0.6); i++) {
 		softParticles.push(new CelestialParticle('soft'));
 	}
-	for (let i = 0; i < Math.floor(PERFORMANCE.maxParticles * 0.7); i++) {
+	for (let i = 0; i < Math.floor(MAX_PARTICLES * 0.7); i++) {
 		sharpParticles.push(new CelestialParticle('sharp'));
 	}
 
