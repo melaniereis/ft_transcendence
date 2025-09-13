@@ -1,9 +1,26 @@
-// GrisMenuController.ts - Main controller for the Gris-inspired menu system
+// srcs/frontend/pages/GrisMenuController.ts - Simplified controller without complex animations
 
 import { CelestialAnimations, initializeCelestialAnimations } from './CelestialAnimations.js';
 import { grisTransitions } from './GrisMenuTransitions.js';
-import { translations } from './services/language/translations.js';
-import { Language } from '../types/language.js';
+
+// Define custom event types
+interface GrisNavigateEvent extends CustomEvent {
+	detail: { path: string };
+}
+
+interface GrisLanguageChangeEvent extends CustomEvent {
+	detail: { language: Language };
+}
+
+// Language type
+type Language = 'en' | 'es' | 'pt';
+
+// Fallback translations interface
+interface TranslationSet {
+	login: string;
+	register: string;
+	language: string;
+}
 
 export interface GrisMenuConfig {
 	enableAnimations?: boolean;
@@ -57,7 +74,7 @@ export class GrisMenuController {
 	}
 
 	/**
-	 * Show the Gris menu with animations
+	 * Show the Gris menu - SIMPLIFIED
 	 */
 	public async show(): Promise<void> {
 		if (!this.menuElement || this.isActive) return;
@@ -65,25 +82,11 @@ export class GrisMenuController {
 		this.isActive = true;
 		this.menuElement.classList.add('active');
 
+		// Simple fade in if animations enabled
 		if (this.config.enableAnimations) {
-			// Animate menu elements in sequence
-			const title = this.menuElement.querySelector('.gris-title') as HTMLElement;
-			const buttons = this.menuElement.querySelectorAll('.gris-btn') as NodeListOf<HTMLElement>;
-			const languageSelector = this.menuElement.querySelector('.gris-language-selector') as HTMLElement;
-
-			// Fade in title first
-			if (title) {
-				await grisTransitions.scaleInWithGlow(title, { delay: 200 });
-			}
-
-			// Stagger fade in buttons
-			if (buttons.length > 0) {
-				await grisTransitions.staggerFadeIn(Array.from(buttons), { delay: 150 });
-			}
-
-			// Fade in language selector
-			if (languageSelector) {
-				await grisTransitions.fadeIn(languageSelector, { delay: 100 });
+			const elements = this.menuElement.querySelectorAll('.gris-menu-content > *') as NodeListOf<HTMLElement>;
+			for (let i = 0; i < elements.length; i++) {
+				await grisTransitions.fadeIn(elements[i], { delay: i * 100 });
 			}
 		}
 
@@ -93,24 +96,19 @@ export class GrisMenuController {
 				this.initializeCelestialEffects();
 			}, 300);
 		}
-
-		// Add floating animations to orbital elements
-		this.addOrbitalAnimations();
 	}
 
 	/**
-	 * Hide the Gris menu with animations
+	 * Hide the Gris menu - SIMPLIFIED
 	 */
 	public async hide(): Promise<void> {
 		if (!this.menuElement || !this.isActive) return;
 
 		if (this.config.enableAnimations) {
 			const elements = this.menuElement.querySelectorAll('.gris-menu-content > *') as NodeListOf<HTMLElement>;
-			const fadeOutPromises = Array.from(elements).map(el =>
-				grisTransitions.fadeOut(el, { duration: 400 })
-			);
-
-			await Promise.all(fadeOutPromises);
+			for (const el of elements) {
+				await grisTransitions.fadeOut(el as HTMLElement, { duration: 200 });
+			}
 		}
 
 		this.isActive = false;
@@ -137,7 +135,20 @@ export class GrisMenuController {
 	 * Update the menu language
 	 */
 	public updateLanguage(language: Language): void {
-		const t = translations[language];
+		// Fallback translations
+		const fallbackTranslations: Record<Language, TranslationSet> = {
+			en: { login: 'Login', register: 'Register', language: 'Language' },
+			es: { login: 'Iniciar Sesión', register: 'Registrarse', language: 'Idioma' },
+			pt: { login: 'Entrar', register: 'Registrar', language: 'Idioma' }
+		};
+
+		let t: TranslationSet;
+		try {
+			const translations = (window as any).translations;
+			t = translations?.[language] || fallbackTranslations[language] || fallbackTranslations.en;
+		} catch {
+			t = fallbackTranslations[language] || fallbackTranslations.en;
+		}
 
 		// Update button texts
 		const loginBtn = document.getElementById('gris-login');
@@ -160,38 +171,21 @@ export class GrisMenuController {
 			return;
 		}
 
-		this.celestialAnimations = initializeCelestialAnimations();
-		if (!this.celestialAnimations) {
-			console.warn('Failed to initialize celestial animations');
+		try {
+			this.celestialAnimations = initializeCelestialAnimations();
+			if (!this.celestialAnimations) {
+				console.warn('Failed to initialize celestial animations');
+			}
+		} catch (error) {
+			console.warn('Error initializing celestial animations:', error);
 		}
-	}
-
-	/**
-	 * Add floating animations to orbital elements
-	 */
-	private addOrbitalAnimations(): void {
-		if (!this.config.enableAnimations) return;
-
-		const orbitalContainer = document.querySelector('.orbital-container');
-		if (orbitalContainer) {
-			grisTransitions.floatingAnimation(orbitalContainer as HTMLElement, 5, 4000);
-		}
-
-		const orbitDots = document.querySelectorAll('.orbit-dot') as NodeListOf<HTMLElement>;
-		orbitDots.forEach((dot, index) => {
-			grisTransitions.pulseGlow(dot);
-			// Slight variation in floating for each dot
-			setTimeout(() => {
-				grisTransitions.floatingAnimation(dot, 3, 3000 + (index * 200));
-			}, index * 500);
-		});
 	}
 
 	/**
 	 * Setup event listeners for menu interactions
 	 */
 	private setupEventListeners(): void {
-		// Button click handlers with animations
+		// Button click handlers
 		const loginBtn = document.getElementById('gris-login');
 		const registerBtn = document.getElementById('gris-register');
 		const languageBtn = document.getElementById('gris-language-btn');
@@ -234,14 +228,19 @@ export class GrisMenuController {
 			languageOptionHandlers.forEach(btn => {
 				const optionHandler = () => {
 					const selectedLang = btn.getAttribute('data-lang') as Language || 'en';
-					localStorage.setItem('preferredLanguage', selectedLang);
+					try {
+						localStorage.setItem('preferredLanguage', selectedLang);
+					} catch (error) {
+						console.warn('Failed to save language preference:', error);
+					}
 					this.updateLanguage(selectedLang);
 					languageOptions.classList.add('hidden');
 
 					// Trigger global language update
-					window.dispatchEvent(new CustomEvent('gris-language-changed', {
+					const event = new CustomEvent('gris-language-changed', {
 						detail: { language: selectedLang }
-					}));
+					}) as GrisLanguageChangeEvent;
+					window.dispatchEvent(event);
 				};
 				btn.addEventListener('click', optionHandler);
 			});
@@ -285,20 +284,20 @@ export class GrisMenuController {
 	 * Navigate to login page
 	 */
 	private navigateToLogin(): void {
-		// Dispatch custom event for navigation
-		window.dispatchEvent(new CustomEvent('gris-navigate', {
+		const event = new CustomEvent('gris-navigate', {
 			detail: { path: '/login' }
-		}));
+		}) as GrisNavigateEvent;
+		window.dispatchEvent(event);
 	}
 
 	/**
 	 * Navigate to registration page
 	 */
 	private navigateToRegister(): void {
-		// Dispatch custom event for navigation
-		window.dispatchEvent(new CustomEvent('gris-navigate', {
+		const event = new CustomEvent('gris-navigate', {
 			detail: { path: '/register' }
-		}));
+		}) as GrisNavigateEvent;
+		window.dispatchEvent(event);
 	}
 
 	/**
@@ -307,9 +306,14 @@ export class GrisMenuController {
 	public updateConfig(newConfig: Partial<GrisMenuConfig>): void {
 		this.config = { ...this.config, ...newConfig };
 
-		// Apply config changes
 		if (newConfig.language) {
 			this.updateLanguage(newConfig.language);
+		}
+
+		if (newConfig.enableParticles === false && this.celestialAnimations) {
+			this.celestialAnimations.stopAnimation();
+		} else if (newConfig.enableParticles === true && !this.celestialAnimations) {
+			this.initializeCelestialEffects();
 		}
 	}
 

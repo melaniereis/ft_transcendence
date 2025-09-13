@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fastify Frontend</title>
+  <link href="./tw.generated.css" rel="stylesheet">
+  <link href="./styles.css" rel="stylesheet">
+  <!-- Montserrat font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0;">
+  <div class="gris-bg-noise"></div>
+  <canvas id="orbs-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:5;"></canvas>
+  
+
+<!-- Page Container -->
+    <!-- HEADER block with solid color and left-aligned text -->
+    <!-- MAIN CONTENT: GRIS-like circular menu -->
+    <main class="main-content gris-menu-bg">
+      <!-- Circles animation loaded from external file -->
+      <div id="circles-container"></div>
+      <div class="gris-menu-center">
+        <div class="gris-menu-center-circles">
+          <!-- Center title id="play-indicator" class="button-indicator indicator-top"-->
+          <div class="center-title glow-soft">
+            <h1>P O N G</h1>
+          </div>
+          
+          <div class="gris-menu-buttons">
+            <button id="play-btn" class="gris-btn gris-btn-top">Play</button>
+
+            <!-- Login button - shown when user is not logged in -->
+            <button id="login-btn" class="gris-btn gris-btn-left">Login</button>
+            <!-- Profile button - shown when user is logged in -->
+            <button left="calc(-24%)" class="gris-btn gris-btn-left gris-btn-profile" style="display: none;">Profile</button>
+            <button id="tournaments-btn" class="gris-btn gris-btn-bottom">Settings</button>
+            
+            <button id="logout-btn" class="gris-btn gris-btn-right">Logout</button>
+            <!-- User List Button -->
+            <button id="users-btn" class="gris-btn gris-btn-secondary">Users</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  <!-- Load compiled JavaScript with modules -->
+  <script type="module" src="./index.js"></script>
+  <script>
+    // Load circles animation from external file
+    async function loadCirclesAnimation() {
+      try {
+        const response = await fetch('./circles-animation.html');
+        const html = await response.text();
+        document.getElementById('circles-container').innerHTML = html;
+      } catch (error) {
+        console.error('Error loading circles animation:', error);
+      }
+    }
+    
+    // Load circles when DOM is ready
+    document.addEventListener('DOMContentLoaded', loadCirclesAnimation);
+  </script>
+  <script type="module">
+    import { initializeOrbsAnimation } from './animations/orb.js';
+    // Initialize orbs animation when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeOrbsAnimation();
+    });
+  </script>
+  <script>
+    // Function to toggle login/profile buttons based on authentication state
+    function updateAuthButtons(isLoggedIn) {
+      const loginBtn = document.getElementById('login-btn');
+      const profileBtn = document.getElementById('profile-btn');
+      
+      if (isLoggedIn) {
+        loginBtn.style.display = 'none';
+        profileBtn.style.display = 'block';
+      } else {
+        loginBtn.style.display = 'block';
+        profileBtn.style.display = 'none';
+      }
+    }
+    
+    // Example: Check authentication state and update buttons
+    // Replace this with your actual authentication check
+    function checkAuthState() {
+      // This should be replaced with your actual authentication logic
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      updateAuthButtons(isLoggedIn);
+    }
+    
+    // Update buttons when page loads
+    document.addEventListener('DOMContentLoaded', checkAuthState);
+  </script>
+</body>
+</html>
+  <script>
+    // Function to toggle login/profile buttons based on authentication state
+    function updateAuthButtons(isLoggedIn) {
+      const loginBtn = document.getElementById('login-btn');
+      const profileBtn = document.getElementById('profile-btn');
+      
+      if (isLoggedIn) {
+        loginBtn.style.display = 'none';
+        profileBtn.style.display = 'block';
+      } else {
+        loginBtn.style.display = 'block';
+        profileBtn.style.display = 'none';
+      }
+    }
+    
+    // Example: Check authentication state and update buttons
+    // Replace this with your actual authentication check
+    function checkAuthState() {
+      // This should be replaced with your actual authentication logic
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      updateAuthButtons(isLoggedIn);
+    }
+
+    // Update buttons when page loads
+    document.addEventListener('DOMContentLoaded', checkAuthState);
+  </script>
+</body>
+</html>
