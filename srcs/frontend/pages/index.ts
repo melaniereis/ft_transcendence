@@ -191,6 +191,24 @@ function updateUIBasedOnAuth(): void {
 }
 
 // On page load initialization
+// Inject fade-in/fade-out animation styles for buttons
+if (!document.getElementById('fade-btn-animations')) {
+	const style = document.createElement('style');
+	style.id = 'fade-btn-animations';
+	style.textContent = `
+		.fade-btn-out {
+			opacity: 0;
+			transform: scale(0.96);
+			transition: opacity 0.38s cubic-bezier(.6,.2,.3,1), transform 0.38s cubic-bezier(.6,.2,.3,1);
+		}
+		.fade-btn-in {
+			opacity: 1;
+			transform: scale(1);
+			transition: opacity 0.38s cubic-bezier(.6,.2,.3,1), transform 0.38s cubic-bezier(.6,.2,.3,1);
+		}
+	`;
+	document.head.appendChild(style);
+}
 document.addEventListener('DOMContentLoaded', async () => {
 	const token = localStorage.getItem('authToken');
 	if (token) {
@@ -218,28 +236,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Event listeners for navigation buttons
-playBtn.addEventListener('click', () => navigateTo('/play'));
-settingsBtn.addEventListener('click', () => navigateTo('/settings'));
-tournamentsBtn.addEventListener('click', () => navigateTo('/tournaments'));
-teamsBtn.addEventListener('click', () => navigateTo('/teams'));
-loginBtn.addEventListener('click', () => {
+function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
+	btn.classList.add('fade-btn-out');
+	setTimeout(() => {
+		btn.classList.remove('fade-btn-out');
+		btn.classList.add('fade-btn-in');
+		navFn();
+		setTimeout(() => {
+			btn.classList.remove('fade-btn-in');
+		}, 400);
+	}, 380);
+}
+
+playBtn.addEventListener('click', () => fadeButtonAndNavigate(playBtn, () => navigateTo('/play')));
+settingsBtn.addEventListener('click', () => fadeButtonAndNavigate(settingsBtn, () => navigateTo('/settings')));
+tournamentsBtn.addEventListener('click', () => fadeButtonAndNavigate(tournamentsBtn, () => navigateTo('/tournaments')));
+teamsBtn.addEventListener('click', () => fadeButtonAndNavigate(teamsBtn, () => navigateTo('/teams')));
+loginBtn.addEventListener('click', () => fadeButtonAndNavigate(loginBtn, () => {
 	renderLoginForm(appDiv, () => {
 		updateUIBasedOnAuth();
 		navigateTo('/');
 	});
-});
-registerBtn.addEventListener('click', () => navigateTo('/register'));
-profileBtn.addEventListener('click', () => navigateTo('/profile'));
-friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
-quickPlayBtn.addEventListener('click', () => navigateTo('/quick-play'));
-logoutBtn.addEventListener('click', () => {
+}));
+registerBtn.addEventListener('click', () => fadeButtonAndNavigate(registerBtn, () => navigateTo('/register')));
+profileBtn.addEventListener('click', () => fadeButtonAndNavigate(profileBtn, () => navigateTo('/profile')));
+friendRequestsBtn.addEventListener('click', () => fadeButtonAndNavigate(friendRequestsBtn, () => navigateTo('/friends')));
+quickPlayBtn.addEventListener('click', () => fadeButtonAndNavigate(quickPlayBtn, () => navigateTo('/quick-play')));
+logoutBtn.addEventListener('click', () => fadeButtonAndNavigate(logoutBtn, () => {
 	localStorage.removeItem('authToken');
 	appDiv.innerHTML = '<p>You have been logged out.</p>';
 	updateUIBasedOnAuth();
-});
-matchmakingBtn.addEventListener('click', () => {
-	navigateTo('/matchmaking');
-});
+}));
+matchmakingBtn.addEventListener('click', () => fadeButtonAndNavigate(matchmakingBtn, () => navigateTo('/matchmaking')));
 
 // Language toggle handlers
 languageBtn.addEventListener('click', (e) => {
