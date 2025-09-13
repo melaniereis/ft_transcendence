@@ -68,6 +68,28 @@
 </head>
 
 <body class="m-0 h-screen bg-cover bg-center bg-no-repeat bg-fixed text-white">
+	<!-- Ambient Music Player -->
+	<div id="ambient-audio-container"
+		style="position:fixed;bottom:24px;right:32px;z-index:1000;display:flex;align-items:center;gap:0.5rem;background:rgba(44,34,84,0.12);border-radius:2rem;padding:0.5rem 1.2rem;box-shadow:0 2px 8px rgba(44,34,84,0.10);">
+		<audio id="ambient-audio" src="assets/ambient.mp3" loop autoplay></audio>
+		<button id="mute-btn"
+			style="background:none;border:none;outline:none;cursor:pointer;font-size:1.6rem;color:#2c2254;">
+			🔊
+		</button>
+	</div>
+	<script>
+		const audio = document.getElementById('ambient-audio');
+		const muteBtn = document.getElementById('mute-btn');
+		let isMuted = false;
+		muteBtn.addEventListener('click', () => {
+			isMuted = !isMuted;
+			audio.muted = isMuted;
+			muteBtn.textContent = isMuted ? '🔇' : '🔊';
+		});
+		// Start playing automatically (some browsers may require user interaction)
+		audio.volume = 0.5;
+		audio.play().catch(() => { });
+	</script>
 	<div id="top-bar"
 		class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-x-auto whitespace-nowrap flex justify-start items-center gap-4 py-4 px-6 no-select">
 		<!-- Game Buttons -->

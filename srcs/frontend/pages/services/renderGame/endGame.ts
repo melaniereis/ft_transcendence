@@ -178,6 +178,21 @@ export function renderEndGameModal(
 	// Winner confetti
 	if (winner) launchOptimizedConfetti(winner);
 
+	// Remove confetti when modal is closed or next match starts
+	function removeConfetti() {
+		if ((window as any).stopConfetti) {
+			(window as any).stopConfetti();
+		}
+	}
+
+	// Remove confetti when any modal button is clicked
+	setTimeout(() => {
+		const modalButtons = modal.querySelectorAll('button');
+		modalButtons.forEach(btn => {
+			btn.addEventListener('click', removeConfetti);
+		});
+	}, 0);
+
 	// Buttons
 	const buttonRow = document.createElement('div');
 	buttonRow.style.cssText = `
