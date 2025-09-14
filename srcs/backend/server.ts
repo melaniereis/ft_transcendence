@@ -106,7 +106,12 @@ async function start() {
 		console.log('✅ Database initialized');
 
 		await fastify.register(fastifyWebsocket);
-		await fastify.register(fastifyCors, { origin: true });
+		await fastify.register(fastifyCors, {
+			origin: true, // Reflect incoming origin (allow all origins)
+			methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+			allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+			credentials: true, // Allow cookies/auth headers
+		});
 		
 		const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
 		console.log('📁 Serving static pages from:', pagesPath);
@@ -147,6 +152,13 @@ async function start() {
 
 		fastify.get('/healthz', async (request, reply) => {
 			reply.send({ status: 'ok' });
+		});
+
+		fastify.get('/ambient.mp3', (request, reply) => {
+			const filePath = path.join(process.cwd(), 'frontend', 'assets', 'ambient.mp3');
+			const stream = fs.createReadStream(filePath);
+			reply.header('Content-Type', 'audio/mpeg');
+			return reply.send(stream);
 		});
 
 		try {

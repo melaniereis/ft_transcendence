@@ -75,15 +75,9 @@ function launchOptimizedConfetti(winnerName: string) {
 	};
 }
 
-export function renderEndGameModal(
-	score1: number,
-	score2: number,
-	player1Name: string,
-	player2Name: string,
-	mode: 'single' | 'tournament' | 'quick',
-	onRestart: (winnerId?: number) => void,
-	winnerId?: number
-) {
+export function renderEndGameModal(score1: number, score2: number, player1Name: string,
+player2Name: string, mode: 'single' | 'tournament' | 'quick', onRestart: (winnerId?: number) => void,
+winnerId?: number) {
 
 	// Só mostra modal se o jogo ainda está ativo
 	const gameContainer = document.getElementById('pong');
@@ -290,16 +284,8 @@ export function renderEndGameModal(
 	showOptimizedFeedback('Game Over', GRIS_COLORS.primary);
 }
 
-export async function endGame(
-	score1: number,
-	score2: number,
-	canvas: HTMLCanvasElement,
-	onRestart: (winnerId?: number) => void,
-	player1Name: string,
-	player2Name: string,
-	mode: 'single' | 'tournament' | 'quick' = 'single',
-	gameId?: number
-) {
+export async function endGame(score1: number,score2: number,canvas: HTMLCanvasElement,onRestart: (winnerId?: number) => void,
+player1Name: string, player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	let winnerId: number | undefined;
 
 	if (gameId) {

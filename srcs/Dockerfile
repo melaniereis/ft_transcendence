@@ -2,27 +2,26 @@ FROM node:20-slim
 
 WORKDIR /usr/src/app
 
-# Install dependencies
-COPY package*.json ./
+# Install system dependencies
 RUN apt-get update && apt-get install -y gnupg ca-certificates curl
 
-RUN npm install
+# Copy only package files
+COPY package*.json ./
 
-# Optional: upgrade npm
+# Install dependencies including devDependencies
+RUN npm install --include=dev
+
+# Optional: upgrade npm version
 RUN npm install -g npm@11.6.0
 
-# Install curl (if needed at runtime)
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-# Copy source code
+# Copy all other source files
 COPY . .
 
-# Build the project
-RUN npm run build
+# Run Tailwind CSS build using npx
+RUN npm run build:css
 
-# Copy frontend assets
-RUN mkdir -p dist/frontend/pages/assets
-RUN cp -r frontend/assets/* dist/frontend/pages/assets/
+# Run other build tasks
+RUN npm run build
 
 EXPOSE 3000
 

@@ -8,27 +8,40 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 	: 'en') as keyof typeof translations;
 const t = translations[lang];
 
-export function startMatchmaking(appDiv: HTMLDivElement, playerId: number, playerName: string,
-	difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
+export function startMatchmaking(appDiv: HTMLDivElement, playerId: number,
+playerName: string, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 	const token = localStorage.getItem('authToken');
 	if (!token) {
 		appDiv.innerHTML = `<p>${t.loginRequired}</p>`;
 		return;
 	}
-	if (socket && socket.readyState === WebSocket.OPEN) {
-		console.log('🟠 Existing socket — closing and reconnecting to prevent stale state...');
-		socket.close();
+
+	function openNewSocket() {
+		const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+		const wsUrl = `${protocol}://${location.host}/matchmaking?token=${encodeURIComponent(token ?? '')}`;
+
+		console.log('🌐 Connecting WebSocket to:', wsUrl);
+
+		socket = new WebSocket(wsUrl);
+
+		socket.onopen = () => handleSocketOpen(playerId, playerName, difficulty);
+		socket.onmessage = (event) => handleSocketMessage(event, appDiv, playerName, difficulty);
+		socket.onclose = () => handleSocketClose(appDiv);
+		socket.onerror = (err) => handleSocketError(err, appDiv);
 	}
 
-	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-	socket = new WebSocket(`${protocol}://${location.host}/matchmaking?token=${encodeURIComponent(token ?? '')}`);
-
-
-	socket.onopen = () => handleSocketOpen(playerId, playerName, difficulty);
-	socket.onmessage = (event) => handleSocketMessage(event, appDiv, playerName, difficulty);
-	socket.onclose = () => handleSocketClose(appDiv);
-	socket.onerror = (err) => handleSocketError(err, appDiv);
+	if (socket && socket.readyState === WebSocket.OPEN) {
+		console.log('🟠 Existing socket — closing and reconnecting to prevent stale state...');
+		socket.onclose = () => {
+			socket = null;
+			openNewSocket();
+		};
+		socket.close();
+	} else {
+		openNewSocket();
+	}
 }
+
 
 function handleSocketOpen(playerId: number, playerName: string, difficulty: string) {
 	console.log('✅ Connected to matchmaking server. Waiting for opponent...');
@@ -38,12 +51,11 @@ function handleSocketOpen(playerId: number, playerName: string, difficulty: stri
 		id: playerId,
 		username: playerName,
 		difficulty,
-		token // add the token here
+		token
 	};
 	console.log('Sending join payload:', payload);
 	socket!.send(JSON.stringify(payload));
 }
-
 
 function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, playerName: string,
 	difficulty: string) {

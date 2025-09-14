@@ -22,6 +22,7 @@ const registerBtn = document.getElementById('register-btn') as HTMLButtonElement
 const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
 const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
 const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
+const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;  // NEW
 const appDiv = document.getElementById('app') as HTMLDivElement;
 const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
 const languageOptions = document.getElementById('language-options') as HTMLDivElement;
@@ -76,7 +77,7 @@ export function renderRoute(path: string): void {
 			case '/friends':
 				renderFriendRequestsPage(appDiv);
 				break;
-			case '/quick-play':
+			case '/quick-play':  // NEW route for Quick Play
 				renderQuickGameSetup(appDiv);
 				break;
 			case '/matchmaking':
@@ -87,20 +88,22 @@ export function renderRoute(path: string): void {
 				break;
 			default:
 				appDiv.innerHTML = `
-					<div style="display: flex; flex-direction: column; height: 100vh; justify-content: space-between; padding: 80px 20px; text-align: center;">
-						<h1 style="font-size: 4rem; font-weight: 900; color: #f0f0f0;">Welcome to</h1>
-						<h1 style="font-size: 6rem; font-weight: 1000; color: #f0f0f0;">PONG</h1>
+					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
+						<h1 style="font-size: 4rem; font-weight: 900; color: #f0f0f0; margin: 0;">Welcome to</h1>
+						
+						<div style="height: 400px;"></div>
+
+						<h1 style="font-size: 6rem; font-weight: 1000; color: #f0f0f0; margin: 0;">PONG</h1>
 					</div>
-				`;
+					`;
 		}
 	}, 500);
 }
 
 // Set background image for route
 function setBackgroundForRoute(route: string): void {
-	let backgroundUrl = ''; // Default background
+	let backgroundUrl = '';
 
-	// Set the background URL based on the current route
 	switch (route) {
 		case '/settings':
 			backgroundUrl = 'url("https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg")';
@@ -121,6 +124,7 @@ function setBackgroundForRoute(route: string): void {
 			backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")'; // Default background
 	}
 
+	appDiv.style.backgroundImage = backgroundUrl;
 }
 
 // UI updates
@@ -137,11 +141,15 @@ export function updateUIBasedOnAuth(): void {
 	if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 	if (registerBtn) registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 
+	// Show Quick Play only if NOT logged in
+	if (quickPlayBtn) quickPlayBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+
 	if (isLoggedIn) {
 		updateFriendRequestsBadge();
 		setOnlineOnLoad();
 	}
 }
+
 
 export async function updateFriendRequestsBadge(): Promise<void> {
 	const pendingCount = await fetchPendingFriendRequests();
@@ -200,6 +208,9 @@ export function applyLanguage(lang: string): void {
 	friendRequestsBtn.innerHTML = `📧 ${t.friendRequests}`;
 	languageBtn.innerHTML = `🌐 ${t.language}`;
 
+	// Quick Play button label
+	if (quickPlayBtn) quickPlayBtn.textContent = `⚡ ${t.quickPlay || 'Quick Play'}`;
+
 	const playOptionPlay = document.getElementById('play-play');
 	const playOptionTournament = document.getElementById('play-tournament');
 	const playOptionMatchmaking = document.getElementById('play-matchmaking');
@@ -209,7 +220,9 @@ export function applyLanguage(lang: string): void {
 	if (playOptionMatchmaking) playOptionMatchmaking.textContent = t.matchmaking;
 }
 
-// Language handling
+// Event listeners for buttons
+quickPlayBtn?.addEventListener('click', () => navigateTo('/quick-play'));
+
 languageBtn.addEventListener('click', (e) => {
 	e.stopPropagation();
 	languageOptions.classList.toggle('hidden');
@@ -230,52 +243,27 @@ document.addEventListener('click', (e) => {
 	}
 });
 
-// Play dropdown
 const playOptions = document.getElementById('play-options');
 document.getElementById('play-tournament')?.addEventListener('click', () => navigateTo('/tournaments'));
 document.getElementById('play-play')?.addEventListener('click', () => navigateTo('/play'));
 document.getElementById('play-matchmaking')?.addEventListener('click', () => navigateTo('/matchmaking'));
 
-// Navigation events
+registerBtn?.addEventListener('click', () => navigateTo('/register'));
+loginBtn?.addEventListener('click', () => navigateTo('/login'));
+logoutBtn.addEventListener('click', () => {
+	localStorage.clear();
+	updateUIBasedOnAuth();
+	navigateTo('/');
+});
 settingsBtn.addEventListener('click', () => navigateTo('/settings'));
 teamsBtn.addEventListener('click', () => navigateTo('/teams'));
 profileBtn.addEventListener('click', () => navigateTo('/profile'));
 friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
-logoutBtn.addEventListener('click', () => {
-	localStorage.removeItem('authToken');
+
+// Initial page load setup
+window.onload = () => {
+	const lang = localStorage.getItem('preferredLanguage') || 'en';
+	applyLanguage(lang);
 	updateUIBasedOnAuth();
-	navigateTo('/');
-});
-
-if (loginBtn) loginBtn.addEventListener('click', () => navigateTo('/login'));
-if (registerBtn) registerBtn.addEventListener('click', () => navigateTo('/register'));
-
-// Startup logic
-document.addEventListener('DOMContentLoaded', async () => {
-	const token = localStorage.getItem('authToken');
-
-	if (token) {
-		try {
-			const res = await fetch('/api/protected', {
-				headers: { Authorization: `Bearer ${token}` }
-			});
-
-			if (res.ok) {
-				const { startActivityMonitoring } = await import('./services/activity.js');
-				startActivityMonitoring();
-				await updateOnlineStatus(true);
-				await updateFriendRequestsBadge();
-			} else {
-				localStorage.removeItem('authToken');
-			}
-		} catch (err) {
-			console.error('Token verification failed:', err);
-			localStorage.removeItem('authToken');
-		}
-	}
-
-	updateUIBasedOnAuth();
-	const preferredLang = localStorage.getItem('preferredLanguage') || 'en';
-	applyLanguage(preferredLang);
 	renderRoute(window.location.pathname);
-});
+};

@@ -1,6 +1,5 @@
 services:
   web:
-    stop_grace_period: 30s
     container_name: web
     build:
       context: .
@@ -14,7 +13,7 @@ services:
     environment:
       - DB_PATH=/usr/src/app/data/database.db
       - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=root # For development only
+      - VAULT_TOKEN=root
     depends_on:
       - vault
     networks:
@@ -68,11 +67,3 @@ services:
 networks:
   transcendence:
     driver: bridge
-
-volumes:
-  db:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data

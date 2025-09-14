@@ -9,14 +9,20 @@ import { GRIS_COLORS } from './constants.js';
  */
 
 export function safeAudioPlay(audio: HTMLAudioElement) {
-	if (typeof (window as any).safePlayAudio === 'function') {
-		(window as any).safePlayAudio(audio);
-	} else {
-		audio.play().catch(() => {
-			console.log('Audio play failed - user interaction required');
-		});
-	}
+    if (typeof (window as any).safePlayAudio === 'function') {
+        (window as any).safePlayAudio(audio);
+    } else {
+        audio.play().catch((err) => {
+            console.error('Audio play failed - user interaction required or error occurred:', err);
+        });
+
+        // Add error event listener for other playback errors
+        audio.addEventListener('error', (e) => {
+            console.error('Audio playback error event:', e);
+        });
+    }
 }
+
 
 export function showNotification(
 	message: string,

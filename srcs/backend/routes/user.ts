@@ -1,6 +1,6 @@
 //routes/user.ts
 import { FastifyInstance } from 'fastify';
-import { createUser, getAllUsers, deleteUser } from '../services/services.js';
+import { createUser, getAllUsers, deleteUser, getDisplayNameById, getUsernameById } from '../services/services.js';
 import { authHook } from '../hooks/auth.js';
 
 export async function userRoutes(fastify: FastifyInstance) {
@@ -9,6 +9,28 @@ export async function userRoutes(fastify: FastifyInstance) {
 		handler: async (_request, reply) => {
 			const users = await getAllUsers();
 			return reply.send(users);
+		}
+	});
+
+	fastify.get('/users/:id/display_name', {
+		preHandler: authHook,
+		handler: async (request, reply) => {
+			const { id } = request.params as { id: string };
+			const userId = Number(id);
+			if (isNaN(userId)) {
+				return reply.status(400).send({ error: 'Invalid user id' });
+			}
+
+			try {
+				const displayName = await getDisplayNameById(userId);
+				if (!displayName) {
+					return reply.status(404).send({ error: 'User not found or display name not set' });
+				}
+				return reply.send({ display_name: displayName });
+			} catch (err) {
+				console.error('Error fetching display name:', err);
+				return reply.status(500).send({ error: 'Internal server error' });
+			}
 		}
 	});
 
@@ -40,6 +62,28 @@ export async function userRoutes(fastify: FastifyInstance) {
 		if (!user) 
 			return reply.status(404).send({ error: 'User not found' });
 		return reply.send(user);
+		}
+	});
+
+	fastify.get('/users/:id/username', {
+		preHandler: authHook,
+		handler: async (request, reply) => {
+			const { id } = request.params as { id: string };
+			const userId = Number(id);
+			if (isNaN(userId)) {
+				return reply.status(400).send({ error: 'Invalid user id' });
+			}
+
+			try {
+				const username = await getUsernameById(userId);
+				if (!username) {
+					return reply.status(404).send({ error: 'User not found' });
+				}
+				return reply.send({ username });
+			} catch (err) {
+				console.error('Error fetching username:', err);
+				return reply.status(500).send({ error: 'Internal server error' });
+			}
 		}
 	});
 

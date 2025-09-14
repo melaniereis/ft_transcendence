@@ -6,8 +6,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pong Game</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <base href="/" />
+
+  <!-- ✅ Tailwind CSS CDN -->
+  <link href="/output.css" rel="stylesheet" />
+
+  <!-- ✅ Google Fonts: Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
   <style>
     /* Reset body and html to prevent extra white space */
     html,
@@ -32,7 +38,9 @@
       background-size: cover;
       background-position: center;
       color: black;
-      /* Set text color to black inside app */
+
+      /* ✅ Apply Montserrat font */
+      font-family: 'Montserrat', sans-serif;
     }
 
     /* Fade-out effect */
@@ -40,7 +48,6 @@
       opacity: 50;
     }
 
-    /* Optional: Add a little extra smoothness by applying background image fade-in delay */
     #app.fade-in {
       transition: opacity 1s ease-in-out 0.5s, background-image 0.5s ease-in-out;
     }
@@ -48,11 +55,9 @@
     /* Style for top bar buttons */
     #top-bar .nav-btn {
       font-size: 2rem;
-      /* 👈 Always large */
       color: black;
       font-weight: bold;
       transition: none;
-      /* 👈 Remove animation */
       cursor: pointer;
       background: transparent;
       border: none;
@@ -60,16 +65,13 @@
     }
 
     #top-bar .nav-btn:hover {
-      /* 👇 Remove font-size change */
       font-size: 2rem;
     }
 
     #top-bar .nav-btn.active {
       font-size: 2rem;
-      /* 👈 Keep size consistent */
     }
-    
-    /* Play dropdown max height and scroll */
+
     #play-options {
       max-height: 200px;
       overflow-y: auto;
@@ -78,15 +80,20 @@
 </head>
 
 <body class="m-0 h-screen bg-cover bg-center bg-no-repeat bg-fixed text-white">
+
   <!-- Ambient Music Player -->
   <div id="ambient-audio-container"
     style="position:fixed;bottom:24px;right:32px;z-index:1000;display:flex;align-items:center;gap:0.5rem;background:rgba(44,34,84,0.12);border-radius:2rem;padding:0.5rem 1.2rem;box-shadow:0 2px 8px rgba(44,34,84,0.10);">
-    <audio id="ambient-audio" src="assets/ambient.mp3" loop autoplay></audio>
+    <audio id="ambient-audio" loop autoplay>
+      <source src="/ambient.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
     <button id="mute-btn"
       style="background:none;border:none;outline:none;cursor:pointer;font-size:1.6rem;color:#2c2254;">
       🔊
     </button>
   </div>
+
   <script>
     const audio = document.getElementById('ambient-audio');
     const muteBtn = document.getElementById('mute-btn');
@@ -96,19 +103,16 @@
       audio.muted = isMuted;
       muteBtn.textContent = isMuted ? '🔇' : '🔊';
     });
-    // Start playing automatically (some browsers may require user interaction)
     audio.volume = 0.5;
     audio.play().catch(() => { });
-    // Ensure playback after first user interaction
     document.body.addEventListener('click', () => {
       audio.play();
     }, { once: true });
   </script>
 
+  <!-- Top Bar -->
   <div id="top-bar"
     class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-visible whitespace-nowrap flex justify-start items-center gap-4 py-6 px-6 no-select">
-
-    <!-- Play button with dropdown -->
     <div class="relative inline-block">
       <button id="play-btn" class="nav-btn">🎮 Play</button>
       <div id="play-options"
@@ -119,7 +123,6 @@
       </div>
     </div>
 
-    <!-- Keep these visible -->
     <button id="teams-btn" class="nav-btn">👥 Teams</button>
     <button id="friend-requests-btn" class="nav-btn relative">
       📧 Friend Requests
@@ -130,11 +133,10 @@
     <button id="settings-btn" class="nav-btn">⚙️ Player Settings</button>
     <button id="logout-btn" class="nav-btn">🚪 Logout</button>
 
-    <!-- Login and Register buttons (visible only when NOT logged in) -->
     <button id="login-btn" class="nav-btn">🔑 Login</button>
     <button id="register-btn" class="nav-btn">📝 Register</button>
+    <button id="quick-play-btn" class="nav-btn hidden">⚡ Quick Play</button>
 
-    <!-- Language Selector -->
     <div class="relative inline-block">
       <button id="language-btn" class="nav-btn">🌐 Language</button>
       <div id="language-options"
@@ -146,37 +148,29 @@
     </div>
   </div>
 
-  <!-- Main App Content -->
+  <!-- ✅ Dynamic App Content -->
   <div id="app" class="pt-32 px-4 text-black">
-    <!-- Dynamic content will be rendered here -->
+    <!-- Content like “Welcome to PONG” will go here -->
   </div>
 
   <!-- App Logic -->
   <script type="module" src="index.js"></script>
 
-  <!-- Dropdown toggle scripts -->
+  <!-- Dropdown Toggles -->
   <script>
-    // Play button dropdown toggle
     document.addEventListener('click', (e) => {
       const playBtn = document.getElementById('play-btn');
       const playOptions = document.getElementById('play-options');
-
       if (!playBtn || !playOptions) return;
-
       if (playBtn.contains(e.target)) {
         playOptions.classList.toggle('hidden');
       } else if (!playOptions.contains(e.target)) {
         playOptions.classList.add('hidden');
       }
-    });
 
-    // Language button dropdown toggle
-    document.addEventListener('click', (e) => {
       const langBtn = document.getElementById('language-btn');
       const langOptions = document.getElementById('language-options');
-
       if (!langBtn || !langOptions) return;
-
       if (langBtn.contains(e.target)) {
         langOptions.classList.toggle('hidden');
       } else if (!langOptions.contains(e.target)) {
@@ -184,6 +178,7 @@
       }
     });
   </script>
+
 </body>
 
 </html>
