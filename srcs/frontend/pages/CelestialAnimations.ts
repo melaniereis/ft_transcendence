@@ -83,7 +83,7 @@ export class CelestialAnimations {
 	private sNumber = 600;
 	private sSize = 0.3;
 	private sSizeR = 0.6;
-	private sAlphaR = 0.5;
+	private sAlphaR = 0.7; // Make stars a bit brighter
 	private sMaxHueProportion = 0.6;
 	private shootingStarDensity = 0.01;
 	private shootingStarBaseXspeed = 30;
@@ -99,10 +99,10 @@ export class CelestialAnimations {
 	private mwClusterSizeR = 80;
 	private mwClusterLayers = 10;
 	private mwAngle = 0.6;
-	private mwHueMin = 150;
-	private mwHueMax = 300;
-	private mwWhiteProportionMin = 50;
-	private mwWhiteProportionMax = 65;
+	private mwHueMin = 180; // More blue/purple
+	private mwHueMax = 280;
+	private mwWhiteProportionMin = 65; // Brighter clusters
+	private mwWhiteProportionMax = 80;
 
 	private class_Star = class {
 		x: number; y: number; size: number; alpha: number; baseHue: number; baseHueProportion: number;
@@ -126,7 +126,7 @@ export class CelestialAnimations {
 			ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
 			let rAlpha = this.alpha + Math.min((this.randomValue - 0.5) * sAlphaR, 1);
 			let rHue = randomArray[this.randomIndexh] > this.baseHueProportion ? hueArray[this.randomIndexa] : this.baseHue;
-			this.color = `hsla(${rHue},100%,85%,${rAlpha})`;
+			this.color = `hsla(${rHue},100%,90%,${rAlpha})`; // Brighter stars
 			ctx.fillStyle = this.color;
 			ctx.fill();
 		}
@@ -207,14 +207,14 @@ export class CelestialAnimations {
 					let whitePercentage = this.baseWhiteProportion + 15 + 15 * this.brightnessModifier + Math.floor(Math.random() * 10);
 					ctxMw.beginPath();
 					ctxMw.arc(posX, posY, size, 0, Math.PI * 2, false);
-					ctxMw.fillStyle = `hsla(${this.hue},100%,${whitePercentage}%,${alpha})`;
+					ctxMw.fillStyle = `hsla(260,100%,98%,${alpha})`; // Soft purple-white
 					ctxMw.fill();
 				}
 			}
 			let gradient = ctxMw.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-			gradient.addColorStop(0, `hsla(${this.hue},100%,${this.baseWhiteProportion}%,0.002)`);
-			gradient.addColorStop(0.25, `hsla(${this.hue},100%,${this.baseWhiteProportion + 30}%,${0.01 + 0.01 * this.brightnessModifier})`);
-			gradient.addColorStop(0.4, `hsla(${this.hue},100%,${this.baseWhiteProportion + 15}%,0.005)`);
+			gradient.addColorStop(0, `hsla(${this.hue},100%,${this.baseWhiteProportion}%,0.008)`);
+			gradient.addColorStop(0.25, `hsla(${this.hue},100%,${this.baseWhiteProportion + 30}%,${0.03 + 0.01 * this.brightnessModifier})`);
+			gradient.addColorStop(0.4, `hsla(${this.hue},100%,${this.baseWhiteProportion + 15}%,0.012)`);
 			gradient.addColorStop(1, "rgba(0,0,0,0)");
 			ctxMw.beginPath();
 			ctxMw.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
@@ -248,8 +248,8 @@ export class CelestialAnimations {
 			let yPos = Math.random() < this.mwRandomStarProp ? Math.floor(Math.random() * window.innerHeight) : this.MilkyWayYFromX(xPos, "star");
 			let size = Math.random() * 0.27;
 			this.ctxMw.arc(xPos, yPos, size, 0, Math.PI * 2, false);
-			let alpha = 0.4 + Math.random() * 0.6;
-			this.ctxMw.fillStyle = `hsla(0,100%,100%,${alpha})`;
+			let alpha = 0.6 + Math.random() * 0.4;
+			this.ctxMw.fillStyle = `hsla(260,100%,98%,${alpha})`; // Soft purple-white
 			this.ctxMw.fill();
 		}
 

@@ -25,10 +25,10 @@
 			position: absolute;
 			width: 100%;
 			height: 100%;
-			object-fit: contain;
+			object-fit: cover;
 			overflow: hidden;
 			z-index: 1;
-			background: radial-gradient(#100826, #060212);
+			background: url('../assets/Background5.png') center center / cover no-repeat;
 		}
 
 		#starsCanvas {
@@ -389,6 +389,17 @@
 			filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 45px rgba(255, 255, 255, 0.3));
 		}
 
+		/* Add shadow to SVG circles and squares */
+		.gris-circles-bg circle,
+		.gris-circles-bg rect {
+			filter: drop-shadow(0 0 16px #3a1857) drop-shadow(0 0 32px #3a1857);
+		}
+
+		/* Add shadow to stars on canvas */
+		#starsCanvas {
+			filter: drop-shadow(0 0 8px #3a1857) drop-shadow(0 0 16px #3a1857);
+		}
+
 		/* Massive outer circles styling */
 		.massive-outer-circles {
 			stroke: #fff;
@@ -597,6 +608,51 @@
 		.start-random-7 {
 			animation-delay: -7s;
 		}
+
+		/* Losange button positions */
+		.losange-btn {
+			position: absolute;
+			z-index: 30;
+			transform: translate(-50%, -50%);
+		}
+
+		#gris-login.losange-btn {
+			top: calc(50% - 225px);
+			left: 50%;
+		}
+
+		#gris-register.losange-btn {
+			top: 50%;
+			left: calc(50% + 225px);
+		}
+
+		#gris-quickplay.losange-btn {
+			top: calc(50% + 225px);
+			left: 50%;
+		}
+
+		#gris-language-btn.losange-btn {
+			top: 50%;
+			left: calc(50% - 225px);
+		}
+
+		.gris-title.losange-title {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%) rotate(-45deg);
+			font-size: 3.2rem;
+			font-weight: 400;
+			color: #e8d5ff;
+			text-shadow: 0 0 20px rgba(232, 213, 255, 0.3);
+			letter-spacing: 0.3em;
+			margin: 0;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			z-index: 31;
+			width: 340px;
+			text-align: center;
+			pointer-events: none;
+		}
 	</style>
 </head>
 
@@ -733,12 +789,12 @@
 		</svg>
 
 		<!-- Main menu content -->
-		<div class="gris-menu-content">
-			<h1 class="gris-title">GRIS PONG</h1>
-			<div class="gris-menu-buttons">
-				<button id="gris-login" class="gris-btn">🔑 Login</button>
-				<button id="gris-register" class="gris-btn">📝 Register</button>
-			</div>
+		<div class="gris-menu-content" style="position:relative; width:100%; height:100%;">
+			<h1 class="gris-title losange-title">GRIS PONG</h1>
+			<button id="gris-login" class="gris-btn losange-btn">🔑 Login</button>
+			<button id="gris-register" class="gris-btn losange-btn">📝 Register</button>
+			<button id="gris-quickplay" class="gris-btn losange-btn">⚡ Quick Play</button>
+			<button id="gris-language-btn" class="gris-language-btn losange-btn">🌐 Language</button>
 		</div>
 
 		<!-- Language selector -->
