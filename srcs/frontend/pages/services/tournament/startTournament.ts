@@ -32,9 +32,37 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 	const player3_id = player3.id;
 	const player4_id = player4.id;
 
-	const getUserName = (userId: number): string => {
+	const getUserName = async (userId: number): Promise<string> => {
+    // Get the auth token from localStorage
+		const token = localStorage.getItem('authToken');
+
+		// Check if the player exists in the selectedPlayers array
 		const user = selectedPlayers.find((u: any) => u.id === userId);
-		return user?.username || `User ${userId}`;
+		if (!user) return `User ${userId}`; // Fallback if user not found in selectedPlayers
+
+		// Fetch the display name from the server, if available
+		try {
+			const response = await fetch(`/users/${userId}/display_name`, {
+				method: 'GET',
+				headers: {
+					'Authorization': token ? `Bearer ${token}` : '', // Include the token if it exists
+					'Content-Type': 'application/json'
+				}
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				console.log("O NOME DELE E", data);
+				return data.display_name || user.name; // Use display_name if it exists, otherwise use the regular name
+			} else {
+				// If no display name found, return the regular name
+				return user.name;
+			}
+		} catch (err) {
+			console.error('Error fetching display name:', err);
+			// In case of an error, return the regular name
+			return user.name;
+		}
 	};
 
 	const difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal';
@@ -94,10 +122,10 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 		return;
 
 	const players = [
-		{ id: player1_id, name: getUserName(player1_id) },
-		{ id: player2_id, name: getUserName(player2_id) },
-		{ id: player3_id, name: getUserName(player3_id) },
-		{ id: player4_id, name: getUserName(player4_id) }
+		{ id: player1_id, name: await getUserName(player1_id) },
+		{ id: player2_id, name: await getUserName(player2_id) },
+		{ id: player3_id, name: await getUserName(player3_id) },
+		{ id: player4_id, name: await getUserName(player4_id) }
 	];
 
 	const winners: { semifinal1?: number; semifinal2?: number; final?: number } = {};
@@ -155,7 +183,7 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 
 	// Semifinal 1
 	renderTournamentBracket(canvas, ctx, players, winners, async () => {
-		await showMatchModal(getUserName(player1_id), getUserName(player2_id));
+		await showMatchModal(await getUserName(player1_id),await getUserName(player2_id));
 		// Hide the tournament bracket background before game starts
 		bracketWrapper.style.display = 'none';
 		gameWrapper.innerHTML = '';
@@ -173,7 +201,7 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 		state.player1 = null;
 		state.player2 = null;
 		state.ball = null;
-		renderGame(gameWrapper, getUserName(player1_id), getUserName(player2_id), maxGames,
+		renderGame(gameWrapper, await getUserName(player1_id), await getUserName(player2_id), maxGames,
 			difficulty, async (gameCanvas, score1, score2) => {
 				await endGame(score1, score2, gameCanvas, async (winner1Id) => {
 					if (!winner1Id)
@@ -187,7 +215,7 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 					// Hide previous game canvas when showing bracket
 					gameWrapper.style.display = 'none';
 					renderTournamentBracket(canvas, ctx, players, winners, async () => {
-						await showMatchModal(getUserName(player3_id), getUserName(player4_id));
+						await showMatchModal(await getUserName(player3_id), await getUserName(player4_id));
 						// Hide the tournament bracket background before game starts
 						bracketWrapper.style.display = 'none';
 						gameWrapper.innerHTML = '';
@@ -198,7 +226,7 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 						state.player1 = null;
 						state.player2 = null;
 						state.ball = null;
-						renderGame(gameWrapper, getUserName(player3_id), getUserName(player4_id), maxGames,
+						renderGame(gameWrapper, await getUserName(player3_id), await getUserName(player4_id), maxGames,
 							difficulty, async (gameCanvas2, score3, score4) => {
 								await endGame(score3, score4, gameCanvas2, async (winner2Id) => {
 									if (!winner2Id)
@@ -214,7 +242,7 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 									const leftFinalId = winners.semifinal1!;
 									const rightFinalId = winners.semifinal2!;
 									renderTournamentBracket(canvas, ctx, players, winners, async () => {
-										await showMatchModal(getUserName(leftFinalId), getUserName(rightFinalId));
+										await showMatchModal(await getUserName(leftFinalId), await getUserName(rightFinalId));
 										// Hide the tournament bracket background before game starts
 										bracketWrapper.style.display = 'none';
 										gameWrapper.innerHTML = '';
@@ -225,7 +253,7 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 										state.player1 = null;
 										state.player2 = null;
 										state.ball = null;
-										renderGame(gameWrapper, getUserName(leftFinalId), getUserName(rightFinalId), maxGames, difficulty,
+										renderGame(gameWrapper, await getUserName(leftFinalId), await getUserName(rightFinalId), maxGames, difficulty,
 											async (finalCanvas, scoreF1, scoreF2) => {
 												await endGame(scoreF1, scoreF2, finalCanvas, async (finalWinnerId) => {
 													if (!finalWinnerId) {
@@ -243,8 +271,8 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 														renderTournamentsPage(container as HTMLDivElement);
 													});
 												},
-													getUserName(winners.semifinal1!),
-													getUserName(winners.semifinal2!),
+													await getUserName(winners.semifinal1!),
+													await getUserName(winners.semifinal2!),
 													'tournament',
 													finalGame.game_id);
 											},
@@ -252,8 +280,8 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 											finalGame.game_id);
 									});
 								},
-									getUserName(player3_id),
-									getUserName(player4_id),
+									await getUserName(player3_id),
+									await getUserName(player4_id),
 									'tournament',
 									game2.game_id);
 							},
@@ -261,8 +289,8 @@ export async function startTournament(container: HTMLElement, tournament: any,se
 							game2.game_id);
 					});
 				},
-					getUserName(player1_id),
-					getUserName(player2_id),
+					await getUserName(player1_id),
+					await getUserName(player2_id),
 					'tournament',
 					game1.game_id);
 			},
