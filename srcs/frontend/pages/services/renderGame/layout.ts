@@ -1,7 +1,13 @@
 //renderGame/layout.ts
 
 import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from './constants.js';
+import { translations } from '../language/translations.js';
 
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
+  ? localStorage.getItem('preferredLanguage') 
+  : 'en') as keyof typeof translations;
+
+const t = translations[lang];
 export interface GameLayoutConfig {
 	player1: { nickname: string; avatarUrl?: string };
 	player2: { nickname: string; avatarUrl?: string };
@@ -196,7 +202,8 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                                 transition: all 0.3s ease;
                                 box-shadow: ${GRIS_SHADOWS.sm};
                                 font-size: 1rem;
-                            ">⏸️ Pause</button>
+                            ">${(t as any)["pauseButton"] || 'Pause'}
+                            </button>
                         </div>
                     ` : ''}
                 </div>

@@ -114,8 +114,8 @@ function setBackgroundForRoute(route: string): void {
 		case '/teams':
 			backgroundUrl = 'url("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/683320/ss_631d99cc6462cce94081032b7e600a6b87c3f7d3.1920x1080.jpg?t=1755285422")';
 			break;
-		case '/friend-requests':
-			backgroundUrl = 'url("assets/Background4.jpg")';
+		case '/friends':
+			backgroundUrl = 'url("/Background4.jpg")';
 			break;
 		case '/matchmaking':
 			backgroundUrl = 'url("https://assets.rockpapershotgun.com/images/2018/12/GRIS-a.jpg")';

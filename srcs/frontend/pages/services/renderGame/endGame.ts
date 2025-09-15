@@ -281,7 +281,7 @@ winnerId?: number) {
 	});
 
 	// Show feedback
-	showOptimizedFeedback('Game Over', GRIS_COLORS.primary);
+	showOptimizedFeedback(t.gameOver, GRIS_COLORS.primary);
 }
 
 export async function endGame(score1: number,score2: number,canvas: HTMLCanvasElement,onRestart: (winnerId?: number) => void,

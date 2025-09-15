@@ -4,6 +4,12 @@ import { updateMatch } from './updateMatch.js';
 import { renderTournamentsPage } from './tournaments.js';
 import { renderTournamentBracket } from './renderTournamentBracket.js';
 import { endGame } from '../renderGame/endGame.js';
+import { translations } from '../language/translations.js';
+
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
+const t = translations[lang];
 
 function shuffleArray<T>(array: T[]): T[] {
 	const result = [...array];
@@ -14,10 +20,8 @@ function shuffleArray<T>(array: T[]): T[] {
 	return result;
 }
 
-export async function startTournament(container: HTMLElement, tournament: any,
-	selectedPlayers: any[],
-	authToken: string  // <-- Auth token parameter added here
-) {
+export async function startTournament(container: HTMLElement, tournament: any,selectedPlayers: any[],
+	authToken: string) {
 	const { id } = tournament;
 
 	const shuffled = shuffleArray(selectedPlayers);
@@ -133,12 +137,14 @@ export async function startTournament(container: HTMLElement, tournament: any,
 			modal.style.justifyContent = 'center';
 			modal.style.zIndex = '9999';
 			modal.innerHTML = `
-				<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
-						${playerA} <span style="color:#b6a6ca;">vs</span> ${playerB}
-					</h2>
-					<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">Start Match</button>
-				</div>
-			`;
+			<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
+				${playerA} <span style="color:#b6a6ca;">vs</span> ${playerB}
+				</h2>
+				<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">
+					${t.startMatchButton}
+				</button>
+			</div>
+		`;
 			document.body.appendChild(modal);
 			modal.querySelector('#start-match-btn')!.addEventListener('click', () => {
 				modal.remove();
@@ -171,7 +177,7 @@ export async function startTournament(container: HTMLElement, tournament: any,
 			difficulty, async (gameCanvas, score1, score2) => {
 				await endGame(score1, score2, gameCanvas, async (winner1Id) => {
 					if (!winner1Id)
-						return alert('❌ Could not determine winner for Semifinal 1.');
+						return alert(t.semifinal1Undetermined);
 					await updateMatch(id, 'semifinal1', winner1Id);
 					winners.semifinal1 = winner1Id;
 
@@ -196,7 +202,7 @@ export async function startTournament(container: HTMLElement, tournament: any,
 							difficulty, async (gameCanvas2, score3, score4) => {
 								await endGame(score3, score4, gameCanvas2, async (winner2Id) => {
 									if (!winner2Id)
-										return alert('❌ Could not determine winner for Semifinal 2.');
+										return alert(t.semifinal2Undetermined);
 									await updateMatch(id, 'semifinal2', winner2Id);
 									winners.semifinal2 = winner2Id;
 
@@ -223,7 +229,7 @@ export async function startTournament(container: HTMLElement, tournament: any,
 											async (finalCanvas, scoreF1, scoreF2) => {
 												await endGame(scoreF1, scoreF2, finalCanvas, async (finalWinnerId) => {
 													if (!finalWinnerId) {
-														alert('❌ Could not determine winner for Final match. Tournament incomplete.');
+														alert(t.finalUndetermined);
 														return;
 													}
 													await updateMatch(id, 'final', finalWinnerId);

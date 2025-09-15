@@ -5,11 +5,10 @@ import fastifyWebsocket from '@fastify/websocket';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-
 import { getEncryptionKey } from './services/vault/vault.js';
 import { decryptFile, encryptFile } from './services/vault/encrypt.js';
-
 import { waitForVaultReady } from './services/vault/waitForVault.js';
+import {registerAssetRoutes }from './asests.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -154,13 +153,9 @@ async function start() {
 			reply.send({ status: 'ok' });
 		});
 
-		fastify.get('/ambient.mp3', (request, reply) => {
-			const filePath = path.join(process.cwd(), 'frontend', 'assets', 'ambient.mp3');
-			const stream = fs.createReadStream(filePath);
-			reply.header('Content-Type', 'audio/mpeg');
-			return reply.send(stream);
-		});
+		await registerAssetRoutes(fastify);
 
+		console.log('✅ Routes registered');
 		try {
 			await fastify.listen({ port: 3000, host: '0.0.0.0' });
 			console.log('✅ Server running at https://localhost:3000');

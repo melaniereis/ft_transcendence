@@ -34,7 +34,7 @@ export function friendsList(friends: Friend[]): string {
     const id = f.friend_id ?? f.id ?? f.userId ?? '';
     const displayName = f.display_name || f.name || f.username || t.unknown;
     const username = f.username || '';
-    const avatar = f.avatar_url || '/assets/avatar/default.png';
+    const avatar = f.avatar_url || 'default.png';
     const online = !!f.online_status;
     const team = f.team ? f.team.toUpperCase() : '';
     let teamLogo = '';

@@ -2,6 +2,8 @@
 import db from '../db/database.js';
 import { UserMatch } from '../types/userStats.js';
 import { UserStats } from '../types/userStats.js';
+import { getUserById } from './usersService.js';
+import { getAllTeamMembers, updateTeamMember } from './teamService.js';
 
 export function getUserStatsById(userId: number): Promise<UserStats | null> {
 	const tableName = `stats_user_${userId}`;
@@ -101,5 +103,130 @@ callback: (err: Error | null) => void): void {
 			console.error(`❌ Failed to delete match ${matchId} for user ${userId}:`, err.message);
 		}
 		callback(err);
+	});
+}
+
+
+function mapTeamToTable(team: string): string | null {
+	const mapping: Record<string, string> = {
+		'hacktivists': 'hacktivists',
+		'bug busters': 'bug_busters',
+		'logic league': 'logic_league',
+		'code alliance': 'code_alliance',
+	};
+
+	return mapping[team.toLowerCase()] || null;
+}
+
+export function updateUserStatsForTournament(userId: number, isWinner: boolean): Promise<void> {
+	return new Promise((resolve, reject) => {
+		db.get(`SELECT * FROM user_stats WHERE user_id = ?`, [userId], async (err, stats: UserStats | undefined) => {
+		if (err) {
+			console.error(`❌ Failed to get stats for user ${userId}:`, err.message);
+			return reject(err);
+		}
+
+		const tournamentsPlayed = (stats?.tournaments_played || 0) + 1;
+		const tournamentsWon = (stats?.tournaments_won || 0) + (isWinner ? 1 : 0);
+
+		const runStatsUpdate = () => {
+			db.run(
+			`UPDATE user_stats SET tournaments_played = ?, tournaments_won = ? WHERE user_id = ?`,
+			[tournamentsPlayed, tournamentsWon, userId],
+			async (updateErr) => {
+				if (updateErr) {
+				console.error(`❌ Failed to update stats for user ${userId}:`, updateErr.message);
+				return reject(updateErr);
+				}
+
+				// ✅ If winner, also update the team table
+				if (isWinner) {
+				try {
+					const user = await getUserById(userId);
+					if (!user || !user.team) {
+					console.warn(`⚠️ Cannot update team stats — user ${userId} has no team`);
+					return resolve();
+					}
+
+					const tableName = mapTeamToTable(user.team);
+					if (!tableName) {
+					console.warn(`⚠️ No valid table found for team: ${user.team}`);
+					return resolve();
+					}
+
+					const teamRows = await getAllTeamMembers(tableName);
+					if (!teamRows.length) {
+					console.warn(`⚠️ No existing team rows found in table ${tableName}`);
+					return resolve();
+					}
+
+					const teamRow = teamRows[0];
+
+					const updatedTeamTournamentsWon = (teamRow.tournaments_won || 0) + 1;
+
+					await updateTeamMember(
+					tableName,
+					teamRow.id,
+					teamRow.members,
+					teamRow.victories,
+					updatedTeamTournamentsWon,
+					teamRow.defeats,
+					teamRow.win_rate
+					);
+
+					console.log(`✅ Team '${user.team}' tournament count updated`);
+				} catch (teamErr) {
+					console.error(`❌ Failed to update team tournament wins:`, teamErr);
+				}
+				}
+
+				resolve();
+			}
+			);
+		};
+
+		// If no stats yet, insert a new row
+		if (!stats) {
+			db.run(
+			`INSERT INTO user_stats (user_id, tournaments_played, tournaments_won) VALUES (?, ?, ?)`,
+			[userId, tournamentsPlayed, tournamentsWon],
+			async (insertErr) => {
+				if (insertErr) {
+				console.error(`❌ Failed to insert stats for user ${userId}:`, insertErr.message);
+				return reject(insertErr);
+				}
+
+				// ✅ Handle team win if needed
+				if (isWinner) {
+				try {
+					const user = await getUserById(userId);
+					if (!user || !user.team) return resolve();
+
+					const tableName = mapTeamToTable(user.team);
+					if (!tableName) return resolve();
+
+					const teamRows = await getAllTeamMembers(tableName);
+					if (!teamRows.length) return resolve();
+
+					const teamRow = teamRows[0];
+					const updatedTeamTournamentsWon = (teamRow.tournaments_won || 0) + 1;
+
+					await updateTeamMember(tableName, teamRow.id, teamRow.members, teamRow.victories,
+					updatedTeamTournamentsWon, teamRow.defeats, teamRow.win_rate);
+
+					console.log(`✅ Team '${user.team}' tournament count updated`);
+				} catch (teamErr) {
+					console.error(`❌ Failed to update team tournament wins:`, teamErr);
+				}
+				}
+
+				resolve();
+			}
+			);
+		} else {
+			// Existing stats: update
+			runStatsUpdate();
+		}
+		});
 	});
 }

@@ -10,14 +10,14 @@ export interface UserMatch {
 }
 
 export type UserStats = {
-    user_id: number;
-    matches_played: number;
-    matches_won: number;
-    matches_lost: number;
-    points_scored: number;
-    points_conceded: number;
-    total_play_time: number;
-    win_rate: number;
-    tournaments_played: number;
-    tournaments_won: number;
+	user_id: number;
+	matches_played: number;
+	matches_won: number;
+	matches_lost: number;
+	points_scored: number;
+	points_conceded: number;
+	total_play_time: number;
+	win_rate: number;
+	tournaments_played: number;
+	tournaments_won: number;
 };
