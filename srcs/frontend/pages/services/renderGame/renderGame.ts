@@ -127,15 +127,8 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, avatar1?: s
 }
 
 
-function initializeGameState(
-    player1Name: string,
-    player2Name: string,
-    maxGames: number,
-    mode: any,
-    gameId?: number,
-    avatar1?: string,
-    avatar2?: string
-) {
+function initializeGameState(player1Name: string, player2Name: string, maxGames: number, mode: any,
+gameId?: number, avatar1?: string, avatar2?: string) {
     state.player1 = {
         nickname: player1Name,
         avatarUrl: avatar1 || '/assets/avatar/default.png',
