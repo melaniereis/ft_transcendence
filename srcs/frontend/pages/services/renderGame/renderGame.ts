@@ -131,13 +131,13 @@ function initializeGameState(player1Name: string, player2Name: string, maxGames:
 gameId?: number, avatar1?: string, avatar2?: string) {
     state.player1 = {
         nickname: player1Name,
-        avatarUrl: avatar1 || '/assets/avatar/default.png',
+        avatarUrl: avatar1 || '/default.png',
         x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
         upKey: 'w', downKey: 's'
     };
     state.player2 = {
         nickname: player2Name,
-        avatarUrl: avatar2 || '/assets/avatar/default.png',
+        avatarUrl: avatar2 || '/default.png',
         x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
         upKey: 'ArrowUp', downKey: 'ArrowDown'
     };
