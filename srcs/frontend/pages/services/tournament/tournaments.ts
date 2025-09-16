@@ -14,6 +14,19 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	container.style.borderRadius = '2rem';
 	container.style.boxShadow = '0 8px 32px 0 rgba(44, 34, 84, 0.18), 0 1.5px 8px 0 rgba(44,34,84,0.10)';
 	container.style.backdropFilter = 'blur(8px)';
+	// Overlay background below top bar
+	if (!document.getElementById('tournaments-bg')) {
+		const bg = document.createElement('div');
+		bg.id = 'tournaments-bg';
+		bg.style.position = 'fixed';
+		bg.style.inset = '0';
+		bg.style.width = '100vw';
+		bg.style.height = '100vh';
+		bg.style.zIndex = '0';
+		bg.style.pointerEvents = 'none';
+		bg.style.background = "url('assets/Background3.jpg') center center / cover no-repeat fixed";
+		document.body.appendChild(bg);
+	}
 
 	// Header
 

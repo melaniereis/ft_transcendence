@@ -13,29 +13,29 @@ export function renderSettingsPage(container: HTMLElement) {
 	}
 
 	container.innerHTML = `
-        <div class="settings-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:transparent;">
-            <div class="magic-gradient"></div>
-            <canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
-            <div class="cloud cloud1"></div>
-            <div class="cloud cloud2"></div>
-            <div class="cloud cloud3"></div>
-            <div class="cloud cloud4"></div>
-            <div class="cloud cloud5"></div>
-            <div class="cloud cloud6"></div>
-        </div>
-        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;animation:fadeInPanel 1.2s cubic-bezier(.6,.2,.3,1) forwards;">
-            <h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);font-family:'Inter','EB Garamond',serif;">${t.playerSettings}</h2>
-            <div class="settings-panel" style="background:linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%);border-radius:2.8rem;box-shadow:0 0 32px 8px #d6d8e8,0 16px 64px 0 rgba(44,34,84,0.08),0 2px 16px 0 rgba(44,34,84,0.04);padding:2.2rem 1.6rem;max-width:480px;width:100%;backdrop-filter:blur(22px);border:1.5px solid rgba(182,166,202,0.22);overflow:hidden;">
-                <div class="panel-sparkle" style="pointer-events:none;position:absolute;inset:0;z-index:0;"></div>
-                <button id="delete-user" class="delete-btn" style="width:100%;background:linear-gradient(90deg,#ff5c5c 0%,#f8fafc 100%);border:2px solid #2c2254;color:#2c2254;font-weight:700;padding:1.4rem;border-radius:1.4rem;font-size:1.18rem;box-shadow:0 8px 32px rgba(44,34,84,0.14);transition:background 0.2s,color 0.2s,box-shadow 0.2s;cursor:pointer;margin-bottom:1.4rem;">${t.deleteUserBtn}</button>
-                <div id="confirmation" class="hidden flex flex-col items-center" style="animation:fadeInCard 0.7s cubic-bezier(.6,.2,.3,1) forwards;">
-                    <p style="color:#2c2254;font-size:1.18rem;font-weight:600;margin-bottom:1.4rem;">${t.confirmDeleteUser}</p>
-                    <button id="confirm-delete" style="width:100%;background:linear-gradient(90deg,#e11d48 0%,#f8fafc 100%);border:2px solid #2c2254;color:#2c2254;font-weight:700;padding:1.4rem;border-radius:1.4rem;font-size:1.18rem;box-shadow:0 8px 32px rgba(44,34,84,0.14);transition:background 0.2s,color 0.2s,box-shadow 0.2s;cursor:pointer;">${t.confirmDeleteBtn}</button>
-                </div>
-                <div id="result" class="result mt-4 text-center" style="color:#e11d48;font-size:1.18rem;font-weight:600;"></div>
-            </div>
-        </div>
-    `;
+		<div class="settings-bg" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:0;background:transparent;pointer-events:none;">
+			<div class="magic-gradient"></div>
+			<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
+			<div class="cloud cloud1"></div>
+			<div class="cloud cloud2"></div>
+			<div class="cloud cloud3"></div>
+			<div class="cloud cloud4"></div>
+			<div class="cloud cloud5"></div>
+			<div class="cloud cloud6"></div>
+		</div>
+		<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 96px);width:100vw;padding-top:96px;animation:fadeInPanel 1.2s cubic-bezier(.6,.2,.3,1) forwards;">
+			<h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);font-family:'Inter','EB Garamond',serif;">${t.playerSettings}</h2>
+			<div class="settings-panel" style="background:linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%);border-radius:2.8rem;box-shadow:0 0 32px 8px #d6d8e8,0 16px 64px 0 rgba(44,34,84,0.08),0 2px 16px 0 rgba(44,34,84,0.04);padding:2.2rem 1.6rem;max-width:480px;width:100%;backdrop-filter:blur(22px);border:1.5px solid rgba(182,166,202,0.22);overflow:hidden;">
+				<div class="panel-sparkle" style="pointer-events:none;position:absolute;inset:0;z-index:0;"></div>
+				<button id="delete-user" class="delete-btn" style="width:100%;background:linear-gradient(90deg,#ff5c5c 0%,#f8fafc 100%);border:2px solid #2c2254;color:#2c2254;font-weight:700;padding:1.4rem;border-radius:1.4rem;font-size:1.18rem;box-shadow:0 8px 32px rgba(44,34,84,0.14);transition:background 0.2s,color 0.2s,box-shadow 0.2s;cursor:pointer;margin-bottom:1.4rem;">${t.deleteUserBtn}</button>
+				<div id="confirmation" class="hidden flex flex-col items-center" style="animation:fadeInCard 0.7s cubic-bezier(.6,.2,.3,1) forwards;">
+					<p style="color:#2c2254;font-size:1.18rem;font-weight:600;margin-bottom:1.4rem;">${t.confirmDeleteUser}</p>
+					<button id="confirm-delete" style="width:100%;background:linear-gradient(90deg,#e11d48 0%,#f8fafc 100%);border:2px solid #2c2254;color:#2c2254;font-weight:700;padding:1.4rem;border-radius:1.4rem;font-size:1.18rem;box-shadow:0 8px 32px rgba(44,34,84,0.14);transition:background 0.2s,color 0.2s,box-shadow 0.2s;cursor:pointer;">${t.confirmDeleteBtn}</button>
+				</div>
+				<div id="result" class="result mt-4 text-center" style="color:#e11d48;font-size:1.18rem;font-weight:600;"></div>
+			</div>
+		</div>
+	`;
 
 	// Inject cloud shapes, gradient overlay, sparkles, and new styles
 	const cloudStyles = document.createElement('style');

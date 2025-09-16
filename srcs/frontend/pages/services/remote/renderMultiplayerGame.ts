@@ -5,15 +5,18 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	const { container, playerName, gameId } = options;
 
 	container.innerHTML = `
-		<canvas id="pong" width="1280" height="680"></canvas>
-		<style>
-			canvas {
-				background: transparent;
-				border: 2px solid black;
-				margin: auto;
-				display: block;
-			}
-		</style>
+		<div style="position:relative;z-index:1;">
+			<canvas id="pong" width="1280" height="680"></canvas>
+			<style>
+				canvas {
+					background: transparent;
+					border: 2px solid black;
+					margin: auto;
+					display: block;
+				}
+			</style>
+		</div>
+		<div style="position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;"></div>
 	`;
 
 	const canvas = container.querySelector('#pong') as HTMLCanvasElement;
@@ -46,81 +49,81 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	let countdownValue = 3;
 
 	function draw(ctx: CanvasRenderingContext2D) {
-  // Clear canvas and reset transform
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+		// Clear canvas and reset transform
+		ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  const isMirrored = playerSide === 'right';
+		const isMirrored = playerSide === 'right';
 
-  if (isMirrored) {
-    // Save context and apply mirroring transform
-    ctx.save();
-    ctx.translate(canvasWidth, 0);
-    ctx.scale(-1, 1);
-  }
+		if (isMirrored) {
+			// Save context and apply mirroring transform
+			ctx.save();
+			ctx.translate(canvasWidth, 0);
+			ctx.scale(-1, 1);
+		}
 
-  // Draw scoreboard (not mirrored)
-  // So we temporarily reset transform, draw, then restore mirroring
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = 'black';
-  ctx.font = '24px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${leftPlayerName} ${leftScore} - ${rightScore} ${rightPlayerName}`, canvasWidth / 2, 40);
+		// Draw scoreboard (not mirrored)
+		// So we temporarily reset transform, draw, then restore mirroring
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.fillStyle = 'black';
+		ctx.font = '24px Arial';
+		ctx.textAlign = 'center';
+		ctx.fillText(`${leftPlayerName} ${leftScore} - ${rightScore} ${rightPlayerName}`, canvasWidth / 2, 40);
 
-  // Restore mirroring transform if needed
-  if (isMirrored) {
-    ctx.restore();
-    // Re-apply mirroring for paddles and ball
-    ctx.save();
-    ctx.translate(canvasWidth, 0);
-    ctx.scale(-1, 1);
-  }
+		// Restore mirroring transform if needed
+		if (isMirrored) {
+			ctx.restore();
+			// Re-apply mirroring for paddles and ball
+			ctx.save();
+			ctx.translate(canvasWidth, 0);
+			ctx.scale(-1, 1);
+		}
 
-  // Draw center dashed line in black
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([12, 16]);
-  ctx.beginPath();
-  ctx.moveTo(canvasWidth / 2, 0);
-  ctx.lineTo(canvasWidth / 2, canvasHeight);
-  ctx.stroke();
-  ctx.setLineDash([]);
+		// Draw center dashed line in black
+		ctx.strokeStyle = 'black';
+		ctx.lineWidth = 2;
+		ctx.setLineDash([12, 16]);
+		ctx.beginPath();
+		ctx.moveTo(canvasWidth / 2, 0);
+		ctx.lineTo(canvasWidth / 2, canvasHeight);
+		ctx.stroke();
+		ctx.setLineDash([]);
 
-  // Draw paddles in black
-  ctx.fillStyle = 'black';
-  ctx.fillRect(30, leftY, paddleWidth, paddleHeight);
-  ctx.fillRect(canvasWidth - 30 - paddleWidth, rightY, paddleWidth, paddleHeight);
+		// Draw paddles in black
+		ctx.fillStyle = 'black';
+		ctx.fillRect(30, leftY, paddleWidth, paddleHeight);
+		ctx.fillRect(canvasWidth - 30 - paddleWidth, rightY, paddleWidth, paddleHeight);
 
-  // Draw ball in black
-  if (gameStarted) {
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
-    ctx.fill();
-  }
+		// Draw ball in black
+		if (gameStarted) {
+			ctx.beginPath();
+			ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
+			ctx.fill();
+		}
 
-  // Restore context after mirroring
-  if (isMirrored) {
-    ctx.restore();
-  }
+		// Restore context after mirroring
+		if (isMirrored) {
+			ctx.restore();
+		}
 
-  // Draw countdown in black (non-mirrored)
-  if (!gameStarted && countdownValue >= 0) {
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = 'black';
-    ctx.textAlign = 'center';
+		// Draw countdown in black (non-mirrored)
+		if (!gameStarted && countdownValue >= 0) {
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			ctx.fillStyle = 'black';
+			ctx.textAlign = 'center';
 
-    if (countdownValue > 0) {
-      ctx.font = '120px Arial';
-      ctx.fillText(`${countdownValue}`, canvasWidth / 2, canvasHeight / 2 + 40);
-    } else {
-      ctx.font = '80px Arial';
-      ctx.fillText(`GO!`, canvasWidth / 2, canvasHeight / 2 + 30);
-    }
-  }
+			if (countdownValue > 0) {
+				ctx.font = '120px Arial';
+				ctx.fillText(`${countdownValue}`, canvasWidth / 2, canvasHeight / 2 + 40);
+			} else {
+				ctx.font = '80px Arial';
+				ctx.fillText(`GO!`, canvasWidth / 2, canvasHeight / 2 + 30);
+			}
+		}
 
-  // Request next frame
-  requestAnimationFrame(() => draw(ctx));
-}
+		// Request next frame
+		requestAnimationFrame(() => draw(ctx));
+	}
 
 
 	function startCountdown(seconds: number) {

@@ -12,7 +12,7 @@ export function startMatchmaking(appDiv: HTMLDivElement, playerId: number, playe
 	difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
 	const token = localStorage.getItem('authToken');
 	if (!token) {
-		appDiv.innerHTML = `<p>${t.loginRequired}</p>`;
+		appDiv.innerHTML = `<p style="position:relative;z-index:1;">${t.loginRequired}</p><div style="position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;"></div>`;
 		return;
 	}
 	if (socket && socket.readyState === WebSocket.OPEN) {

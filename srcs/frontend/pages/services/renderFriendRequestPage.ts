@@ -3,26 +3,56 @@ if (!document.getElementById('gris-friend-hover-styles')) {
 	const hoverStyle = document.createElement('style');
 	hoverStyle.id = 'gris-friend-hover-styles';
 	hoverStyle.textContent = `
-			#back-to-profile {
-				transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.25s;
-			}
-			#back-to-profile:hover {
-				background: linear-gradient(90deg,#818cf8 0%,#b6a6ca 100%);
-				color: #fff;
-				box-shadow: 0 12px 40px rgba(44,34,84,0.22);
-				border-color: #818cf8;
-				transform: translateY(-3px) scale(1.04);
-				filter: drop-shadow(0 0 12px #b6a6ca);
-			}
-			#back-to-profile svg {
-				transition: stroke 0.25s;
-			}
-			#back-to-profile:hover svg {
-				stroke: #fff;
-				filter: drop-shadow(0 0 8px #fff);
-			}
-		`;
+		#back-to-profile {
+			transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.25s;
+		}
+		#back-to-profile:hover {
+			background: linear-gradient(90deg,#818cf8 0%,#b6a6ca 100%);
+			color: #fff;
+			box-shadow: 0 12px 40px rgba(44,34,84,0.22);
+			border-color: #818cf8;
+			transform: translateY(-3px) scale(1.04);
+			filter: drop-shadow(0 0 12px #b6a6ca);
+		}
+		#back-to-profile svg {
+			transition: stroke 0.25s;
+		}
+		#back-to-profile:hover svg {
+			stroke: #fff;
+			filter: drop-shadow(0 0 8px #fff);
+		}
+	`;
 	document.head.appendChild(hoverStyle);
+}
+
+// Ensure overlays/backgrounds do not block the top bar
+const appContainer = document.getElementById('app');
+if (appContainer) {
+	appContainer.style.position = 'relative';
+}
+if (!document.getElementById('friend-bg-styles')) {
+	const bgStyle = document.createElement('style');
+	bgStyle.id = 'friend-bg-styles';
+	bgStyle.textContent = `
+	.friend-bg {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 0;
+		pointer-events: none;
+		background: url('assets/Background3.jpg') center center / cover no-repeat fixed;
+	}
+	.friend-gradient {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background: radial-gradient(circle at 60% 30%,rgba(236,233,244,0.13) 0%,rgba(182,166,202,0.09) 40%,rgba(44,34,84,0.04) 100%);
+		mix-blend-mode: screen;
+	}
+	`;
+	document.head.appendChild(bgStyle);
 }
 // Add hover effect styles for Back to Profile button
 if (!document.getElementById('gris-friend-hover-styles')) {

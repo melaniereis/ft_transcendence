@@ -14,47 +14,47 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 	// Limpar conteúdo anterior
 	container.innerHTML = `
-		<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">
-			<div class="magic-gradient"></div>
-			<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
-			<div class="cloud cloud1"></div>
-			<div class="cloud cloud2"></div>
-			<div class="cloud cloud3"></div>
-			<div class="cloud cloud4"></div>
-			<div class="cloud cloud5"></div>
-			<div class="cloud cloud6"></div>
+	<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;">
+		<h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);">${t.selectOpponentTitle}</h2>
+		<div class="selection-panel">
+			<label>
+				${t.opponentLabel}
+				<select id="player1-select"></select>
+			</label>
+			<label>
+				${t.maxGamesLabel}
+				<select id="max-games-select">
+					<option value="3">3</option>
+					<option value="5">5</option>
+					<option value="7">7</option>
+					<option value="9">9</option>
+					<option value="11">11</option>
+				</select>
+			</label>
+			<label>
+				${t.difficultyLabel}
+				<select id="difficulty-select">
+					<option value="easy">Easy</option>
+					<option value="normal" selected>Normal</option>
+					<option value="hard">Hard</option>
+					<option value="crazy">Crazy</option>
+				</select>
+			</label>
+			<button id="start-game-btn">${t.startGame}</button>
+			<div id="selection-error"></div>
+			<div id="verification-form"></div>
 		</div>
-		<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;">
-			<h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);">${t.selectOpponentTitle}</h2>
-			<div class="selection-panel">
-				<label>
-					${t.opponentLabel}
-					<select id="player1-select"></select>
-				</label>
-				<label>
-					${t.maxGamesLabel}
-					<select id="max-games-select">
-						<option value="3">3</option>
-						<option value="5">5</option>
-						<option value="7">7</option>
-						<option value="9">9</option>
-						<option value="11">11</option>
-					</select>
-				</label>
-				<label>
-					${t.difficultyLabel}
-					<select id="difficulty-select">
-						<option value="easy">Easy</option>
-						<option value="normal" selected>Normal</option>
-						<option value="hard">Hard</option>
-						<option value="crazy">Crazy</option>
-					</select>
-				</label>
-				<button id="start-game-btn">${t.startGame}</button>
-				<div id="selection-error"></div>
-				<div id="verification-form"></div>
-			</div>
-		</div>
+	</div>
+	<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;pointer-events:none;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">
+		<div class="magic-gradient"></div>
+		<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
+		<div class="cloud cloud1"></div>
+		<div class="cloud cloud2"></div>
+		<div class="cloud cloud3"></div>
+		<div class="cloud cloud4"></div>
+		<div class="cloud cloud5"></div>
+		<div class="cloud cloud6"></div>
+	</div>
 	`;
 
 	// Inject cloud shapes, gradient overlay, sparkles, and new styles for magic

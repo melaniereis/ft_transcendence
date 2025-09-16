@@ -11,7 +11,7 @@ export function endGame(score1: number, score2: number, canvas: HTMLCanvasElemen
 	// Display final score
 	ctx.fillStyle = '#fff';
 	ctx.textAlign = 'center';
-	ctx.fillText('🎮 Game Over', canvas.width / 2, canvas.height / 2 - 60);
+	ctx.fillText('\ud83c\udfae Game Over', canvas.width / 2, canvas.height / 2 - 60);
 	ctx.fillText(`${player1Name}: ${score1}`, canvas.width / 2, canvas.height / 2 - 20);
 	ctx.fillText(`${player2Name}: ${score2}`, canvas.width / 2, canvas.height / 2 + 20);
 
@@ -52,4 +52,18 @@ export function endGame(score1: number, score2: number, canvas: HTMLCanvasElemen
 
 	// Append the button container to the canvas parent (not directly to body)
 	parent.appendChild(buttonContainer);
+
+	// Add overlay background below top bar
+	if (!document.getElementById('end-remote-bg')) {
+		const bg = document.createElement('div');
+		bg.id = 'end-remote-bg';
+		bg.style.position = 'fixed';
+		bg.style.inset = '0';
+		bg.style.width = '100vw';
+		bg.style.height = '100vh';
+		bg.style.zIndex = '0';
+		bg.style.pointerEvents = 'none';
+		bg.style.background = "url('assets/Background3.jpg') center center / cover no-repeat fixed";
+		document.body.appendChild(bg);
+	}
 }

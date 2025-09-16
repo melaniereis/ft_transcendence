@@ -37,6 +37,19 @@ export async function startTournament(container: HTMLElement, tournament: any,
 	const maxGames = 3;
 
 	// GRIS-inspired bracket and game wrappers
+	// Overlay background below top bar
+	if (!document.getElementById('start-tournament-bg')) {
+		const bg = document.createElement('div');
+		bg.id = 'start-tournament-bg';
+		bg.style.position = 'fixed';
+		bg.style.inset = '0';
+		bg.style.width = '100vw';
+		bg.style.height = '100vh';
+		bg.style.zIndex = '0';
+		bg.style.pointerEvents = 'none';
+		bg.style.background = "url('assets/Background3.jpg') center center / cover no-repeat fixed";
+		document.body.appendChild(bg);
+	}
 	const bracketWrapper = document.createElement('div');
 	bracketWrapper.id = 'bracket-wrapper';
 	bracketWrapper.style.background = 'rgba(255,251,230,0.85)';
