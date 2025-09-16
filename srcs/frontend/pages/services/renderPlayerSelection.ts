@@ -1,6 +1,34 @@
 import { renderGame } from './renderGame/renderGame.js';
 import { translations } from './language/translations.js';
 
+const getUserName = async (userId: number, selectedPlayers: any[], token: string | null): Promise<string> => {
+  // Find user in selectedPlayers array (you need to pass this array)
+  const user = selectedPlayers.find(u => u.id === userId);
+  if (!user) return `User ${userId}`; // fallback
+
+  if (!token) return user.name; // no token, just return local name
+
+  try {
+    const response = await fetch(`/users/${userId}/display_name`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.display_name || user.name;
+    } else {
+      return user.name;
+    }
+  } catch (err) {
+    console.error('Error fetching display name:', err);
+    return user.name;
+  }
+};
+
 export async function renderPlayerSelection(container: HTMLElement) {
 	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 		? localStorage.getItem('preferredLanguage')
@@ -14,7 +42,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 	// Limpar conteúdo anterior
 	container.innerHTML = `
-		<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">
+		<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('/Background3.jpg') center center / cover no-repeat fixed;">
 			<div class="magic-gradient"></div>
 			<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
 			<div class="cloud cloud1"></div>
@@ -387,9 +415,10 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 					const data = await gameRes.json();
 					const gameId = data.game_id;
-
+					const player1DisplayName = await getUserName(loggedInPlayerId, users, token);
+        			const player2DisplayName = await getUserName(opponentId, users, token);
 					container.innerHTML = '';
-					renderGame(container, loggedInPlayerName, opponentName!, maxGames, difficulty, undefined, 'single', gameId);
+					renderGame(container, player1DisplayName, player2DisplayName, maxGames, difficulty, undefined, 'single', gameId);
 				}
 				else {
 					resultDiv.textContent = t.verifyInvalid;

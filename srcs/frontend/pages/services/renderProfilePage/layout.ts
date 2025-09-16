@@ -22,7 +22,7 @@ export function layout(profile: Profile, stats: Stats, history: Match[], friends
 
       /* Fixed, cover background so it does NOT visually change when content height changes */
       body {
-        background-image: url('/assets/Background.png');
+        background-image: url('/Background.png');
         background-repeat: no-repeat;
         background-size: cover;           /* scale to cover viewport */
         background-position: center center;

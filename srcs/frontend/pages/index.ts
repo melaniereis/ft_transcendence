@@ -64,7 +64,6 @@ export function renderRoute(path: string): void {
 				renderLoginForm(appDiv, async () => {
 					updateUIBasedOnAuth();
 					await updateFriendRequestsBadge();
-					await setOnlineOnLoad();
 					navigateTo('/');
 				});
 				break;
@@ -171,9 +170,13 @@ export async function setOnlineOnLoad(): Promise<void> {
 	if (!token) return;
 
 	try {
-		await fetch('/api/online', {
-			method: 'POST',
-			headers: { 'Authorization': `Bearer ${token}` }
+		await fetch('/api/profile/status', {
+		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ online: true })
 		});
 	} catch (err) {
 		console.error('Failed to set online:', err);
@@ -185,14 +188,19 @@ export async function updateOnlineStatus(isOnline: boolean): Promise<void> {
 	if (!token) return;
 
 	try {
-		await fetch('/api/online', {
-			method: isOnline ? 'POST' : 'DELETE',
-			headers: { 'Authorization': `Bearer ${token}` }
+		await fetch('/api/profile/status', {
+		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ online: isOnline })
 		});
 	} catch (err) {
 		console.error('Failed to update status:', err);
 	}
 }
+
 
 export function applyLanguage(lang: string): void {
 	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;

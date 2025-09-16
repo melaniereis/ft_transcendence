@@ -74,10 +74,10 @@ export function showNotification(
 
 export function playGameSound(type: 'score' | 'win' | 'pause' | 'resume', volume: number = 0.2) {
 	const soundMap: Record<string, string> = {
-		score: '/assets/sounds/score.mp3',
-		win: '/assets/sounds/win.mp3',
-		pause: '/assets/sounds/pause.mp3',
-		resume: '/assets/sounds/resume.mp3'
+		score: 'score.mp3',
+		win: '/win.mp3',
+		pause: 'pause.mp3',
+		resume: 'resume.mp3'
 	};
 
 	const src = soundMap[type];

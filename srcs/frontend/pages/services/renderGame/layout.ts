@@ -88,7 +88,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                             background: #fff;
                             border: 2.5px solid ${GRIS_COLORS.depression};
                             box-shadow: 0 1px 6px rgba(44,34,84,0.10);
-                            background-image: url('${config.player1.avatarUrl || '/assets/avatar/default.png'}');
+                            background-image: url('${config.player1.avatarUrl || '/default.png'}');
                             background-size: cover;
                             background-position: center;
                         "></div>

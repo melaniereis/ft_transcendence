@@ -81,10 +81,10 @@ const t = translations[lang];
 
 // Team logo mapping (copied from templates.ts)
 const TEAM_LOGOS = {
-	'HACKTIVISTS': '/assets/hacktivists.png',
-	'BUG BUSTERS': '/assets/bugbusters.png',
-	'LOGIC LEAGUE': '/assets/logicleague.png',
-	'CODE ALLIANCE': '/assets/codealliance.png'
+	'HACKTIVISTS': '/hacktivists.png',
+	'BUG BUSTERS': '/bugbusters.png',
+	'LOGIC LEAGUE': '/logicleague.png',
+	'CODE ALLIANCE': '/codealliance.png'
 };
 
 // SVG ICON HELPERS (local, for requests page)
@@ -111,7 +111,7 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 	}
 
 	container.innerHTML = `
-		<div class="friend-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background4.jpg') center center / cover no-repeat fixed;">
+		<div class="friend-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('/Background4.jpg') center center / cover no-repeat fixed;">
 			<div class="magic-gradient"></div>
 			<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
 			<div class="cloud cloud1"></div>

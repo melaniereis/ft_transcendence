@@ -70,7 +70,7 @@ ${recent.map((m, index) => {
 	<div style="position:absolute;left:0;top:10px;bottom:10px;width:5px;border-radius:5px;background:${isWin ? '#4be17b' : '#ff5c5c'};box-shadow:0 0 8px 0 ${isWin ? '#4be17b55' : '#ff5c5c44'};"></div>
 	<div style="margin-left:18px;display:flex;align-items:center;gap:10px;">
 <div class="match-avatar-wrap" style="border-radius:50%;overflow:hidden;width:36px;height:36px;box-shadow:0 0 0 2px ${isWin ? '#4be17b' : '#ff5c5c'}33;">
-		<img src="/assets/avatar/default.png" width="36" height="36" class="match-avatar" alt="Opponent Avatar" style="border-radius:50%;object-fit:cover;"/>
+		<img src="/default.png" width="36" height="36" class="match-avatar" alt="Opponent Avatar" style="border-radius:50%;object-fit:cover;"/>
 		</div>
 	</div>
 	<div style="flex:1;min-width:0;display:flex;align-items:center;gap:14px;justify-content:space-between;">
@@ -124,7 +124,7 @@ ${history.length === 0
 		<div style="position:absolute;left:0;top:18px;bottom:18px;width:10px;border-radius:10px;background:${barColor};box-shadow:0 0 18px 0 ${barColor}55;"></div>
 		<div style="margin-left:44px;display:flex;align-items:center;gap:0;">
 		<div class="match-avatar-wrap" style="border-radius:50%;overflow:hidden;width:60px;height:60px;box-shadow:0 0 0 4px ${barColor}33;transition:transform 0.18s;">
-			<img src="/assets/avatar/default.png" width="60" height="60" class="match-avatar" alt="Opponent Avatar" style="border-radius:50%;object-fit:cover;transition:transform 0.18s;" onmouseover="this.style.transform='scale(1.13)'" onmouseout="this.style.transform='scale(1)'"/>
+			<img src="/default.png" width="60" height="60" class="match-avatar" alt="Opponent Avatar" style="border-radius:50%;object-fit:cover;transition:transform 0.18s;" onmouseover="this.style.transform='scale(1.13)'" onmouseout="this.style.transform='scale(1)'"/>
 		</div>
 		</div>
 		<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;justify-content:center;">

@@ -129,8 +129,13 @@ export function setupFriendsEvents(container: HTMLElement) {
 			const btn = document.getElementById('friend-add') as HTMLButtonElement;
 			const username = input.value.trim();
 			if (!username) return;
+
+			const token = localStorage.getItem('authToken'); // get token from localStorage
+
 			try {
-				const res = await fetch(`/api/users/${encodeURIComponent(username)}`);
+				const res = await fetch(`/api/users/${encodeURIComponent(username)}`, {
+					headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+				});
 				if (!res.ok) {
 					showInlineMessage('friend-msg', t.userNotFound, '#dc3545');
 					return;

@@ -79,7 +79,7 @@ export const state: GameState = {
 		mistLevel: 0.3,
 		gradient: 'linear-gradient(120deg, #b6a6ca 0%, #fffbe6 100%)',
 		glow: true,
-		soundscape: '/assets/sounds/ambient.mp3',
+		soundscape: '/ambient.mp3',
 	},
 	updateScore(player1Score: number, player2Score: number) {
 		this.score1 = player1Score;
