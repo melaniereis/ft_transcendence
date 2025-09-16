@@ -69,15 +69,15 @@ export function renderLoginForm(container: HTMLElement, onLoginSuccess: () => vo
 				// ✅ Start monitoring after token is saved
 				startActivityMonitoring();
 
-
-				// Call the success callback to handle navigation and UI updates
 				onLoginSuccess();
-			} else {
+			} 
+			else {
 				resultDiv.classList.remove('text-green-600', 'text-red-600');
 				resultDiv.classList.add('text-red-600');
 				resultDiv.textContent = t.invalid;
 			}
-		} catch (err) {
+		} 
+		catch (err) {
 			resultDiv.classList.remove('text-green-600', 'text-red-600');
 			resultDiv.classList.add('text-red-600');
 			console.error('Login error:', err);
