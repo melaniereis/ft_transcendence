@@ -1,5 +1,6 @@
 // srcs/frontend/pages/CelestialAnimations.ts - Gris-inspired celestial effects for main menu (multi-canvas)
 
+
 export class CelestialAnimations {
 	private backgroundCanvas: HTMLCanvasElement;
 	private starsCanvas: HTMLCanvasElement;
@@ -11,6 +12,7 @@ export class CelestialAnimations {
 	private ctxOrbs: CanvasRenderingContext2D;
 	private animationId: number = 0;
 
+
 	// Animation state
 	private randomArray: number[] = [];
 	private hueArray: number[] = [];
@@ -20,10 +22,12 @@ export class CelestialAnimations {
 	private randomArrayIterator = 0;
 	private hueArrayLength = 1000;
 
+
 	// Orbs state
 	private orbs: Orb[] = [];
 	private orbCount = 8;
 	private isDestroyed = false;
+
 
 	constructor(backgroundCanvas: HTMLCanvasElement, starsCanvas: HTMLCanvasElement, milkyWayCanvas: HTMLCanvasElement, orbsCanvas: HTMLCanvasElement) {
 		this.backgroundCanvas = backgroundCanvas;
@@ -31,19 +35,23 @@ export class CelestialAnimations {
 		this.milkyWayCanvas = milkyWayCanvas;
 		this.orbsCanvas = orbsCanvas;
 
+
 		const bgCtx = backgroundCanvas.getContext('2d');
 		const starsCtx = starsCanvas.getContext('2d');
 		const mwCtx = milkyWayCanvas.getContext('2d');
 		const orbsCtx = orbsCanvas.getContext('2d');
 
+
 		if (!bgCtx || !starsCtx || !mwCtx || !orbsCtx) {
 			throw new Error('Failed to get canvas contexts');
 		}
+
 
 		this.ctxBg = bgCtx;
 		this.ctx = starsCtx;
 		this.ctxMw = mwCtx;
 		this.ctxOrbs = orbsCtx;
+
 
 		this.resizeCanvases();
 		window.addEventListener('resize', () => {
@@ -55,8 +63,10 @@ export class CelestialAnimations {
 		this.animate();
 	}
 
+
 	private resizeCanvases() {
 		if (this.isDestroyed) return;
+
 
 		const dpr = window.devicePixelRatio || 1;
 		[this.backgroundCanvas, this.starsCanvas, this.milkyWayCanvas, this.orbsCanvas].forEach(canvas => {
@@ -68,6 +78,7 @@ export class CelestialAnimations {
 			}
 		});
 
+
 		// Reset transforms and scale
 		[this.ctxBg, this.ctx, this.ctxMw, this.ctxOrbs].forEach(ctx => {
 			if (ctx) {
@@ -76,37 +87,41 @@ export class CelestialAnimations {
 			}
 		});
 
+
 		this.init();
 	}
 
+
 	// Animation configuration
-	private sNumber = 600;
-	private sSize = 0.3;
-	private sSizeR = 0.6;
-	private sAlphaR = 0.7; // Make stars a bit brighter
-	private sMaxHueProportion = 0.6;
-	private shootingStarDensity = 0.01;
-	private shootingStarBaseXspeed = 30;
-	private shootingStarBaseYspeed = 15;
-	private shootingStarBaseLength = 8;
-	private shootingStarBaseLifespan = 60;
-	private shootingStarsColors = ["#a1ffba", "#a1d2ff", "#fffaa1", "#ffa1a1"];
-	private mwStarCount = 100000;
-	private mwRandomStarProp = 0.2;
-	private mwClusterCount = 300;
-	private mwClusterStarCount = 1500;
-	private mwClusterSize = 120;
-	private mwClusterSizeR = 80;
-	private mwClusterLayers = 10;
-	private mwAngle = 0.6;
-	private mwHueMin = 180; // More blue/purple
-	private mwHueMax = 280;
-	private mwWhiteProportionMin = 65; // Brighter clusters
-	private mwWhiteProportionMax = 80;
+	private sNumber = 1200; // More stars
+	private sSize = 0.22; // Slightly smaller base size
+	private sSizeR = 0.7; // More size variation
+	private sAlphaR = 0.85; // Brighter dreamy stars
+	private sMaxHueProportion = 0.7;
+	private shootingStarDensity = 0.012; // Slightly more shooting stars
+	private shootingStarBaseXspeed = 32;
+	private shootingStarBaseYspeed = 17;
+	private shootingStarBaseLength = 10;
+	private shootingStarBaseLifespan = 70;
+	private shootingStarsColors = ["#a1ffba", "#a1d2ff", "#fffaa1", "#ffa1a1", "#e8d5ff", "#bfa1ff"];
+	private mwStarCount = 180000; // More milky way stars
+	private mwRandomStarProp = 0.22;
+	private mwClusterCount = 420; // More clusters
+	private mwClusterStarCount = 1800; // More stars per cluster
+	private mwClusterSize = 140; // Larger clusters
+	private mwClusterSizeR = 110; // More size variation
+	private mwClusterLayers = 12; // More layers
+	private mwAngle = 0.7; // More dreamy tilt
+	private mwHueMin = 175; // More blue/purple
+	private mwHueMax = 285;
+	private mwWhiteProportionMin = 68; // Brighter clusters
+	private mwWhiteProportionMax = 85;
+
 
 	private class_Star = class {
 		x: number; y: number; size: number; alpha: number; baseHue: number; baseHueProportion: number;
 		randomIndexa: number; randomIndexh: number; randomValue: number; color: string;
+
 
 		constructor(x: number, y: number, size: number, randomArray: number[], hueArray: number[], hueArrayLength: number, randomArrayLength: number) {
 			this.x = x;
@@ -121,6 +136,7 @@ export class CelestialAnimations {
 			this.color = "";
 		}
 
+
 		draw(ctx: CanvasRenderingContext2D, randomArray: number[], hueArray: number[], hueArrayLength: number, randomArrayLength: number, sAlphaR: number) {
 			ctx.beginPath();
 			ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
@@ -131,6 +147,7 @@ export class CelestialAnimations {
 			ctx.fill();
 		}
 
+
 		update(ctx: CanvasRenderingContext2D, randomArray: number[], hueArray: number[], hueArrayLength: number, randomArrayLength: number, sAlphaR: number) {
 			this.randomIndexh = this.randomIndexa;
 			this.randomIndexa = (this.randomIndexa >= randomArrayLength - 1) ? 0 : this.randomIndexa + 1;
@@ -139,8 +156,10 @@ export class CelestialAnimations {
 		}
 	}
 
+
 	private class_ShootingStar = class {
 		x: number; y: number; speedX: number; speedY: number; framesLeft: number; color: string;
+
 
 		constructor(x: number, y: number, speedX: number, speedY: number, color: string, lifespan: number) {
 			this.x = x;
@@ -151,14 +170,17 @@ export class CelestialAnimations {
 			this.color = color;
 		}
 
+
 		goingOut() {
 			return this.framesLeft <= 0;
 		}
+
 
 		ageModifier(baseLifespan: number) {
 			let halfLife = baseLifespan / 2.0;
 			return Math.pow(1.0 - Math.abs(this.framesLeft - halfLife) / halfLife, 2);
 		}
+
 
 		draw(ctx: CanvasRenderingContext2D, baseLength: number, baseLifespan: number) {
 			let am = this.ageModifier(baseLifespan);
@@ -175,6 +197,7 @@ export class CelestialAnimations {
 			ctx.stroke();
 		}
 
+
 		update(ctx: CanvasRenderingContext2D, baseLength: number, baseLifespan: number) {
 			this.framesLeft--;
 			this.x += this.speedX;
@@ -183,8 +206,10 @@ export class CelestialAnimations {
 		}
 	}
 
+
 	private class_MwStarCluster = class {
 		x: number; y: number; size: number; hue: number; baseWhiteProportion: number; brightnessModifier: number;
+
 
 		constructor(x: number, y: number, size: number, hue: number, baseWhiteProportion: number, brightnessModifier: number) {
 			this.x = x;
@@ -194,6 +219,7 @@ export class CelestialAnimations {
 			this.baseWhiteProportion = baseWhiteProportion;
 			this.brightnessModifier = brightnessModifier;
 		}
+
 
 		draw(ctxMw: CanvasRenderingContext2D, mwClusterStarCount: number, mwClusterLayers: number) {
 			let starsPerLayer = Math.floor(mwClusterStarCount / mwClusterLayers);
@@ -223,9 +249,11 @@ export class CelestialAnimations {
 		}
 	}
 
+
 	private MilkyWayX() {
 		return Math.floor(Math.random() * window.innerWidth);
 	}
+
 
 	private MilkyWayYFromX(xPos: number, mode: string) {
 		let offset = ((window.innerWidth / 2) - xPos) * this.mwAngle;
@@ -236,10 +264,13 @@ export class CelestialAnimations {
 		}
 	}
 
+
 	private DrawMilkyWayCanvas() {
 		if (this.isDestroyed) return;
 
+
 		this.ctxMw.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
 
 		// Draw random stars
 		for (let i = 0; i < this.mwStarCount; i++) {
@@ -253,6 +284,7 @@ export class CelestialAnimations {
 			this.ctxMw.fill();
 		}
 
+
 		// Draw clusters
 		for (let i = 0; i < this.mwClusterCount; i++) {
 			let xPos = this.MilkyWayX();
@@ -265,8 +297,10 @@ export class CelestialAnimations {
 		}
 	}
 
+
 	private init() {
 		if (this.isDestroyed) return;
+
 
 		// Initialize random arrays
 		this.randomArray = [];
@@ -274,12 +308,14 @@ export class CelestialAnimations {
 			this.randomArray[i] = Math.random();
 		}
 
+
 		this.hueArray = [];
 		for (let i = 0; i < this.hueArrayLength; i++) {
 			let rHue = Math.floor(Math.random() * 160);
 			if (rHue > 60) rHue += 110;
 			this.hueArray[i] = rHue;
 		}
+
 
 		// Initialize stars
 		this.StarsArray = [];
@@ -290,8 +326,10 @@ export class CelestialAnimations {
 			this.StarsArray.push(new this.class_Star(x, y, size, this.randomArray, this.hueArray, this.hueArrayLength, this.randomArrayLength));
 		}
 
+
 		this.ShootingStarsArray = [];
 		this.DrawMilkyWayCanvas();
+
 
 		// Initialize orbs with improved distribution
 		const centerX = window.innerWidth / 2;
@@ -307,21 +345,26 @@ export class CelestialAnimations {
 			{ r: 10, color: '#fff', glow: 10, angle: Math.random() * Math.PI * 2, speed: 0.015, distance: 220 },
 		];
 
+
 		this.orbs = orbConfigs.map(cfg => new Orb(centerX, centerY, cfg.r, cfg.color, cfg.glow, cfg.angle, cfg.speed, cfg.distance));
 	}
+
 
 	private frameCount = 0;
 	private animate = () => {
 		if (this.isDestroyed) return;
 
+
 		try {
 			// Clear canvases
 			this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
 
 			// Update stars
 			for (let i = 0; i < this.StarsArray.length; i++) {
 				this.StarsArray[i].update(this.ctx, this.randomArray, this.hueArray, this.hueArrayLength, this.randomArrayLength, this.sAlphaR);
 			}
+
 
 			// Generate shooting stars
 			if (this.randomArray[this.randomArrayIterator] < this.shootingStarDensity) {
@@ -332,6 +375,7 @@ export class CelestialAnimations {
 				let color = this.shootingStarsColors[Math.floor(Math.random() * this.shootingStarsColors.length)];
 				this.ShootingStarsArray.push(new this.class_ShootingStar(posX, posY, speedX, speedY, color, this.shootingStarBaseLifespan));
 			}
+
 
 			// Update shooting stars
 			let arrayIterator = this.ShootingStarsArray.length - 1;
@@ -344,6 +388,7 @@ export class CelestialAnimations {
 				arrayIterator--;
 			}
 
+
 			// Update random array iterator
 			if (this.randomArrayIterator + 1 >= this.randomArrayLength) {
 				this.randomArrayIterator = 0;
@@ -351,32 +396,37 @@ export class CelestialAnimations {
 				this.randomArrayIterator++;
 			}
 
+
 			// Animate orbs
 			this.ctxOrbs.clearRect(0, 0, window.innerWidth, window.innerHeight);
 			const cx = window.innerWidth / 2;
 			const cy = window.innerHeight / 2;
+
 
 			for (const orb of this.orbs) {
 				orb.update(cx, cy);
 				orb.draw(this.ctxOrbs);
 			}
 
+
 			this.frameCount++;
 			this.animationId = requestAnimationFrame(this.animate);
 		} catch (error) {
-			console.error('Animation error:', error);
 			this.stopAnimation();
 		}
 	}
 
+
 	public startAnimation() {
 		if (this.isDestroyed) return;
+
 
 		if (this.animationId) {
 			cancelAnimationFrame(this.animationId);
 		}
 		this.animate();
 	}
+
 
 	public stopAnimation() {
 		if (this.animationId) {
@@ -385,12 +435,15 @@ export class CelestialAnimations {
 		}
 	}
 
+
 	public destroy() {
 		this.isDestroyed = true;
 		this.stopAnimation();
 
+
 		// Clean up event listeners
 		window.removeEventListener('resize', this.resizeCanvases);
+
 
 		// Clear arrays
 		this.StarsArray = [];
@@ -398,10 +451,9 @@ export class CelestialAnimations {
 		this.orbs = [];
 		this.randomArray = [];
 		this.hueArray = [];
-
-		console.log('CelestialAnimations destroyed');
 	}
 }
+
 
 // Orb class for glowing orbs with improved movement
 class Orb {
@@ -415,6 +467,7 @@ class Orb {
 	distance: number;
 	pulsePhase: number;
 
+
 	constructor(x: number, y: number, r: number, color: string, glow: number, angle: number, speed: number, distance: number = 220) {
 		this.x = x;
 		this.y = y;
@@ -427,9 +480,11 @@ class Orb {
 		this.pulsePhase = Math.random() * Math.PI * 2;
 	}
 
+
 	update(centerX: number, centerY: number) {
 		this.angle += this.speed;
 		this.pulsePhase += 0.02;
+
 
 		// Move in a circle around center with slight pulsing
 		const pulseFactor = 1 + Math.sin(this.pulsePhase) * 0.1;
@@ -437,16 +492,20 @@ class Orb {
 		this.y = centerY + Math.sin(this.angle) * (this.distance * pulseFactor);
 	}
 
+
 	draw(ctx: CanvasRenderingContext2D) {
 		ctx.save();
+
 
 		// Pulsing alpha effect
 		const pulseAlpha = 0.7 + Math.sin(this.pulsePhase) * 0.3;
 		ctx.globalAlpha = pulseAlpha;
 
+
 		// Enhanced glow effect
 		ctx.shadowColor = this.color;
 		ctx.shadowBlur = this.glow + Math.sin(this.pulsePhase * 2) * 5;
+
 
 		// Draw main orb
 		ctx.beginPath();
@@ -454,18 +513,22 @@ class Orb {
 		ctx.fillStyle = this.color;
 		ctx.fill();
 
+
 		// Add inner glow
 		const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
 		gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
 		gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.3)');
 		gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
+
 		ctx.fillStyle = gradient;
 		ctx.fill();
+
 
 		ctx.restore();
 	}
 }
+
 
 // Initialize celestial animations for main menu
 export function initializeCelestialAnimations(): CelestialAnimations | null {
@@ -475,14 +538,14 @@ export function initializeCelestialAnimations(): CelestialAnimations | null {
 		const milkyWayCanvas = document.getElementById('milkyWayCanvas') as HTMLCanvasElement;
 		const orbsCanvas = document.getElementById('orbsCanvas') as HTMLCanvasElement;
 
+
 		if (!backgroundCanvas || !starsCanvas || !milkyWayCanvas || !orbsCanvas) {
-			console.warn('Celestial canvases not found');
 			return null;
 		}
 
+
 		return new CelestialAnimations(backgroundCanvas, starsCanvas, milkyWayCanvas, orbsCanvas);
 	} catch (error) {
-		console.error('Failed to initialize celestial animations:', error);
 		return null;
 	}
 }

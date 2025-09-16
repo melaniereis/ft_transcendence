@@ -36,8 +36,6 @@ export function renderGame(
 	avatar1?: string,
 	avatar2?: string
 ) {
-	console.log('🎮 Initializing GRIS-inspired game...');
-
 	// Clean up any existing game
 	if (gameCleanupFunction) {
 		gameCleanupFunction();
@@ -191,7 +189,6 @@ export function renderGame(
 		const confetti = document.getElementById('gris-confetti-canvas');
 		if (confetti) confetti.remove();
 
-		console.log('🧹 Game cleanup completed');
 	};
 
 	// Start the countdown and game
@@ -240,7 +237,6 @@ function initializeGameState(
 		scoreUpdate: false,
 	};
 
-	console.log('✅ Game state initialized');
 }
 
 function renderModals(): string {
@@ -297,20 +293,17 @@ function renderSettingsContent(): string {
 }
 
 function initializeOptimizedEffects() {
-	console.log('🌟 Initializing background effects...');
 
 	let atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
 	if (!atmosphereCanvas) {
 		// Retry after short delay if canvas not found
 		setTimeout(initializeOptimizedEffects, 100);
-		console.log('⏳ Waiting for atmosphere canvas...');
 		return;
 	}
 
 	const atmosphereCtx = atmosphereCanvas.getContext('2d');
 	if (!atmosphereCtx) {
 		setTimeout(initializeOptimizedEffects, 100);
-		console.log('⏳ Waiting for atmosphere canvas context...');
 		return;
 	}
 
@@ -509,7 +502,6 @@ function initializeOptimizedEffects() {
 	}
 
 	animateParticles();
-	console.log('✨ Background effects initialized');
 
 	// Update on resize
 	const resizeBg = () => {
@@ -538,7 +530,6 @@ function startOptimizedCountdown(
 	mode: any,
 	gameId?: number
 ) {
-	console.log('⏰ Starting countdown...');
 
 	let countdown = 3;
 	const countdownMessages = ['Ready?', 'Set...', 'Go!'];
@@ -584,7 +575,6 @@ function startOptimizedCountdown(
 				drawCountdown();
 			} else {
 				clearInterval(interval);
-				console.log('🚀 Starting game loop...');
 
 				// Start the game
 				stopGameLoop = startGameLoop(
@@ -617,5 +607,3 @@ export function cleanupGame() {
 		gameCleanupFunction = null;
 	}
 }
-
-console.log('🎨 GRIS-inspired game renderer loaded with optimizations!');

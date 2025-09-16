@@ -22,6 +22,5 @@ export async function waitForWinner(gameId: number, maxAttempts = 10, delay = 20
 	feedback.textContent = `No winner found for game ${gameId} after ${maxAttempts} attempts.`;
 	document.body.appendChild(feedback);
 	setTimeout(() => feedback.remove(), 3500);
-	console.warn(`No winner found for game ${gameId} after ${maxAttempts} attempts.`);
 	return null;
 }

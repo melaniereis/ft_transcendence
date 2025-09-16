@@ -1,3 +1,4 @@
+// srcs/frontend/pages/services/renderRegistrationForm.ts
 import { translations } from './language/translations.js';
 import { renderLoginForm } from './renderLoginForm.js';
 import { navigateTo } from '../index.js';
@@ -14,7 +15,7 @@ export function renderRegistrationForm(container: HTMLElement): void {
 
 		<div class="bg-transparent p-8 rounded-lg shadow-xl space-y-6 w-full max-w-xl backdrop-blur-md">
 			<form id="register-form" class="space-y-6">
-			
+
 			<label class="text-2xl font-bold text-black block">
 				${t.name}:
 				<input type="text" id="name" required
@@ -29,7 +30,7 @@ export function renderRegistrationForm(container: HTMLElement): void {
 
 			<label class="text-2xl font-bold text-black block">
 				${t.email} (optional):
-				<input type="email" id="email" 
+				<input type="email" id="email"
 				class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
 			</label>
 
@@ -89,7 +90,7 @@ export function renderRegistrationForm(container: HTMLElement): void {
 		resultDiv.textContent = '';
 
 		if (!isStrongPassword(password)) {
-			passwordErrorDiv.textContent = t.passwordStrengthError || 
+			passwordErrorDiv.textContent = t.passwordStrengthError ||
 				'Password must be at least 8 characters and include a number, a special character, and an uppercase letter.';
 			return;
 		}
@@ -115,13 +116,13 @@ export function renderRegistrationForm(container: HTMLElement): void {
 				setTimeout(() => {
 					navigateTo('/login');
 				}, 1000);
-			} 
+			}
 			else {
 				resultDiv.textContent = `${t.registrationError} ${result.error}`;
 				resultDiv.classList.remove('text-green-600');
 				resultDiv.classList.add('text-red-600');
 			}
-		} 
+		}
 		catch (err) {
 			resultDiv.textContent = t.registrationFailed || 'Registration failed. Please try again.';
 			resultDiv.classList.remove('text-green-600');

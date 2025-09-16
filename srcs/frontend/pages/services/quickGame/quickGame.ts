@@ -1,3 +1,4 @@
+// srcs/frontend/pages/services/quickGame/quickGame.ts
 import { renderGame } from '../renderGame/renderGame.js';
 import { translations } from "../language/translations.js";
 

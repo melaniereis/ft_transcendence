@@ -255,7 +255,6 @@ async function fetchTeamStats(teamKey: string) {
 		members.sort((a: any, b: any) => b.win_rate - a.win_rate);
 		return members;
 	} catch (err) {
-		console.error(`Error loading stats for ${teamKey}:`, err);
 		return null;
 	}
 }

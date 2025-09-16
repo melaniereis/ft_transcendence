@@ -1,3 +1,4 @@
+// srcs/frontend/pages/services/renderLoginForm.ts
 import { translations } from "./language/translations.js";
 import { startActivityMonitoring } from "./activity.js"
 

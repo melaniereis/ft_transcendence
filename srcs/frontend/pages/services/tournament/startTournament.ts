@@ -99,7 +99,6 @@ export async function startTournament(container: HTMLElement, tournament: any,
 	const winners: { semifinal1?: number; semifinal2?: number; final?: number } = {};
 
 	const fetchGame = async (playerA: number, playerB: number) => {
-		console.log('authToken:', authToken);  // Add this line to debug
 		if (!authToken)
 			authToken = localStorage.getItem('authToken') || '';
 		const res = await fetch('/games', {

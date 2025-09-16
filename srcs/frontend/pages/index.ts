@@ -1,735 +1,443 @@
-// srcs/frontend/pages/index.ts - Simplified main entry point
+// srcs/frontend/pages/index.ts
+// Imports (unchanged)
+import { renderPlayMenu } from './services/renderPlayMenu.js';
+import { renderSettingsPage } from './services/settings.js';
+import { renderTournamentsPage } from './services/tournament/tournaments.js';
+import { renderTeamsPage } from './services/teams.js';
+import { renderRegistrationForm } from './services/renderRegistrationForm.js';
+import { renderLoginForm } from './services/renderLoginForm.js'
+import { renderProfilePage } from './services/renderProfilePage/profile.js';
+import { renderFriendRequestsPage } from './services/renderFriendRequestPage.js';
+import { startMatchmaking } from './services/remote/matchmaking.js';
+import { renderQuickGameSetup } from './services/quickGame/quickGame.js';
+import { renderPlayerSelection } from './services/renderPlayerSelection.js';
+import { translations } from './services/language/translations.js';
+import { Language } from '../types/language.js';
+import { renderIntroScreen } from './services/renderIntro.js';
 
-import { GrisMenuController, createGrisMenuController } from './GrisMenuController.js';
-import { grisTransitions } from './GrisMenuTransitions.js';
+// DOM references
 
-// Define custom event types
-interface GrisNavigateEvent extends CustomEvent {
-	detail: { path: string };
+const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
+const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
+const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
+const teamsBtn = document.getElementById('teams-btn') as HTMLButtonElement;
+const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
+const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+const registerBtn = document.getElementById('register-btn') as HTMLButtonElement;
+const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
+const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
+const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
+const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
+const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
+const appDiv = document.getElementById('app') as HTMLDivElement;
+const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+const languageOptions = document.getElementById('language-options') as HTMLDivElement;
+const loaderWindow = document.getElementById('loader-window') as HTMLDivElement;
+
+// Navigation handler
+export function navigateTo(path: string): void {
+	history.pushState({}, '', path);
+	renderRoute(path);
 }
 
-interface GrisLanguageChangeEvent extends CustomEvent {
-	detail: { language: 'en' | 'es' | 'pt' };
+// Handle back/forward browser buttons
+window.onpopstate = () => {
+	renderRoute(window.location.pathname);
+};
+
+// Route rendering with fade effect and background change
+
+// Helper to preload images
+function preloadImages(urls: string[]): Promise<void[]> {
+	return Promise.all(urls.map(url => new Promise<void>((resolve, reject) => {
+		const img = new window.Image();
+		img.onload = () => resolve();
+		img.onerror = () => resolve(); // Ignore errors, resolve anyway
+		img.src = url;
+	})));
 }
 
-interface AuthSuccessEvent extends CustomEvent {
-	detail: { user: User };
+// Helper to preload audio
+function preloadAudio(url: string): Promise<void> {
+	return new Promise<void>((resolve) => {
+		const audio = new window.Audio();
+		audio.oncanplaythrough = () => resolve();
+		audio.onerror = () => resolve();
+		audio.src = url;
+	});
 }
 
-interface AuthErrorEvent extends CustomEvent {
-	detail: { error: string };
+async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
+	if (loaderWindow) loaderWindow.style.display = 'flex';
+	// Preload assets (add more if needed)
+	await Promise.all([
+		preloadImages([
+			'assets/Background4.jpg',
+			'assets/Background5.png',
+			'https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg',
+			'https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg',
+			'https://i0.wp.com/epiloguegaming.com/wp-content/uploads/2019/02/IMG_20190225_191501.jpg?fit=1280%2C720&ssl=1',
+			'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/683320/ss_631d99cc6462cce94081032b7e600a6b87c3f7d3.1920x1080.jpg?t=1755285422',
+			'https://assets.rockpapershotgun.com/images/2018/12/GRIS-a.jpg',
+		]),
+		preloadAudio('assets/ambient.mp3'),
+	]);
+	// Remove loader
+	if (loaderWindow) loaderWindow.style.display = 'none';
+	renderIntroScreen(appDiv, (route: string) => navigateTo(route));
 }
 
-// App state management
-interface AppState {
-	isLoggedIn: boolean;
-	currentUser: User | null;
-	currentPage: string;
-	language: 'en' | 'es' | 'pt';
-}
-
-interface User {
-	id: string;
-	name: string;
-	username: string;
-	team?: string;
-}
-
-class GrisPongApp {
-	private static instance: GrisPongApp;
-	private state: AppState;
-	private grisMenuController: GrisMenuController;
-	private appElement: HTMLElement | null = null;
-
-	constructor() {
-		this.state = {
-			isLoggedIn: false,
-			currentUser: null,
-			currentPage: 'menu',
-			language: this.getStoredLanguage()
-		};
-
-		// Initialize Gris menu controller
-		this.grisMenuController = createGrisMenuController({
-			enableAnimations: true,
-			enableParticles: true,
-			enableSound: true,
-			language: this.state.language
-		});
-	}
-
-	public static getInstance(): GrisPongApp {
-		if (!GrisPongApp.instance) {
-			GrisPongApp.instance = new GrisPongApp();
-		}
-		return GrisPongApp.instance;
-	}
-
-	/**
-	 * Initialize the application
-	 */
-	public async initialize(): Promise<void> {
-		console.log('Initializing Gris Pong App...');
-
-		// Get app container
-		this.appElement = document.getElementById('app');
-		if (!this.appElement) {
-			console.error('App container not found');
+function renderRoute(path: string): void {
+	appDiv.innerHTML = '';
+	appDiv.classList.add('fade-out');
+	setTimeout(() => {
+		setBackgroundForRoute(path);
+		appDiv.classList.remove('fade-out');
+		appDiv.classList.add('fade-in');
+		const token = localStorage.getItem('authToken');
+		const isLoggedIn = !!token;
+		// Only show loader for route '/'
+		if (path === '/' || path === '') {
+			if (!isLoggedIn) {
+				showLoaderAndRenderIntro(appDiv);
+			} else {
+				appDiv.innerHTML = `
+			<div style="
+			  display: flex;
+			  height: 100vh;
+			  justify-content: center;
+			  align-items: center;
+			  text-align: center;
+			  padding: 0 20px;
+			">
+			  <h1 style="
+				font-size: 4rem;
+				font-weight: 900;
+				text-transform: uppercase;
+				color: #f0f0f0;
+				text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+				letter-spacing: 0.15em;
+				max-width: 800px;
+				line-height: 1.2;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			  ">
+				Welcome to GRIS PONG!<br />
+			  </h1>
+			</div>
+			`;
+			}
 			return;
 		}
-
-		// Initialize menu controller
-		await this.grisMenuController.initialize();
-
-		// Setup global event listeners
-		this.setupGlobalEventListeners();
-
-		// Check authentication state
-		this.checkAuthState();
-
-		// Show appropriate UI
-		this.updateUI();
-
-		console.log('Gris Pong App initialized successfully');
-	}
-
-	/**
-	 * Get stored language preference
-	 */
-	private getStoredLanguage(): 'en' | 'es' | 'pt' {
-		try {
-			const stored = localStorage.getItem('preferredLanguage') as 'en' | 'es' | 'pt';
-			return stored || 'en';
-		} catch {
-			return 'en';
-		}
-	}
-
-	/**
-	 * Setup global event listeners
-	 */
-	private setupGlobalEventListeners(): void {
-		// Navigation events from Gris menu
-		window.addEventListener('gris-navigate', ((e: GrisNavigateEvent) => {
-			const { path } = e.detail;
-			this.navigate(path);
-		}) as EventListener);
-
-		// Language change events
-		window.addEventListener('gris-language-changed', ((e: GrisLanguageChangeEvent) => {
-			const { language } = e.detail;
-			this.updateLanguage(language);
-		}) as EventListener);
-
-		// Top bar navigation
-		this.setupTopBarEventListeners();
-
-		// Authentication events
-		this.setupAuthEventListeners();
-	}
-
-	/**
-	 * Setup top bar event listeners
-	 */
-	private setupTopBarEventListeners(): void {
-		// Play button handlers
-		const playTournament = document.getElementById('play-tournament');
-		const playPlay = document.getElementById('play-play');
-		const playMatchmaking = document.getElementById('play-matchmaking');
-
-		if (playTournament) {
-			playTournament.addEventListener('click', () => this.navigate('/tournament'));
-		}
-
-		if (playPlay) {
-			playPlay.addEventListener('click', () => this.navigate('/play'));
-		}
-
-		if (playMatchmaking) {
-			playMatchmaking.addEventListener('click', () => this.navigate('/matchmaking'));
-		}
-
-		// Other navigation buttons
-		const teamsBtn = document.getElementById('teams-btn');
-		const friendRequestsBtn = document.getElementById('friend-requests-btn');
-		const profileBtn = document.getElementById('profile-btn');
-		const settingsBtn = document.getElementById('settings-btn');
-		const logoutBtn = document.getElementById('logout-btn');
-
-		if (teamsBtn) {
-			teamsBtn.addEventListener('click', () => this.navigate('/teams'));
-		}
-
-		if (friendRequestsBtn) {
-			friendRequestsBtn.addEventListener('click', () => this.navigate('/friend-requests'));
-		}
-
-		if (profileBtn) {
-			profileBtn.addEventListener('click', () => this.navigate('/profile'));
-		}
-
-		if (settingsBtn) {
-			settingsBtn.addEventListener('click', () => this.navigate('/settings'));
-		}
-
-		if (logoutBtn) {
-			logoutBtn.addEventListener('click', () => this.logout());
-		}
-
-		// Top bar login/register buttons
-		const topLoginBtn = document.getElementById('login-btn');
-		const topRegisterBtn = document.getElementById('register-btn');
-
-		if (topLoginBtn) {
-			topLoginBtn.addEventListener('click', () => this.navigate('/login'));
-		}
-
-		if (topRegisterBtn) {
-			topRegisterBtn.addEventListener('click', () => this.navigate('/register'));
-		}
-	}
-
-	/**
-	 * Setup authentication event listeners
-	 */
-	private setupAuthEventListeners(): void {
-		// Listen for successful authentication
-		window.addEventListener('auth-success', ((e: AuthSuccessEvent) => {
-			const { user } = e.detail;
-			this.handleAuthSuccess(user);
-		}) as EventListener);
-
-		// Listen for auth errors
-		window.addEventListener('auth-error', ((e: AuthErrorEvent) => {
-			const { error } = e.detail;
-			this.handleAuthError(error);
-		}) as EventListener);
-	}
-
-	/**
-	 * Check authentication state on app load
-	 */
-	private checkAuthState(): void {
-		try {
-			const storedUser = localStorage.getItem('currentUser');
-			const authToken = localStorage.getItem('authToken');
-
-			if (storedUser && authToken) {
-				this.state.currentUser = JSON.parse(storedUser);
-				this.state.isLoggedIn = true;
-			}
-		} catch (error) {
-			console.warn('Failed to check auth state:', error);
-			this.clearAuthData();
-		}
-	}
-
-	/**
-	 * Handle successful authentication
-	 */
-	private handleAuthSuccess(user: User): void {
-		this.state.currentUser = user;
-		this.state.isLoggedIn = true;
-
-		try {
-			localStorage.setItem('currentUser', JSON.stringify(user));
-		} catch (error) {
-			console.warn('Failed to store user data:', error);
-		}
-
-		this.updateUI();
-		this.navigate('/dashboard');
-	}
-
-	/**
-	 * Handle authentication error
-	 */
-	private handleAuthError(error: string): void {
-		console.error('Authentication error:', error);
-		this.clearAuthData();
-		this.updateUI();
-		this.showNotification(error, 'error');
-	}
-
-	/**
-	 * Clear authentication data
-	 */
-	private clearAuthData(): void {
-		this.state.currentUser = null;
-		this.state.isLoggedIn = false;
-
-		try {
-			localStorage.removeItem('currentUser');
-			localStorage.removeItem('authToken');
-		} catch (error) {
-			console.warn('Failed to clear auth data:', error);
-		}
-	}
-
-	/**
-	 * Logout user
-	 */
-	private logout(): void {
-		this.clearAuthData();
-		this.updateUI();
-		this.navigate('/');
-		this.showNotification('Logged out successfully', 'success');
-	}
-
-	/**
-	 * Update language
-	 */
-	private updateLanguage(language: 'en' | 'es' | 'pt'): void {
-		this.state.language = language;
-		this.grisMenuController.updateLanguage(language);
-
-		try {
-			localStorage.setItem('preferredLanguage', language);
-		} catch (error) {
-			console.warn('Failed to save language preference:', error);
-		}
-	}
-
-	/**
-	 * Navigate to a specific route
-	 */
-	public navigate(path: string): void {
-		console.log(`Navigating to: ${path}`);
-
-		this.state.currentPage = path;
-
-		// Handle navigation based on path
+		// Other routes: no loader
 		switch (path) {
-			case '/':
-			case '/menu':
-				this.showMainMenu();
-				break;
-			case '/login':
-				this.showLoginForm();
-				break;
-			case '/register':
-				this.showRegistrationForm();
-				break;
-			case '/dashboard':
-				this.showDashboard();
-				break;
-			case '/profile':
-				this.showProfile();
+			case '/play':
+				renderPlayerSelection(appDiv);
 				break;
 			case '/settings':
-				this.showSettings();
+				renderSettingsPage(appDiv);
 				break;
-			case '/play':
-				this.showGameInterface();
-				break;
-			case '/tournament':
-				this.showTournament();
-				break;
-			case '/matchmaking':
-				this.showMatchmaking();
+			case '/tournaments':
+				renderTournamentsPage(appDiv);
 				break;
 			case '/teams':
-				this.showTeams();
+				renderTeamsPage(appDiv);
 				break;
-			case '/friend-requests':
-				this.showFriendRequests();
+			case '/login':
+				renderLoginForm(appDiv, async () => {
+					updateUIBasedOnAuth();
+					await updateFriendRequestsBadge();
+					await setOnlineOnLoad();
+					navigateTo('/');
+				});
 				break;
-			default:
-				this.show404();
+			case '/register':
+				renderRegistrationForm(appDiv);
+				break;
+			case '/profile':
+				renderProfilePage(appDiv);
+				break;
+			case '/friends':
+				renderFriendRequestsPage(appDiv);
+				break;
+			case '/quick-play':
+				renderQuickGameSetup(appDiv);
+				break;
+			case '/matchmaking':
+				const playerId = Number(localStorage.getItem('playerId'));
+				const playerName = localStorage.getItem('playerName') || 'Unknown';
+				const difficulty = 'normal';
+				startMatchmaking(appDiv, playerId, playerName, difficulty);
 				break;
 		}
+	}, 500);
+}
 
-		this.updateUI();
+// Set background image for route
+function setBackgroundForRoute(route: string): void {
+	let backgroundUrl = ''; // Default background
+
+	// Set the background URL based on the current route
+	switch (route) {
+		case '/settings':
+			backgroundUrl = 'url("https://cdn.staticneo.com/ew/thumb/c/c8/Gris_Ch2-2_Kp08J.jpg/730px-Gris_Ch2-2_Kp08J.jpg")';
+			break;
+		case '/tournaments':
+			backgroundUrl = 'url("https://i0.wp.com/epiloguegaming.com/wp-content/uploads/2019/02/IMG_20190225_191501.jpg?fit=1280%2C720&ssl=1")';
+			break;
+		case '/teams':
+			backgroundUrl = 'url("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/683320/ss_631d99cc6462cce94081032b7e600a6b87c3f7d3.1920x1080.jpg?t=1755285422")';
+			break;
+		case '/friend-requests':
+			backgroundUrl = 'url("assets/Background4.jpg")';
+			break;
+		case '/matchmaking':
+			backgroundUrl = 'url("https://assets.rockpapershotgun.com/images/2018/12/GRIS-a.jpg")';
+			break;
+		default:
+			backgroundUrl = 'url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg")'; // Default background
 	}
 
-	/**
-	 * Update UI based on current state
-	 */
-	private updateUI(): void {
-		const topBar = document.getElementById('top-bar');
-		const grisMenu = document.getElementById('gris-main-menu');
+	// Apply the new background with transition effect
+	appDiv.style.transition = 'background-image 1s ease-in-out';
+	appDiv.style.backgroundImage = backgroundUrl;
+	appDiv.style.backgroundSize = 'cover'; /* Ensure the image always covers the full background */
+	appDiv.style.backgroundPosition = 'center'; /* Center the image */
+}
 
-		if (!topBar || !grisMenu) return;
+// Update UI elements based on login state
+function updateUIBasedOnAuth(): void {
+	const token = localStorage.getItem('authToken');
+	const isLoggedIn = !!token;
 
-		if (this.state.isLoggedIn) {
-			topBar.style.display = 'flex';
-			this.grisMenuController.hide();
-			this.updateTopBarButtons(true);
-		} else {
-			topBar.style.display = 'none';
-			this.grisMenuController.show();
-			this.updateTopBarButtons(false);
-		}
+	// Show/hide buttons based on login state
+	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 
-		this.updateFriendRequestsBadge();
-	}
+	playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	tournamentsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	teamsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	logoutBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	profileBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
+	matchmakingBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 
-	/**
-	 * Update friend requests badge
-	 */
-	public updateFriendRequestsBadge(count?: number): void {
-		const badge = document.getElementById('friend-requests-badge');
-		if (!badge) return;
+	// Quick Play button should only be visible when NOT logged in
+	quickPlayBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 
-		if (count === undefined) {
-			try {
-				const storedCount = localStorage.getItem('pendingFriendRequests');
-				count = storedCount ? parseInt(storedCount, 10) : 0;
-			} catch {
-				count = 0;
-			}
-		}
+	loginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+	registerBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
 
-		if (count > 0) {
-			badge.textContent = count.toString();
-			badge.classList.remove('hidden');
-		} else {
-			badge.classList.add('hidden');
-		}
-	}
-
-	/**
-	 * Update top bar button visibility
-	 */
-	private updateTopBarButtons(isLoggedIn: boolean): void {
-		const loggedInElements = [
-			'play-btn', 'teams-btn', 'friend-requests-btn',
-			'profile-btn', 'settings-btn', 'logout-btn'
-		];
-
-		const notLoggedInElements = ['login-btn', 'register-btn'];
-
-		loggedInElements.forEach(id => {
-			const element = document.getElementById(id);
-			if (element) {
-				element.style.display = isLoggedIn ? 'block' : 'none';
-			}
-		});
-
-		notLoggedInElements.forEach(id => {
-			const element = document.getElementById(id);
-			if (element) {
-				element.style.display = isLoggedIn ? 'none' : 'block';
-			}
-		});
-	}
-
-	/**
-	 * Show main menu
-	 */
-	private showMainMenu(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '';
-		}
-	}
-
-	/**
-	 * Show login form
-	 */
-	private showLoginForm(): void {
-		if (!this.appElement) return;
-
-		this.appElement.innerHTML = `
-			<div class="auth-container">
-				<h2>Login</h2>
-				<form id="login-form" class="auth-form">
-					<label>
-						Username:
-						<input type="text" id="login-username" required />
-					</label>
-					<label>
-						Password:
-						<input type="password" id="login-password" required />
-					</label>
-					<button type="submit">Login</button>
-				</form>
-				<p><a href="#" id="show-register">Don't have an account? Register here</a></p>
-				<div id="login-result"></div>
-			</div>
-		`;
-
-		this.setupLoginForm();
-	}
-
-	/**
-	 * Show registration form
-	 */
-	private showRegistrationForm(): void {
-		if (!this.appElement) return;
-
-		this.appElement.innerHTML = `
-			<div class="auth-container">
-				<h2>Register</h2>
-				<form id="registration-form" class="auth-form">
-					<label>
-						Name:
-						<input type="text" id="name" required />
-					</label>
-					<label>
-						Username:
-						<input type="text" id="username" required />
-					</label>
-					<label>
-						Team:
-						<input type="text" id="team" />
-					</label>
-					<label>
-						Password:
-						<input type="password" id="password" required />
-					</label>
-					<button type="submit">Register</button>
-				</form>
-				<p><a href="#" id="show-login">Already have an account? Login here</a></p>
-				<div id="result"></div>
-			</div>
-		`;
-
-		this.setupRegistrationForm();
-	}
-
-	/**
-	 * Setup login form
-	 */
-	private setupLoginForm(): void {
-		const form = document.getElementById('login-form') as HTMLFormElement;
-		const result = document.getElementById('login-result');
-		const showRegister = document.getElementById('show-register');
-
-		if (form && result) {
-			form.addEventListener('submit', async (e) => {
-				e.preventDefault();
-
-				const username = (document.getElementById('login-username') as HTMLInputElement).value;
-				const password = (document.getElementById('login-password') as HTMLInputElement).value;
-
-				try {
-					const response = await fetch('/auth/login', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ username, password })
-					});
-
-					if (!response.ok) {
-						throw new Error('Login failed');
-					}
-
-					const data = await response.json();
-					localStorage.setItem('authToken', data.token);
-					this.handleAuthSuccess(data.user);
-					result.innerHTML = '✅ Login successful!';
-				} catch (err) {
-					result.innerHTML = `❌ ${(err as Error).message}`;
-				}
-			});
-		}
-
-		if (showRegister) {
-			showRegister.addEventListener('click', (e) => {
-				e.preventDefault();
-				this.navigate('/register');
-			});
-		}
-	}
-
-	/**
-	 * Setup registration form
-	 */
-	private setupRegistrationForm(): void {
-		const form = document.getElementById('registration-form') as HTMLFormElement;
-		const result = document.getElementById('result');
-		const showLogin = document.getElementById('show-login');
-
-		if (form && result) {
-			form.addEventListener('submit', async (e) => {
-				e.preventDefault();
-
-				const name = (document.getElementById('name') as HTMLInputElement).value;
-				const username = (document.getElementById('username') as HTMLInputElement).value;
-				const team = (document.getElementById('team') as HTMLInputElement).value;
-				const password = (document.getElementById('password') as HTMLInputElement).value;
-
-				try {
-					const response = await fetch('/users', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ name, username, team, password })
-					});
-
-					if (!response.ok) {
-						throw new Error('Registration failed');
-					}
-
-					const data = await response.json();
-					result.innerHTML = `✅ Registered successfully: ${data.username}`;
-					form.reset();
-
-					setTimeout(() => {
-						this.navigate('/login');
-					}, 2000);
-				} catch (err) {
-					result.innerHTML = `❌ ${(err as Error).message}`;
-				}
-			});
-		}
-
-		if (showLogin) {
-			showLogin.addEventListener('click', (e) => {
-				e.preventDefault();
-				this.navigate('/login');
-			});
-		}
-	}
-
-	/**
-	 * Show dashboard
-	 */
-	private showDashboard(): void {
-		if (!this.appElement) return;
-
-		this.appElement.innerHTML = `
-			<div class="dashboard-container">
-				<h1>Welcome, ${this.state.currentUser?.name || 'Player'}!</h1>
-				<div class="dashboard-grid">
-					<div class="dashboard-card">
-						<h3>Quick Play</h3>
-						<button onclick="window.app.navigate('/play')">Start Game</button>
-					</div>
-					<div class="dashboard-card">
-						<h3>Tournaments</h3>
-						<button onclick="window.app.navigate('/tournament')">View Tournaments</button>
-					</div>
-					<div class="dashboard-card">
-						<h3>Profile</h3>
-						<button onclick="window.app.navigate('/profile')">View Profile</button>
-					</div>
-					<div class="dashboard-card">
-						<h3>Teams</h3>
-						<button onclick="window.app.navigate('/teams')">Manage Teams</button>
-					</div>
-				</div>
-			</div>
-		`;
-	}
-
-	/**
-	 * Show other pages - SIMPLIFIED versions
-	 */
-	private showFriendRequests(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Friend Requests</h1><p>Friend requests page coming soon...</p>';
-		}
-	}
-
-	private showProfile(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Profile Page</h1><p>Profile management coming soon...</p>';
-		}
-	}
-
-	private showSettings(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Settings Page</h1><p>Settings panel coming soon...</p>';
-		}
-	}
-
-	private showGameInterface(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Game Interface</h1><p>Pong game coming soon...</p>';
-		}
-	}
-
-	private showTournament(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Tournament</h1><p>Tournament system coming soon...</p>';
-		}
-	}
-
-	private showMatchmaking(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Matchmaking</h1><p>Matchmaking system coming soon...</p>';
-		}
-	}
-
-	private showTeams(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>Teams</h1><p>Team management coming soon...</p>';
-		}
-	}
-
-	private show404(): void {
-		if (this.appElement) {
-			this.appElement.innerHTML = '<h1>404 - Page Not Found</h1><p>The requested page could not be found.</p>';
-		}
-	}
-
-	/**
-	 * Show notification
-	 */
-	private showNotification(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
-		const notification = document.createElement('div');
-		notification.className = `notification notification-${type}`;
-		notification.textContent = message;
-		notification.style.cssText = `
-			position: fixed;
-			top: 20px;
-			right: 20px;
-			background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
-			color: white;
-			padding: 12px 20px;
-			border-radius: 8px;
-			z-index: 10000;
-			animation: slideIn 0.3s ease-out;
-		`;
-
-		document.body.appendChild(notification);
-
-		setTimeout(() => {
-			notification.style.animation = 'slideOut 0.3s ease-in';
-			setTimeout(() => {
-				if (notification.parentNode) {
-					notification.parentNode.removeChild(notification);
-				}
-			}, 300);
-		}, 3000);
-	}
-
-	/**
-	 * Get app state
-	 */
-	public getState(): AppState {
-		return { ...this.state };
-	}
-
-	/**
-	 * Get current user
-	 */
-	public getCurrentUser(): User | null {
-		return this.state.currentUser;
+	if (isLoggedIn) {
+		updateFriendRequestsBadge();
+		setOnlineOnLoad();
 	}
 }
 
-// Initialize app when DOM is loaded
+// On page load initialization
+// Inject fade-in/fade-out animation styles for buttons
+if (!document.getElementById('fade-btn-animations')) {
+	const style = document.createElement('style');
+	style.id = 'fade-btn-animations';
+	style.textContent = `
+		.fade-btn-out {
+			opacity: 0;
+			transform: scale(0.96);
+			transition: opacity 0.38s cubic-bezier(.6,.2,.3,1), transform 0.38s cubic-bezier(.6,.2,.3,1);
+		}
+		.fade-btn-in {
+			opacity: 1;
+			transform: scale(1);
+			transition: opacity 0.38s cubic-bezier(.6,.2,.3,1), transform 0.38s cubic-bezier(.6,.2,.3,1);
+		}
+	`;
+	document.head.appendChild(style);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-	const app = GrisPongApp.getInstance();
-	await app.initialize();
-	(window as any).app = app;
+	const token = localStorage.getItem('authToken');
+	if (token) {
+		try {
+			const response = await fetch('/api/protected', {
+				headers: { 'Authorization': `Bearer ${token}` }
+			});
+
+			if (response.ok) {
+				const { startActivityMonitoring } = await import('./services/activity.js');
+				startActivityMonitoring();
+				await updateOnlineStatus(true);
+				updateFriendRequestsBadge();
+			} else {
+				localStorage.removeItem('authToken');
+			}
+		} catch (error) {
+			console.error('Error verifying token on page load:', error);
+			localStorage.removeItem('authToken');
+		}
+	}
+
+	updateUIBasedOnAuth();
+	// Only render intro screen after all resources are loaded
+	if (document.readyState === 'complete') {
+		renderRoute(window.location.pathname); // ← load initial route
+	} else {
+		window.addEventListener('load', () => {
+			renderRoute(window.location.pathname);
+		});
+	}
 });
 
-// Export app instance and required functions
-export const app = GrisPongApp.getInstance();
-
-export function navigateTo(path: string): void {
-	app.navigate(path);
+// Event listeners for navigation buttons
+function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
+	btn.classList.add('fade-btn-out');
+	setTimeout(() => {
+		btn.classList.remove('fade-btn-out');
+		btn.classList.add('fade-btn-in');
+		navFn();
+		setTimeout(() => {
+			btn.classList.remove('fade-btn-in');
+		}, 400);
+	}, 380);
 }
 
-export function updateFriendRequestsBadge(count?: number): void {
-	app.updateFriendRequestsBadge(count);
+playBtn.addEventListener('click', () => fadeButtonAndNavigate(playBtn, () => navigateTo('/play')));
+settingsBtn.addEventListener('click', () => fadeButtonAndNavigate(settingsBtn, () => navigateTo('/settings')));
+tournamentsBtn.addEventListener('click', () => fadeButtonAndNavigate(tournamentsBtn, () => navigateTo('/tournaments')));
+teamsBtn.addEventListener('click', () => fadeButtonAndNavigate(teamsBtn, () => navigateTo('/teams')));
+loginBtn.addEventListener('click', () => fadeButtonAndNavigate(loginBtn, () => {
+	renderLoginForm(appDiv, () => {
+		updateUIBasedOnAuth();
+		navigateTo('/');
+	});
+}));
+registerBtn.addEventListener('click', () => fadeButtonAndNavigate(registerBtn, () => navigateTo('/register')));
+profileBtn.addEventListener('click', () => fadeButtonAndNavigate(profileBtn, () => navigateTo('/profile')));
+friendRequestsBtn.addEventListener('click', () => fadeButtonAndNavigate(friendRequestsBtn, () => navigateTo('/friends')));
+quickPlayBtn.addEventListener('click', () => fadeButtonAndNavigate(quickPlayBtn, () => navigateTo('/quick-play')));
+logoutBtn.addEventListener('click', () => fadeButtonAndNavigate(logoutBtn, () => {
+	localStorage.removeItem('authToken');
+	appDiv.innerHTML = '<p>You have been logged out.</p>';
+	updateUIBasedOnAuth();
+}));
+matchmakingBtn.addEventListener('click', () => fadeButtonAndNavigate(matchmakingBtn, () => navigateTo('/matchmaking')));
+
+// Language toggle handlers
+languageBtn.addEventListener('click', (e) => {
+	e.stopPropagation(); // Prevent document click from immediately hiding dropdown
+	languageOptions.classList.toggle('hidden');
+});
+
+// Language option buttons click handler
+languageOptions.querySelectorAll('button').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang') || 'en';
+		localStorage.setItem('preferredLanguage', selectedLang);
+		applyLanguage(selectedLang);
+		languageOptions.classList.add('hidden'); // Hide dropdown after selection
+	});
+});
+
+// Close language dropdown on outside click
+document.addEventListener('click', (e) => {
+	if (!languageOptions.contains(e.target as Node) && e.target !== languageBtn) {
+		languageOptions.classList.add('hidden');
+	}
+});
+
+// Apply language function
+function applyLanguage(lang: string) {
+	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
+	const t = translations[safeLang];
+
+	playBtn.innerHTML = `🎮 ${t.play}`;
+	settingsBtn.innerHTML = `⚙️ ${t.settings}`;
+	tournamentsBtn.innerHTML = `🏆 ${t.tournaments}`;
+	teamsBtn.innerHTML = `👥 ${t.teams}`;
+	loginBtn.innerHTML = `🔑 ${t.login}`;
+	logoutBtn.innerHTML = `🚪 ${t.logout}`;
+	registerBtn.innerHTML = `📝 ${t.register}`;
+	profileBtn.innerHTML = `👤 ${t.profile}`;
+	friendRequestsBtn.innerHTML = `🤝 ${t.friendRequests}`;
+	quickPlayBtn.innerHTML = `⚡ ${t.quickPlay}`;
+	matchmakingBtn.innerHTML = `🎯 ${t.matchmaking}`;
+	languageBtn.innerHTML = `🌐 ${t.language}`;
 }
 
-export function getCurrentUser(): User | null {
-	return app.getCurrentUser();
+// On load, apply preferred language
+const storedLang = localStorage.getItem('preferredLanguage') || 'en';
+applyLanguage(storedLang);
+
+// Export friend requests badge update function
+export async function updateFriendRequestsBadge() {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+
+	try {
+		const response = await fetch('/api/friends/pending', {
+			headers: { 'Authorization': `Bearer ${token}` }
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			const pendingCount = data.pending?.length || 0;
+
+			if (pendingCount > 0) {
+				friendRequestsBadge.textContent = pendingCount.toString();
+				friendRequestsBadge.style.display = 'block';
+			} else {
+				friendRequestsBadge.style.display = 'none';
+			}
+		}
+	} catch (error) {
+		console.error('Error updating friend requests badge:', error);
+	}
 }
 
-export function getAppState(): AppState {
-	return app.getState();
+// Update online status
+async function updateOnlineStatus(isOnline: boolean) {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+
+	try {
+		await fetch('/api/profile/status', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			},
+			body: JSON.stringify({ online: isOnline })
+		});
+		console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
+	} catch (error) {
+		console.error('Failed to update status:', error);
+	}
 }
+
+async function setOnlineOnLoad() {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+	try {
+		await fetch('/api/profile/status', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
+			},
+			body: JSON.stringify({ online: true })
+		});
+	} catch (error) {
+		console.error('Failed to set online on load:', error);
+	}
+}
+
+languageBtn.addEventListener('click', () => {
+	const isHidden = getComputedStyle(languageOptions).display === 'none';
+	languageOptions.style.display = isHidden ? 'block' : 'none';
+});
+
+languageOptions.querySelectorAll('button').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang') || 'en';
+		localStorage.setItem('preferredLanguage', selectedLang);
+		applyLanguage(selectedLang);
+		languageOptions.style.display = 'none';
+	});
+});
