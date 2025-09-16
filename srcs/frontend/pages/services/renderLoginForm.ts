@@ -9,30 +9,25 @@ export function renderLoginForm(container: HTMLElement, onLoginSuccess: () => vo
 	const t = translations[lang];
 
 	container.innerHTML = `
-		<div class="flex flex-col items-center justify-center h-screen p-6 bg-cover bg-center">
-			<h2 class="text-6xl font-bold text-black mb-8">${t.loginTitle}</h2>
+	<div class="flex flex-col items-center justify-center min-h-screen p-4 bg-cover bg-center">
+			<h2 class="text-5xl font-bold text-[#e8d5ff] mb-8 drop-shadow-lg text-center" style="font-family:'Segoe UI',sans-serif;letter-spacing:0.08em;">${t.loginTitle}</h2>
 
-			<div class="bg-transparent p-8 rounded-lg shadow-xl space-y-6 w-full max-w-xl backdrop-blur-md">
-				<form id="login-form" class="space-y-6">
-					<label class="text-2xl font-bold text-black block">
-						${t.username}:
-						<input type="text" name="username" placeholder="${t.username}" required
-							class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black placeholder-gray-500" />
+			<div class="w-full max-w-xl p-8 rounded-3xl shadow-2xl backdrop-blur-lg bg-[rgba(44,34,84,0.10)] border border-[rgba(232,213,255,0.18)]" style="box-shadow:0 8px 32px 0 rgba(44,34,84,0.18),0 1.5px 8px 0 rgba(44,34,84,0.10);">
+				<form id="login-form" class="space-y-7 flex flex-col items-center">
+					<label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+						<span class="mb-2">${t.username}:</span>
+						<input type="text" name="username" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.username}" />
 					</label>
-
-					<label class="text-2xl font-bold text-black block">
-						${t.password}:
-						<input type="password" name="password" placeholder="${t.password}" required
-							class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black placeholder-gray-500" />
+					<label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+						<span class="mb-2">${t.password}:</span>
+						<input type="password" name="password" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.password}" />
 					</label>
-
-					<button type="submit"
-						class="w-full py-4 text-2xl font-bold text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
+					<div id="login-error" class="w-full text-red-600 text-lg text-center"></div>
+					<button type="submit" class="mx-auto w-2/3 py-4 text-2xl font-bold text-[#2c2254] bg-gradient-to-r from-[#e8d5ff] to-[#6c4fa3] border-none rounded-full shadow-lg hover:from-[#6c4fa3] hover:to-[#e8d5ff] hover:text-white focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-200">
 						${t.login}
 					</button>
 				</form>
-
-				<div id="login-result" class="text-xl text-red-600 text-center"></div>
+				<div id="login-result" class="text-xl text-red-600 mt-4 text-center"></div>
 			</div>
 		</div>
 	`;

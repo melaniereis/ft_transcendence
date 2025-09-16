@@ -1,4 +1,4 @@
-// srcs/frontend/pages/CelestialAnimations.ts - Gris-inspired celestial effects for main menu (multi-canvas)
+// srcs/frontend/pages/renderIntro/CelestialAnimations.ts - Gris-inspired celestial effects for main menu (multi-canvas)
 
 
 export class CelestialAnimations {
@@ -54,9 +54,13 @@ export class CelestialAnimations {
 
 
 		this.resizeCanvases();
+		let resizeTimeout: number | undefined;
 		window.addEventListener('resize', () => {
 			if (!this.isDestroyed) {
-				this.resizeCanvases();
+				if (resizeTimeout) window.clearTimeout(resizeTimeout);
+				resizeTimeout = window.setTimeout(() => {
+					this.resizeCanvases();
+				}, 120);
 			}
 		});
 		this.init();
@@ -93,24 +97,24 @@ export class CelestialAnimations {
 
 
 	// Animation configuration
-	private sNumber = 1200; // More stars
+	private sNumber = 900; // Slightly fewer stars for performance
 	private sSize = 0.22; // Slightly smaller base size
 	private sSizeR = 0.7; // More size variation
 	private sAlphaR = 0.85; // Brighter dreamy stars
 	private sMaxHueProportion = 0.7;
-	private shootingStarDensity = 0.012; // Slightly more shooting stars
+	private shootingStarDensity = 0.008; // Fewer shooting stars
 	private shootingStarBaseXspeed = 32;
 	private shootingStarBaseYspeed = 17;
 	private shootingStarBaseLength = 10;
 	private shootingStarBaseLifespan = 70;
 	private shootingStarsColors = ["#a1ffba", "#a1d2ff", "#fffaa1", "#ffa1a1", "#e8d5ff", "#bfa1ff"];
-	private mwStarCount = 180000; // More milky way stars
+	private mwStarCount = 100000; // Fewer milky way stars
 	private mwRandomStarProp = 0.22;
-	private mwClusterCount = 420; // More clusters
-	private mwClusterStarCount = 1800; // More stars per cluster
+	private mwClusterCount = 250; // Fewer clusters
+	private mwClusterStarCount = 1200; // Fewer stars per cluster
 	private mwClusterSize = 140; // Larger clusters
 	private mwClusterSizeR = 110; // More size variation
-	private mwClusterLayers = 12; // More layers
+	private mwClusterLayers = 8; // Fewer layers
 	private mwAngle = 0.7; // More dreamy tilt
 	private mwHueMin = 175; // More blue/purple
 	private mwHueMax = 285;

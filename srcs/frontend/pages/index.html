@@ -36,22 +36,6 @@
 		}
 
 		#top-bar .nav-btn {
-			font-size: 2rem;
-			color: black;
-			font-weight: bold;
-			transition: none;
-		}
-
-		#top-bar .nav-btn:hover {
-			font-size: 2rem;
-		}
-
-		#top-bar .nav-btn.active {
-			font-size: 2rem;
-		}
-
-		/* Make top-bar buttons transparent */
-		#top-bar .nav-btn {
 			display: flex;
 			align-items: center;
 			gap: 0.5rem;
@@ -169,71 +153,36 @@
 			audio.play();
 		}, { once: true });
 	</script>
-	<!-- Top Bar -->
 	<div id="top-bar"
-		class="fixed top-0 left-0 w-full z-50 bg-transparent flex flex-wrap justify-center items-center gap-3 py-4 px-6 no-select">
-
+		class="fixed top-0 left-0 w-full z-50 bg-transparent overflow-visible whitespace-nowrap flex justify-start items-center gap-4 py-6 px-6 no-select">
 		<!-- Game Buttons -->
-		<button id="play-btn" class="nav-btn hidden" title="Play">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z" />
-			</svg>
-			<span class="hidden sm:inline">Play</span>
-		</button>
-
-		<button id="tournaments-btn" class="nav-btn hidden" title="Tournaments">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="M9 3v2H5v6a7 7 0 0014 0V5h-4V3" />
-			</svg>
-			<span class="hidden sm:inline">Tournaments</span>
-		</button>
-
-		<button id="teams-btn" class="nav-btn hidden" title="Teams">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a3 3 0 015.356-1.857M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-			</svg>
-			<span class="hidden sm:inline">Teams</span>
-		</button>
-
+		<button id="play-btn" class="nav-btn hidden">🎮 Play</button>
+		<button id="tournaments-btn" class="nav-btn hidden">🏆 Tournaments</button>
+		<button id="teams-btn" class="nav-btn hidden">👥 Teams</button>
+		<button id="matchmaking-btn" class="nav-btn hidden">🔗 Matchmaking</button>
 		<!-- Auth Buttons -->
-		<button id="quick-play-btn" class="nav-btn" title="Quick Play">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-			</svg>
-			<span class="hidden sm:inline">Quick Play</span>
+		<button id="quick-play-btn" class="nav-btn">⚡ Quick Play</button>
+		<button id="login-btn" class="nav-btn">🔐 Login</button>
+		<button id="register-btn" class="nav-btn">📝 Register</button>
+		<button id="profile-btn" class="nav-btn hidden">👤 Profile</button>
+		<!-- Friend Requests -->
+		<button id="friend-requests-btn" class="nav-btn relative hidden">
+			📧 Friend Requests
+			<span id="friend-requests-badge"
+				class="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">!</span>
 		</button>
-
-		<button id="login-btn" class="nav-btn" title="Login">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="M15 12H3m6-6l-6 6 6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-			</svg>
-			<span class="hidden sm:inline">Login</span>
-		</button>
-
-		<button id="register-btn" class="nav-btn" title="Register">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-			</svg>
-			<span class="hidden sm:inline">Register</span>
-		</button>
-
-		<button id="profile-btn" class="nav-btn hidden" title="Profile">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="M5.121 17.804A9 9 0 1117.804 5.121 9 9 0 015.121 17.804z" />
-			</svg>
-			<span class="hidden sm:inline">Profile</span>
-		</button>
+		<button id="settings-btn" class="nav-btn hidden">⚙️ Player Settings</button>
+		<button id="logout-btn" class="nav-btn hidden">🚪 Logout</button>
+		<!-- Language Selector -->
+		<div class="relative inline-block">
+			<button id="language-btn" class="nav-btn">🌐 Language</button>
+			<div id="language-options"
+				class="hidden absolute top-full left-0 mt-2 bg-white text-black rounded shadow-lg p-2 space-y-1 z-[9999] w-32">
+				<button data-lang="en" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">English</button>
+				<button data-lang="es" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Español</button>
+				<button data-lang="pt" class="block px-4 py-2 hover:bg-gray-200 w-full text-left">Português</button>
+			</div>
+		</div>
 	</div>
 	<!-- Main App Content -->
 	<div id="app" class="pt-32 px-4 text-black">

@@ -1,7 +1,7 @@
-// srcs/frontend/pages/services/renderIntro.ts - Responsive Gris-inspired intro screen with improved positioning
+// srcs/frontend/pages/services/renderIntro/renderIntro.ts - Responsive Gris-inspired intro screen with improved positioning
 
-import { translations } from './language/translations.js';
-import { initializeCelestialAnimations } from '../CelestialAnimations.js';
+import { translations } from '../language/translations.js';
+import { initializeCelestialAnimations } from './CelestialAnimations.js';
 
 export function renderIntroScreen(container: HTMLElement, onNavigate: (route: string) => void): void {
 	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')

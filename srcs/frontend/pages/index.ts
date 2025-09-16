@@ -13,7 +13,7 @@ import { renderQuickGameSetup } from './services/quickGame/quickGame.js';
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
 import { Language } from '../types/language.js';
-import { renderIntroScreen } from './services/renderIntro.js';
+import { renderIntroScreen } from './services/renderIntro/renderIntro.js';
 
 // DOM references
 
@@ -68,7 +68,10 @@ function preloadAudio(url: string): Promise<void> {
 }
 
 async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
-	if (loaderWindow) loaderWindow.style.display = 'flex';
+	// Only show loader if NOT logged in
+	const token = localStorage.getItem('authToken');
+	const isLoggedIn = !!token;
+	if (!isLoggedIn && loaderWindow) loaderWindow.style.display = 'flex';
 	// Preload assets (add more if needed)
 	await Promise.all([
 		preloadImages([
@@ -82,9 +85,12 @@ async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
 		]),
 		preloadAudio('assets/ambient.mp3'),
 	]);
-	// Remove loader
-	if (loaderWindow) loaderWindow.style.display = 'none';
+	// Render intro visuals and initialize animations before hiding loader
 	renderIntroScreen(appDiv, (route: string) => navigateTo(route));
+	// Wait a short moment to ensure all animations/canvases are initialized
+	setTimeout(() => {
+		if (loaderWindow) loaderWindow.style.display = 'none';
+	}, 250);
 }
 
 function renderRoute(path: string): void {
@@ -96,6 +102,10 @@ function renderRoute(path: string): void {
 		appDiv.classList.add('fade-in');
 		const token = localStorage.getItem('authToken');
 		const isLoggedIn = !!token;
+		// Hide loader for all non-intro routes
+		if (path !== '/' && path !== '' && loaderWindow) {
+			loaderWindow.style.display = 'none';
+		}
 		// Only show loader for route '/'
 		if (path === '/' || path === '') {
 			if (!isLoggedIn) {
@@ -254,17 +264,18 @@ if (!document.getElementById('fade-btn-animations')) {
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const token = localStorage.getItem('authToken');
+	let isLoggedIn = false;
 	if (token) {
 		try {
 			const response = await fetch('/api/protected', {
 				headers: { 'Authorization': `Bearer ${token}` }
 			});
-
 			if (response.ok) {
 				const { startActivityMonitoring } = await import('./services/activity.js');
 				startActivityMonitoring();
 				await updateOnlineStatus(true);
 				updateFriendRequestsBadge();
+				isLoggedIn = true;
 			} else {
 				localStorage.removeItem('authToken');
 			}
@@ -277,9 +288,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 	updateUIBasedOnAuth();
 	// Only render intro screen after all resources are loaded
 	if (document.readyState === 'complete') {
-		renderRoute(window.location.pathname); // ← load initial route
+		// If logged in, hide loader immediately
+		if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
+		renderRoute(window.location.pathname);
 	} else {
 		window.addEventListener('load', () => {
+			if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
 			renderRoute(window.location.pathname);
 		});
 	}
