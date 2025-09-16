@@ -20,7 +20,7 @@ export async function loadOutgoingFriendRequests() {
 			state.outgoingFriendRequests = data.outgoing || [];
 		}
 	} catch (e) {
-		// ignore
+		// ignore errors silently
 	}
 }
 
@@ -46,44 +46,11 @@ export function setupFriendHoverEffects() {
 	});
 }
 
-export function setupRemoveFriendEvents() {
-	document.querySelectorAll('.remove-friend-btn').forEach(btn => {
-		btn.addEventListener('click', async (e) => {
-			e.stopPropagation();
-			e.preventDefault();
-
-			const target = e.currentTarget as HTMLElement;
-			const friendId = target.dataset.friendId || target.dataset.id;
-			const friendName = target.dataset.friendName || target.dataset.name;
-
-			if (!friendId || !friendName) {
-				console.error('Missing friend data:', { friendId, friendName });
-				return;
-			}
-
-			if (confirm(`${t.confirmRemoveFriend} ${friendName}?`)) {
-				try {
-					await removeFriendApi(friendId);
-					showNotification(`${friendName} ${t.friendRemoved}`, '#28a745');
-
-					const friends = await loadFriends();
-					state.friends = friends;
-					rerenderFriends();
-				} catch (err: any) {
-					console.error('Error removing friend:', err);
-					showNotification(`${t.errorRemovingFriend}: ${err.message || t.unknownError}`, '#dc3545');
-				}
-			}
-		});
-	});
-}
-
 export function rerenderFriends() {
-	const fc = document.getElementById('friends-container');
+	let fc = document.getElementById('friends-container');
+
 	if (fc) {
 		setHTML(fc, friendsList(state.friends));
-		setupFriendHoverEffects();
-		setupRemoveFriendEvents();
 	} else {
 		const friendsPanel = document.getElementById('friends-panel');
 		if (friendsPanel) {
@@ -96,12 +63,21 @@ export function rerenderFriends() {
 							<button id="friend-add" class="gris-action-btn" title="${t.addFriend}" type="submit">${t.add}</button>
 						</form>
 						<div id="friend-msg" style="margin-top:8px;font-size:12px;color:#fff"></div>
-						<div id="friends-container" style="margin:10px 0;text-align:center">${friendsList(state.friends)}</div>
+						<div id="friends-container" style="margin:10px 0;text-align:center">
+							${friendsList(state.friends)}
+						</div>
 					</div>
-				</div>`;
-			setupFriendHoverEffects();
-			setupRemoveFriendEvents();
+				</div>
+			`;
+			fc = document.getElementById('friends-container'); // re-assign after replacing innerHTML
 		}
+	}
+
+	if (fc) {
+		setupFriendHoverEffects();
+		// No setupRemoveFriendEvents() needed, handled in setupFriendsEvents via delegation
+	} else {
+		console.warn('Friends container missing, cannot setup hover effects');
 	}
 }
 
@@ -110,17 +86,79 @@ export function setupFriendsEvents(container: HTMLElement) {
 		const tEl = e.target as HTMLElement;
 		const id = tEl.id;
 
+		// Show all friends modal
 		if (id === 'show-all-friends') {
 			document.getElementById('friends-modal')!.style.display = 'flex';
 			return;
 		}
 
+		// Close friends modal
 		if (id === 'friends-modal-close') {
 			document.getElementById('friends-modal')!.style.display = 'none';
 			return;
 		}
+
+		// Pagination buttons handling
+		if (id === 'friends-prev' || id === 'friends-next') {
+			e.preventDefault();
+			e.stopPropagation();
+			console.log(`Pagination button clicked: ${id}`);
+
+			const total = Math.ceil((state.friends?.length || 0) / 10);
+
+			if (typeof state.friendsPage !== 'number') {
+				state.friendsPage = 0;
+			}
+
+			if (id === 'friends-prev') {
+				state.friendsPage = Math.max(0, state.friendsPage - 1);
+			} else if (id === 'friends-next') {
+				state.friendsPage = Math.min(total - 1, state.friendsPage + 1);
+			}
+
+			console.log('Updated friendsPage:', state.friendsPage);
+			rerenderFriends();
+			return;
+		}
+
+		// === REMOVE FRIEND BUTTON HANDLING ===
+		// Event delegation: check if clicked element or its ancestor is .remove-friend-btn
+		const removeBtn = tEl.closest('.remove-friend-btn') as HTMLElement | null;
+		if (removeBtn) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			const friendId = removeBtn.dataset.friendId || removeBtn.dataset.id;
+			const friendName = removeBtn.dataset.friendName || removeBtn.dataset.name;
+
+			if (!friendId || !friendName) {
+				console.error('Remove Friend: Missing friendId or friendName data attributes');
+				showNotification('Error: friend data missing', '#dc3545');
+				return;
+			}
+
+			const confirmMessage = `${t.confirmRemoveFriend} ${friendName}?`;
+
+			if (!confirm(confirmMessage)) {
+				console.log('User cancelled friend removal');
+				return;
+			}
+
+			try {
+				await removeFriendApi(friendId);
+				showNotification(`${friendName} ${t.friendRemoved}`, '#28a745');
+
+				state.friends = await loadFriends();
+				rerenderFriends();
+			} catch (err: any) {
+				console.error('Error removing friend:', err);
+				showNotification(`${t.errorRemovingFriend}: ${err.message || t.unknownError}`, '#dc3545');
+			}
+			return; // stop further processing
+		}
 	});
 
+	// Submit handler for friend add form
 	container.addEventListener('submit', async (e) => {
 		const form = e.target as HTMLFormElement;
 		if (form.id === 'friend-form') {
@@ -130,7 +168,7 @@ export function setupFriendsEvents(container: HTMLElement) {
 			const username = input.value.trim();
 			if (!username) return;
 
-			const token = localStorage.getItem('authToken'); // get token from localStorage
+			const token = localStorage.getItem('authToken');
 
 			try {
 				const res = await fetch(`/api/users/${encodeURIComponent(username)}`, {
@@ -144,16 +182,20 @@ export function setupFriendsEvents(container: HTMLElement) {
 				showInlineMessage('friend-msg', t.errorCheckingUser, '#dc3545');
 				return;
 			}
+
 			const isFriend = Array.isArray(state.friends) && state.friends.some((f: any) => {
 				return (f.username && f.username.toLowerCase() === username.toLowerCase()) ||
 					(f.name && f.name.toLowerCase() === username.toLowerCase());
 			});
 			const isSelf = state.profile && state.profile.username.toLowerCase() === username.toLowerCase();
+
 			if (isFriend || isSelf) {
 				showInlineMessage('friend-msg', t.alreadyFriend, '#ffc107');
 				return;
 			}
+
 			await loadOutgoingFriendRequests();
+
 			if (state.outgoingFriendRequests && Array.isArray(state.outgoingFriendRequests)) {
 				const alreadyRequested = state.outgoingFriendRequests.some((req: any) => {
 					return (req.username && req.username.toLowerCase() === username.toLowerCase()) ||
@@ -164,6 +206,7 @@ export function setupFriendsEvents(container: HTMLElement) {
 					return;
 				}
 			}
+
 			try {
 				btn.disabled = true;
 				btn.textContent = t.adding;

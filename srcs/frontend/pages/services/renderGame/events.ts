@@ -83,8 +83,13 @@ function setupOptimizedKeyboardControls() {
 			}
 			toggleHelpOverlay();
 		}
-	};
+	
+		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+			e.preventDefault();
 
+			if (state.isPaused) return; // Don't move player if paused
+		}
+	};
 	addEventListenerWithCleanup(window, 'keydown', keyHandler as EventListener);
 }
 

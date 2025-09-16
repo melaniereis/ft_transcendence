@@ -1,4 +1,3 @@
-<!-- srcs/frontend/pages/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,6 +14,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 
   <style>
+    /* Force vertical scrollbar always to prevent flicker */
+    html {
+      overflow-y: scroll;
+    }
+
     /* Reset body and html to prevent extra white space */
     html,
     body {
@@ -26,6 +30,11 @@
       min-height: 240px;
     }
 
+    body {
+      /* Additional body styles */
+      background-color: black;
+    }
+
     .no-select {
       user-select: none;
     }
@@ -34,18 +43,20 @@
       transition: opacity 0.5s ease-in-out, background-image 0.5s ease-in-out;
       opacity: 1;
       background-image: url("https://images.gog-statics.com/2711f1155f42d68a57c9ad2fb755a49839e6bc17a22b4a0bc262b0e35cb73115.jpg");
-      min-height: 100%;
+      min-height: 100vh; /* Changed from 100% to viewport height */
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       color: black;
 
       /* ✅ Apply Montserrat font */
       font-family: 'Montserrat', sans-serif;
     }
 
-    /* Fade-out effect */
+    /* Fade-out effect: opacity corrected to 0.5 */
     #app.fade-out {
-      opacity: 50;
+      opacity: 0.5;
     }
 
     #app.fade-in {
