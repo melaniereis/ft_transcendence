@@ -17,19 +17,6 @@ export function renderTournamentBracket(
 
 	// Modern GRIS-inspired bracket background
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	// Overlay background below top bar
-	if (!document.getElementById('tournament-bg')) {
-		const bg = document.createElement('div');
-		bg.id = 'tournament-bg';
-		bg.style.position = 'fixed';
-		bg.style.inset = '0';
-		bg.style.width = '100vw';
-		bg.style.height = '100vh';
-		bg.style.zIndex = '0';
-		bg.style.pointerEvents = 'none';
-		bg.style.background = "url('assets/Background3.jpg') center center / cover no-repeat fixed";
-		document.body.appendChild(bg);
-	}
 	const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
 	bgGradient.addColorStop(0, 'rgba(255,251,230,0.98)');
 	bgGradient.addColorStop(0.5, GRIS_COLORS.surface);

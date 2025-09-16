@@ -14,55 +14,56 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 	// Limpar conteúdo anterior
 	container.innerHTML = `
-	<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;">
-		<h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);">${t.selectOpponentTitle}</h2>
-		<div class="selection-panel">
-			<label>
-				${t.opponentLabel}
-				<select id="player1-select"></select>
-			</label>
-			<label>
-				${t.maxGamesLabel}
-				<select id="max-games-select">
-					<option value="3">3</option>
-					<option value="5">5</option>
-					<option value="7">7</option>
-					<option value="9">9</option>
-					<option value="11">11</option>
-				</select>
-			</label>
-			<label>
-				${t.difficultyLabel}
-				<select id="difficulty-select">
-					<option value="easy">Easy</option>
-					<option value="normal" selected>Normal</option>
-					<option value="hard">Hard</option>
-					<option value="crazy">Crazy</option>
-				</select>
-			</label>
-			<button id="start-game-btn">${t.startGame}</button>
-			<div id="selection-error"></div>
-			<div id="verification-form"></div>
+		<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">
+			<div class="magic-gradient"></div>
+			<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
+			<div class="cloud cloud1"></div>
+			<div class="cloud cloud2"></div>
+			<div class="cloud cloud3"></div>
+			<div class="cloud cloud4"></div>
+			<div class="cloud cloud5"></div>
+			<div class="cloud cloud6"></div>
 		</div>
-	</div>
-	<div class="cloud-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;pointer-events:none;background:url('assets/Background3.jpg') center center / cover no-repeat fixed;">
-		<div class="magic-gradient"></div>
-		<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
-		<div class="cloud cloud1"></div>
-		<div class="cloud cloud2"></div>
-		<div class="cloud cloud3"></div>
-		<div class="cloud cloud4"></div>
-		<div class="cloud cloud5"></div>
-		<div class="cloud cloud6"></div>
-	</div>
+		<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;">
+			<h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);">${t.selectOpponentTitle}</h2>
+			<div class="selection-panel">
+				<label>
+					${t.opponentLabel}
+					<select id="player1-select"></select>
+				</label>
+				<label>
+					${t.maxGamesLabel}
+					<select id="max-games-select">
+						<option value="3">3</option>
+						<option value="5">5</option>
+						<option value="7">7</option>
+						<option value="9">9</option>
+						<option value="11">11</option>
+					</select>
+				</label>
+				<label>
+					${t.difficultyLabel}
+					<select id="difficulty-select">
+						<option value="easy">Easy</option>
+						<option value="normal" selected>Normal</option>
+						<option value="hard">Hard</option>
+						<option value="crazy">Crazy</option>
+					</select>
+				</label>
+				<button id="start-game-btn">${t.startGame}</button>
+				<div id="selection-error"></div>
+				<div id="verification-form"></div>
+			</div>
+		</div>
 	`;
 
-	// Inject cloud shapes, gradient overlay, sparkles, and new styles for magic
+	// Inject cloud shapes, overlays, and force top bar above all
 	const cloudStyles = document.createElement('style');
 	cloudStyles.textContent = `
+		.cloud-bg { position: absolute !important; z-index: 0 !important; }
 		.magic-gradient { position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 60% 30%,rgba(236,233,244,0.13) 0%,rgba(182,166,202,0.09) 40%,rgba(44,34,84,0.04) 100%);mix-blend-mode:screen;animation:magicGradientMove 12s ease-in-out infinite alternate; }
 		@keyframes magicGradientMove { 0%{background-position:60% 30%;} 100%{background-position:40% 70%;} }
-	.cloud { position: absolute; border-radius: 50%; filter: blur(18px); opacity: 0.85; z-index: 10; pointer-events: none; animation: floatCloud 22s ease-in-out infinite alternate; }
+		.cloud { position: absolute; border-radius: 50%; filter: blur(18px); opacity: 0.85; z-index: 10; pointer-events: none; animation: floatCloud 22s ease-in-out infinite alternate; }
 		.cloud1 { width: 260px; height: 100px; left: 7vw; top: 9vh; animation-delay: 0s; background: linear-gradient(90deg, #e3e7f1 0%, #c7cbe6 100%); }
 		.cloud2 { width: 360px; height: 140px; right: 9vw; top: 21vh; animation-delay: 2s; background: linear-gradient(90deg, #e3e7f1 0%, #bfc6e0 100%); }
 		.cloud3 { width: 220px; height: 80px; left: 54vw; bottom: 13vh; animation-delay: 4s; background: linear-gradient(90deg, #e3e7f1 0%, #d6d8e8 100%); }
@@ -76,7 +77,6 @@ export async function renderPlayerSelection(container: HTMLElement) {
 			80% { transform: translateY(12px) scale(0.98); }
 			100% { transform: translateY(0) scale(1); }
 		}
-
 		.selection-panel {
 			background: rgba(236,233,244,0.22);
 			border-radius: 2.8rem;
@@ -207,6 +207,11 @@ export async function renderPlayerSelection(container: HTMLElement) {
 			font-weight: 700;
 			font-size: 1.18rem;
 			margin-top: 1.4rem;
+		}
+		#top-bar, .top-bar {
+			position: fixed !important;
+			top: 0; left: 0; right: 0;
+			z-index: 100 !important;
 		}
 	`;
 	document.head.appendChild(cloudStyles);

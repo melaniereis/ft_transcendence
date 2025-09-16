@@ -1,4 +1,4 @@
-// Add hover effect styles for Back to Profile button (matching renderPlayerSelection)
+// Inject hover effect styles for Back to Profile button (single block, main app style)
 if (!document.getElementById('gris-friend-hover-styles')) {
 	const hoverStyle = document.createElement('style');
 	hoverStyle.id = 'gris-friend-hover-styles';
@@ -22,84 +22,6 @@ if (!document.getElementById('gris-friend-hover-styles')) {
 			filter: drop-shadow(0 0 8px #fff);
 		}
 	`;
-	document.head.appendChild(hoverStyle);
-}
-
-// Ensure overlays/backgrounds do not block the top bar
-const appContainer = document.getElementById('app');
-if (appContainer) {
-	appContainer.style.position = 'relative';
-}
-if (!document.getElementById('friend-bg-styles')) {
-	const bgStyle = document.createElement('style');
-	bgStyle.id = 'friend-bg-styles';
-	bgStyle.textContent = `
-	.friend-bg {
-		position: fixed;
-		inset: 0;
-		width: 100vw;
-		height: 100vh;
-		z-index: 0;
-		pointer-events: none;
-		background: url('assets/Background3.jpg') center center / cover no-repeat fixed;
-	}
-	.friend-gradient {
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		pointer-events: none;
-		background: radial-gradient(circle at 60% 30%,rgba(236,233,244,0.13) 0%,rgba(182,166,202,0.09) 40%,rgba(44,34,84,0.04) 100%);
-		mix-blend-mode: screen;
-	}
-	`;
-	document.head.appendChild(bgStyle);
-}
-// Add hover effect styles for Back to Profile button
-if (!document.getElementById('gris-friend-hover-styles')) {
-	const hoverStyle = document.createElement('style');
-	hoverStyle.id = 'gris-friend-hover-styles';
-	hoverStyle.textContent = `
-			#back-to-profile {
-				transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.25s;
-			}
-			#back-to-profile:hover {
-				background: linear-gradient(90deg,#b6a6ca 0%,#e3e7f1 100%);
-				color: #fff;
-				box-shadow: 0 10px 32px rgba(44,34,84,0.18);
-				border-color: #b6a6ca;
-				transform: translateY(-2px) scale(1.03);
-			}
-			#back-to-profile svg {
-				transition: stroke 0.25s;
-			}
-			#back-to-profile:hover svg {
-				stroke: #fff;
-			}
-		`;
-	document.head.appendChild(hoverStyle);
-}
-// Add hover effect styles for Back to Profile button
-if (!document.getElementById('gris-friend-hover-styles')) {
-	const hoverStyle = document.createElement('style');
-	hoverStyle.id = 'gris-friend-hover-styles';
-	hoverStyle.textContent = `
-			#back-to-profile {
-				transition: background 0.25s, color 0.25s, box-shadow 0.25s;
-			}
-			#back-to-profile:hover {
-				background: linear-gradient(90deg,#b6a6ca 0%,#e3e7f1 100%);
-				color: #fff;
-				box-shadow: 0 10px 32px rgba(44,34,84,0.18);
-				border-color: #b6a6ca;
-				transform: translateY(-2px) scale(1.03);
-			}
-			#back-to-profile svg {
-				transition: stroke 0.25s;
-			}
-			#back-to-profile:hover svg {
-				stroke: #fff;
-			}
-		`;
 	document.head.appendChild(hoverStyle);
 }
 import { updateFriendRequestsBadge } from '../index.js';
@@ -141,7 +63,7 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 	}
 
 	container.innerHTML = `
-		<div class="friend-bg" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background4.jpg') center center / cover no-repeat fixed;">
+		<div class="friend-bg" style="position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;background:url('assets/Background4.jpg') center center / cover no-repeat fixed;">
 			<div class="magic-gradient"></div>
 			<canvas id="magic-sparkles" style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;"></canvas>
 			<div class="cloud cloud1"></div>
@@ -155,7 +77,7 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 			<div class="cloud cloud9"></div>
 			<div class="cloud cloud10"></div>
 		</div>
-		<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;animation:fadeInPanel 1.2s cubic-bezier(.6,.2,.3,1) forwards;">
+	<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;animation:fadeInPanel 1.2s cubic-bezier(.6,.2,.3,1) forwards;padding-top:72px;">
 			<h2 style="font-size:3.2rem;font-weight:700;color:#fff;margin-bottom:2.8rem;letter-spacing:0.04em;text-shadow:0 6px 32px rgba(44,34,84,0.22);font-family:'Inter','EB Garamond',serif;display:flex;align-items:center;gap:12px;">
 				<span style="display:inline-block;vertical-align:middle;">${svgInboxIcon()}</span>
 				<span>${t.friendRequestsTitle}</span>
@@ -177,10 +99,11 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 		</div>
 	`;
 
-	// Inject cloud shapes, gradient overlay, sparkles, and new styles for magic
+	// Inject cloud shapes, overlays, and force top bar above all
 	const cloudStyles = document.createElement('style');
 	cloudStyles.id = 'gris-friend-styles';
 	cloudStyles.textContent = `
+		.friend-bg { position: absolute !important; z-index: 0 !important; }
 		.magic-gradient { position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 60% 30%,rgba(236,233,244,0.13) 0%,rgba(182,166,202,0.09) 40%,rgba(44,34,84,0.04) 100%);mix-blend-mode:screen;animation:magicGradientMove 12s ease-in-out infinite alternate; }
 		@keyframes magicGradientMove { 0%{background-position:60% 30%;} 100%{background-position:40% 70%;} }
 		.cloud { position: absolute; border-radius: 50%; filter: blur(18px); opacity: 0.85; z-index: 10; pointer-events: none; animation: floatCloud 22s ease-in-out infinite alternate; }
@@ -193,7 +116,7 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 		.cloud7 { width: 180px; height: 60px; left: 12vw; bottom: 18vh; animation-delay: 12s; background: linear-gradient(90deg, #e3e7f1 0%, #bfc6e0 100%); }
 		.cloud8 { width: 140px; height: 50px; right: 32vw; top: 12vh; animation-delay: 14s; background: linear-gradient(90deg, #e3e7f1 0%, #c7cbe6 100%); }
 		.cloud9 { width: 100px; height: 40px; left: 38vw; top: 44vh; animation-delay: 16s; background: linear-gradient(90deg, #e3e7f1 0%, #d6d8e8 100%); }
-		.cloud10 { width: 70px; height: 30px; right: 44vw; bottom: 32vh; animation-delay: 18s; background: linear-gradient(90deg, #e3e7f1 0%, #bfc6e0 100%); }
+		.cloud10 { width: 70px; height: 30px; right: 44vw; bottom: 32vh; animation-delay: 18s; background: linear-gradient(90deg, #e3e7f1 0%, #b6a6ca 100%); }
 		@keyframes floatCloud {
 			0% { transform: translateY(0) scale(1); }
 			20% { transform: translateY(-18px) scale(1.04); }
@@ -265,6 +188,11 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 			background: linear-gradient(90deg,#818cf8 0%,#f8fafc 100%);
 			color: #fff;
 			box-shadow: 0 12px 40px rgba(44,34,84,0.22);
+		}
+		#top-bar, .top-bar {
+			position: fixed !important;
+			top: 0; left: 0; right: 0;
+			z-index: 100 !important;
 		}
 	`;
 	document.head.appendChild(cloudStyles);
@@ -347,8 +275,8 @@ export async function renderFriendRequestsPage(container: HTMLElement) {
 	}, 100);
 
 	document.getElementById('back-to-profile')!.addEventListener('click', async () => {
-		const { renderProfilePage } = await import('./renderProfilePage.js');
-		await renderProfilePage(container);
+		const { render } = await import('./renderProfilePage/render.js');
+		render(container);
 	});
 
 	loadPendingRequests(token);

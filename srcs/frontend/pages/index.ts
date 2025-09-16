@@ -1,6 +1,5 @@
 // srcs/frontend/pages/index.ts
 // Imports (unchanged)
-import { renderPlayMenu } from './services/renderPlayMenu.js';
 import { renderSettingsPage } from './services/settings.js';
 import { renderTournamentsPage } from './services/tournament/tournaments.js';
 import { renderTeamsPage } from './services/teams.js';
@@ -328,8 +327,14 @@ friendRequestsBtn.addEventListener('click', () => fadeButtonAndNavigate(friendRe
 quickPlayBtn.addEventListener('click', () => fadeButtonAndNavigate(quickPlayBtn, () => navigateTo('/quick-play')));
 logoutBtn.addEventListener('click', () => fadeButtonAndNavigate(logoutBtn, () => {
 	localStorage.removeItem('authToken');
-	appDiv.innerHTML = '<p>You have been logged out.</p>';
 	updateUIBasedOnAuth();
+	if (loaderWindow) loaderWindow.style.display = 'flex';
+	setTimeout(() => {
+		renderIntroScreen(appDiv, (route: string) => navigateTo(route));
+		setTimeout(() => {
+			if (loaderWindow) loaderWindow.style.display = 'none';
+		}, 250);
+	}, 250);
 }));
 matchmakingBtn.addEventListener('click', () => fadeButtonAndNavigate(matchmakingBtn, () => navigateTo('/matchmaking')));
 
@@ -361,18 +366,38 @@ function applyLanguage(lang: string) {
 	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
 	const t = translations[safeLang];
 
-	playBtn.innerHTML = `🎮 ${t.play}`;
-	settingsBtn.innerHTML = `⚙️ ${t.settings}`;
-	tournamentsBtn.innerHTML = `🏆 ${t.tournaments}`;
-	teamsBtn.innerHTML = `👥 ${t.teams}`;
-	loginBtn.innerHTML = `🔑 ${t.login}`;
-	logoutBtn.innerHTML = `🚪 ${t.logout}`;
-	registerBtn.innerHTML = `📝 ${t.register}`;
-	profileBtn.innerHTML = `👤 ${t.profile}`;
-	friendRequestsBtn.innerHTML = `🤝 ${t.friendRequests}`;
-	quickPlayBtn.innerHTML = `⚡ ${t.quickPlay}`;
-	matchmakingBtn.innerHTML = `🎯 ${t.matchmaking}`;
-	languageBtn.innerHTML = `🌐 ${t.language}`;
+	// Only update the text node after the SVG for each button, preserving SVG markup
+	function setButtonText(btn: HTMLButtonElement, text: string) {
+		if (!btn) return;
+		// Find the first text node after the SVG
+		const svg = btn.querySelector('svg');
+		if (svg) {
+			// Remove all text nodes after SVG
+			let next = svg.nextSibling;
+			while (next) {
+				const toRemove = next;
+				next = next.nextSibling;
+				if (toRemove.nodeType === Node.TEXT_NODE || (toRemove.nodeType === Node.ELEMENT_NODE && toRemove.nodeName === 'SPAN')) {
+					btn.removeChild(toRemove);
+				}
+			}
+			// Add a single space and the new text
+			btn.appendChild(document.createTextNode(' ' + text));
+		}
+	}
+
+	setButtonText(playBtn, t.play);
+	setButtonText(settingsBtn, t.settings);
+	setButtonText(tournamentsBtn, t.tournaments);
+	setButtonText(teamsBtn, t.teams);
+	setButtonText(loginBtn, t.login);
+	setButtonText(logoutBtn, t.logout);
+	setButtonText(registerBtn, t.register);
+	setButtonText(profileBtn, t.profile);
+	setButtonText(friendRequestsBtn, t.friendRequests);
+	setButtonText(quickPlayBtn, t.quickPlay);
+	setButtonText(matchmakingBtn, t.matchmaking);
+	setButtonText(languageBtn, t.language);
 }
 
 // On load, apply preferred language
