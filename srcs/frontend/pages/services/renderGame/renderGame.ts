@@ -55,7 +55,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, isAI: boole
                 if (onGameEnd) 
                 onGameEnd(canvas, score1, score2);
             },
-            mode, gameId, isAI
+            mode, gameId, isAI, difficulty
             );
         }
         }, 1000);
