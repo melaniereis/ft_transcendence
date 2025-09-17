@@ -18,6 +18,9 @@ export function renderQuickGameSetup(container: HTMLElement) {
 	<label>${t.username} 2:
 		<input type="text" id="player2-name" placeholder="${t.username} 2">
 	</label>
+	<label>${t.aiOpponentLabel || 'Play vs AI:'}
+		<input type="checkbox" id="ai-opponent">
+	</label>
 	<label>${t.maxGamesLabel}:
 		<select id="max-games-select">
 			<option value="3">3</option>
@@ -44,6 +47,7 @@ export function renderQuickGameSetup(container: HTMLElement) {
 	const aiCheckbox = document.getElementById('ai-opponent') as HTMLInputElement;
 	const player2Input = document.getElementById('player2-name') as HTMLInputElement;
 
+  // event listener for the AI checkbox
 	aiCheckbox.addEventListener('change', () => {
 		player2Input.value = aiCheckbox.checked ? 'AI Bot' : '';
 		player2Input.readOnly = aiCheckbox.checked;
@@ -63,20 +67,20 @@ export function renderQuickGameSetup(container: HTMLElement) {
 		if (!player1Name)
 		{
 			errorDiv.textContent = t.invalidOpponent || 'Please enter a player 1 name.';
-			return;
-			}
+    	  	return ;
+    	}
 		if (!isAI && !player2Name)
 		{
 			errorDiv.textContent = t.invalidOpponent || 'Please enter a player 2 name or select AI opponent.';
-			return;
+			return ;
 		}
 		if (!isAI && player1Name === player2Name)
 		{
 			errorDiv.textContent = t.invalidOpponent || 'Please enter two different player names.';
-			return;
+			return ;
 		}
 
 		container.innerHTML = '';
-		renderGame(container, player1Name, player2Name, maxGames, difficulty, undefined, 'quick', undefined);
+		renderGame(container, player1Name, player2Name, maxGames, difficulty, undefined, 'quick', undefined, isAI);
 	});
 }
