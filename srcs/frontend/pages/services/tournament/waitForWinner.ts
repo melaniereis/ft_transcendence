@@ -6,19 +6,6 @@ export async function waitForWinner(gameId: number, maxAttempts = 10, delay = 20
 		await new Promise(resolve => setTimeout(resolve, delay));
 	}
 	// GRIS-inspired feedback UI for no winner found
-	// Overlay background below top bar
-	if (!document.getElementById('wait-winner-bg')) {
-		const bg = document.createElement('div');
-		bg.id = 'wait-winner-bg';
-		bg.style.position = 'fixed';
-		bg.style.inset = '0';
-		bg.style.width = '100vw';
-		bg.style.height = '100vh';
-		bg.style.zIndex = '0';
-		bg.style.pointerEvents = 'none';
-		bg.style.background = "url('/Background3.jpg') center center / cover no-repeat fixed";
-		document.body.appendChild(bg);
-	}
 	const feedback = document.createElement('div');
 	feedback.style.position = 'fixed';
 	feedback.style.top = '2rem';
@@ -35,5 +22,6 @@ export async function waitForWinner(gameId: number, maxAttempts = 10, delay = 20
 	feedback.textContent = `No winner found for game ${gameId} after ${maxAttempts} attempts.`;
 	document.body.appendChild(feedback);
 	setTimeout(() => feedback.remove(), 3500);
+	console.warn(`No winner found for game ${gameId} after ${maxAttempts} attempts.`);
 	return null;
 }

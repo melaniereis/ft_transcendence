@@ -418,4 +418,5 @@ export default {
 	duplicatePlayerNames: "Nomes de jogadores duplicados não são permitidos.",
 	tournamentNameRequired: "O nome do torneio é obrigatório.",
 	invalidPlayerList: "Por favor, corrija os erros na lista de jogadores.",
+	quickTournament: "Torneio Rápido",
 }

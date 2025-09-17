@@ -11,19 +11,6 @@ export async function updateMatch(tournamentId: number, round: string, winnerId:
 	});
 
 	if (!res.ok) {
-		// Overlay background below top bar
-		if (!document.getElementById('update-match-bg')) {
-			const bg = document.createElement('div');
-			bg.id = 'update-match-bg';
-			bg.style.position = 'fixed';
-			bg.style.inset = '0';
-			bg.style.width = '100vw';
-			bg.style.height = '100vh';
-			bg.style.zIndex = '0';
-			bg.style.pointerEvents = 'none';
-			bg.style.background = "url('/Background3.jpg') center center / cover no-repeat fixed";
-			document.body.appendChild(bg);
-		}
 		// GRIS-inspired error feedback
 		const feedback = document.createElement('div');
 		feedback.style.position = 'fixed';

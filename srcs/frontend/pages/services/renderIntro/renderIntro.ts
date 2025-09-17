@@ -2,6 +2,7 @@
 
 import { translations } from '../language/translations.js';
 import { initializeCelestialAnimations } from './CelestialAnimations.js';
+import { applyLanguage } from '../../index.js';
 
 export function renderIntroScreen(container: HTMLElement, onNavigate: (route: string) => void): void {
 	const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
@@ -213,6 +214,12 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 align-self: start;
                 margin-top: 2rem;
             }
+            #intro-quicktournament {
+                grid-column: 2;
+                grid-row: 4; /* one row below quickplay which is at row 3 */
+                align-self: start;
+                margin-top: 2rem;
+            }
 
             .language-container {
                 grid-column: 1;
@@ -319,6 +326,14 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     margin: 0;
                     align-self: center;
                     justify-self: center;
+                }
+                    
+                #intro-quicktournament {
+                    grid-column: 1;
+                    grid-row: 5;
+                    align-self: start;
+                    justify-self: start;
+                    margin-top: 2rem;
                 }
 
                 .language-container {
@@ -459,18 +474,18 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
             </svg>
 
             <!-- Perfect diamond layout using CSS Grid -->
-            <div id="diamond-layout">
-                <h1 id="intro-title">GRIS PONG</h1>
-                <button id="intro-login" class="diamond-btn">${t.login}</button>
-                <button id="intro-register" class="diamond-btn">${t.register}</button>
-                <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
-                <div class="language-container">
-                    <button id="intro-language-btn" class="diamond-btn">${t.language}</button>
-                    <div id="intro-language-options">
-                        <button data-lang="en" class="language-option">English</button>
-                        <button data-lang="es" class="language-option">Español</button>
-                        <button data-lang="pt" class="language-option">Português</button>
-                    </div>
+           <div id="diamond-layout">
+            <h1 id="intro-title">GRIS PONG</h1>
+            <button id="intro-login" class="diamond-btn">${t.login}</button>
+            <button id="intro-register" class="diamond-btn">${t.register}</button>
+            <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
+            <button id="intro-quicktournament" class="diamond-btn">${t.quickTournament}</button> 
+            <div class="language-container">
+                <button id="intro-language-btn" class="diamond-btn">${t.language}</button>
+                <div id="intro-language-options">
+                    <button data-lang="en" class="language-option">English</button>
+                    <button data-lang="es" class="language-option">Español</button>
+                    <button data-lang="pt" class="language-option">Português</button>
                 </div>
             </div>
         </div>
@@ -512,86 +527,101 @@ function initializeCelestialEffects(): void {
 }
 
 function setupIntroEventListeners(onNavigate: (route: string) => void): void {
-	const introLogin = document.getElementById('intro-login');
-	const introRegister = document.getElementById('intro-register');
-	const introQuickplay = document.getElementById('intro-quickplay');
-	const introLanguageBtn = document.getElementById('intro-language-btn');
-	const introLanguageOptions = document.getElementById('intro-language-options');
+  const introLogin = document.getElementById('intro-login');
+  const introRegister = document.getElementById('intro-register');
+  const introQuickplay = document.getElementById('intro-quickplay');
+  const quickTournamentBtn = document.getElementById('intro-quicktournament');
+  const introLanguageBtn = document.getElementById('intro-language-btn');
+  const introLanguageOptions = document.getElementById('intro-language-options');
 
-	function addButtonPressEffect(button: HTMLElement) {
-		if (!button) return;
-		button.addEventListener('mousedown', () => {
-			button.style.transform = 'scale(0.95)';
-		});
-		button.addEventListener('mouseup', () => {
-			button.style.transform = 'scale(1)';
-		});
-		button.addEventListener('mouseleave', () => {
-			button.style.transform = 'scale(1)';
-		});
-	}
+  function addButtonPressEffect(button: HTMLElement) {
+    if (!button) 
+        return;
+    button.addEventListener('mousedown', () => {
+      button.style.transform = 'scale(0.95)';
+    });
+    button.addEventListener('mouseup', () => {
+      button.style.transform = 'scale(1)';
+    });
+    button.addEventListener('mouseleave', () => {
+      button.style.transform = 'scale(1)';
+    });
+  }
 
-	if (introLogin) {
-		addButtonPressEffect(introLogin);
-		introLogin.addEventListener('click', () => {
-			console.log('🔑 Intro login clicked');
-			onNavigate('/login');
-		});
-	}
+  if (introLogin) {
+    addButtonPressEffect(introLogin);
+    introLogin.addEventListener('click', () => {
+      console.log('🔑 Intro login clicked');
+      onNavigate('/login');
+    });
+  }
 
-	if (introRegister) {
-		addButtonPressEffect(introRegister);
-		introRegister.addEventListener('click', () => {
-			console.log('📝 Intro register clicked');
-			onNavigate('/register');
-		});
-	}
+  if (introRegister) {
+    addButtonPressEffect(introRegister);
+    introRegister.addEventListener('click', () => {
+      console.log('📝 Intro register clicked');
+      onNavigate('/register');
+    });
+  }
 
-	if (introQuickplay) {
-		addButtonPressEffect(introQuickplay);
-		introQuickplay.addEventListener('click', () => {
-			console.log('⚡ Intro quickplay clicked');
-			onNavigate('/quick-play');
-		});
-	}
+  if (introQuickplay) {
+    addButtonPressEffect(introQuickplay);
+    introQuickplay.addEventListener('click', () => {
+      console.log('⚡ Intro quickplay clicked');
+      onNavigate('/quick-play');
+    });
+  }
 
-	if (introLanguageBtn && introLanguageOptions) {
-		addButtonPressEffect(introLanguageBtn);
-		introLanguageBtn.addEventListener('click', (e) => {
-			e.stopPropagation();
-			const isHidden = introLanguageOptions.style.display === 'none';
-			introLanguageOptions.style.display = isHidden ? 'block' : 'none';
-			console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
-		});
+  if (quickTournamentBtn) {
+    addButtonPressEffect(quickTournamentBtn);
+    quickTournamentBtn.addEventListener('click', () => {
+      console.log('🏆 Quick tournament button clicked');
+      onNavigate('/quick-tournament');
+    });
+  }
 
-		introLanguageOptions.querySelectorAll('button').forEach(btn => {
-			addButtonPressEffect(btn);
-			btn.addEventListener('click', () => {
-				const selectedLang = btn.getAttribute('data-lang') || 'en';
-				console.log(`Language changed to: ${selectedLang}`);
-				localStorage.setItem('preferredLanguage', selectedLang);
-				introLanguageOptions.style.display = 'none';
+  if (introLanguageBtn && introLanguageOptions) {
+    addButtonPressEffect(introLanguageBtn);
+    introLanguageBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = introLanguageOptions.style.display === 'none';
+      introLanguageOptions.style.display = isHidden ? 'block' : 'none';
+      console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
+    });
 
-				// Smooth re-render with fade effect
-				const container = document.getElementById('app');
-				if (container) {
-					container.style.transition = 'opacity 0.3s ease';
-					container.style.opacity = '0.5';
-					setTimeout(() => {
-						renderIntroScreen(container, onNavigate);
-						container.style.opacity = '1';
-					}, 300);
-				}
-			});
-		});
+    introLanguageOptions?.querySelectorAll('button').forEach(btn => {
+      addButtonPressEffect(btn);
+      btn.addEventListener('click', () => {
+        const selectedLang = btn.getAttribute('data-lang') || 'en';
+        console.log(`Language changed to: ${selectedLang}`);
+        localStorage.setItem('preferredLanguage', selectedLang);
 
-		// Close dropdown on outside click
-		document.addEventListener('click', (e) => {
-			if (!introLanguageOptions.contains(e.target as Node) && e.target !== introLanguageBtn) {
-				introLanguageOptions.style.display = 'none';
-			}
-		});
-	}
+        setTimeout(() => {
+            introLanguageOptions.style.display = 'none';
+        }, 150);
 
-	console.log('🎮 Intro screen event listeners setup complete');
+        applyLanguage(selectedLang);
+
+        const container = document.getElementById('app');
+        if (container) {
+            container.style.transition = 'opacity 0.3s ease';
+            container.style.opacity = '0.5';
+            setTimeout(() => {
+            renderIntroScreen(container, onNavigate);
+            container.style.opacity = '1';
+            }, 300);
+        }
+    });
+
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (!introLanguageOptions.contains(e.target as Node) && e.target !== introLanguageBtn) {
+        introLanguageOptions.style.display = 'none';
+      }
+    });
+  }
+
+  console.log('🎮 Intro screen event listeners setup complete');
 }

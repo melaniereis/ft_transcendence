@@ -419,4 +419,5 @@ play: "Play",
 	duplicatePlayerNames: "Duplicate player names are not allowed.",
 	tournamentNameRequired: "Tournament name is required.",
 	invalidPlayerList: "Please fix player list errors.",
+	quickTournament: "Quick Tournament"
 }

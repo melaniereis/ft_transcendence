@@ -8,22 +8,8 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export async function renderTournamentsPage(container: HTMLDivElement) {
-	// Inject overlays and force top bar above all
-	if (!document.getElementById('tournament-topbar-styles')) {
-		const style = document.createElement('style');
-		style.id = 'tournament-topbar-styles';
-		style.textContent = `
-			.tournament-bg { position:absolute !important; z-index:0 !important; }
-			#top-bar, .top-bar {
-				position: fixed !important;
-				top: 0; left: 0; right: 0;
-				z-index: 100 !important;
-			}
-		`;
-		document.head.appendChild(style);
-	}
 	container.className = 'flex flex-col items-center justify-center min-h-screen p-8';
-	container.style.background = "url('Background6.jpg') center center / cover no-repeat fixed";
+	container.style.background = GRIS_COLORS.gradients.ethereal;
 	container.style.borderRadius = '2rem';
 	container.style.boxShadow = '0 8px 32px 0 rgba(44, 34, 84, 0.18), 0 1.5px 8px 0 rgba(44,34,84,0.10)';
 	container.style.backdropFilter = 'blur(8px)';

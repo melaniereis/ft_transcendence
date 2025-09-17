@@ -11,6 +11,8 @@ import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
 import { Language } from '../types/language.js';
 import { renderIntroScreen } from './services/renderIntro/renderIntro.js';
+import { renderLocalTournamentPage } from './services/quickTournament/quickTournament.js';
+
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
@@ -26,13 +28,14 @@ const registerBtn = document.getElementById('register-btn') as HTMLButtonElement
 const profileBtn = document.getElementById('profile-btn') as HTMLButtonElement;
 const friendRequestsBtn = document.getElementById('friend-requests-btn') as HTMLButtonElement;
 const friendRequestsBadge = document.getElementById('friend-requests-badge') as HTMLSpanElement;
-const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;  // NEW
+const quickPlayBtn = document.getElementById('quick-play-btn') as HTMLButtonElement;
 const appDiv = document.getElementById('app') as HTMLDivElement;
 const languageBtn = document.getElementById('language-btn') as HTMLButtonElement;
 const languageOptions = document.getElementById('language-options') as HTMLDivElement;
 const loaderWindow = document.getElementById('loader-window') as HTMLDivElement;
 const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
 const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
+const quickTournamentBtn = document.getElementById('quick-tournament-btn') as HTMLButtonElement | null;
 
 // Route navigation
 export function navigateTo(path: string): void {
@@ -112,14 +115,14 @@ function renderRoute(path: string): void {
 			} else {
 				appDiv.innerHTML = `
 			<div style="
-			  display: flex;
-			  height: 100vh;
-			  justify-content: center;
-			  align-items: center;
-			  text-align: center;
-			  padding: 0 20px;
+			display: flex;
+			height: 100vh;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			padding: 0 20px;
 			">
-			  <h1 style="
+			<h1 style="
 				font-size: 4rem;
 				font-weight: 900;
 				text-transform: uppercase;
@@ -129,9 +132,9 @@ function renderRoute(path: string): void {
 				max-width: 800px;
 				line-height: 1.2;
 				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			  ">
+			">
 				Welcome to GRIS PONG!<br />
-			  </h1>
+			</h1>
 			</div>
 			`;
 			}
@@ -175,6 +178,9 @@ function renderRoute(path: string): void {
 				const playerName = localStorage.getItem('playerName') || 'Unknown';
 				const difficulty = 'normal';
 				startMatchmaking(appDiv, playerId, playerName, difficulty);
+				break;
+			case '/quick-tournament':
+				renderLocalTournamentPage(appDiv);
 				break;
 			default:
 				appDiv.innerHTML = `
@@ -221,10 +227,10 @@ function setBackgroundForRoute(route: string): void {
 export function updateUIBasedOnAuth(): void {
 	const isLoggedIn = !!localStorage.getItem('authToken');
 
-    const topBar = document.getElementById('top-bar') as HTMLElement;
-    if (topBar) {
-        topBar.style.display = isLoggedIn ? 'flex' : 'none';
-    }
+	const topBar = document.getElementById('top-bar') as HTMLElement;
+	if (topBar) {
+		topBar.style.display = isLoggedIn ? 'flex' : 'none';
+	}
 	
 	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 	playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
@@ -319,15 +325,23 @@ playBtn.addEventListener('click', () => fadeButtonAndNavigate(playBtn, () => nav
 settingsBtn.addEventListener('click', () => fadeButtonAndNavigate(settingsBtn, () => navigateTo('/settings')));
 tournamentsBtn.addEventListener('click', () => fadeButtonAndNavigate(tournamentsBtn, () => navigateTo('/tournaments')));
 teamsBtn.addEventListener('click', () => fadeButtonAndNavigate(teamsBtn, () => navigateTo('/teams')));
-if(loginBtn)
-loginBtn.addEventListener('click', () => fadeButtonAndNavigate(loginBtn, () => {
-	renderLoginForm(appDiv, () => {
-		updateUIBasedOnAuth();
-		navigateTo('/');
-	});
-}));
+if(loginBtn){
+	loginBtn.addEventListener('click', () => fadeButtonAndNavigate(loginBtn, () => {
+		renderLoginForm(appDiv, () => {
+			updateUIBasedOnAuth();
+			navigateTo('/');
+		});
+	}));
+}
+if (quickTournamentBtn) {
+  quickTournamentBtn.addEventListener('click', () => {
+    fadeButtonAndNavigate(quickTournamentBtn, () => navigateTo('/quick-tournament'));
+  });
+}
+
 if(registerBtn)
 	registerBtn.addEventListener('click', () => fadeButtonAndNavigate(registerBtn, () => navigateTo('/register')));
+
 profileBtn.addEventListener('click', () => fadeButtonAndNavigate(profileBtn, () => navigateTo('/profile')));
 friendRequestsBtn.addEventListener('click', () => fadeButtonAndNavigate(friendRequestsBtn, () => navigateTo('/friends')));
 quickPlayBtn.addEventListener('click', () => fadeButtonAndNavigate(quickPlayBtn, () => navigateTo('/quick-play')));
@@ -356,23 +370,26 @@ export function applyLanguage(lang: string): void {
 	playBtn.innerHTML = `🎮 ${t.play}`;
 	settingsBtn.innerHTML = `⚙️ ${t.settings}`;
 	teamsBtn.innerHTML = `👥 ${t.teams}`;
-	if (loginBtn) loginBtn.innerHTML = `🔑 ${t.login}`;
-	if (logoutBtn) logoutBtn.innerHTML = `🚪 ${t.logout}`;
-	if (registerBtn) registerBtn.innerHTML = `📝 ${t.register}`;
+	if (loginBtn) 
+		loginBtn.innerHTML = `🔑 ${t.login}`;
+	if (logoutBtn) 
+		logoutBtn.innerHTML = `🚪 ${t.logout}`;
+	if (registerBtn) 
+		registerBtn.innerHTML = `📝 ${t.register}`;
 	profileBtn.innerHTML = `👤 ${t.profile}`;
 	friendRequestsBtn.innerHTML = `📧 ${t.friendRequests}`;
 	languageBtn.innerHTML = `🌐 ${t.language}`;
-
-	// Quick Play button label
-	if (quickPlayBtn) quickPlayBtn.textContent = `⚡ ${t.quickPlay || 'Quick Play'}`;
-
+	if (quickPlayBtn) 
+		quickPlayBtn.textContent = `⚡ ${t.quickPlay || 'Quick Play'}`;
 	const playOptionPlay = document.getElementById('play-play');
 	const playOptionTournament = document.getElementById('play-tournament');
 	const playOptionMatchmaking = document.getElementById('play-matchmaking');
-
-	if (playOptionPlay) playOptionPlay.textContent = t.play;
-	if (playOptionTournament) playOptionTournament.textContent = t.tournaments;
-	if (playOptionMatchmaking) playOptionMatchmaking.textContent = t.matchmaking;
+	if (playOptionPlay) 
+		playOptionPlay.textContent = t.play;
+	if (playOptionTournament) 
+		playOptionTournament.textContent = t.tournaments;
+	if (playOptionMatchmaking) 
+		playOptionMatchmaking.textContent = t.matchmaking;
 }
 
 // Event listeners for buttons
@@ -431,12 +448,13 @@ document.getElementById('play-matchmaking')?.addEventListener('click', () => nav
 		setButtonText(loginBtn, t.login);
 	setButtonText(logoutBtn, t.logout);
 	if(registerBtn)
-	setButtonText(registerBtn, t.register);
+		setButtonText(registerBtn, t.register);
 	setButtonText(profileBtn, t.profile);
 	setButtonText(friendRequestsBtn, t.friendRequests);
 	setButtonText(quickPlayBtn, t.quickPlay);
 	setButtonText(matchmakingBtn, t.matchmaking);
 	setButtonText(languageBtn, t.language);
+	
 
 // On load, apply preferred language
 const storedLang = localStorage.getItem('preferredLanguage') || 'en';

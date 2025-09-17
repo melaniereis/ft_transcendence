@@ -24,7 +24,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 			try {
 				const displayName = await getDisplayNameById(userId);
 				if (!displayName) {
-					return reply.status(404).send({ error: 'User not found or display name not set' });
+					 return reply.send({ display_name: '' });
 				}
 				return reply.send({ display_name: displayName });
 			} catch (err) {
@@ -76,16 +76,16 @@ export async function userRoutes(fastify: FastifyInstance) {
 
 			try {
 				const username = await getUsernameById(userId);
-				if (!username) {
-					return reply.status(404).send({ error: 'User not found' });
-				}
-				return reply.send({ username });
-			} catch (err) {
+				// Return empty string if no username found instead of 404
+				return reply.send('');
+			} 
+			catch (err) {
 				console.error('Error fetching username:', err);
 				return reply.status(500).send({ error: 'Internal server error' });
 			}
 		}
 	});
+
 
 	fastify.delete('/users/:id', {
 		preHandler: authHook,
