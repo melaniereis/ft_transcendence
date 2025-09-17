@@ -52,6 +52,7 @@ export default {
 	noPlayersSelected: "No hay jugadores seleccionados todavía.",
 	confirm: "Confirmar",
 	waitingForOpponent: "Esperando a que el oponente elija el número de juegos...",
+	waitingForPlayer: "Esperando a que el jugador se una...",
 	connectionError: "Error de conexión. Por favor, inténtalo de nuevo.",
 	difficultyEasy: "Fácil",
 	difficultyNormal: "Normal",

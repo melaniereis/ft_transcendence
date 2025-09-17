@@ -1,4 +1,4 @@
-import { GameRoom } from '../types/gameRoom';
+import { GameRoom } from '../types/webSocket.js'; // Use webSocket.js
 
 const canvasWidth = 1280;
 const canvasHeight = 680;
@@ -31,7 +31,7 @@ export function startGameLoop(gameRoom: GameRoom) {
 
 		// Send updates to players
 		sendGameUpdates(r);
-	}, 1000 / 60);
+	}, 1000 / 60); // 60 FPS
 }
 
 // Move the ball based on velocity
@@ -54,23 +54,19 @@ function bounceBallOffWalls(r: GameRoom) {
 // Handle paddle collisions
 function handlePaddleCollisions(r: GameRoom) {
 	// Left paddle collision
-	if (
-		r.ballX - ballRadius <= paddleXLeft + paddleWidth &&
+	if (r.ballX - ballRadius <= paddleXLeft + paddleWidth &&
 		r.ballX - ballRadius >= paddleXLeft &&
 		r.ballY >= r.leftY &&
-		r.ballY <= r.leftY + r.paddleHeight
-	) {
+		r.ballY <= r.leftY + r.paddleHeight) {
 		r.ballVX = -r.ballVX;
 		r.ballX = paddleXLeft + paddleWidth + ballRadius;
 	}
 
 	// Right paddle collision
-	if (
-		r.ballX + ballRadius >= paddleXRight &&
+	if (r.ballX + ballRadius >= paddleXRight &&
 		r.ballX + ballRadius <= paddleXRight + paddleWidth &&
 		r.ballY >= r.rightY &&
-		r.ballY <= r.rightY + r.paddleHeight
-	) {
+		r.ballY <= r.rightY + r.paddleHeight) {
 		r.ballVX = -r.ballVX;
 		r.ballX = paddleXRight - ballRadius;
 	}
@@ -93,21 +89,25 @@ function handleScoreUpdate(r: GameRoom) {
 	// Check if max score reached
 	if (r.leftScore >= r.maxScore || r.rightScore >= r.maxScore) {
 		const winnerName = r.leftScore > r.rightScore ? r.left?.username : r.right?.username;
+
 		[r.left, r.right].forEach((player) => {
 			if (player && player.readyState === player.OPEN) {
-				player.send(
-					JSON.stringify({
-						type: 'end',
-						message: `${winnerName} wins!`,
-						leftScore: r.leftScore,
-						rightScore: r.rightScore,
-						leftPlayerName: r.left?.username,
-						rightPlayerName: r.right?.username,
-					})
-				);
+				player.send(JSON.stringify({
+					type: 'end',
+					message: `${winnerName} wins!`,
+					leftScore: r.leftScore,
+					rightScore: r.rightScore,
+					leftPlayerName: r.left?.username,
+					rightPlayerName: r.right?.username
+				}));
 			}
 		});
-		if (r.intervalId) clearInterval(r.intervalId);
+
+		// Stop game loop but don't clear interval - let next game handlers manage it
+		if (r.intervalId) {
+			clearInterval(r.intervalId);
+			r.intervalId = undefined;
+		}
 		return;
 	}
 
@@ -131,11 +131,13 @@ function sendScoreUpdate(r: GameRoom) {
 		rightScore: r.rightScore,
 		message: `Score update: ${r.leftScore} - ${r.rightScore}`,
 		leftPlayerName: r.left?.username,
-		rightPlayerName: r.right?.username,
+		rightPlayerName: r.right?.username
 	});
 
 	[r.left, r.right].forEach((player) => {
-		if (player && player.readyState === player.OPEN) player.send(scoreUpdateMessage);
+		if (player && player.readyState === player.OPEN) {
+			player.send(scoreUpdateMessage);
+		}
 	});
 }
 
@@ -156,10 +158,7 @@ function movePaddles(r: GameRoom) {
 	if (r.rightMovingDown) {
 		r.rightY = Math.min(r.rightY + speed, canvasHeight - r.paddleHeight);
 	}
-
-	console.log('leftY:', r.leftY, 'rightY:', r.rightY);
 }
-
 
 // Send the current game state to both players
 function sendGameUpdates(r: GameRoom) {
@@ -168,7 +167,7 @@ function sendGameUpdates(r: GameRoom) {
 		ball: { x: r.ballX, y: r.ballY },
 		paddles: { leftY: r.leftY, rightY: r.rightY },
 		leftScore: r.leftScore,
-		rightScore: r.rightScore,
+		rightScore: r.rightScore
 	});
 
 	[r.left, r.right].forEach((player) => {

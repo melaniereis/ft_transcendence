@@ -23,7 +23,6 @@ export async function websocketMatchmakingRoutes(fastify: FastifyInstance) {
 		}
 
 		ws.token = token;
-
 		initializeConnection(ws);
 
 		ws.on('message', async (message: RawData) => {

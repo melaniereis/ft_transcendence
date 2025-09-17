@@ -1,5 +1,6 @@
 // srcs/frontend/pages/services/renderRegistrationForm.ts
 import { translations } from './language/translations.js';
+import { renderLoginForm } from './renderLoginForm.js';
 import { navigateTo } from '../index.js';
 
 export function renderRegistrationForm(container: HTMLElement): void {
@@ -12,69 +13,43 @@ export function renderRegistrationForm(container: HTMLElement): void {
 		<div class="flex flex-col items-center justify-center min-h-screen p-4 bg-cover bg-center">
 		       <h2 class="text-5xl font-bold text-[#e8d5ff] mb-8 drop-shadow-lg text-center" style="font-family:'Segoe UI',sans-serif;letter-spacing:0.08em;">${t.registerTitle}</h2>
 
-		<div class="bg-transparent p-8 rounded-lg shadow-xl space-y-6 w-full max-w-xl backdrop-blur-md">
-			<form id="register-form" class="space-y-6">
-				<!-- Name -->
-				<label class="text-2xl font-bold text-black block">
-					${t.name}:
-					<input type="text" id="name" required
-					class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
-				</label>
-
-				<!-- Username -->
-				<label class="text-2xl font-bold text-black block">
-					${t.username}:
-					<input type="text" id="username" required
-					class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
-				</label>
-
-				<!-- Email -->
-				<label class="text-2xl font-bold text-black block">
-					${t.email} (optional):
-					<input type="email" id="email"
-					class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
-				</label>
-				<div id="email-error" class="text-red-600 text-lg"></div>
-
-				<!-- Team -->
-				<label class="text-2xl font-bold text-black block">
-					${t.team}:
-					<select id="team" required
-					class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black">
-					<option value="">${t.selectTeam}</option>
-					<option value="HACKTIVISTS">HACKTIVISTS</option>
-					<option value="BUG BUSTERS">BUG BUSTERS</option>
-					<option value="LOGIC LEAGUE">LOGIC LEAGUE</option>
-					<option value="CODE ALLIANCE">CODE ALLIANCE</option>
-					</select>
-				</label>
-
-				<!-- Password -->
-				<label class="text-2xl font-bold text-black block">
-					${t.password}:
-					<input type="password" id="password" required
-					class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
-				</label>
-
-				<!-- Confirm Password -->
-				<label class="text-2xl font-bold text-black block">
-					${t.confirmPassword || "Confirm Password"}:
-					<input type="password" id="confirm-password" required
-					class="w-full p-4 mt-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:outline-none bg-transparent backdrop-blur-sm text-black" />
-				</label>
-
-				<div id="password-error" class="text-red-600 text-lg"></div>
-				<div id="confirm-password-error" class="text-red-600 text-lg"></div>
-
-				<button type="submit"
-					class="w-full py-4 text-2xl font-bold text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition">
-					${t.register}
-				</button>
-			</form>
-			<div id="register-result" class="text-xl text-red-600 mt-4 text-center"></div>
-		</div>
-		</div>
-	`;
+		       <div class="w-full max-w-xl p-8 rounded-3xl shadow-2xl backdrop-blur-lg bg-[rgba(44,34,84,0.10)] border border-[rgba(232,213,255,0.18)]" style="box-shadow:0 8px 32px 0 rgba(44,34,84,0.18),0 1.5px 8px 0 rgba(44,34,84,0.10);">
+			       <form id="register-form" class="space-y-7 flex flex-col items-center">
+				       <label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+					       <span class="mb-2">${t.name}:</span>
+					       <input type="text" id="name" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.name}" />
+				       </label>
+				       <label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+					       <span class="mb-2">${t.username}:</span>
+					       <input type="text" id="username" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.username}" />
+				       </label>
+				       <label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+					       <span class="mb-2">${t.email} (${t.notProvided}):</span>
+					       <input type="email" id="email" class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.email}" />
+				       </label>
+				       <label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+					       <span class="mb-2">${t.team}:</span>
+					       <select id="team" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur text-[#2c2254]">
+						       <option value="">${t.selectTeam}</option>
+						       <option value="HACKTIVISTS">HACKTIVISTS</option>
+						       <option value="BUG BUSTERS">BUG BUSTERS</option>
+						       <option value="LOGIC LEAGUE">LOGIC LEAGUE</option>
+						       <option value="CODE ALLIANCE">CODE ALLIANCE</option>
+					       </select>
+				       </label>
+				       <label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+					       <span class="mb-2">${t.password}:</span>
+					       <input type="password" id="password" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.password}" />
+				       </label>
+				       <div id="password-error" class="w-full text-red-600 text-lg text-center"></div>
+				       <button type="submit" class="mx-auto w-2/3 py-4 text-2xl font-bold text-[#2c2254] bg-gradient-to-r from-[#e8d5ff] to-[#6c4fa3] border-none rounded-full shadow-lg hover:from-[#6c4fa3] hover:to-[#e8d5ff] hover:text-white focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-200">
+					       ${t.register}
+				       </button>
+			       </form>
+			       <div id="register-result" class="text-xl text-red-600 mt-4 text-center"></div>
+		       </div>
+	       </div>
+       `;
 
 	function isStrongPassword(pw: string): boolean {
 		const minLength = pw.length >= 8;
@@ -87,14 +62,6 @@ export function renderRegistrationForm(container: HTMLElement): void {
 	const form = document.getElementById('register-form') as HTMLFormElement;
 	const resultDiv = document.getElementById('register-result') as HTMLDivElement;
 	const passwordErrorDiv = document.getElementById('password-error') as HTMLDivElement;
-	const confirmPasswordErrorDiv = document.getElementById('confirm-password-error') as HTMLDivElement;
-	const emailErrorDiv = document.getElementById('email-error') as HTMLDivElement;
-
-	function isValidEmail(email: string): boolean {
-		const atIndex = email.indexOf('@');
-		const dotIndex = email.lastIndexOf('.');
-		return atIndex > 0 && dotIndex > atIndex + 1;
-	}
 
 	form.addEventListener('submit', async (e: Event) => {
 		e.preventDefault();
@@ -103,27 +70,14 @@ export function renderRegistrationForm(container: HTMLElement): void {
 		const username = (document.getElementById('username') as HTMLInputElement).value.trim();
 		const team = (document.getElementById('team') as HTMLSelectElement).value;
 		const password = (document.getElementById('password') as HTMLInputElement).value;
-		const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value;
 		const email = (document.getElementById('email') as HTMLInputElement).value.trim();
 
 		passwordErrorDiv.textContent = '';
-		confirmPasswordErrorDiv.textContent = '';
-		emailErrorDiv.textContent = '';
 		resultDiv.textContent = '';
 
 		if (!isStrongPassword(password)) {
 			passwordErrorDiv.textContent = t.passwordStrengthError ||
 				'Password must be at least 8 characters and include a number, a special character, and an uppercase letter.';
-			return;
-		}
-
-		if (password !== confirmPassword) {
-			confirmPasswordErrorDiv.textContent = t.passwordMismatch || 'Passwords do not match.';
-			return;
-		}
-
-		if (email && !isValidEmail(email)) {
-			emailErrorDiv.textContent = t.invalidEmail || 'Please enter a valid email address.';
 			return;
 		}
 

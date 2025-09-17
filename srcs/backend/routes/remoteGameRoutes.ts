@@ -1,35 +1,37 @@
+// remoteGameRoutes.ts - Add connection tracking and cleanup
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { RawData } from 'ws';
-import { AliveWebSocket, GameRoom } from '../types/gameRoom';
+import { AliveWebSocket, GameRoom } from '../types/webSocket.js';
 import { startGameLoop } from '../services/remoteGameService.js';
 
 const gameRooms = new Map<string, GameRoom>();
 
 export async function gameSocketRoutes(fastify: FastifyInstance) {
 	fastify.get('/game/:gameId', { websocket: true }, (ws: AliveWebSocket, req: FastifyRequest) => {
-		const { gameId } = req.params as { gameId: string };
+		const gameId = (req.params as { gameId: string }).gameId;
 		ws.gameId = gameId;
 		ws.isAlive = true;
 
-		ws.on('pong', () => ws.isAlive = true);
-		ws.on('error', (err) => console.error(`❌ WebSocket error on game ${gameId}:`, err.message));
+		ws.on('pong', () => (ws.isAlive = true));
+		ws.on('error', (err) => console.error(`WebSocket error on game ${gameId}:`, err.message));
 		ws.on('close', () => handleClose(ws, gameId));
 		ws.on('message', (message) => handleMessage(ws, gameId, message));
 	});
 
 	fastify.addHook('onClose', () => {
-		gameRooms.forEach(room => {
-			if (room.intervalId) clearInterval(room.intervalId);
+		gameRooms.forEach((room) => {
+			if (room.intervalId) {
+				clearInterval(room.intervalId);
+			}
 		});
 		gameRooms.clear();
-		console.log('🛑 Cleared all game rooms on server shutdown.');
+		console.log('Cleared all game rooms on server shutdown.');
 	});
 }
 
 function handleMessage(ws: AliveWebSocket, gameId: string, message: RawData) {
 	try {
 		const data = JSON.parse(message.toString());
-
 		switch (data.type) {
 			case 'join':
 				handleJoin(ws, gameId, data);
@@ -40,26 +42,39 @@ function handleMessage(ws: AliveWebSocket, gameId: string, message: RawData) {
 			case 'end':
 				handleEnd(ws, gameId, data);
 				break;
+			case 'inviteNext':
+				handleInviteNext(ws, gameId);
+				break;
+			case 'acceptNext':
+				handleAcceptNext(ws, gameId);
+				break;
+			case 'declineNext':
+				handleDeclineNext(ws, gameId);
+				break;
 			default:
 				ws.send(JSON.stringify({ type: 'error', message: 'Unknown message type' }));
 		}
-	} 
-	catch (err) {
-		console.error('❌ Error parsing message:', err);
+	} catch (err) {
+		console.error('Error parsing message:', err);
 		ws.send(JSON.stringify({ type: 'error', message: 'Invalid message format' }));
 	}
 }
 
 function handleJoin(ws: AliveWebSocket, gameId: string, data: any) {
 	ws.username = data.playerName;
-	let room = gameRooms.get(gameId);
 
+	ws.send(JSON.stringify({
+		type: 'join',
+		playerName: data.playerName,
+		maxScore: data.maxScore || 5
+	}));
+
+	let room = gameRooms.get(gameId);
 	if (!room) {
 		room = createNewRoom(ws, data.maxScore);
 		ws.side = 'left';
 		gameRooms.set(gameId, room);
-	} 
-	else if (!room.right) {
+	} else if (!room.right) {
 		room.right = ws;
 		ws.side = 'right';
 
@@ -68,7 +83,7 @@ function handleJoin(ws: AliveWebSocket, gameId: string, data: any) {
 			leftScore: room.leftScore,
 			rightScore: room.rightScore,
 			leftPlayerName: room.left?.username,
-			rightPlayerName: room.right?.username,
+			rightPlayerName: room.right?.username
 		});
 
 		sendToBoth(room, { type: 'startCountdown' });
@@ -78,73 +93,174 @@ function handleJoin(ws: AliveWebSocket, gameId: string, data: any) {
 				startGameLoop(room!);
 			}
 		}, 3500);
-	} 
-	else {
+	} else {
 		ws.send(JSON.stringify({ type: 'error', message: 'Room full' }));
 		ws.close();
 		return;
 	}
 
 	ws.send(JSON.stringify({ type: 'assignSide', side: ws.side }));
-	console.log(`✅ Player ${ws.username} joined game ${gameId} as ${ws.side}`);
+	console.log(`Player ${ws.username} joined game ${gameId} as ${ws.side}`);
 }
-
 
 function handleMove(ws: AliveWebSocket, gameId: string, data: any) {
 	const room = gameRooms.get(gameId);
-	if (!room) 
-		return;
+	if (!room) return;
 
 	const { action, direction } = data;
 	const isStart = action === 'start';
-	const isEnd = action === 'end';
 
 	if (ws.side === 'left') {
-		if (direction === 'ArrowUp') 
+		if (direction === 'ArrowUp') {
 			room.leftMovingUp = isStart;
-		if (direction === 'ArrowDown') 
+		}
+		if (direction === 'ArrowDown') {
 			room.leftMovingDown = isStart;
-	} 
-	else if (ws.side === 'right') {
-		if (direction === 'ArrowUp') 
+		}
+	} else if (ws.side === 'right') {
+		if (direction === 'ArrowUp') {
 			room.rightMovingUp = isStart;
-		if (direction === 'ArrowDown') 
+		}
+		if (direction === 'ArrowDown') {
 			room.rightMovingDown = isStart;
+		}
 	}
 }
 
 function handleEnd(ws: AliveWebSocket, gameId: string, data: any) {
 	const room = gameRooms.get(gameId);
-	if (!room) 
-		return;
+	if (!room) return;
 
 	const opponent = ws.side === 'left' ? room.right : room.left;
-	if (opponent && opponent.readyState === opponent.OPEN)
+	if (opponent && opponent.readyState === opponent.OPEN) {
 		opponent.send(JSON.stringify({ type: 'end', message: data.message }));
+	}
 
-	ws.close();
-	opponent?.close();
-	if (room.intervalId) 
+	if (room.intervalId) {
 		clearInterval(room.intervalId);
-	gameRooms.delete(gameId);
-	console.log(`🏁 Game ${gameId} ended`);
+		room.intervalId = undefined;
+	}
+	console.log(`Game ${gameId} ended`);
 }
 
+// FIXED: Handle invite next with connection check
+function handleInviteNext(ws: AliveWebSocket, gameId: string) {
+	const room = gameRooms.get(gameId);
+	if (!room) {
+		ws.send(JSON.stringify({
+			type: 'error',
+			message: 'Game room not found'
+		}));
+		return;
+	}
+
+	const opponent = ws.side === 'left' ? room.right : room.left;
+
+	// CRITICAL FIX: Check if opponent is still connected
+	if (!opponent || opponent.readyState !== opponent.OPEN) {
+		ws.send(JSON.stringify({
+			type: 'opponentLeft',
+			message: 'Your opponent has left the game'
+		}));
+		return;
+	}
+
+	opponent.send(JSON.stringify({
+		type: 'nextGameInvite',
+		from: ws.username
+	}));
+
+	ws.send(JSON.stringify({
+		type: 'waitingForResponse',
+		message: 'Waiting for opponent to accept...'
+	}));
+}
+
+// FIXED: Handle accept next with connection check
+function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
+	const room = gameRooms.get(gameId);
+	if (!room) {
+		ws.send(JSON.stringify({
+			type: 'error',
+			message: 'Game room not found'
+		}));
+		return;
+	}
+
+	const opponent = ws.side === 'left' ? room.right : room.left;
+
+	// CRITICAL FIX: Check if opponent is still connected
+	if (!opponent || opponent.readyState !== opponent.OPEN) {
+		ws.send(JSON.stringify({
+			type: 'opponentLeft',
+			message: 'Your opponent has left the game'
+		}));
+		return;
+	}
+
+	// Reset game state for new round
+	room.leftScore = 0;
+	room.rightScore = 0;
+	room.ballX = 1280 / 2;
+	room.ballY = 680 / 2;
+	room.ballVX = 7 * (Math.random() > 0.5 ? 1 : -1);
+	room.ballVY = 5 * (Math.random() > 0.5 ? 1 : -1);
+
+	room.leftY = 680 / 2 - 50;
+	room.rightY = 680 / 2 - 50;
+
+	room.leftMovingUp = false;
+	room.leftMovingDown = false;
+	room.rightMovingUp = false;
+	room.rightMovingDown = false;
+
+	sendToBoth(room, {
+		type: 'nextGameStarted',
+		message: 'New game started!',
+		leftScore: 0,
+		rightScore: 0
+	});
+
+	if (!room.intervalId) {
+		startGameLoop(room);
+	}
+}
+
+function handleDeclineNext(ws: AliveWebSocket, gameId: string) {
+	const room = gameRooms.get(gameId);
+	if (!room) return;
+
+	const opponent = ws.side === 'left' ? room.right : room.left;
+	if (opponent && opponent.readyState === opponent.OPEN) {
+		opponent.send(JSON.stringify({
+			type: 'nextGameDeclined',
+			message: 'Opponent declined to play again'
+		}));
+	}
+}
+
+// FIXED: Handle close with proper cleanup and notification
 function handleClose(ws: AliveWebSocket, gameId: string) {
 	const room = gameRooms.get(gameId);
-	if (!room) 
-		return;
+	if (!room) return;
 
-	if (room.left === ws) 
-		room.left = null;
-	if (room.right === ws) 
-		room.right = null;
+	console.log(`Player ${ws.username} disconnected from game ${gameId}`);
 
-	if (!room.left && !room.right) {
-		if (room.intervalId) clearInterval(room.intervalId);
-			gameRooms.delete(gameId);
-		console.log(`🧹 Cleaned up game room ${gameId}`);
+	// Notify remaining player if any
+	const opponent = ws.side === 'left' ? room.right : room.left;
+	if (opponent && opponent.readyState === opponent.OPEN) {
+		opponent.send(JSON.stringify({
+			type: 'opponentLeft',
+			message: 'Your opponent has left the game'
+		}));
 	}
+
+	// Clean up room immediately when someone leaves
+	if (room.intervalId) {
+		clearInterval(room.intervalId);
+	}
+	gameRooms.delete(gameId);
+	console.log(`Cleaned up game room ${gameId} due to player disconnect`);
 }
 
 function createNewRoom(ws: AliveWebSocket, maxScore: number = 5): GameRoom {
@@ -156,28 +272,22 @@ function createNewRoom(ws: AliveWebSocket, maxScore: number = 5): GameRoom {
 	return {
 		left: ws,
 		right: null,
-
-		// Ball starts at center
 		ballX: canvasWidth / 2,
 		ballY: canvasHeight / 2,
 		ballVX: 7,
 		ballVY: 5,
-
-		// Paddles start vertically centered
 		leftY: canvasHeight / 2 - paddleHeight / 2,
 		rightY: canvasHeight / 2 - paddleHeight / 2,
-
 		paddleHeight,
 		paddleWidth,
-
 		leftMovingUp: false,
 		leftMovingDown: false,
 		rightMovingUp: false,
 		rightMovingDown: false,
-
 		leftScore: 0,
 		rightScore: 0,
 		maxScore,
+		intervalId: undefined,
 	};
 }
 

@@ -1,3 +1,4 @@
+// endRemoteGame.ts
 export function endGame(score1: number, score2: number, canvas: HTMLCanvasElement,
 	player1Name: string, player2Name: string) {
 	const ctx = canvas.getContext('2d');
