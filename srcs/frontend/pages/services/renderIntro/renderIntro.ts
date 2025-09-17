@@ -116,6 +116,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
             /* IMPROVED DIAMOND LAYOUT - Using CSS Grid for perfect positioning */
             #diamond-layout {
+                --layout-height-offset: 45px; /* Adjustable height offset - change this value to move entire layout up/down */
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -127,6 +128,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 gap: 0;
                 z-index: 1002;
                 pointer-events: none;
+                transform: translateY(var(--layout-height-offset));
             }
 
             /* Title positioned in center */
@@ -149,6 +151,10 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 text-align: center;
                 pointer-events: none;
                 z-index: 2000;
+                width: 100%;
+                height: 100%;
+                position: relative;
+                transform: translateY(0px);
             }
 
             /* Diamond button base style */
@@ -302,6 +308,12 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     grid-row: 3;
                     font-size: clamp(1.5rem, 8vw, 2.2rem);
 					z-index: 1200;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                    text-align: center;
                 }
 
                 #intro-login {
@@ -475,7 +487,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
             <!-- Perfect diamond layout using CSS Grid -->
            <div id="diamond-layout">
-            <h1 id="intro-title">GRIS PONG</h1>
+            <h1 id="intro-title">GRIS</h1>
             <button id="intro-login" class="diamond-btn">${t.login}</button>
             <button id="intro-register" class="diamond-btn">${t.register}</button>
             <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>

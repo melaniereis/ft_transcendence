@@ -333,24 +333,8 @@ export class CelestialAnimations {
 
 		this.ShootingStarsArray = [];
 		this.DrawMilkyWayCanvas();
-
-
-		// Initialize orbs with improved distribution
-		const centerX = window.innerWidth / 2;
-		const centerY = window.innerHeight / 2;
-		const orbConfigs = [
-			{ r: 32, color: '#fff', glow: 32, angle: Math.random() * Math.PI * 2, speed: 0.008, distance: 280 },
-			{ r: 24, color: '#fff', glow: 24, angle: Math.random() * Math.PI * 2, speed: -0.006, distance: 320 },
-			{ r: 16, color: '#fff', glow: 18, angle: Math.random() * Math.PI * 2, speed: 0.012, distance: 260 },
-			{ r: 12, color: '#fff', glow: 12, angle: Math.random() * Math.PI * 2, speed: -0.014, distance: 340 },
-			{ r: 8, color: '#fff', glow: 8, angle: Math.random() * Math.PI * 2, speed: 0.018, distance: 240 },
-			{ r: 20, color: '#fff', glow: 20, angle: Math.random() * Math.PI * 2, speed: 0.010, distance: 360 },
-			{ r: 14, color: '#fff', glow: 14, angle: Math.random() * Math.PI * 2, speed: -0.008, distance: 300 },
-			{ r: 10, color: '#fff', glow: 10, angle: Math.random() * Math.PI * 2, speed: 0.015, distance: 220 },
-		];
-
-
-		this.orbs = orbConfigs.map(cfg => new Orb(centerX, centerY, cfg.r, cfg.color, cfg.glow, cfg.angle, cfg.speed, cfg.distance));
+		// Initialize empty orbs array (orbs disabled)
+		this.orbs = [];
 	}
 
 
