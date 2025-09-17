@@ -9,14 +9,20 @@ import { GRIS_COLORS } from './constants.js';
  */
 
 export function safeAudioPlay(audio: HTMLAudioElement) {
-	if (typeof (window as any).safePlayAudio === 'function') {
-		(window as any).safePlayAudio(audio);
-	} else {
-		audio.play().catch(() => {
-			console.log('Audio play failed - user interaction required');
-		});
-	}
+    if (typeof (window as any).safePlayAudio === 'function') {
+        (window as any).safePlayAudio(audio);
+    } else {
+        audio.play().catch((err) => {
+            console.error('Audio play failed - user interaction required or error occurred:', err);
+        });
+
+        // Add error event listener for other playback errors
+        audio.addEventListener('error', (e) => {
+            console.error('Audio playback error event:', e);
+        });
+    }
 }
+
 
 export function showNotification(
 	message: string,
@@ -68,10 +74,10 @@ export function showNotification(
 
 export function playGameSound(type: 'score' | 'win' | 'pause' | 'resume', volume: number = 0.2) {
 	const soundMap: Record<string, string> = {
-		score: '/assets/sounds/score.mp3',
-		win: '/assets/sounds/win.mp3',
-		pause: '/assets/sounds/pause.mp3',
-		resume: '/assets/sounds/resume.mp3'
+		score: 'score.mp3',
+		win: '/win.mp3',
+		pause: 'pause.mp3',
+		resume: 'resume.mp3'
 	};
 
 	const src = soundMap[type];

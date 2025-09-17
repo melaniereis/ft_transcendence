@@ -1,56 +1,41 @@
-//renderGame/events.ts
-
 import { state } from './state.js';
 import { GRIS_COLORS, GRIS_ANIMATIONS, GRIS_TYPOGRAPHY, GRIS_SHADOWS, PERFORMANCE } from './constants.js';
+import { translations } from '../language/translations.js';
 
-/**
- * Optimized GRIS-inspired event system
- * - Beautiful emotional feedback with performance-first approach
- * - Efficient event handling with proper cleanup
- * - Responsive design without performance penalties
- * - Graceful degradation for lower-end devices
- */
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
+  ? localStorage.getItem('preferredLanguage') 
+  : 'en') as keyof typeof translations;
 
-let eventListeners: Array<{ element: Element | Window, event: string, handler: EventListener }> = [];
+const t = translations[lang];
+
+let eventListeners: Array<{ element: Element | Window, event: string, handler: EventListener,
+options?: any}> = [];
 
 export function setupGameEvents(container: HTMLElement) {
-	// Performance monitoring
 	setupPerformanceMonitoring();
-
-	// Essential keyboard controls
 	setupOptimizedKeyboardControls();
-
-	// Efficient touch events for mobile
 	setupOptimizedTouchEvents(container);
-
-	// Click interactions with debouncing
 	setupOptimizedClickEvents(container);
-
-	// Responsive window events with throttling
 	setupThrottledWindowEvents();
-
-	// Lightweight accessibility features
 	setupLightweightAccessibility(container);
 }
 
-// Cleanup function to prevent memory leaks
 export function cleanupGameEvents() {
-	eventListeners.forEach(({ element, event, handler }) => {
-		element.removeEventListener(event, handler);
-	});
-	eventListeners = [];
+    eventListeners.forEach(({ element, event, handler, options }) => {
+        element.removeEventListener(event, handler, options);
+    });
+    eventListeners = [];
 
-	// Remove any notification elements
-	const feedback = document.getElementById('gris-emotional-feedback');
-	if (feedback) feedback.remove();
+    const feedback = document.getElementById('gris-emotional-feedback');
+    if (feedback) feedback.remove();
 
-	const announcer = document.getElementById('gris-announcer');
-	if (announcer) announcer.remove();
+    const announcer = document.getElementById('gris-announcer');
+    if (announcer) announcer.remove();
 }
 
 function addEventListenerWithCleanup(element: Element | Window, event: string, handler: EventListener, options?: any) {
-	element.addEventListener(event, handler, options);
-	eventListeners.push({ element, event, handler });
+    element.addEventListener(event, handler, options);
+    eventListeners.push({ element, event, handler, options });
 }
 
 function setupPerformanceMonitoring() {
@@ -67,7 +52,6 @@ function setupPerformanceMonitoring() {
 			frameCount = 0;
 			lastTime = now;
 
-			// Adjust quality based on performance
 			if (fps < PERFORMANCE.lowFPSThreshold) {
 				document.body.classList.add('performance-mode');
 			} else {
@@ -81,30 +65,36 @@ function setupPerformanceMonitoring() {
 }
 
 function setupOptimizedKeyboardControls() {
-	const keyHandler = (e: KeyboardEvent) => {
-		// Pause/Resume
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			state.isPaused = !state.isPaused;
-			updatePauseUI();
-			showOptimizedFeedback(
-				state.isPaused ? 'Paused' : 'Resumed',
-				state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance
-			);
-		}
+    const keyHandler = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            state.isPaused = !state.isPaused;
+            updatePauseUI();
+            showOptimizedFeedback(
+                state.isPaused ? t['feedback.paused'] : t['feedback.resumed'],
+                state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance
+            );
+        }
 
-		// Help
-		if (e.key === 'h' || e.key === 'H') {
-			e.preventDefault();
-			if (!state.isPaused) {
-				state.isPaused = true;
-				updatePauseUI();
-			}
-			toggleHelpOverlay();
-		}
-	};
+        if (e.key === 'h' || e.key === 'H') {
+            e.preventDefault();
+            if (!state.isPaused) {
+                state.isPaused = true;
+                updatePauseUI();
+            }
+            toggleHelpOverlay();
+        }
 
-	addEventListenerWithCleanup(window, 'keydown', keyHandler as EventListener);
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            e.preventDefault();   // Stop page scrolling here
+
+            if (state.isPaused) return; // Skip moving player if paused
+            // Add player movement logic here
+        }
+    };
+
+    // Add with passive: false to enable preventDefault
+    addEventListenerWithCleanup(window, 'keydown', keyHandler as EventListener, { passive: false });
 }
 
 function setupOptimizedTouchEvents(container: HTMLElement) {
@@ -118,10 +108,9 @@ function setupOptimizedTouchEvents(container: HTMLElement) {
 			state.isPaused = !state.isPaused;
 			updatePauseUI();
 			showOptimizedFeedback(
-				state.isPaused ? 'Paused' : 'Resumed',
+				state.isPaused ? t['feedback.paused'] : t['feedback.resumed'],
 				state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance
 			);
-			// Lightweight haptic feedback
 			if (navigator.vibrate) {
 				navigator.vibrate(25);
 			}
@@ -131,7 +120,6 @@ function setupOptimizedTouchEvents(container: HTMLElement) {
 	addEventListenerWithCleanup(container, 'touchstart', touchStartHandler as EventListener, { passive: true });
 }
 
-// Debounced click handler to prevent rapid clicks
 let clickTimeout: number | null = null;
 function setupOptimizedClickEvents(container: HTMLElement) {
 	const clickHandler = (e: MouseEvent) => {
@@ -147,7 +135,7 @@ function setupOptimizedClickEvents(container: HTMLElement) {
 			state.isPaused = !state.isPaused;
 			updatePauseUI();
 			showOptimizedFeedback(
-				state.isPaused ? 'Paused' : 'Resumed',
+				state.isPaused ? t['feedback.paused'] : t['feedback.resumed'],
 				state.isPaused ? GRIS_COLORS.depression : GRIS_COLORS.acceptance
 			);
 		}
@@ -161,7 +149,6 @@ function setupOptimizedClickEvents(container: HTMLElement) {
 	addEventListenerWithCleanup(container, 'click', clickHandler as EventListener);
 }
 
-// Throttled window events for performance
 let resizeTimeout: number | null = null;
 function setupThrottledWindowEvents() {
 	const resizeHandler = () => {
@@ -175,12 +162,11 @@ function setupThrottledWindowEvents() {
 
 	addEventListenerWithCleanup(window, 'resize', resizeHandler);
 
-	// Efficient visibility change handling
 	const visibilityHandler = () => {
 		if (document.hidden && !state.isPaused && !state.isGameOver) {
 			state.isPaused = true;
 			updatePauseUI();
-			showOptimizedFeedback('Paused - Tab Hidden', GRIS_COLORS.muted);
+			showOptimizedFeedback(t['feedback.pausedTabHidden'], GRIS_COLORS.muted);
 		}
 	};
 
@@ -206,7 +192,6 @@ function setupLightweightAccessibility(container: HTMLElement) {
 		addEventListenerWithCleanup(element, 'blur', blurHandler);
 	});
 
-	// Minimal screen reader support
 	const announcer = document.createElement('div');
 	announcer.id = 'gris-announcer';
 	announcer.setAttribute('aria-live', 'polite');
@@ -221,7 +206,6 @@ function setupLightweightAccessibility(container: HTMLElement) {
 	document.body.appendChild(announcer);
 }
 
-// Optimized UI update functions
 function updatePauseUI() {
 	const pauseOverlay = document.getElementById('gris-game-pause-overlay');
 	if (pauseOverlay) {
@@ -229,7 +213,6 @@ function updatePauseUI() {
 			pauseOverlay.style.display = 'flex';
 			pauseOverlay.style.opacity = '0';
 
-			// Use requestAnimationFrame for smooth animation
 			requestAnimationFrame(() => {
 				pauseOverlay.style.transition = `opacity ${GRIS_ANIMATIONS.duration.swift}ms ${GRIS_ANIMATIONS.curves.organic}`;
 				pauseOverlay.style.opacity = '1';
@@ -268,7 +251,6 @@ function updateModalsUI() {
 	});
 }
 
-// Optimized feedback system
 export function showOptimizedFeedback(message: string, color: string) {
 	let feedbackEl = document.getElementById('gris-emotional-feedback');
 
@@ -299,19 +281,16 @@ export function showOptimizedFeedback(message: string, color: string) {
 		document.body.appendChild(feedbackEl);
 	}
 
-	// Update content
 	feedbackEl.textContent = message;
 	feedbackEl.style.background = color;
 	feedbackEl.style.display = 'block';
 	feedbackEl.style.opacity = '0';
 
-	// Smooth entrance
 	requestAnimationFrame(() => {
 		feedbackEl!.style.transition = `opacity ${GRIS_ANIMATIONS.duration.swift}ms ${GRIS_ANIMATIONS.curves.organic}`;
 		feedbackEl!.style.opacity = '1';
 	});
 
-	// Auto-hide
 	setTimeout(() => {
 		if (feedbackEl) {
 			feedbackEl.style.transition = `opacity ${GRIS_ANIMATIONS.duration.swift}ms ${GRIS_ANIMATIONS.curves.organic}`;
@@ -324,7 +303,6 @@ export function showOptimizedFeedback(message: string, color: string) {
 	}, 2000);
 }
 
-// Optimized score animation
 export function triggerScoreAnimation() {
 	const scoreDisplays = document.querySelectorAll('.mystical-score');
 	scoreDisplays.forEach((display) => {
@@ -353,7 +331,6 @@ function updateResponsiveLayout() {
 			canvas.style.width = width + 'px';
 			canvas.style.height = height + 'px';
 
-			// Update canvas resolution for crisp rendering
 			canvas.width = width;
 			canvas.height = height;
 		}
@@ -392,17 +369,17 @@ function toggleHelpOverlay() {
                     font-size: ${GRIS_TYPOGRAPHY.scale.xl};
                     margin-bottom: 1rem;
                     text-align: center;
-                ">Game Controls</h2>
+                ">${t['help.title']}</h2>
                 <div style="
                     display: grid;
                     gap: 0.5rem;
                     color: ${GRIS_COLORS.secondary};
                     font-size: ${GRIS_TYPOGRAPHY.scale.base};
                 ">
-                    <div><kbd>ESC</kbd> - Pause/Resume</div>
-                    <div><kbd>H</kbd> - Toggle Help</div>
-                    <div><kbd>W/S</kbd> - Player 1 Controls</div>
-                    <div><kbd>↑/↓</kbd> - Player 2 Controls</div>
+                    <div><kbd>${t['help.keys.esc']}</kbd> - ${t['help.keys.pauseResume']}</div>
+                    <div><kbd>${t['help.keys.h']}</kbd> - ${t['help.keys.toggleHelp']}</div>
+                    <div><kbd>${t['help.keys.ws']}</kbd> - ${t['help.keys.player1Controls']}</div>
+                    <div><kbd>${t['help.keys.arrowUpDown']}</kbd> - ${t['help.keys.player2Controls']}</div>
                 </div>
                 <button onclick="this.parentElement.parentElement.remove()" style="
                     margin-top: 1rem;
@@ -414,14 +391,13 @@ function toggleHelpOverlay() {
                     color: white;
                     font-size: ${GRIS_TYPOGRAPHY.scale.base};
                     cursor: pointer;
-                ">Close</button>
+                ">${t['help.closeButton']}</button>
             </div>
         `;
 
 		document.body.appendChild(helpOverlay);
 	} else {
 		helpOverlay.remove();
-		// Resume game when help is closed
 		if (state.isPaused && !state.isGameOver) {
 			state.isPaused = false;
 			updatePauseUI();

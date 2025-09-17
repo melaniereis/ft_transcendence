@@ -12,6 +12,7 @@ export const state: {
 	activeHistoryView: HistoryView;
 	activeMainTab: 'profile' | 'stats' | 'history' | 'friends';
 	historyPage?: number; // FIX: Add pagination support
+	friendsPage?: number;
 	onBadgeUpdate?: () => void;
 	container?: HTMLElement;
 	matchPagination: {
@@ -31,6 +32,7 @@ export const state: {
 	activeHistoryView: 'list',
 	activeMainTab: 'profile',
 	historyPage: 1,
+	friendsPage: 1,
 	matchPagination: {
 		currentPage: 0,
 		totalMatches: 0,

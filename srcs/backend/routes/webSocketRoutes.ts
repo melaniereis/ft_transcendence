@@ -68,6 +68,7 @@ function handleDisconnect(ws: AliveWebSocket) {
 		waitingRoom.player1 = null;
 	else if (waitingRoom.player2?.connection === ws)
 		waitingRoom.player2 = null;
+
 	waitingRoom.confirmations.clear();
 	waitingRoom.maxGames = null;
 	console.log('❌ A player left matchmaking');
@@ -90,16 +91,22 @@ async function handleMessage(ws: AliveWebSocket, data: any, fastify: FastifyInst
 }
 
 function handleJoin(ws: AliveWebSocket, data: any) {
-	const { id, username, difficulty, authToken } = data;
-	if (typeof id !== 'number' || typeof username !== 'string' || typeof authToken !== 'string') {
-		ws.send(JSON.stringify({ type: 'error', message: 'Invalid player data or missing auth token' }));
+	const { id, username, difficulty } = data;
+
+	console.log('[handleJoin] Received data:');
+	console.log('  id:', id);
+	console.log('  username:', username);
+	console.log('  difficulty:', difficulty);
+	console.log('  token (from query):', ws.token);
+
+	if (typeof id !== 'number' || typeof username !== 'string') {
+		ws.send(JSON.stringify({ type: 'error', message: 'Invalid player data' }));
 		return;
 	}
 
 	ws.playerId = id;
 	ws.username = username;
 	ws.difficulty = difficulty;
-	ws.token = authToken;
 
 	if (!waitingRoom.player1) {
 		waitingRoom.player1 = { id, username, difficulty, connection: ws };
@@ -108,10 +115,12 @@ function handleJoin(ws: AliveWebSocket, data: any) {
 	}
 	else if (!waitingRoom.player2) {
 		waitingRoom.player2 = { id, username, difficulty, connection: ws };
+
 		if (waitingRoom.maxGames)
 			sendReadyToBoth();
 		else
 			ws.send(JSON.stringify({ type: 'waitingForGameSelection' }));
+
 		console.log(`🧍 Player 2 joined matchmaking: ${username}`);
 	}
 }
@@ -132,6 +141,7 @@ function handleGameSelection(ws: AliveWebSocket, data: any) {
 		sendReadyToBoth();
 	else
 		ws.send(JSON.stringify({ type: 'waitingForOpponent' }));
+
 	console.log(`🧮 Player 1 selected maxGames: ${maxGames}`);
 }
 
@@ -206,6 +216,7 @@ function sendReadyToBoth() {
 	const p1 = waitingRoom.player1!;
 	const p2 = waitingRoom.player2!;
 	const maxGames = waitingRoom.maxGames!;
+
 	p1.connection.send(JSON.stringify({
 		type: 'ready',
 		opponent: p2.username,

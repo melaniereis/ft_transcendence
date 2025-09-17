@@ -4,11 +4,11 @@ import { changePassword, updateProfile, loadProfile } from './api.js';
 import { showNotification } from './utils.js';
 import { Profile, Match } from './types.js';
 import { render } from './render.js';
-import { rerenderFriends, setupFriendsEvents, setupFriendHoverEffects, setupRemoveFriendEvents } from './friends-events.js';
+import { rerenderFriends, setupFriendsEvents, setupFriendHoverEffects} from './friends-events.js';
 import { setupHistoryEvents } from './history-events.js';
 
 // Re-export everything from the split files
-export {setupFriendHoverEffects, setupRemoveFriendEvents, render, setupFriendsEvents,
+export {setupFriendHoverEffects, render, setupFriendsEvents,
 	setupHistoryEvents,
 	rerenderFriends
 }
@@ -188,7 +188,6 @@ export function setupEvents(container: HTMLElement) {
 	setupHistoryEvents(container);
 	setTimeout(() => {
 		setupFriendHoverEffects();
-		setupRemoveFriendEvents();
 	}, 100);
 }
 

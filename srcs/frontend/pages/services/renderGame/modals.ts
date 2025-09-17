@@ -1,6 +1,9 @@
-//renderGame/modals.ts
-
 import { GRIS_COLORS, GRIS_TYPOGRAPHY, GRIS_SHADOWS } from './constants.js';
+import { translations } from '../language/translations.js';
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+    ? localStorage.getItem('preferredLanguage')
+    : 'en') as keyof typeof translations;
+const t = translations[lang];
 
 /**
  * Optimized GRIS-inspired modals
@@ -10,7 +13,7 @@ import { GRIS_COLORS, GRIS_TYPOGRAPHY, GRIS_SHADOWS } from './constants.js';
  */
 
 export function renderPauseModal(): string {
-	return `
+    return `
         <div id="gris-game-pause-overlay" class="gris-game-modal" style="
             display: none;
             position: fixed;
@@ -35,7 +38,7 @@ export function renderPauseModal(): string {
                     font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
                     margin-bottom: 1.5rem;
                     font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                ">Game Paused</h2>
+                ">${t.gamePaused}</h2>
                 <button class="gris-game-pause-btn" style="
                     background: ${GRIS_COLORS.acceptance};
                     color: white;
@@ -46,14 +49,14 @@ export function renderPauseModal(): string {
                     font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
                     cursor: pointer;
                     transition: background-color 0.2s ease;
-                ">Resume Game</button>
+                ">${t.resumeGame}</button>
             </div>
         </div>
     `;
 }
 
 export function renderAchievementsModal(achievements: string[]): string {
-	return `
+    return `
         <div id="gris-game-achievements-modal" class="gris-game-modal" style="
             display: none;
             position: fixed;
@@ -79,7 +82,7 @@ export function renderAchievementsModal(achievements: string[]): string {
                     font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
                     margin-bottom: 1.5rem;
                     font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                ">Achievements</h2>
+                ">${t.achievements}</h2>
                 <ul style="
                     list-style: none;
                     padding: 0;
@@ -87,8 +90,8 @@ export function renderAchievementsModal(achievements: string[]): string {
                     color: ${GRIS_COLORS.secondary};
                 ">
                     ${achievements.length
-			? achievements.map(a => `<li style="margin-bottom: 0.5rem;">${a}</li>`).join('')
-			: '<li style="color: #999;">No achievements yet.</li>'}
+            ? achievements.map(a => `<li style="margin-bottom: 0.5rem;">${a}</li>`).join('')
+            : `<li style="color: #999;">${t.noAchievementsYet}</li>`}
                 </ul>
                 <button class="gris-game-modal-close" style="
                     background: ${GRIS_COLORS.secondary};
@@ -100,14 +103,14 @@ export function renderAchievementsModal(achievements: string[]): string {
                     font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
                     cursor: pointer;
                     transition: background-color 0.2s ease;
-                ">Close</button>
+                ">${t.close}</button>
             </div>
         </div>
     `;
 }
 
 export function renderSettingsModal(settingsHtml: string): string {
-	return `
+    return `
         <div id="gris-game-settings-modal" class="gris-game-modal" style="
             display: none;
             position: fixed;
@@ -133,7 +136,7 @@ export function renderSettingsModal(settingsHtml: string): string {
                     font-size: ${GRIS_TYPOGRAPHY.scale['2xl']};
                     margin-bottom: 1.5rem;
                     font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-                ">Settings</h2>
+                ">${t.settings}</h2>
                 <div style="text-align: left; margin-bottom: 1.5rem;">
                     ${settingsHtml}
                 </div>
@@ -147,7 +150,7 @@ export function renderSettingsModal(settingsHtml: string): string {
                     font-weight: ${GRIS_TYPOGRAPHY.weights.semibold};
                     cursor: pointer;
                     transition: background-color 0.2s ease;
-                ">Close</button>
+                ">${t.close}</button>
             </div>
         </div>
     `;

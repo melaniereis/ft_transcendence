@@ -23,12 +23,10 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 		document.head.appendChild(style);
 	}
 	container.className = 'flex flex-col items-center justify-center min-h-screen p-8';
-	container.style.background = "url('assets/Background6.jpg') center center / cover no-repeat fixed";
+	container.style.background = "url('Background6.jpg') center center / cover no-repeat fixed";
 	container.style.borderRadius = '2rem';
 	container.style.boxShadow = '0 8px 32px 0 rgba(44, 34, 84, 0.18), 0 1.5px 8px 0 rgba(44,34,84,0.10)';
 	container.style.backdropFilter = 'blur(8px)';
-
-	// Header
 
 	const token = localStorage.getItem('authToken');
 	const loggedInPlayerId = Number(localStorage.getItem('playerId'));
@@ -37,10 +35,8 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 		return;
 	}
 	container.className = 'flex flex-col items-center justify-center min-h-screen p-8 bg-transparent rounded-lg shadow-lg';
-
 	container.innerHTML = `<h2 class="text-3xl font-bold text-black mb-4">${t.tournaments}</h2>`;
 
-	// Fetch all registered users
 	let users: any[] = [];
 	try {
 		const res = await fetch('/users', {
@@ -61,7 +57,6 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	const userMap = new Map<number, any>();
 	users.forEach(user => userMap.set(user.id, user));
 
-	// Tournament creation form container
 	const formContainer = document.createElement('div');
 	formContainer.className = '';
 	formContainer.style.background = 'rgba(255,251,230,0.92)';
@@ -72,15 +67,14 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 	formContainer.style.width = '100%';
 	formContainer.style.maxWidth = '480px';
 
-	// Tournament creation form (three username inputs)
 	const form = document.createElement('form');
 	form.className = '';
 	form.innerHTML = `
 		<input type="text" id="tournament-name" placeholder="${t.tournamentNamePlaceholder}" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.primary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.primary};font-weight:700;font-size:1.1rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
-		<label style="display:block;color:${GRIS_COLORS.primary};font-weight:700;margin-bottom:0.5rem;">Enter three opponent display names:</label>
-		<input type="text" id="opponent1" placeholder="Opponent 1 display name" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.secondary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.secondary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
-		<input type="text" id="opponent2" placeholder="Opponent 2 display name" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.secondary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.secondary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
-		<input type="text" id="opponent3" placeholder="Opponent 3 display name" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.secondary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.secondary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
+		<label style="display:block;color:${GRIS_COLORS.primary};font-weight:700;margin-bottom:0.5rem;">${t.enterThreeOpponents}</label>
+		<input type="text" id="opponent1" placeholder="${t.opponent1Placeholder}" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.secondary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.secondary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
+		<input type="text" id="opponent2" placeholder="${t.opponent2Placeholder}" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.secondary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.secondary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
+		<input type="text" id="opponent3" placeholder="${t.opponent3Placeholder}" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.secondary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.secondary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
 		<div id="selected-preview" style="color:${GRIS_COLORS.primary};font-weight:700;margin-bottom:1rem;">${t.noPlayersSelected}</div>
 		<button type="submit" style="width:100%;background:${GRIS_COLORS.gradients.sunrise};border:2px solid ${GRIS_COLORS.primary};color:${GRIS_COLORS.primary};font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">${t.createTournamentButton}</button>
 	`;
@@ -98,30 +92,31 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 		let valid = true;
 		let selectedUsers: any[] = [];
 		let errors: string[] = [];
+
 		displayNames.forEach((dname, idx) => {
 			if (!dname) {
 				valid = false;
-				errors.push(`Opponent ${idx + 1} display name is required.`);
+				errors.push(t.opponentRequired.replace('{index}', String(idx + 1)));
 				return;
 			}
 			const user = users.find(u => u.name === dname && u.id !== loggedInPlayerId);
 			if (!user) {
 				valid = false;
-				errors.push(`Opponent ${idx + 1} (${dname}) not found or is yourself.`);
+				errors.push(t.opponentNotFound.replace('{index}', String(idx + 1)).replace('{name}', dname));
 			} else {
 				selectedUsers.push(user);
 			}
 		});
 		if (uniqueDisplayNames.length !== 3) {
 			valid = false;
-			errors.push('Opponent display names must be unique.');
+			errors.push(t.duplicateOpponentNames);
 		}
 		if (valid) {
 			preview.innerHTML = `
-				<strong style="color:${GRIS_COLORS.primary};font-weight:700;">Selected Players:</strong>
+				<strong style="color:${GRIS_COLORS.primary};font-weight:700;">${t.selectedPlayers}</strong>
 				<ul style="padding-left:1.2rem;">
-					<li style="color:${GRIS_COLORS.primary};font-weight:700;">${loggedInPlayer.name} (${loggedInPlayer.username}) <em style="color:${GRIS_COLORS.secondary};font-style:italic;">(You)</em></li>
-					${selectedUsers.map(u => `<li style="color:${GRIS_COLORS.primary};font-weight:700;">${u.name} (${u.username}) - Team: ${u.team}</li>`).join('')}
+					<li style="color:${GRIS_COLORS.primary};font-weight:700;">${loggedInPlayer.name} (${loggedInPlayer.username}) <em style="color:${GRIS_COLORS.secondary};font-style:italic;">${t.youLabel}</em></li>
+					${selectedUsers.map(u => `<li style="color:${GRIS_COLORS.primary};font-weight:700;">${u.name} (${u.username}) - ${t.teamLabel}: ${u.team}</li>`).join('')}
 				</ul>
 			`;
 		} else {
@@ -134,13 +129,12 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 		form.querySelector(`#${id}`)!.addEventListener('input', validateOpponents);
 	});
 
-	// Tournament creation
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		const name = (document.getElementById('tournament-name') as HTMLInputElement).value;
 		const selectedUsers = validateOpponents();
 		if (!selectedUsers || selectedUsers.length !== 3) {
-			alert('Please enter three valid, unique opponent usernames.');
+			alert(t.invalidOpponentList);
 			return;
 		}
 		const allPlayerIds = [...selectedUsers.map(u => u.id), loggedInPlayerId];
@@ -163,7 +157,7 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 
 			document.getElementById('start-btn')?.addEventListener('click', async () => {
 				const verifiedPlayers = new Set<number>();
-				verifiedPlayers.add(loggedInPlayerId); // Already verified
+				verifiedPlayers.add(loggedInPlayerId);
 
 				const selectedPlayerObjects = users.filter(u => allPlayerIds.includes(u.id));
 				const playersToVerify = selectedPlayerObjects.filter(p => p.id !== loggedInPlayerId);
@@ -181,7 +175,7 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 					form.className = '';
 					form.innerHTML = `
 						<h4 style="font-size:1.1rem;font-weight:700;color:${GRIS_COLORS.primary};margin-bottom:0.5rem;">${player.name} (${player.username})</h4>
-						<input type="password" name="password" placeholder="Password" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.primary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.primary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
+						<input type="password" name="password" placeholder="${t.passwordPlaceholder}" required style="width:100%;padding:1.2rem;border:2px solid ${GRIS_COLORS.primary};border-radius:1.2rem;background:rgba(255,255,255,0.98);color:${GRIS_COLORS.primary};font-weight:700;font-size:1.05rem;box-shadow:0 2px 8px rgba(44,34,84,0.08);margin-bottom:1rem;" />
 						<button type="submit" style="width:100%;background:${GRIS_COLORS.gradients.sunrise};border:2px solid ${GRIS_COLORS.primary};color:${GRIS_COLORS.primary};font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.05rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">${t.verifyButton}</button>
 						<div class="result" style="color:${GRIS_COLORS.error};font-weight:700;margin-top:0.5rem;"></div>
 					`;
@@ -203,12 +197,11 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 							const result = await res.json();
 
 							if (res.ok && result.user.id === player.id) {
-								resultDiv.textContent = '✅ Verified';
+								resultDiv.textContent = t.verified;
 								verifiedPlayers.add(player.id);
 								form.querySelector('button')!.disabled = true;
 
 								if (verifiedPlayers.size === 4) {
-									// Clear everything and only show tournament canvas
 									container.innerHTML = '';
 									const token = localStorage.getItem('authToken') || '';
 									await startTournament(container, tournament, selectedPlayerObjects, token);
@@ -227,7 +220,7 @@ export async function renderTournamentsPage(container: HTMLDivElement) {
 		}
 		else {
 			const error = await res.json();
-			alert(`Error: ${error.error}`);
+			alert(`${t.error}: ${error.error}`);
 		}
 	});
 }

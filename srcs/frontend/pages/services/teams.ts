@@ -6,10 +6,10 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 const teams = [
-	{ key: 'hacktivists', displayName: 'Hacktivists', img: 'assets/hacktivists.png' },
-	{ key: 'bug_busters', displayName: 'Bug Busters', img: 'assets/bugbusters.png' },
-	{ key: 'logic_league', displayName: 'Logic League', img: 'assets/logicleague.png' },
-	{ key: 'code_alliance', displayName: 'Code Alliance', img: 'assets/codealliance.png' },
+	{ key: 'hacktivists', displayName: 'Hacktivists', img: '/hacktivists.png' },
+	{ key: 'bug_busters', displayName: 'Bug Busters', img: '/bugbusters.png' },
+	{ key: 'logic_league', displayName: 'Logic League', img: '/logicleague.png' },
+	{ key: 'code_alliance', displayName: 'Code Alliance', img: '/codealliance.png' },
 ];
 
 export async function renderTeamsPage(container: HTMLElement) {

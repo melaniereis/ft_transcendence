@@ -5,11 +5,10 @@ import fastifyWebsocket from '@fastify/websocket';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-
 import { getEncryptionKey } from './services/vault/vault.js';
 import { decryptFile, encryptFile } from './services/vault/encrypt.js';
-
 import { waitForVaultReady } from './services/vault/waitForVault.js';
+import {registerAssetRoutes }from './asests.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,7 +105,12 @@ async function start() {
 		console.log('✅ Database initialized');
 
 		await fastify.register(fastifyWebsocket);
-		await fastify.register(fastifyCors, { origin: true });
+		await fastify.register(fastifyCors, {
+			origin: true, // Reflect incoming origin (allow all origins)
+			methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+			allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+			credentials: true, // Allow cookies/auth headers
+		});
 		
 		const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
 		console.log('📁 Serving static pages from:', pagesPath);
@@ -149,6 +153,9 @@ async function start() {
 			reply.send({ status: 'ok' });
 		});
 
+		await registerAssetRoutes(fastify);
+
+		console.log('✅ Routes registered');
 		try {
 			await fastify.listen({ port: 3000, host: '0.0.0.0' });
 			console.log('✅ Server running at https://localhost:3000');

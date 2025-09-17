@@ -20,7 +20,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 height: 100vh;
                 min-width: 100vw;
                 min-height: 100vh;
-                background: url('../assets/Background5.png') center center / cover no-repeat;
+                background: url('/Background5.png') center center / cover no-repeat;
                 overflow: hidden;
                 z-index: 1;
             }

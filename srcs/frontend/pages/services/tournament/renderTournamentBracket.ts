@@ -6,13 +6,9 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 	: 'en') as keyof typeof translations;
 const t = translations[lang];
 
-export function renderTournamentBracket(
-	canvas: HTMLCanvasElement,
-	ctx: CanvasRenderingContext2D,
-	players: { id: number; name: string }[],
-	winners: { semifinal1?: number; semifinal2?: number; final?: number },
-	onNext?: () => void
-) {
+export function renderTournamentBracket(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
+players: { id: number; name: string }[], winners: { semifinal1?: number; semifinal2?: number; final?: number },
+onNext?: () => void) {
 	if (!ctx || players.length !== 4) return;
 
 	// Modern GRIS-inspired bracket background

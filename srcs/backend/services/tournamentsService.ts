@@ -1,5 +1,6 @@
 import db from '../db/database.js';
 import { Tournament } from '../types/tournament.js';
+import {updateUserStatsForTournament} from '../services/userStatsService.js'
 
 export async function createTournament(name: string, playerIds: number[]): Promise<Tournament> {
 	const [p1, p2, p3, p4] = playerIds;
@@ -54,47 +55,82 @@ export function getTournamentById(id: number): Promise<Tournament> {
 
 export async function updateMatchResult(tournamentId: number, round: 'semifinal1' | 'semifinal2' | 'final',
 winnerId: number): Promise<void> {
-	const fieldMap: Record<typeof round, string> = {
-		semifinal1: 'semifinal1_winner_id',
-		semifinal2: 'semifinal2_winner_id',
-		final: 'winner_id'
-	};
+const fieldMap: Record<typeof round, string> = {
+	semifinal1: 'semifinal1_winner_id',
+	semifinal2: 'semifinal2_winner_id',
+	final: 'winner_id',
+};
 
 	const field = fieldMap[round];
 
 	await new Promise<void>((resolve, reject) => {
 		db.run(
-			`UPDATE tournaments SET ${field} = ? WHERE id = ?`,
-			[winnerId, tournamentId],
-			function (err: Error | null) {
-				if (err) {
-					console.error(`❌ Failed to update ${round} result:`, err.message);
-					return reject(err);
-				}
-				resolve();
+		`UPDATE tournaments SET ${field} = ? WHERE id = ?`,
+		[winnerId, tournamentId],
+		function (err: Error | null) {
+			if (err) {
+				console.error(`❌ Failed to update ${round} result:`, err.message);
+				return reject(err);
 			}
+			resolve();
+		}
 		);
 	});
 
-	if (round === 'semifinal2') {
-		const tournament = await getTournamentById(tournamentId);
-		if (tournament.semifinal1_winner_id && winnerId) {
-			await new Promise<void>((resolve, reject) => {
-				db.run(
-					`UPDATE tournaments SET final_player1_id = ?, final_player2_id = ? WHERE id = ?`,
-					[tournament.semifinal1_winner_id, winnerId, tournamentId],
-					function (err: Error | null) {
-						if (err) {
-							console.error('❌ Failed to set final match players:', err.message);
-							return reject(err);
-						}
-						resolve();
-					}
-				);
-			});
+	// Get tournament details
+	const tournament = await getTournamentById(tournamentId);
+
+	// Handle semifinal rounds: set final players & update stats for winner and loser
+	if (round === 'semifinal1' || round === 'semifinal2') {
+		// Determine semifinal players for this round
+		const player1Id = round === 'semifinal1' ? tournament.semifinal1_player1_id : tournament.semifinal2_player1_id;
+		const player2Id = round === 'semifinal1' ? tournament.semifinal1_player2_id : tournament.semifinal2_player2_id;
+
+		if (!player1Id || !player2Id) {
+			console.warn(`Players for ${round} not properly set.`);
+		} 
+		else {
+			const loserId = player1Id === winnerId ? player2Id : player1Id;
+
+			// Update loser stats: +1 tournament played
+			await updateUserStatsForTournament(loserId, false);
+		}
+
+		// If this is semifinal2 and semifinal1 winner exists, set final players
+		if (round === 'semifinal2' && tournament.semifinal1_winner_id && winnerId) {
+		await new Promise<void>((resolve, reject) => {
+			db.run(
+			`UPDATE tournaments SET final_player1_id = ?, final_player2_id = ? WHERE id = ?`,
+			[tournament.semifinal1_winner_id, winnerId, tournamentId],
+			function (err: Error | null) {
+				if (err) {
+				console.error('❌ Failed to set final match players:', err.message);
+				return reject(err);
+				}
+				resolve();
+			}
+			);
+		});
+		}
+	}
+
+	// For final round, update winner and loser stats accordingly (winner gets tournament won)
+	if (round === 'final') {
+		if (!tournament.final_player1_id || !tournament.final_player2_id) {
+			console.warn('Final players not set properly.');
+		} 
+		else {
+			const loserId = tournament.final_player1_id === winnerId ? tournament.final_player2_id : tournament.final_player1_id;
+
+			// Winner: +1 tournament played +1 tournament won
+			await updateUserStatsForTournament(winnerId, true);
+
+			// Loser: +1 tournament played (no win)
+			await updateUserStatsForTournament(loserId, false);
 		}
 	}
 }
+
 
 export function getAllTournaments(): Promise<Tournament[]> {
 	return new Promise((resolve, reject) => {

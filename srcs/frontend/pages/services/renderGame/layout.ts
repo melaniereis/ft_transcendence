@@ -1,7 +1,13 @@
 //renderGame/layout.ts
 
 import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from './constants.js';
+import { translations } from '../language/translations.js';
 
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
+  ? localStorage.getItem('preferredLanguage') 
+  : 'en') as keyof typeof translations;
+
+const t = translations[lang];
 export interface GameLayoutConfig {
 	player1: { nickname: string; avatarUrl?: string };
 	player2: { nickname: string; avatarUrl?: string };
@@ -82,7 +88,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                             background: #fff;
                             border: 2.5px solid ${GRIS_COLORS.depression};
                             box-shadow: 0 1px 6px rgba(44,34,84,0.10);
-                            background-image: url('${config.player1.avatarUrl || '/assets/avatar/default.png'}');
+                            background-image: url('${config.player1.avatarUrl || '/default.png'}');
                             background-size: cover;
                             background-position: center;
                         "></div>
@@ -120,7 +126,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                             background: #fff;
                             border: 2.5px solid ${GRIS_COLORS.acceptance};
                             box-shadow: 0 1px 6px rgba(44,34,84,0.10);
-                            background-image: url('${config.player2.avatarUrl || '/assets/avatar/default.png'}');
+                            background-image: url('${config.player2.avatarUrl || '/default.png'}');
                             background-size: cover;
                             background-position: center;
                         "></div>
@@ -196,7 +202,8 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                                 transition: all 0.3s ease;
                                 box-shadow: ${GRIS_SHADOWS.sm};
                                 font-size: 1rem;
-                            ">⏸️ Pause</button>
+                            ">${(t as any)["pauseButton"] || 'Pause'}
+                            </button>
                         </div>
                     ` : ''}
                 </div>

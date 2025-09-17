@@ -88,6 +88,12 @@ export async function getUserByUsername(username: string): Promise<User | undefi
     return await getAsync<User>(query, [username]);
 }
 
+export async function getUsernameById(userId: number): Promise<string | undefined> {
+    const query = `SELECT username FROM users WHERE id = ?`;
+    const row = await getAsync<{ username: string }>(query, [userId]);
+    return row?.username;
+}
+
 export async function updateUser(id: number, name: string, team: string): Promise<void> {
     const query = `UPDATE users SET name = ?, team = ? WHERE id = ?`;
     await runAsync(query, [name, team, id]);
@@ -96,6 +102,12 @@ export async function updateUser(id: number, name: string, team: string): Promis
 export async function deleteUser(id: number): Promise<void> {
     const query = `DELETE FROM users WHERE id = ?`;
     await runAsync(query, [id]);
+}
+
+export async function getDisplayNameById(userId: number): Promise<string | undefined> {
+    const query = `SELECT display_name FROM users WHERE id = ?`;
+    const row = await getAsync<{ display_name: string }>(query, [userId]);
+    return row?.display_name;
 }
 
 export function getAllUsersFromTeam(teamName: string): Promise<User[]> {

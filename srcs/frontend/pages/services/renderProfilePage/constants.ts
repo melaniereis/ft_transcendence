@@ -49,10 +49,10 @@ const GRID_COLORS = {
 };
 // Team logo mapping
 const TEAM_LOGOS = {
-	'HACKTIVISTS': '/assets/hacktivists.png',
-	'BUG BUSTERS': '/assets/bugbusters.png',
-	'LOGIC LEAGUE': '/assets/logicleague.png',
-	'CODE ALLIANCE': '/assets/codealliance.png'
+	'HACKTIVISTS': '/hacktivists.png',
+	'BUG BUSTERS': '/bugbusters.png',
+	'LOGIC LEAGUE': '/logicleague.png',
+	'CODE ALLIANCE': '/codealliance.png'
 };
 
 export {svgUserIcon, svgFriendsIcon, svgChartIcon, svgFlameIcon, svgBarChartIcon,

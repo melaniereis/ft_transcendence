@@ -63,7 +63,7 @@ export function endGame(score1: number, score2: number, canvas: HTMLCanvasElemen
 		bg.style.height = '100vh';
 		bg.style.zIndex = '0';
 		bg.style.pointerEvents = 'none';
-		bg.style.background = "url('assets/Background3.jpg') center center / cover no-repeat fixed";
+		bg.style.background = "url('/Background3.jpg') center center / cover no-repeat fixed";
 		document.body.appendChild(bg);
 	}
 }
