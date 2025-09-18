@@ -374,7 +374,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     align-self: center;
                     justify-self: center;
                 }
-                    
+
                 #intro-quicktournament {
                     grid-column: 1;
                     grid-row: 5;
@@ -544,7 +544,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
     `;
 
 	// Initialize celestial animations with enhanced error handling
-	//initializeCelestialEffects();
+	initializeCelestialEffects();
 
 	// Setup event listeners
 	setupIntroEventListeners(onNavigate);
@@ -579,136 +579,136 @@ function initializeCelestialEffects(): void {
 }
 
 function setupIntroEventListeners(onNavigate: (route: string) => void): void {
-  const introLogin = document.getElementById('intro-login');
-  const introRegister = document.getElementById('intro-register');
-  const introQuickplay = document.getElementById('intro-quickplay');
-  const quickTournamentBtn = document.getElementById('intro-quicktournament');
-  const introLanguageBtn = document.getElementById('intro-language-btn');
-  const introLanguageOptions = document.getElementById('intro-language-options');
-  const playDropdown = document.getElementById('play-options');
-  const introPlayBtn = document.getElementById('intro-play-btn'); 
+	const introLogin = document.getElementById('intro-login');
+	const introRegister = document.getElementById('intro-register');
+	const introQuickplay = document.getElementById('intro-quickplay');
+	const quickTournamentBtn = document.getElementById('intro-quicktournament');
+	const introLanguageBtn = document.getElementById('intro-language-btn');
+	const introLanguageOptions = document.getElementById('intro-language-options');
+	const playDropdown = document.getElementById('play-options');
+	const introPlayBtn = document.getElementById('intro-play-btn');
 
-  function addButtonPressEffect(button: HTMLElement) {
-    if (!button) return;
-    button.addEventListener('mousedown', () => {
-      button.style.transform = 'scale(0.95)';
-    });
-    button.addEventListener('mouseup', () => {
-      button.style.transform = 'scale(1)';
-    });
-    button.addEventListener('mouseleave', () => {
-      button.style.transform = 'scale(1)';
-    });
-  }
+	function addButtonPressEffect(button: HTMLElement) {
+		if (!button) return;
+		button.addEventListener('mousedown', () => {
+			button.style.transform = 'scale(0.95)';
+		});
+		button.addEventListener('mouseup', () => {
+			button.style.transform = 'scale(1)';
+		});
+		button.addEventListener('mouseleave', () => {
+			button.style.transform = 'scale(1)';
+		});
+	}
 
-  if (introLogin) {
-    addButtonPressEffect(introLogin);
-    introLogin.addEventListener('click', () => {
-      console.log('🔑 Intro login clicked');
-      onNavigate('/login');
-    });
-  }
+	if (introLogin) {
+		addButtonPressEffect(introLogin);
+		introLogin.addEventListener('click', () => {
+			console.log('🔑 Intro login clicked');
+			onNavigate('/login');
+		});
+	}
 
-  if (introRegister) {
-    addButtonPressEffect(introRegister);
-    introRegister.addEventListener('click', () => {
-      console.log('📝 Intro register clicked');
-      onNavigate('/register');
-    });
-  }
+	if (introRegister) {
+		addButtonPressEffect(introRegister);
+		introRegister.addEventListener('click', () => {
+			console.log('📝 Intro register clicked');
+			onNavigate('/register');
+		});
+	}
 
-    if (introPlayBtn && playDropdown) {
-    addButtonPressEffect(introPlayBtn);
-    introPlayBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isHidden = playDropdown.style.display === 'none' || !playDropdown.style.display;
-        playDropdown.style.display = isHidden ? 'block' : 'none';
-        console.log('🎮 Play dropdown toggled:', isHidden ? 'opened' : 'closed');
-    });
+	if (introPlayBtn && playDropdown) {
+		addButtonPressEffect(introPlayBtn);
+		introPlayBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const isHidden = playDropdown.style.display === 'none' || !playDropdown.style.display;
+			playDropdown.style.display = isHidden ? 'block' : 'none';
+			console.log('🎮 Play dropdown toggled:', isHidden ? 'opened' : 'closed');
+		});
 
-    // Clicking outside closes the dropdown
-    document.addEventListener('click', (e) => {
-        if (
-        !playDropdown.contains(e.target as Node) &&
-        !introPlayBtn.contains(e.target as Node)
-        ) {
-        playDropdown.style.display = 'none';
-        }
-    });
-    }
+		// Clicking outside closes the dropdown
+		document.addEventListener('click', (e) => {
+			if (
+				!playDropdown.contains(e.target as Node) &&
+				!introPlayBtn.contains(e.target as Node)
+			) {
+				playDropdown.style.display = 'none';
+			}
+		});
+	}
 
-    if (introQuickplay) {
-    addButtonPressEffect(introQuickplay);
-    introQuickplay.addEventListener('click', () => {
-        console.log('⚡ Intro quickplay clicked');
-        onNavigate('/quick-play');
-        playDropdown!.style.display = 'none';
-    });
-    }
+	if (introQuickplay) {
+		addButtonPressEffect(introQuickplay);
+		introQuickplay.addEventListener('click', () => {
+			console.log('⚡ Intro quickplay clicked');
+			onNavigate('/quick-play');
+			playDropdown!.style.display = 'none';
+		});
+	}
 
-    if (quickTournamentBtn) {
-    addButtonPressEffect(quickTournamentBtn);
-    quickTournamentBtn.addEventListener('click', () => {
-        console.log('🏆 Quick tournament clicked');
-        onNavigate('/quick-tournament');
-        playDropdown!.style.display = 'none';
-    });
-    }
+	if (quickTournamentBtn) {
+		addButtonPressEffect(quickTournamentBtn);
+		quickTournamentBtn.addEventListener('click', () => {
+			console.log('🏆 Quick tournament clicked');
+			onNavigate('/quick-tournament');
+			playDropdown!.style.display = 'none';
+		});
+	}
 
 
-  if (quickTournamentBtn) {
-    addButtonPressEffect(quickTournamentBtn);
-    quickTournamentBtn.addEventListener('click', () => {
-      console.log('🏆 Quick tournament button clicked');
-      onNavigate('/quick-tournament');
-    });
-  }
+	if (quickTournamentBtn) {
+		addButtonPressEffect(quickTournamentBtn);
+		quickTournamentBtn.addEventListener('click', () => {
+			console.log('🏆 Quick tournament button clicked');
+			onNavigate('/quick-tournament');
+		});
+	}
 
-  if (introLanguageBtn && introLanguageOptions) {
-    addButtonPressEffect(introLanguageBtn);
+	if (introLanguageBtn && introLanguageOptions) {
+		addButtonPressEffect(introLanguageBtn);
 
-    introLanguageBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isHidden = introLanguageOptions.style.display === 'none';
-      introLanguageOptions.style.display = isHidden ? 'block' : 'none';
-      console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
-    });
+		introLanguageBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const isHidden = introLanguageOptions.style.display === 'none';
+			introLanguageOptions.style.display = isHidden ? 'block' : 'none';
+			console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
+		});
 
-    introLanguageOptions.querySelectorAll('button').forEach((btn) => {
-      addButtonPressEffect(btn);
+		introLanguageOptions.querySelectorAll('button').forEach((btn) => {
+			addButtonPressEffect(btn);
 
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const selectedLang = btn.getAttribute('data-lang') || 'en';
-        console.log(`Language changed to: ${selectedLang}`);
-        localStorage.setItem('preferredLanguage', selectedLang);
+			btn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				const selectedLang = btn.getAttribute('data-lang') || 'en';
+				console.log(`Language changed to: ${selectedLang}`);
+				localStorage.setItem('preferredLanguage', selectedLang);
 
-        setTimeout(() => {
-          introLanguageOptions.style.display = 'none';
-        }, 150);
+				setTimeout(() => {
+					introLanguageOptions.style.display = 'none';
+				}, 150);
 
-        applyLanguage(selectedLang);
+				applyLanguage(selectedLang);
 
-        const container = document.getElementById('app');
-        if (container) {
-          container.style.transition = 'opacity 0.3s ease';
-          container.style.opacity = '0.5';
-          setTimeout(() => {
-            renderIntroScreen(container, onNavigate);
-            container.style.opacity = '1';
-          }, 300);
-        }
-      });
-    });
+				const container = document.getElementById('app');
+				if (container) {
+					container.style.transition = 'opacity 0.3s ease';
+					container.style.opacity = '0.5';
+					setTimeout(() => {
+						renderIntroScreen(container, onNavigate);
+						container.style.opacity = '1';
+					}, 300);
+				}
+			});
+		});
 
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (
-        !introLanguageOptions.contains(e.target as Node) &&
-        !introLanguageBtn.contains(e.target as Node)
-      ) {
-        introLanguageOptions.style.display = 'none';
-      }
-    });
-  }
+		// Close dropdown on outside click
+		document.addEventListener('click', (e) => {
+			if (
+				!introLanguageOptions.contains(e.target as Node) &&
+				!introLanguageBtn.contains(e.target as Node)
+			) {
+				introLanguageOptions.style.display = 'none';
+			}
+		});
+	}
 }
