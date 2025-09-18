@@ -126,7 +126,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 grid-template-rows: 1fr 1fr 1fr;
                 gap: 0;
                 z-index: 1002;
-                pointer-events: none;
+                pointer-events: auto;
             }
 
             /* Title positioned in center */
@@ -149,6 +149,53 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 text-align: center;
                 pointer-events: none;
                 z-index: 2000;
+            }
+
+            .play-container {
+                position: relative;
+                grid-column: 2;
+                grid-row: 3;
+                align-self: start;
+                justify-self: center;
+                margin-top: 2rem;
+            }
+
+            /* Slight adjustment for dropdown positioning */
+            #play-options {
+                top: 100%;
+                margin-top: 0.5rem;
+            }
+
+            #play-options {
+                display: none; /* shown via JS */
+                position: absolute;
+                top: 100%;     /* just below Play button */
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(44, 34, 84, 0.9);
+                border-radius: 0.5rem;
+                box-shadow: 0 0 12px rgba(108, 79, 163, 0.7);
+                padding: 0.5rem 0;
+                z-index: 50;
+                min-width: 160px;
+                margin-top: 0.5rem; /* minor vertical spacing */
+            }
+
+            #play-options button {
+                width: 100%;
+                margin: 0.25rem 0;
+                border-radius: 0.5rem;
+                background: rgba(44, 34, 84, 0.1);
+                color: #e8d5ff;
+                cursor: pointer;
+                text-transform: uppercase;
+                font-weight: 400;
+                transition: background 0.2s ease;
+            }
+
+            #play-options button:hover {
+                background: #6c4fa3;
+                color: #fff;
             }
 
             /* Diamond button base style */
@@ -478,8 +525,13 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
             <h1 id="intro-title">GRIS PONG</h1>
             <button id="intro-login" class="diamond-btn">${t.login}</button>
             <button id="intro-register" class="diamond-btn">${t.register}</button>
-            <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
-            <button id="intro-quicktournament" class="diamond-btn">${t.quickTournament}</button> 
+            <div class="play-container">
+                <button id="intro-play-btn" class="diamond-btn">${t.play}</button>
+                <div id="play-options" class="play-options">
+                    <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
+                    <button id="intro-quicktournament" class="diamond-btn">${t.quickTournament}</button>
+                </div>
+            </div>
             <div class="language-container">
                 <button id="intro-language-btn" class="diamond-btn">${t.language}</button>
                 <div id="intro-language-options">
@@ -492,7 +544,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
     `;
 
 	// Initialize celestial animations with enhanced error handling
-	initializeCelestialEffects();
+	//initializeCelestialEffects();
 
 	// Setup event listeners
 	setupIntroEventListeners(onNavigate);
@@ -533,10 +585,11 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
   const quickTournamentBtn = document.getElementById('intro-quicktournament');
   const introLanguageBtn = document.getElementById('intro-language-btn');
   const introLanguageOptions = document.getElementById('intro-language-options');
+  const playDropdown = document.getElementById('play-options');
+  const introPlayBtn = document.getElementById('intro-play-btn'); 
 
   function addButtonPressEffect(button: HTMLElement) {
-    if (!button) 
-        return;
+    if (!button) return;
     button.addEventListener('mousedown', () => {
       button.style.transform = 'scale(0.95)';
     });
@@ -564,13 +617,44 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
     });
   }
 
-  if (introQuickplay) {
+    if (introPlayBtn && playDropdown) {
+    addButtonPressEffect(introPlayBtn);
+    introPlayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = playDropdown.style.display === 'none' || !playDropdown.style.display;
+        playDropdown.style.display = isHidden ? 'block' : 'none';
+        console.log('🎮 Play dropdown toggled:', isHidden ? 'opened' : 'closed');
+    });
+
+    // Clicking outside closes the dropdown
+    document.addEventListener('click', (e) => {
+        if (
+        !playDropdown.contains(e.target as Node) &&
+        !introPlayBtn.contains(e.target as Node)
+        ) {
+        playDropdown.style.display = 'none';
+        }
+    });
+    }
+
+    if (introQuickplay) {
     addButtonPressEffect(introQuickplay);
     introQuickplay.addEventListener('click', () => {
-      console.log('⚡ Intro quickplay clicked');
-      onNavigate('/quick-play');
+        console.log('⚡ Intro quickplay clicked');
+        onNavigate('/quick-play');
+        playDropdown!.style.display = 'none';
     });
-  }
+    }
+
+    if (quickTournamentBtn) {
+    addButtonPressEffect(quickTournamentBtn);
+    quickTournamentBtn.addEventListener('click', () => {
+        console.log('🏆 Quick tournament clicked');
+        onNavigate('/quick-tournament');
+        playDropdown!.style.display = 'none';
+    });
+    }
+
 
   if (quickTournamentBtn) {
     addButtonPressEffect(quickTournamentBtn);
@@ -582,6 +666,7 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
 
   if (introLanguageBtn && introLanguageOptions) {
     addButtonPressEffect(introLanguageBtn);
+
     introLanguageBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isHidden = introLanguageOptions.style.display === 'none';
@@ -589,39 +674,41 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
       console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
     });
 
-    introLanguageOptions?.querySelectorAll('button').forEach(btn => {
+    introLanguageOptions.querySelectorAll('button').forEach((btn) => {
       addButtonPressEffect(btn);
-      btn.addEventListener('click', () => {
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const selectedLang = btn.getAttribute('data-lang') || 'en';
         console.log(`Language changed to: ${selectedLang}`);
         localStorage.setItem('preferredLanguage', selectedLang);
 
         setTimeout(() => {
-            introLanguageOptions.style.display = 'none';
+          introLanguageOptions.style.display = 'none';
         }, 150);
 
         applyLanguage(selectedLang);
 
         const container = document.getElementById('app');
         if (container) {
-            container.style.transition = 'opacity 0.3s ease';
-            container.style.opacity = '0.5';
-            setTimeout(() => {
+          container.style.transition = 'opacity 0.3s ease';
+          container.style.opacity = '0.5';
+          setTimeout(() => {
             renderIntroScreen(container, onNavigate);
             container.style.opacity = '1';
-            }, 300);
+          }, 300);
         }
-    });
-
+      });
     });
 
     // Close dropdown on outside click
     document.addEventListener('click', (e) => {
-      if (!introLanguageOptions.contains(e.target as Node) && e.target !== introLanguageBtn) {
+      if (
+        !introLanguageOptions.contains(e.target as Node) &&
+        !introLanguageBtn.contains(e.target as Node)
+      ) {
         introLanguageOptions.style.display = 'none';
       }
     });
   }
-
-  console.log('🎮 Intro screen event listeners setup complete');
 }

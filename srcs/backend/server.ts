@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 import { getEncryptionKey } from './services/vault/vault.js';
 import { decryptFile, encryptFile } from './services/vault/encrypt.js';
 import { waitForVaultReady } from './services/vault/waitForVault.js';
-import { registerAssetRoutes } from './asests.js'
+import { registerAssetRoutes } from './assets.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
