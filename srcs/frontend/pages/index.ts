@@ -304,7 +304,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 });
 
-// Event listeners for navigation buttons with fade effect and no duplicated listeners
 
 function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 	btn.classList.add('fade-btn-out');
@@ -318,24 +317,18 @@ function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 	}, 380);
 }
 
-// Play button toggles play options menu
+
 if (playBtn && playOptions) {
-	playBtn.addEventListener('click', () => {
-		if (playOptions.style.display === 'block') {
-			playOptions.style.display = 'none';
-		} else {
-			playOptions.style.display = 'block';
-		}
-	});
+  playBtn.addEventListener('click', () => {
+    playOptions.classList.toggle('hidden');
+  });
 }
 
-// Play options routes
 const playOptionsMap: Record<string, string> = {
 	'play-play': '/play',
 	'play-matchmaking': '/matchmaking',
 	'play-tournament': '/quick-tournament',
 };
-
 
  languageOptions.querySelectorAll('button[data-lang]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -350,16 +343,15 @@ const playOptionsMap: Record<string, string> = {
   });
 
 Object.entries(playOptionsMap).forEach(([btnId, path]) => {
-	const btn = document.getElementById(btnId) as HTMLButtonElement | null;
-	if (btn) {
-		btn.addEventListener('click', () => {
-			playOptions.style.display = 'none';
-			navigateTo(path);
-		});
-	}
+  const btn = document.getElementById(btnId) as HTMLButtonElement | null;
+  if (btn) {
+    btn.addEventListener('click', () => {
+      playOptions.classList.add('hidden');
+      navigateTo(path);
+    });
+  }
 });
 
-// Other nav buttons with fade
 if (settingsBtn) {
 	settingsBtn.addEventListener('click', () => {
 		fadeButtonAndNavigate(settingsBtn, () => navigateTo('/settings'));
@@ -437,19 +429,15 @@ document.addEventListener('click', (event) => {
 
 	// Close language options if click outside languageBtn and languageOptions
 	if (languageOptions && languageBtn && !languageOptions.contains(target) && !languageBtn.contains(target)) {
-		if (!languageOptions.classList.contains('hidden')) {
-		languageOptions.classList.add('hidden');
-		}
+		if (!languageOptions.classList.contains('hidden'))
+			languageOptions.classList.add('hidden');
 	}
 
-	// Close play options if click outside playBtn and playOptions
 	if (playOptions && playBtn && target !== playBtn && !playOptions.contains(target)) {
-		if (playOptions.style.display === 'block') {
-		playOptions.style.display = 'none';
-		}
+		if (!playOptions.classList.contains('hidden'))
+			playOptions.classList.add('hidden');
 	}
 });
-
 
 // Update friend requests badge
 export async function updateFriendRequestsBadge(): Promise<void> {

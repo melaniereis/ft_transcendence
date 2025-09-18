@@ -870,26 +870,27 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		document.body.appendChild(modal);
 	}
 
-	// ONLY controls - no local game logic
-	// document.addEventListener('keydown', e => {
-	// 	if (!assignedSide || !gameInSession) return;
+	document.addEventListener('keydown', e => {
+		if (!assignedSide || !gameInSession) return;
 
-	// 	if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
-	// 		const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
-	// 		ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
-	// 	} else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-	// 		ws.send(JSON.stringify({ type: 'move', action: 'start', direction: e.key }));
-	// 	}
-	// });
+		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
+			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
+			ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
+		} 
+		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+			ws.send(JSON.stringify({ type: 'move', action: 'start', direction: e.key }));
+		}
+	});
 
-	// document.addEventListener('keyup', e => {
-	// 	if (!assignedSide || !gameInSession) return;
+	document.addEventListener('keyup', e => {
+		if (!assignedSide || !gameInSession) return;
 
-	// 	if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
-	// 		const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
-	// 		ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
-	// 	} else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-	// 		ws.send(JSON.stringify({ type: 'move', action: 'end', direction: e.key }));
-	// 	}
-	// });
-}
+		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
+			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
+			ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
+		} 
+		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: e.key }));
+		}
+	});
+	}

@@ -264,4 +264,32 @@ export async function friendsRoutes(fastify: FastifyInstance) {
 			reply.status(500).send({ error: 'Internal server error' });
 		}
 	});
+
+	fastify.get('/api/friendRequests/count', async (req, reply) => {
+		const authHeader = req.headers.authorization;
+		if (!authHeader) {
+			return reply.status(401).send({ error: 'Authorization header missing' });
+		}
+
+		const token = authHeader.split(' ')[1];
+		if (!token) {
+			return reply.status(401).send({ error: 'Token missing' });
+		}
+
+		try {
+			const userId = await verifyToken(token);
+			if (!userId) {
+			return reply.status(401).send({ error: 'Invalid token' });
+			}
+
+			const pendingRequests = await getPendingRequests(userId);
+			const count = pendingRequests.length;
+
+			reply.send({ count });
+		}
+		catch (err: any) {
+			console.error('Error fetching friend requests count:', err);
+			reply.status(500).send({ error: 'Internal server error' });
+		}
+	});
 }
