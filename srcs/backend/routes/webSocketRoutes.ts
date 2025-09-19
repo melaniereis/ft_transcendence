@@ -189,16 +189,18 @@ async function startGame(fastify: FastifyInstance) {
 		return;
 	}
 
-	p1.connection.send(JSON.stringify({
+	(p1.connection as any).send(JSON.stringify({
 		type: 'start',
 		opponent: p2.username,
+		opponent_id: p2.id,
 		game_id: gameData.game_id,
 		maxGames,
 	}));
 
-	p2.connection.send(JSON.stringify({
+	(p2.connection as any).send(JSON.stringify({
 		type: 'start',
 		opponent: p1.username,
+		opponent_id: p1.id,
 		game_id: gameData.game_id,
 		maxGames,
 	}));
@@ -216,12 +218,12 @@ function sendReadyToBoth() {
 	const p2 = waitingRoom.player2!;
 	const maxGames = waitingRoom.maxGames!;
 
-	p1.connection.send(JSON.stringify({
+	(p1.connection as any).send(JSON.stringify({
 		type: 'ready',
 		opponent: p2.username,
 		maxGames,
 	}));
-	p2.connection.send(JSON.stringify({
+	(p2.connection as any).send(JSON.stringify({
 		type: 'ready',
 		opponent: p1.username,
 		maxGames,
@@ -229,6 +231,6 @@ function sendReadyToBoth() {
 }
 
 function sendErrorToBoth(message: string) {
-	waitingRoom.player1?.connection.send(JSON.stringify({ type: 'error', message }));
-	waitingRoom.player2?.connection.send(JSON.stringify({ type: 'error', message }));
+	waitingRoom.player1?.connection && (waitingRoom.player1.connection as any).send(JSON.stringify({ type: 'error', message }));
+	waitingRoom.player2?.connection && (waitingRoom.player2.connection as any).send(JSON.stringify({ type: 'error', message }));
 }

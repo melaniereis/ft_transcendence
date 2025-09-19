@@ -3,10 +3,12 @@ import { drawRect, drawCircle, drawNet, setOptimizedCanvasSize } from '../render
 import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from '../renderGame/constants.js';
 
 export function renderMultiplayerGame(options: MultiplayerGameOptions) {
-	const { container, playerName, opponentName, gameId, maxGames, difficulty } = options;
+	const { container, playerName, opponentName, gameId, maxGames, difficulty, playerAvatarUrl = 'default.png', opponentAvatarUrl = 'default.png' } = options;
+	console.log('[RenderMultiplayerGame] playerAvatarUrl:', playerAvatarUrl);
+	console.log('[RenderMultiplayerGame] opponentAvatarUrl:', opponentAvatarUrl);
 
 	// Create beautiful UI like renderGame
-	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames);
+	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames, playerAvatarUrl, opponentAvatarUrl);
 
 	// Setup WebSocket for remote state
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
@@ -289,7 +291,9 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		});
 	}
 
-	function createBeautifulMultiplayerUI(container: HTMLElement, player1: string, player2: string, maxGames: number) {
+	function createBeautifulMultiplayerUI(container: HTMLElement, player1: string, player2: string, maxGames: number, playerAvatarUrl: string, opponentAvatarUrl: string) {
+		console.log('[createBeautifulMultiplayerUI] playerAvatarUrl:', playerAvatarUrl);
+		console.log('[createBeautifulMultiplayerUI] opponentAvatarUrl:', opponentAvatarUrl);
 		container.innerHTML = `
             <div class="gris-game-universe" style="
                 min-height: 100vh;
@@ -352,17 +356,17 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                         border: 1.5px solid #b6a6ca;
                         transition: all 0.3s ease;
                     ">
-                        <div class="player-avatar" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            background: #fff;
-                            border: 2.5px solid ${GRIS_COLORS.depression};
-                            box-shadow: ${GRIS_SHADOWS.sm};
-                            background-image: url('default.png');
-                            background-size: cover;
-                            background-position: center;
-                        "></div>
+						<div class="player-avatar" style="
+							width: 44px;
+							height: 44px;
+							border-radius: 50%;
+							background: #fff;
+							border: 2.5px solid ${GRIS_COLORS.depression};
+							box-shadow: ${GRIS_SHADOWS.sm};
+							background-image: url('${playerAvatarUrl}');
+							background-size: cover;
+							background-position: center;
+						"></div>
                         <span style="
                             color: #2c2254;
                             font-size: 1.08rem;
@@ -402,17 +406,17 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                         border: 1.5px solid #f7b267;
                         transition: all 0.3s ease;
                     ">
-                        <div class="player-avatar" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            background: #fff;
-                            border: 2.5px solid ${GRIS_COLORS.acceptance};
-                            box-shadow: ${GRIS_SHADOWS.sm};
-                            background-image: url('default.png');
-                            background-size: cover;
-                            background-position: center;
-                        "></div>
+						<div class="player-avatar" style="
+							width: 44px;
+							height: 44px;
+							border-radius: 50%;
+							background: #fff;
+							border: 2.5px solid ${GRIS_COLORS.acceptance};
+							box-shadow: ${GRIS_SHADOWS.sm};
+							background-image: url('${opponentAvatarUrl}');
+							background-size: cover;
+							background-position: center;
+						"></div>
                         <span style="
                             color: #2c2254;
                             font-size: 1.08rem;
@@ -876,7 +880,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
 			ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
-		} 
+		}
 		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
 			ws.send(JSON.stringify({ type: 'move', action: 'start', direction: e.key }));
 		}
@@ -888,9 +892,9 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
 			ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
-		} 
+		}
 		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
 			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: e.key }));
 		}
 	});
-	}
+}
