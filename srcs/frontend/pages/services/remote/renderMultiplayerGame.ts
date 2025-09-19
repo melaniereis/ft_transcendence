@@ -4,8 +4,6 @@ import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from '../ren
 
 export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	const { container, playerName, opponentName, gameId, maxGames, difficulty, playerAvatarUrl = 'default.png', opponentAvatarUrl = 'default.png' } = options;
-	console.log('[RenderMultiplayerGame] playerAvatarUrl:', playerAvatarUrl);
-	console.log('[RenderMultiplayerGame] opponentAvatarUrl:', opponentAvatarUrl);
 
 	// Create beautiful UI like renderGame
 	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames, playerAvatarUrl, opponentAvatarUrl);
@@ -42,7 +40,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		if (data.type === 'assignSide') {
 			assignedSide = data.side;
-			console.log(`Assigned to ${assignedSide} side`);
 			if (assignedSide !== null) {
 				updatePlayerDisplay(assignedSide, playerName, opponentName);
 			}
@@ -292,8 +289,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	}
 
 	function createBeautifulMultiplayerUI(container: HTMLElement, player1: string, player2: string, maxGames: number, playerAvatarUrl: string, opponentAvatarUrl: string) {
-		console.log('[createBeautifulMultiplayerUI] playerAvatarUrl:', playerAvatarUrl);
-		console.log('[createBeautifulMultiplayerUI] opponentAvatarUrl:', opponentAvatarUrl);
 		container.innerHTML = `
             <div class="gris-game-universe" style="
                 min-height: 100vh;

@@ -87,8 +87,6 @@ function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, player
 			const token = localStorage.getItem('authToken');
 			const currentUsername = playerName;
 			const startGameWithAvatars = (playerAvatar: string, opponentAvatar: string) => {
-				console.log('[Matchmaking] playerAvatarUrl:', playerAvatar);
-				console.log('[Matchmaking] opponentAvatarUrl:', opponentAvatar);
 				renderMultiplayerGame({
 					container: appDiv,
 					playerName,
@@ -108,15 +106,12 @@ function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, player
 					}
 				})
 					.then(res => {
-						console.log('[Matchmaking] Player avatar fetch response status:', res.status);
 						if (!res.ok) {
-							console.error('[Matchmaking] Failed to fetch player avatar, using default.');
 							return { avatar_url: '/default.png' };
 						}
 						return res.json();
 					})
-					.catch((err) => {
-						console.error('[Matchmaking] Error fetching player avatar:', err);
+					.catch(() => {
 						return { avatar_url: '/default.png' };
 					}),
 				fetch(`/api/users/${data.opponent}`, {
@@ -125,20 +120,15 @@ function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, player
 					}
 				})
 					.then(res => {
-						console.log('[Matchmaking] Opponent avatar fetch response status:', res.status);
 						if (!res.ok) {
-							console.error('[Matchmaking] Failed to fetch opponent avatar, using default.');
 							return { avatar_url: '/default.png' };
 						}
 						return res.json();
 					})
-					.catch((err) => {
-						console.error('[Matchmaking] Error fetching opponent avatar:', err);
+					.catch(() => {
 						return { avatar_url: '/default.png' };
 					})
 			]).then(([playerUser, opponentUser]) => {
-				console.log('[Matchmaking] Player user object:', playerUser);
-				console.log('[Matchmaking] Opponent user object:', opponentUser);
 				startGameWithAvatars(playerUser.avatar_url || '/default.png', opponentUser.avatar_url || '/default.png');
 			});
 			break;
