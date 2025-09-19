@@ -4,31 +4,31 @@ import { translations } from './language/translations.js';
 const getUserName = async (userId: number, selectedPlayers: any[], token: string | null): Promise<string> => {
 	const user = selectedPlayers.find(u => u.id === userId);
 	if (!user)
-		return `User ${userId}`; 
+		return `User ${userId}`;
 
-	if (!token) 
+	if (!token)
 		return user.name;
 
 	try {
 		const response = await fetch(`/users/${userId}/display_name`, {
-		method: 'GET',
-		headers: {
-			'Authorization': `Bearer ${token}`,
-			'Content-Type': 'application/json'
-		}
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			}
 		});
 
 		if (response.ok) {
 			const data = await response.json();
 			return data.display_name || user.name;
-		} 
+		}
 		else {
 			return user.name;
 		}
-	} 
-		catch (err) {
-			console.error('Error fetching display name:', err);
-			return user.name;
+	}
+	catch (err) {
+		console.error('Error fetching display name:', err);
+		return user.name;
 	}
 };
 
@@ -346,6 +346,7 @@ export async function renderPlayerSelection(container: HTMLElement) {
 
 		if (!response.ok) throw new Error('Unauthorized or failed request');
 		users = await response.json();
+		console.log('Fetched users:', users);
 
 		users.forEach((user: any) => {
 			if (user.id === loggedInPlayerId) return;
@@ -425,8 +426,10 @@ export async function renderPlayerSelection(container: HTMLElement) {
 					const gameId = data.game_id;
 					const player1DisplayName = await getUserName(loggedInPlayerId, users, token);
 					const player2DisplayName = await getUserName(opponentId, users, token);
+					const player1Avatar = (users.find(u => u.id === loggedInPlayerId)?.avatar_url) || '/default.png';
+					const player2Avatar = (users.find(u => u.id === opponentId)?.avatar_url) || '/default.png';
 					container.innerHTML = '';
-					renderGame(container, player1DisplayName, player2DisplayName, maxGames, difficulty, undefined, 'single', gameId);
+					renderGame(container, player1DisplayName, player2DisplayName, maxGames, difficulty, undefined, 'single', gameId, player1Avatar, player2Avatar);
 				}
 				else {
 					resultDiv.textContent = t.verifyInvalid;
