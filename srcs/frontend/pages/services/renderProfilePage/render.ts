@@ -13,7 +13,7 @@ const t = translations[lang];
 export function render(container: HTMLElement) {
 	if (!state.profile) return;
 	container.innerHTML = layout(state.profile, state.stats, state.history, state.friends,
-	state.activeStatsTab, state.activeHistoryView, state.editMode, state.activeMainTab || 'profile'
+		state.activeStatsTab, state.activeHistoryView, state.editMode, state.activeMainTab || 'profile'
 	);
 	// Always re-attach button events after render
 	if (typeof window.setupButtons === 'function') window.setupButtons();
@@ -121,5 +121,6 @@ export function render(container: HTMLElement) {
 		}
 	}
 
+	// ...existing code...
 	renderAllCharts();
 }

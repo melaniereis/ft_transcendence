@@ -2,8 +2,8 @@
 import { state } from './state.js';
 import { translations } from '../language/translations.js';
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
-  ? localStorage.getItem('preferredLanguage')
-  : 'en') as keyof typeof translations;
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
 const t = translations[lang];
 /**
  * GRIS-inspired responsive charts with:
@@ -308,85 +308,85 @@ export function renderWinRateChart() {
 }
 
 export function renderPerformanceChart() {
-const canvas = document.getElementById('performanceChart') as HTMLCanvasElement | null;
-if (!canvas) return;
-let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
-try {
-	({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
-} catch {
-	return;
-}
-
-const matches = state.history.slice(-10).reverse();
-const paddingBottom = Math.max(22, Math.round(cssHeight * 0.12));
-const availableH = cssHeight - paddingBottom - 12;
-const barW = Math.max(8, cssWidth / Math.max(1, matches.length) - 10);
-const maxScore = Math.max(...matches.map(m => m.user_score), 20);
-
-const id = 'performanceChart';
-cancelAnim(id);
-
-function draw(progress: number) {
-	ctx.clearRect(0, 0, cssWidth, cssHeight);
-	// background
-	ctx.save();
-	ctx.globalAlpha = 0.7;
-	const bgGrad = ctx.createLinearGradient(0, 0, cssWidth, cssHeight);
-	bgGrad.addColorStop(0, '#f4f6fa');
-	bgGrad.addColorStop(1, '#e6c79c11');
-	ctx.fillStyle = bgGrad;
-	ctx.fillRect(0, 0, cssWidth, cssHeight);
-	ctx.restore();
-
-	if (!matches.length) {
-	ctx.fillStyle = '#696969';
-	ctx.font = '16px Inter, Arial, sans-serif';
-	ctx.textAlign = 'center';
-	ctx.fillText(t.noRecentMatches, cssWidth / 2, cssHeight / 2);
-	return;
+	const canvas = document.getElementById('performanceChart') as HTMLCanvasElement | null;
+	if (!canvas) return;
+	let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+	try {
+		({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+	} catch {
+		return;
 	}
 
-	matches.forEach((m, i) => {
-	const rawH = (m.user_score / maxScore) * (availableH - 8);
-	const h = rawH * progress;
-	const x = i * (barW + 10) + 8;
-	const y = cssHeight - paddingBottom - h;
+	const matches = state.history.slice(-10).reverse();
+	const paddingBottom = Math.max(22, Math.round(cssHeight * 0.12));
+	const availableH = cssHeight - paddingBottom - 12;
+	const barW = Math.max(8, cssWidth / Math.max(1, matches.length) - 10);
+	const maxScore = Math.max(...matches.map(m => m.user_score), 20);
 
-	const gradient = ctx.createLinearGradient(x, y, x, y + Math.max(6, h));
-	if (m.result === 'win') {
-		gradient.addColorStop(0, '#cfeff6');
-		gradient.addColorStop(1, '#7b93a4');
-	} else {
-		gradient.addColorStop(0, '#fff0d6');
-		gradient.addColorStop(1, '#b1715a');
+	const id = 'performanceChart';
+	cancelAnim(id);
+
+	function draw(progress: number) {
+		ctx.clearRect(0, 0, cssWidth, cssHeight);
+		// background
+		ctx.save();
+		ctx.globalAlpha = 0.7;
+		const bgGrad = ctx.createLinearGradient(0, 0, cssWidth, cssHeight);
+		bgGrad.addColorStop(0, '#f4f6fa');
+		bgGrad.addColorStop(1, '#e6c79c11');
+		ctx.fillStyle = bgGrad;
+		ctx.fillRect(0, 0, cssWidth, cssHeight);
+		ctx.restore();
+
+		if (!matches.length) {
+			ctx.fillStyle = '#696969';
+			ctx.font = '16px Inter, Arial, sans-serif';
+			ctx.textAlign = 'center';
+			ctx.fillText(t.noRecentMatches, cssWidth / 2, cssHeight / 2);
+			return;
+		}
+
+		matches.forEach((m, i) => {
+			const rawH = (m.user_score / maxScore) * (availableH - 8);
+			const h = rawH * progress;
+			const x = i * (barW + 10) + 8;
+			const y = cssHeight - paddingBottom - h;
+
+			const gradient = ctx.createLinearGradient(x, y, x, y + Math.max(6, h));
+			if (m.result === 'win') {
+				gradient.addColorStop(0, '#cfeff6');
+				gradient.addColorStop(1, '#7b93a4');
+			} else {
+				gradient.addColorStop(0, '#fff0d6');
+				gradient.addColorStop(1, '#b1715a');
+			}
+
+			ctx.save();
+			ctx.shadowColor = m.result === 'win' ? '#7fc7d9cc' : '#b1715a99';
+			ctx.shadowBlur = 18 * progress;
+			roundRect(ctx, x, y, barW, h, Math.min(10, barW / 1.3));
+			ctx.fillStyle = gradient;
+			ctx.fill();
+			ctx.strokeStyle = 'rgba(80,80,80,0.22)';
+			ctx.lineWidth = 1.5;
+			ctx.stroke();
+			ctx.shadowBlur = 0;
+			ctx.restore();
+
+			// label
+			ctx.fillStyle = '#2f4f4f';
+			ctx.font = '13px Inter, Arial, sans-serif';
+			ctx.textAlign = 'center';
+			ctx.fillText(String(m.user_score), x + barW / 2, cssHeight - 6);
+		});
 	}
 
-	ctx.save();
-	ctx.shadowColor = m.result === 'win' ? '#7fc7d9cc' : '#b1715a99';
-	ctx.shadowBlur = 18 * progress;
-	roundRect(ctx, x, y, barW, h, Math.min(10, barW / 1.3));
-	ctx.fillStyle = gradient;
-	ctx.fill();
-	ctx.strokeStyle = 'rgba(80,80,80,0.22)';
-	ctx.lineWidth = 1.5;
-	ctx.stroke();
-	ctx.shadowBlur = 0;
-	ctx.restore();
+	animate(id, draw, 800);
 
-	// label
-	ctx.fillStyle = '#2f4f4f';
-	ctx.font = '13px Inter, Arial, sans-serif';
-	ctx.textAlign = 'center';
-	ctx.fillText(String(m.user_score), x + barW / 2, cssHeight - 6);
-	});
-}
-
-animate(id, draw, 800);
-
-renderLegendHTML('performanceChart', [
-	{ label: t.winsHighBars, swatch: '#7b93a4' },
-	{ label: t.lossesLowBars, swatch: '#b1715a' }
-]);
+	renderLegendHTML('performanceChart', [
+		{ label: t.winsHighBars, swatch: '#7b93a4' },
+		{ label: t.lossesLowBars, swatch: '#b1715a' }
+	]);
 }
 
 export function renderScoreDistribution() {
@@ -589,98 +589,7 @@ export function renderTrendsChart() {
 }
 
 export function renderWeeklyChart() {
-const canvas = document.getElementById('weeklyChart') as HTMLCanvasElement | null;
-if (!canvas) return;
-let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
-try {
-	({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
-} catch {
-	return;
-}
-
-const now = new Date();
-const weeks = Array.from({ length: 4 }, (_, idx) => {
-	const i = 3 - idx;
-	const start = new Date(now);
-	start.setDate(now.getDate() - (i + 1) * 7);
-	start.setHours(0, 0, 0, 0);
-	const end = new Date(now);
-	end.setDate(now.getDate() - i * 7);
-	end.setHours(0, 0, 0, 0);
-	const matches = state.history.filter(m => {
-	const d = new Date(m.date_played);
-	return d >= start && d < end;
-	});
-	const winsCount = matches.filter(m => m.result === 'win').length;
-	return { label: `${t.weekLabel || 'Week'} ${idx + 1}`, games: matches.length, wins: winsCount };
-});
-
-if (weeks.every(w => w.games === 0)) {
-	ctx.fillStyle = '#696969';
-	ctx.font = '14px Inter, Arial, sans-serif';
-	ctx.textAlign = 'center';
-	ctx.fillText(t.noMatchesLast4Weeks || 'No matches in last 4 weeks', cssWidth / 2, cssHeight / 2);
-	// still render an empty legend
-	renderLegendHTML('weeklyChart', [
-	{ label: t.grayTotalGames || 'Gray: Total games', swatch: '#72818a' },
-	{ label: t.softBlueWins || 'Soft blue: Wins', swatch: '#7b93a4' }
-	]);
-	return;
-}
-
-const barW = Math.max(18, cssWidth / weeks.length - 22);
-const maxGames = Math.max(...weeks.map(w => w.games), 1);
-
-const id = 'weeklyChart';
-cancelAnim(id);
-
-function draw(progress: number) {
-	ctx.clearRect(0, 0, cssWidth, cssHeight);
-
-	weeks.forEach((w, i) => {
-	const totalH = (w.games / maxGames) * (cssHeight - 40) * progress;
-	const winH = (w.wins / maxGames) * (cssHeight - 40) * progress;
-	const x = i * (barW + 22) + 8;
-	const yTotal = cssHeight - 24 - totalH;
-	const yWin = cssHeight - 24 - winH;
-
-	// total
-	const gGrad = ctx.createLinearGradient(x, yTotal, x, yTotal + Math.max(6, totalH));
-	gGrad.addColorStop(0, '#e6e6e6');
-	gGrad.addColorStop(1, '#72818a');
-	roundRect(ctx, x, yTotal, barW * 0.6, totalH, 6);
-	ctx.fillStyle = gGrad;
-	ctx.fill();
-	ctx.strokeStyle = 'rgba(80,80,80,0.18)';
-	ctx.stroke();
-
-	// wins overlay
-	const wX = x + barW * 0.4;
-	const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 24);
-	winsGrad.addColorStop(0, '#dff6fb');
-	winsGrad.addColorStop(1, '#7b93a4');
-	roundRect(ctx, wX, yWin, barW * 0.6, winH, 6);
-	ctx.fillStyle = winsGrad;
-	ctx.fill();
-	ctx.strokeRect(wX, yWin, barW * 0.6, winH);
-
-	ctx.fillStyle = '#2f4f4f';
-	ctx.font = '12px Inter, Arial, sans-serif';
-	ctx.textAlign = 'center';
-	ctx.fillText(w.label, x + barW / 2, cssHeight - 6);
-	});
-}
-
-animate(id, draw, 700);
-
-renderLegendHTML('weeklyChart', [
-	{ label: t.gamesTotalPerWeek || 'Games (total per week)', swatch: '#72818a' },
-	{ label: t.winsPerWeek || 'Wins (per week)', swatch: '#7b93a4' }
-]);
-}
-
-export function renderActivityHeatmap() {
-	const canvas = document.getElementById('activityHeatmap') as HTMLCanvasElement | null;
+	const canvas = document.getElementById('weeklyChart') as HTMLCanvasElement | null;
 	if (!canvas) return;
 	let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
 	try {
@@ -689,19 +598,122 @@ export function renderActivityHeatmap() {
 		return;
 	}
 
+	const now = new Date();
+	const weeks = Array.from({ length: 4 }, (_, idx) => {
+		const i = 3 - idx;
+		const start = new Date(now);
+		start.setDate(now.getDate() - (i + 1) * 7);
+		start.setHours(0, 0, 0, 0);
+		const end = new Date(now);
+		end.setDate(now.getDate() - i * 7);
+		end.setHours(0, 0, 0, 0);
+		const matches = state.history.filter(m => {
+			const d = new Date(m.date_played);
+			return d >= start && d < end;
+		});
+		const winsCount = matches.filter(m => m.result === 'win').length;
+		return { label: `${t.weekLabel || 'Week'} ${idx + 1}`, games: matches.length, wins: winsCount };
+	});
+
+	if (weeks.every(w => w.games === 0)) {
+		ctx.fillStyle = '#696969';
+		ctx.font = '14px Inter, Arial, sans-serif';
+		ctx.textAlign = 'center';
+		ctx.fillText(t.noMatchesLast4Weeks || 'No matches in last 4 weeks', cssWidth / 2, cssHeight / 2);
+		// still render an empty legend
+		renderLegendHTML('weeklyChart', [
+			{ label: t.grayTotalGames || 'Gray: Total games', swatch: '#72818a' },
+			{ label: t.softBlueWins || 'Soft blue: Wins', swatch: '#7b93a4' }
+		]);
+		return;
+	}
+
+	const barW = Math.max(18, cssWidth / weeks.length - 22);
+	const maxGames = Math.max(...weeks.map(w => w.games), 1);
+
+	const id = 'weeklyChart';
+	cancelAnim(id);
+
+	function draw(progress: number) {
+		ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+		weeks.forEach((w, i) => {
+			const totalH = (w.games / maxGames) * (cssHeight - 40) * progress;
+			const winH = (w.wins / maxGames) * (cssHeight - 40) * progress;
+			const x = i * (barW + 22) + 8;
+			const yTotal = cssHeight - 24 - totalH;
+			const yWin = cssHeight - 24 - winH;
+
+			// total
+			const gGrad = ctx.createLinearGradient(x, yTotal, x, yTotal + Math.max(6, totalH));
+			gGrad.addColorStop(0, '#e6e6e6');
+			gGrad.addColorStop(1, '#72818a');
+			roundRect(ctx, x, yTotal, barW * 0.6, totalH, 6);
+			ctx.fillStyle = gGrad;
+			ctx.fill();
+			ctx.strokeStyle = 'rgba(80,80,80,0.18)';
+			ctx.stroke();
+
+			// wins overlay
+			const wX = x + barW * 0.4;
+			const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 24);
+			winsGrad.addColorStop(0, '#dff6fb');
+			winsGrad.addColorStop(1, '#7b93a4');
+			roundRect(ctx, wX, yWin, barW * 0.6, winH, 6);
+			ctx.fillStyle = winsGrad;
+			ctx.fill();
+			ctx.strokeRect(wX, yWin, barW * 0.6, winH);
+
+			ctx.fillStyle = '#2f4f4f';
+			ctx.font = '12px Inter, Arial, sans-serif';
+			ctx.textAlign = 'center';
+			ctx.fillText(w.label, x + barW / 2, cssHeight - 6);
+		});
+	}
+
+	animate(id, draw, 700);
+
+	renderLegendHTML('weeklyChart', [
+		{ label: t.gamesTotalPerWeek || 'Games (total per week)', swatch: '#72818a' },
+		{ label: t.winsPerWeek || 'Wins (per week)', swatch: '#7b93a4' }
+	]);
+}
+
+export function renderActivityHeatmap() {
+	const canvas = document.getElementById('activityHeatmap') as HTMLCanvasElement | null;
+	if (!canvas) {
+		return;
+	}
+	let ctx: CanvasRenderingContext2D, cssWidth: number, cssHeight: number;
+	try {
+		({ ctx, cssWidth, cssHeight } = setupCanvas(canvas));
+	} catch {
+		return;
+	}
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 	const days = Array.from({ length: 7 }, (_, i) => {
-		const d = new Date();
-		d.setHours(0, 0, 0, 0);
-		d.setDate(d.getDate() - (6 - i));
+		const d = new Date(today);
+		d.setDate(today.getDate() - (6 - i)); // i=0: 6 days ago, i=6: today
 		return d;
 	});
-	const counts = days.map(day => {
-		const next = new Date(day);
-		next.setDate(day.getDate() + 1);
-		return state.history.filter(m => {
-			const d = new Date(m.date_played);
-			return d >= day && d < next;
-		}).length;
+	const counts = days.map((day, dayIdx) => {
+		let count = 0;
+		const dayYear = day.getFullYear();
+		const dayMonth = day.getMonth();
+		const dayDate = day.getDate();
+		state.history.forEach((m) => {
+			const dateStr = typeof m.date_played === 'string' ? m.date_played.replace(' ', 'T') : m.date_played;
+			const d = new Date(dateStr);
+			// Use local time for both
+			const matchYear = d.getFullYear();
+			const matchMonth = d.getMonth();
+			const matchDate = d.getDate();
+			const sameDay = matchYear === dayYear && matchMonth === dayMonth && matchDate === dayDate;
+			if (sameDay) count++;
+		});
+		return count;
 	});
 	const max = Math.max(...counts, 1);
 	const cw = Math.max(24, Math.floor(cssWidth / 7));
@@ -712,20 +724,56 @@ export function renderActivityHeatmap() {
 	function draw(progress: number) {
 		ctx.clearRect(0, 0, cssWidth, cssHeight);
 		counts.forEach((c, i) => {
-			// ... your existing fill & stroke code ...
+			// Visual parameters
+			const intensity = c > 0 ? Math.min(1, c / max) : 0;
+			const x = i * cw + cw / 2;
+			const y = cssHeight - 38;
+			const radius = Math.max(16, Math.min(cw / 2 - 2, 22));
 
+			// Gradient fill
+			const grad = ctx.createRadialGradient(x + 6, y, radius * 0.3, x + 6, y, radius);
+			grad.addColorStop(0, `rgba(74,144,226,${0.18 + intensity * 0.22})`);
+			grad.addColorStop(0.7, `rgba(74,144,226,${0.32 + intensity * 0.5})`);
+			grad.addColorStop(1, `rgba(74,144,226,${0.08 + intensity * 0.7})`);
+
+			// Shadow and border
+			ctx.save();
+			ctx.shadowColor = 'rgba(74,144,226,0.18)';
+			ctx.shadowBlur = 10 * intensity + 4;
+			ctx.beginPath();
+			ctx.arc(x + 6, y, radius, 0, 2 * Math.PI);
+			ctx.fillStyle = grad;
+			ctx.fill();
+			ctx.lineWidth = 2.5;
+			ctx.strokeStyle = `rgba(123,147,164,${0.18 + intensity * 0.5})`;
+			ctx.stroke();
+			ctx.restore();
+
+			// Draw count number if > 0
+			if (c > 0) {
+				ctx.save();
+				ctx.font = 'bold 18px Inter, Arial, sans-serif';
+				ctx.fillStyle = '#2f4f4f';
+				ctx.textAlign = 'center';
+				ctx.shadowColor = 'rgba(60,60,60,0.12)';
+				ctx.shadowBlur = 6;
+				ctx.fillText(String(c), x + 6, y + 7);
+				ctx.restore();
+			}
+
+			// Draw day label
 			const dayIndex = days[i].getDay();
 			const label = t.daysShort[dayIndex];
-			ctx.fillStyle = '#2f4f4f';
-			ctx.font = '12px Inter, Arial, sans-serif';
+			ctx.fillStyle = '#4b5a6a';
+			ctx.font = '15px Inter, Arial, sans-serif';
 			ctx.textAlign = 'center';
-			ctx.fillText(label, i * cw + cw / 2 + 6, cssHeight - 8);
+			ctx.fillText(label, x + 6, cssHeight - 10);
 		});
 	}
 	animate(id, draw, 650);
 
 	renderLegendHTML('activityHeatmap', [
-		{ label: t.activityDarkerMoreGames || 'Activity (darker = more games)',  swatch: '#b0cde6' }
+		{ label: t.activityDarkerMoreGames || 'Activity (darker = more games)', swatch: '#b0cde6' }
 	]);
 }
 
