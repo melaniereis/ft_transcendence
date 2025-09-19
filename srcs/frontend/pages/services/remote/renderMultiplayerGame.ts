@@ -15,7 +15,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 	const ws = new WebSocket(`${protocol}://${location.host}/game/${gameId}`);
-
+	let updatedb = 0;
 	let assignedSide: 'left' | 'right' | null = null;
 	let gameInSession = false;
 	let animationId: number | null = null;
@@ -74,6 +74,26 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				animationId = null;
 			}
 			showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
+			if (!updatedb  && gameId) {
+				updatedb = 1;
+				(async () => {
+					try {
+						const res = await fetch(`/games/${gameId}/end`, {
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json',
+								'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+							},
+							body: JSON.stringify({ 
+								score_player1: Number(document.getElementById('left-score')?.textContent), 
+								score_player2: Number(document.getElementById('right-score')?.textContent) 
+							})
+						});
+					} 
+						catch (err) {
+					}
+				})();
+			}
 		}
 
 		if (data.type === 'nextGameInvite')

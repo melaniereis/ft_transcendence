@@ -8,7 +8,8 @@ const paddleXLeft = 30;
 const paddleXRight = canvasWidth - 30 - paddleWidth;
 
 export function startGameLoop(gameRoom: GameRoom) {
-	if (!gameRoom) return;
+	if (!gameRoom) 
+		return;
 
 	gameRoom.intervalId = setInterval(() => {
 		const r = gameRoom;
@@ -86,9 +87,9 @@ function checkScoring(r: GameRoom) {
 }
 
 function handleScoreUpdate(r: GameRoom) {
-	// Check if max score reached
-	if (r.leftScore >= r.maxScore || r.rightScore >= r.maxScore) {
+	if ((r.leftScore + r.rightScore) >= r.maxScore) {
 		const winnerName = r.leftScore > r.rightScore ? r.left?.username : r.right?.username;
+		sendScoreUpdate(r);
 
 		[r.left, r.right].forEach((player) => {
 			if (player && player.readyState === player.OPEN) {
@@ -103,7 +104,7 @@ function handleScoreUpdate(r: GameRoom) {
 			}
 		});
 
-		// Stop game loop but don't clear interval - let next game handlers manage it
+		// Stop game loop
 		if (r.intervalId) {
 			clearInterval(r.intervalId);
 			r.intervalId = undefined;
@@ -111,6 +112,7 @@ function handleScoreUpdate(r: GameRoom) {
 		return;
 	}
 
+	// Continue game
 	resetBallPosition(r);
 	sendScoreUpdate(r);
 }

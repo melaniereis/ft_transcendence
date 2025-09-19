@@ -143,7 +143,6 @@ function handleEnd(ws: AliveWebSocket, gameId: string, data: any) {
 	console.log(`Game ${gameId} ended`);
 }
 
-// FIXED: Handle invite next with connection check
 function handleInviteNext(ws: AliveWebSocket, gameId: string) {
 	const room = gameRooms.get(gameId);
 	if (!room) {
@@ -155,8 +154,7 @@ function handleInviteNext(ws: AliveWebSocket, gameId: string) {
 	}
 
 	const opponent = ws.side === 'left' ? room.right : room.left;
-
-	// CRITICAL FIX: Check if opponent is still connected
+	
 	if (!opponent || opponent.readyState !== opponent.OPEN) {
 		ws.send(JSON.stringify({
 			type: 'opponentLeft',
