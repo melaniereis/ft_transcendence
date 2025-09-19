@@ -13,7 +13,7 @@ export async function renderLocalTournamentPage(container: HTMLDivElement) {
   container.style.borderRadius = '2rem';
   container.style.boxShadow = '0 8px 32px 0 rgba(44, 34, 84, 0.18), 0 1.5px 8px 0 rgba(44,34,84,0.10)';
   container.style.backdropFilter = 'blur(8px)';
-  container.innerHTML = `<h2 class="text-3xl font-bold text-black mb-4">${t.tournaments} (Local)</h2>`;
+  container.innerHTML = `<h2 class="text-3xl font-bold text-black mb-4">${t.tournaments} </h2>`;
 
   const formContainer = document.createElement('div');
   formContainer.style.background = 'rgba(255,251,230,0.92)';

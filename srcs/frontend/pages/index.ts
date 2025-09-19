@@ -325,7 +325,7 @@ if (playBtn && playOptions) {
 const playOptionsMap: Record<string, string> = {
 	'play-play': '/play',
 	'play-matchmaking': '/matchmaking',
-	'play-tournament': '/quick-tournament',
+	'play-tournament': '/tournaments',
 };
 
 languageOptions.querySelectorAll('button[data-lang]').forEach(btn => {
