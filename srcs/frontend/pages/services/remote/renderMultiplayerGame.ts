@@ -657,7 +657,13 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		function render() {
 			if (!gameInSession) return;
 
-			// Clear canvas with beautiful background
+			ctx.save();
+
+			if (assignedSide === 'right') {
+				ctx.translate(canvas.width, 0);
+				ctx.scale(-1, 1);
+			}
+
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Draw background gradient
@@ -667,14 +673,11 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			ctx.fillStyle = gradient;
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-			// Draw net
 			drawNet(ctx, canvas);
 
-			// Draw paddles (scale to canvas size)
 			const scaleX = canvas.width / 1280;
 			const scaleY = canvas.height / 680;
 
-			// Left paddle
 			drawRect(ctx,
 				30 * scaleX,
 				gameState.leftPaddle.y * scaleY,
@@ -683,7 +686,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				GRIS_COLORS.depression
 			);
 
-			// Right paddle
 			drawRect(ctx,
 				(1280 - 30 - 12) * scaleX,
 				gameState.rightPaddle.y * scaleY,
@@ -692,13 +694,14 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				GRIS_COLORS.acceptance
 			);
 
-			// Draw ball
 			drawCircle(ctx,
 				gameState.ball.x * scaleX,
 				gameState.ball.y * scaleY,
 				10 * Math.min(scaleX, scaleY),
 				'#ffffff'
 			);
+
+			ctx.restore();
 
 			animationId = requestAnimationFrame(render);
 		}
@@ -869,28 +872,22 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		document.body.appendChild(modal);
 	}
-
 	document.addEventListener('keydown', e => {
-		if (!assignedSide || !gameInSession) return;
+	if (!assignedSide || !gameInSession) return;
 
-		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
-			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
-			ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
-		} 
-		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-			ws.send(JSON.stringify({ type: 'move', action: 'start', direction: e.key }));
+	if (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S') {
+		const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
+		ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
 		}
 	});
 
 	document.addEventListener('keyup', e => {
 		if (!assignedSide || !gameInSession) return;
 
-		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
+		if (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S') {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
 			ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
-		} 
-		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: e.key }));
 		}
 	});
+
 	}
