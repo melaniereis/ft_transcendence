@@ -599,20 +599,27 @@ export function renderWeeklyChart() {
 	}
 
 	const now = new Date();
+	now.setHours(0, 0, 0, 0);
+	// Find start of current week (Monday)
+	const dayOfWeek = now.getDay(); // Sunday=0, Monday=1, ...
+	const weekStart = new Date(now);
+	weekStart.setDate(now.getDate() - ((dayOfWeek + 6) % 7)); // Monday as start
+
 	const weeks = Array.from({ length: 4 }, (_, idx) => {
-		const i = 3 - idx;
-		const start = new Date(now);
-		start.setDate(now.getDate() - (i + 1) * 7);
-		start.setHours(0, 0, 0, 0);
-		const end = new Date(now);
-		end.setDate(now.getDate() - i * 7);
-		end.setHours(0, 0, 0, 0);
+		const start = new Date(weekStart);
+		start.setDate(weekStart.getDate() - (3 - idx) * 7);
+		const end = new Date(start);
+		end.setDate(start.getDate() + 7);
+		// Filter matches in this week
 		const matches = state.history.filter(m => {
-			const d = new Date(m.date_played);
+			const d = new Date(typeof m.date_played === 'string' ? m.date_played.replace(' ', 'T') : m.date_played);
 			return d >= start && d < end;
 		});
 		const winsCount = matches.filter(m => m.result === 'win').length;
-		return { label: `${t.weekLabel || 'Week'} ${idx + 1}`, games: matches.length, wins: winsCount };
+		// Use translation for week label, JS for date
+		const dateLabel = `${start.getDate()}/${start.getMonth() + 1}`;
+		const weekLabel = `${t.weekLabel || 'Week'} ${idx + 1}`;
+		return { dateLabel, weekLabel, games: matches.length, wins: winsCount };
 	});
 
 	if (weeks.every(w => w.games === 0)) {
@@ -629,6 +636,11 @@ export function renderWeeklyChart() {
 	}
 
 	const barW = Math.max(18, cssWidth / weeks.length - 22);
+	const leftMargin = 24;
+	const rightMargin = 36;
+	const barSpacing = Math.max(18, Math.min(32, (cssWidth - leftMargin - rightMargin - weeks.length * barW) / (weeks.length - 1)));
+	const totalWidth = leftMargin + rightMargin + (weeks.length - 1) * (barW + barSpacing) + barW;
+	const xOffset = (cssWidth - totalWidth) > 0 ? (cssWidth - totalWidth) / 2 + leftMargin : leftMargin;
 	const maxGames = Math.max(...weeks.map(w => w.games), 1);
 
 	const id = 'weeklyChart';
@@ -636,46 +648,78 @@ export function renderWeeklyChart() {
 
 	function draw(progress: number) {
 		ctx.clearRect(0, 0, cssWidth, cssHeight);
-
 		weeks.forEach((w, i) => {
-			const totalH = (w.games / maxGames) * (cssHeight - 40) * progress;
-			const winH = (w.wins / maxGames) * (cssHeight - 40) * progress;
-			const x = i * (barW + 22) + 8;
-			const yTotal = cssHeight - 24 - totalH;
-			const yWin = cssHeight - 24 - winH;
+			// Bar positions and sizes
+			const totalH = (w.games / maxGames) * (cssHeight - 60) * progress;
+			const winH = (w.wins / maxGames) * (cssHeight - 60) * progress;
+			const x = i * (barW + barSpacing) + xOffset;
+			const yTotal = cssHeight - 38 - totalH;
+			const yWin = cssHeight - 38 - winH;
 
-			// total
+			// Total games bar (background)
+			ctx.save();
+			ctx.shadowColor = 'rgba(114,129,138,0.18)';
+			ctx.shadowBlur = 12;
 			const gGrad = ctx.createLinearGradient(x, yTotal, x, yTotal + Math.max(6, totalH));
 			gGrad.addColorStop(0, '#e6e6e6');
 			gGrad.addColorStop(1, '#72818a');
-			roundRect(ctx, x, yTotal, barW * 0.6, totalH, 6);
+			roundRect(ctx, x, yTotal, barW * 0.7, totalH, 12);
 			ctx.fillStyle = gGrad;
 			ctx.fill();
-			ctx.strokeStyle = 'rgba(80,80,80,0.18)';
-			ctx.stroke();
+			ctx.restore();
 
-			// wins overlay
-			const wX = x + barW * 0.4;
-			const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 24);
+			// Wins overlay (foreground)
+			ctx.save();
+			ctx.shadowColor = 'rgba(123,147,164,0.22)';
+			ctx.shadowBlur = 8;
+			const wX = x + barW * 0.18;
+			const winsGrad = ctx.createLinearGradient(wX, yWin, wX, cssHeight - 38);
 			winsGrad.addColorStop(0, '#dff6fb');
 			winsGrad.addColorStop(1, '#7b93a4');
-			roundRect(ctx, wX, yWin, barW * 0.6, winH, 6);
+			roundRect(ctx, wX, yWin, barW * 0.34, winH, 12);
 			ctx.fillStyle = winsGrad;
 			ctx.fill();
-			ctx.strokeRect(wX, yWin, barW * 0.6, winH);
+			ctx.restore();
 
-			ctx.fillStyle = '#2f4f4f';
+			// Draw game count on top of bar
+			if (w.games > 0) {
+				ctx.save();
+				ctx.font = 'bold 16px Inter, Arial, sans-serif';
+				ctx.fillStyle = '#2f4f4f';
+				ctx.textAlign = 'center';
+				ctx.shadowColor = 'rgba(60,60,60,0.10)';
+				ctx.shadowBlur = 4;
+				ctx.fillText(String(w.games), x + barW * 0.35, yTotal - 8);
+				ctx.restore();
+			}
+			// Draw win count on top of win bar
+			if (w.wins > 0) {
+				ctx.save();
+				ctx.font = 'bold 15px Inter, Arial, sans-serif';
+				ctx.fillStyle = '#7b93a4';
+				ctx.textAlign = 'center';
+				ctx.shadowColor = 'rgba(123,147,164,0.10)';
+				ctx.shadowBlur = 4;
+				ctx.fillText(String(w.wins), wX + barW * 0.17, yWin - 8);
+				ctx.restore();
+			}
+
+			// Draw date label (above week label)
+			ctx.fillStyle = '#4b5a6a';
 			ctx.font = '12px Inter, Arial, sans-serif';
 			ctx.textAlign = 'center';
-			ctx.fillText(w.label, x + barW / 2, cssHeight - 6);
+			ctx.fillText(w.dateLabel, x + barW * 0.35, cssHeight - 26);
+			// Draw week label (smaller)
+			ctx.font = '11px Inter, Arial, sans-serif';
+			ctx.fillText(w.weekLabel, x + barW * 0.35, cssHeight - 12);
 		});
 	}
 
 	animate(id, draw, 700);
 
 	renderLegendHTML('weeklyChart', [
-		{ label: t.gamesTotalPerWeek || 'Games (total per week)', swatch: '#72818a' },
-		{ label: t.winsPerWeek || 'Wins (per week)', swatch: '#7b93a4' }
+		{ label: t.gamesTotalPerWeek || 'Total games (gray bar)', swatch: 'linear-gradient(90deg,#e6e6e6,#72818a)' },
+		{ label: t.winsPerWeek || 'Wins (blue bar)', swatch: 'linear-gradient(90deg,#dff6fb,#7b93a4)' }
 	]);
 }
 
