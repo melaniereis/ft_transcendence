@@ -4,7 +4,6 @@ import { MatchHistoryRecord } from '../types/matchHistory.js';
 export async function createMatchHistoryRecord(gameId: number, userId: number, opponentId: number,
 	userScore: number, opponentScore: number, duration: number): Promise<void> {
 	const result = userScore > opponentScore ? 'win' : 'loss';
-
 	return new Promise<void>((resolve, reject) => {
 		db.run(
 			`INSERT INTO match_history (
@@ -13,7 +12,7 @@ export async function createMatchHistoryRecord(gameId: number, userId: number, o
 			[gameId, userId, opponentId, userScore, opponentScore, result, duration],
 			function (err: Error | null) {
 				if (err) {
-					console.error('❌ Erro ao criar histórico de partida:', err.message);
+					console.error('❌ Error creating match history:', err.message);
 					reject(err);
 				}
 				else
@@ -26,10 +25,12 @@ export async function createMatchHistoryRecord(gameId: number, userId: number, o
 export async function getMatchHistory(userId: number): Promise<MatchHistoryRecord[]> {
 	return new Promise((resolve, reject) => {
 		db.all(
-			`SELECT mh.*, u.username AS opponentUsername, u.display_name AS opponentDisplayName
-             FROM match_history mh
-             LEFT JOIN users u ON u.id = mh.opponent_id
-             WHERE mh.user_id = ? ORDER BY date_played DESC LIMIT 20`,
+			`SELECT mh.*,
+				COALESCE(u.display_name, u.username, '') AS opponentDisplayName,
+				u.username AS opponentUsername
+			 FROM match_history mh
+			 LEFT JOIN users u ON u.id = mh.opponent_id
+			 WHERE mh.user_id = ? ORDER BY date_played DESC LIMIT 20`,
 			[userId],
 			(err, rows) => {
 				if (err) {
