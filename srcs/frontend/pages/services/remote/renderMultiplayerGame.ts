@@ -9,8 +9,8 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export function renderMultiplayerGame(options: MultiplayerGameOptions) {
-	const { container, playerName, opponentName, gameId, maxGames, difficulty } = options;
-
+	const { container, playerName, opponentName, gameId, maxGames} = options;
+	let game_id= gameId;
 	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames);
 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
@@ -68,32 +68,62 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		}
 
 		if (data.type === 'end') {
-			gameInSession = false;
-			if (animationId) {
-				cancelAnimationFrame(animationId);
-				animationId = null;
-			}
-			showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
-			if (!updatedb  && gameId) {
-				updatedb = 1;
-				(async () => {
-					try {
-						const res = await fetch(`/games/${gameId}/end`, {
-							method: 'PUT',
-							headers: {
-								'Content-Type': 'application/json',
-								'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-							},
-							body: JSON.stringify({ 
-								score_player1: Number(document.getElementById('left-score')?.textContent), 
-								score_player2: Number(document.getElementById('right-score')?.textContent) 
-							})
-						});
-					} 
-						catch (err) {
-					}
-				})();
-			}
+			(async () => {
+				gameInSession = false;
+				if (animationId) {
+					cancelAnimationFrame(animationId);
+					animationId = null;
+				}
+				showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
+				++updatedb;
+				console.log(updatedb);
+				if (updatedb === 3){ 
+					const response = await fetch(`/games/${gameId}`, {
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`
+						}
+					});
+					const game = await response.json();
+
+					const createRes = await fetch('/games', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`
+					},
+					body: JSON.stringify({
+						player1_id:  game.player1.id,
+						player2_id: game.player2.id,
+						max_games: maxGames,
+						time_started: new Date().toISOString()
+					})
+					});
+
+					const createData = await createRes.json();
+					game_id = createData.game_id; 
+					updatedb = 1;
+				}
+				if (updatedb === 1 && game_id) {
+					(async () => {
+						try {
+							console.log("ENTREI");
+							const res = await fetch(`/games/${game_id}/end`, {
+								method: 'PUT',
+								headers: {
+									'Content-Type': 'application/json',
+									'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+								},
+								body: JSON.stringify({ 
+									score_player1: Number(document.getElementById('left-score')?.textContent), 
+									score_player2: Number(document.getElementById('right-score')?.textContent) 
+								})
+							});
+						} 
+							catch (err) {
+						}
+					})();
+				}
+			})();
 		}
 
 		if (data.type === 'nextGameInvite')
@@ -107,7 +137,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			gameState.leftScore = 0;
 			gameState.rightScore = 0;
 			updateScoreDisplay(0, 0);
-			showCountdown(() => startRenderLoop());
 		}
 
 		if (data.type === 'nextGameDeclined')

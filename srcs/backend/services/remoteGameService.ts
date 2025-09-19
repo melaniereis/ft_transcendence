@@ -13,7 +13,8 @@ export function startGameLoop(gameRoom: GameRoom) {
 
 	gameRoom.intervalId = setInterval(() => {
 		const r = gameRoom;
-		if (!r) return;
+		if (!r) 
+			return;
 
 		// Move ball
 		moveBall(r);
