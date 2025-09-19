@@ -32,7 +32,7 @@ export function render(container: HTMLElement) {
 		if (statsInner) {
 			if (state.activeStatsTab === 'overview') statsInner.innerHTML = statsOverview(state.stats, state.history);
 			if (state.activeStatsTab === 'performance') statsInner.innerHTML = statsPerformance(state.stats, state.history);
-			if (state.activeStatsTab === 'trends') statsInner.innerHTML = statsTrends(state.stats);
+			if (state.activeStatsTab === 'trends') statsInner.innerHTML = statsTrends(state.stats, state.history);
 		}
 	}
 	if (mainTab === 'history') {

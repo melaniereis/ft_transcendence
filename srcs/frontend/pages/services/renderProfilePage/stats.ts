@@ -1,8 +1,10 @@
 import { Match, Stats } from './types.js';
 import { translations } from '../language/translations.js';
 import { GRID_COLORS, svgMedalGold, svgTrendIcon, svgBarChartIcon, svgFlameIcon, svgChartIcon, svgClockIcon } from './constants.js';
-import {averageScore, bestPerformance, consistencyScore, clutchFactor, dominanceRating, efficiencyScore, 
-gamesThisWeek, longestWinStreak, mostActiveTime,} from './metrics.js';
+import {
+	averageScore, bestPerformance, consistencyScore, clutchFactor, dominanceRating, efficiencyScore,
+	gamesThisWeek, longestWinStreak, mostActiveTime,
+} from './metrics.js';
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
@@ -87,11 +89,11 @@ export function statsPerformance(stats: Stats, history: Match[]): string {
 		<div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;">
 		<h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgMedalGold()} ${t.performanceRankings}</h4>
 ${[
-	{ label: t.consistency, value: `${cons}%`, desc: t.performanceStability, color: cons >= 70 ? GRID_COLORS.success : cons >= 50 ? GRID_COLORS.warm : GRID_COLORS.accent, icon: svgBarChartIcon() },
-	{ label: t.clutchFactor, value: `${clutch}%`, desc: t.closeGameWins, color: clutch >= 60 ? GRID_COLORS.success : GRID_COLORS.warm, icon: svgFlameIcon() },
-	{ label: t.dominance, value: `${dom}%`, desc: t.bigMarginWins, color: GRID_COLORS.cool, icon: svgTrendIcon() },
-	{ label: t.efficiency, value: eff, desc: t.performancePerMatch, color: GRID_COLORS.accent, icon: svgBarChartIcon() },
-].map(r => `
+			{ label: t.consistency, value: `${cons}%`, desc: t.performanceStability, color: cons >= 70 ? GRID_COLORS.success : cons >= 50 ? GRID_COLORS.warm : GRID_COLORS.accent, icon: svgBarChartIcon() },
+			{ label: t.clutchFactor, value: `${clutch}%`, desc: t.closeGameWins, color: clutch >= 60 ? GRID_COLORS.success : GRID_COLORS.warm, icon: svgFlameIcon() },
+			{ label: t.dominance, value: `${dom}%`, desc: t.bigMarginWins, color: GRID_COLORS.cool, icon: svgTrendIcon() },
+			{ label: t.efficiency, value: eff, desc: t.performancePerMatch, color: GRID_COLORS.accent, icon: svgBarChartIcon() },
+		].map(r => `
 			<div style="display:flex;align-items:center;gap:12px;padding:10px;background:${GRID_COLORS.bg};border-radius:8px;border-left:4px solid ${r.color};margin-bottom:10px;">
 			<div style="font-size:20px">${r.icon}</div>
 			<div style="flex:1">
@@ -110,24 +112,24 @@ ${[
 `;
 }
 
-export function statsTrends(stats: Stats): string {
+export function statsTrends(stats: Stats, history: Match[]): string {
 	return `
 	<div>
 	<div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:30px">
-${[
-	{ label: t.winRate, value: `${(stats.win_rate * 100).toFixed(1)}%`, color: GRID_COLORS.success, icon: svgMedalGold(), period: t.current },
-	{ label: t.avgScore, value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: GRID_COLORS.cool, icon: svgBarChartIcon(), period: t.perMatch },
-	{ label: t.gamesPerWeek, value: String(gamesThisWeek([])), color: GRID_COLORS.cool, icon: svgChartIcon(), period: t.thisWeek }, /* updated at runtime in index */
-].map(ti => `
-		<div style="background:linear-gradient(135deg, ${ti.color}15, ${ti.color}05);padding:18px;border-radius:12px;border-left:4px solid ${ti.color};">
-			<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-			<span style="font-size:20px">${ti.icon}</span>
-			<div style="text-align:right"><div style="font-size:16px;font-weight:bold;color:${ti.color}">${ti.value}</div></div>
+	${[
+			{ label: t.winRate, value: `${(stats.win_rate * 100).toFixed(1)}%`, color: GRID_COLORS.success, icon: svgMedalGold(), period: t.current },
+			{ label: t.avgScore, value: (stats.matches_played ? (stats.points_scored / stats.matches_played).toFixed(1) : '0'), color: GRID_COLORS.cool, icon: svgBarChartIcon(), period: t.perMatch },
+			{ label: t.gamesPerWeek, value: String(gamesThisWeek(history)), color: GRID_COLORS.cool, icon: svgChartIcon(), period: t.thisWeek },
+		].map(ti => `
+			<div style="background:linear-gradient(135deg, ${ti.color}15, ${ti.color}05);padding:18px;border-radius:12px;border-left:4px solid ${ti.color};">
+				<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+				<span style="font-size:20px">${ti.icon}</span>
+				<div style="text-align:right"><div style="font-size:16px;font-weight:bold;color:${ti.color}">${ti.value}</div></div>
+				</div>
+				<div style="font-size:14px;font-weight:bold;color:${GRID_COLORS.primary}">${ti.label}</div>
+				<div style="font-size:12px;color:${GRID_COLORS.muted}">${ti.period}</div>
 			</div>
-			<div style="font-size:14px;font-weight:bold;color:${GRID_COLORS.primary}">${ti.label}</div>
-			<div style="font-size:12px;color:${GRID_COLORS.muted}">${ti.period}</div>
-		</div>
-		`).join('')}
+			`).join('')}
 	</div>
 	<div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:20px;border-radius:12px;margin-bottom:30px;">
 		<h4 style="margin:0 0 15px 0;color:${GRID_COLORS.primary}">${svgTrendIcon()} ${t.winRateProgression}</h4>
@@ -144,5 +146,5 @@ ${[
 		</div>
 	</div>
 	</div>
-`;
+	`;
 }
