@@ -304,7 +304,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 });
 
-
 function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 	btn.classList.add('fade-btn-out');
 	setTimeout(() => {
@@ -317,39 +316,39 @@ function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 	}, 380);
 }
 
-
 if (playBtn && playOptions) {
-  playBtn.addEventListener('click', () => {
-    playOptions.classList.toggle('hidden');
-  });
+	playBtn.addEventListener('click', () => {
+	playOptions.classList.toggle('hidden');
+	});
 }
 
 const playOptionsMap: Record<string, string> = {
 	'play-play': '/play',
 	'play-matchmaking': '/matchmaking',
-	'play-tournament': '/quick-tournament',
+	'play-tournament': '/tournaments',
 };
 
- languageOptions.querySelectorAll('button[data-lang]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const selectedLang = btn.getAttribute('data-lang');
-      if (selectedLang) {
-        localStorage.setItem('preferredLanguage', selectedLang);
-        languageOptions.classList.add('hidden');  
+languageOptions.querySelectorAll('button[data-lang]').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang');
+		if (selectedLang) {
+		localStorage.setItem('preferredLanguage', selectedLang);
+		languageOptions.classList.add('hidden');  
 		applyLanguage(selectedLang);
-        location.reload();
-      }
-    });
-  });
+		location.reload();
+		}
+	});
+});
 
-Object.entries(playOptionsMap).forEach(([btnId, path]) => {
-  const btn = document.getElementById(btnId) as HTMLButtonElement | null;
-  if (btn) {
-    btn.addEventListener('click', () => {
-      playOptions.classList.add('hidden');
-      navigateTo(path);
-    });
-  }
+playOptions.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target) return;
+
+    const route = playOptionsMap[target.id];
+    if (route) {
+        playOptions.classList.add('hidden');
+        navigateTo(route);
+    }
 });
 
 if (settingsBtn) {

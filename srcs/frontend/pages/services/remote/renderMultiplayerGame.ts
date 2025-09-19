@@ -1,22 +1,27 @@
 import type { MultiplayerGameOptions } from '../../../types/remoteTypes.js';
 import { drawRect, drawCircle, drawNet, setOptimizedCanvasSize } from '../renderGame/gameCanvas.js';
-import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from '../renderGame/constants.js';
+import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from '../renderGame/constants.js'
+import { translations } from '../language/translations.js';;
+
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
+const t = translations[lang];
 
 export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	const { container, playerName, opponentName, gameId, maxGames, difficulty, playerAvatarUrl = 'default.png', opponentAvatarUrl = 'default.png' } = options;
 
+	let game_id = gameId;
 	// Create beautiful UI like renderGame
 	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames, playerAvatarUrl, opponentAvatarUrl);
 
-	// Setup WebSocket for remote state
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 	const ws = new WebSocket(`${protocol}://${location.host}/game/${gameId}`);
-
+	let updatedb = 0;
 	let assignedSide: 'left' | 'right' | null = null;
 	let gameInSession = false;
 	let animationId: number | null = null;
 
-	// Game state - receive-only from server
 	let gameState = {
 		ball: { x: 640, y: 340 },
 		leftPaddle: { y: 290 },
@@ -40,9 +45,8 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		if (data.type === 'assignSide') {
 			assignedSide = data.side;
-			if (assignedSide !== null) {
+			if (assignedSide !== null)
 				updatePlayerDisplay(assignedSide, playerName, opponentName);
-			}
 		}
 
 		if (data.type === 'startCountdown') {
@@ -65,34 +69,79 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		}
 
 		if (data.type === 'end') {
-			gameInSession = false;
-			if (animationId) {
-				cancelAnimationFrame(animationId);
-				animationId = null;
-			}
-			showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
+			(async () => {
+				gameInSession = false;
+				if (animationId) {
+					cancelAnimationFrame(animationId);
+					animationId = null;
+				}
+				showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
+				++updatedb;
+				console.log(updatedb);
+				if (updatedb === 3) {
+					const response = await fetch(`/games/${gameId}`, {
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`
+						}
+					});
+					const game = await response.json();
+
+					const createRes = await fetch('/games', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`
+						},
+						body: JSON.stringify({
+							player1_id: game.player1.id,
+							player2_id: game.player2.id,
+							max_games: maxGames,
+							time_started: new Date().toISOString()
+						})
+					});
+
+					const createData = await createRes.json();
+					game_id = createData.game_id;
+					updatedb = 1;
+				}
+				if (updatedb === 1 && game_id) {
+					(async () => {
+						try {
+							console.log("ENTREI");
+							const res = await fetch(`/games/${game_id}/end`, {
+								method: 'PUT',
+								headers: {
+									'Content-Type': 'application/json',
+									'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+								},
+								body: JSON.stringify({
+									score_player1: Number(document.getElementById('left-score')?.textContent),
+									score_player2: Number(document.getElementById('right-score')?.textContent)
+								})
+							});
+						}
+						catch (err) {
+						}
+					})();
+				}
+			})();
 		}
 
-		if (data.type === 'nextGameInvite') {
+		if (data.type === 'nextGameInvite')
 			showNextGameInviteModal(data.from);
-		}
 
-		if (data.type === 'waitingForResponse') {
+		if (data.type === 'waitingForResponse')
 			showWaitingModal(data.message);
-		}
-
 		if (data.type === 'nextGameStarted') {
 			hideAllModals();
 			gameInSession = true;
 			gameState.leftScore = 0;
 			gameState.rightScore = 0;
 			updateScoreDisplay(0, 0);
-			showCountdown(() => startRenderLoop());
 		}
 
-		if (data.type === 'nextGameDeclined') {
+		if (data.type === 'nextGameDeclined')
 			showDeclinedModal(data.message);
-		}
 
 		if (data.type === 'opponentLeft') {
 			gameInSession = false;
@@ -290,43 +339,43 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 	function createBeautifulMultiplayerUI(container: HTMLElement, player1: string, player2: string, maxGames: number, playerAvatarUrl: string, opponentAvatarUrl: string) {
 		container.innerHTML = `
-            <div class="gris-game-universe" style="
-                min-height: 100vh;
-                background: transparent;
-                padding: ${GRIS_SPACING[3]};
-                position: relative;
-                overflow: hidden;
-            ">
-                <!-- Optimized Background Atmosphere -->
-                <div class="gris-atmosphere" style="
-                    position: fixed;
-                    inset: 0;
-                    pointer-events: none;
-                    z-index: 0;
-                ">
-                    <canvas id="gris-bg-particles" width="100" height="100" style="
-                        position: absolute;
-                        inset: 0;
-                        opacity: 0.5;
-                        background: transparent;
-                    "></canvas>
-                </div>
+			<div class="gris-game-universe" style="
+				min-height: 100vh;
+				background: transparent;
+				padding: ${GRIS_SPACING[3]};
+				position: relative;
+				overflow: hidden;
+			">
+				<!-- Optimized Background Atmosphere -->
+				<div class="gris-atmosphere" style="
+					position: fixed;
+					inset: 0;
+					pointer-events: none;
+					z-index: 0;
+				">
+					<canvas id="gris-bg-particles" width="100" height="100" style="
+						position: absolute;
+						inset: 0;
+						opacity: 0.5;
+						background: transparent;
+					"></canvas>
+				</div>
 
-                <!-- Game Header -->
-                <div class="ethereal-header" style="
-                    text-align: center;
-                    margin-bottom: ${GRIS_SPACING[4]};
-                    position: relative;
-                    z-index: 2;
-                ">
-                    <div class="game-oracle" style="
-                        color: ${GRIS_COLORS.secondary};
-                        font-size: ${GRIS_TYPOGRAPHY.scale.base};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
-                    ">
-                        Remote Pong - Best of ${maxGames}
-                    </div>
-                </div>
+				<!-- Game Header -->
+				<div class="ethereal-header" style="
+					text-align: center;
+					margin-bottom: ${GRIS_SPACING[4]};
+					position: relative;
+					z-index: 2;
+				">
+					<div class="game-oracle" style="
+						color: ${GRIS_COLORS.secondary};
+						font-size: ${GRIS_TYPOGRAPHY.scale.base};
+						font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
+					">
+						Remote Pong - Best of ${maxGames}
+					</div>
+				</div>
 
                 <!-- Players Top Bar (Beautiful like renderGame) -->
                 <div class="gris-players-topbar" style="
@@ -378,14 +427,14 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                         ">0</span>
                     </div>
 
-                    <!-- VS Indicator -->
-                    <div style="
-                        display: flex;
-                        align-items: center;
-                        font-size: 1.5rem;
-                        color: ${GRIS_COLORS.primary};
-                        font-weight: bold;
-                    ">VS</div>
+					<!-- VS Indicator -->
+					<div style="
+						display: flex;
+						align-items: center;
+						font-size: 1.5rem;
+						color: ${GRIS_COLORS.primary};
+						font-weight: bold;
+					">VS</div>
 
                     <!-- Right Player -->
                     <div id="right-player-section" class="player-sanctuary right-sanctuary" style="
@@ -429,88 +478,88 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                     </div>
                 </div>
 
-                <!-- Game Arena (Beautiful like renderGame) -->
-                <div class="gris-game-arena" style="
-                    width: 100%;
-                    max-width: 900px;
-                    margin: 0 auto;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    background: linear-gradient(120deg, #fffbe6 0%, #e9e4f0 100%);
-                    border-radius: 24px;
-                    box-shadow: ${GRIS_SHADOWS.lg};
-                    padding: 28px 18px;
-                ">
-                    <div class="canvas-container" style="
-                        position: relative;
-                        border-radius: 16px;
-                        overflow: hidden;
-                        box-shadow: ${GRIS_SHADOWS.base};
-                        background: transparent;
-                        width: 100%;
-                        aspect-ratio: 5/3;
-                        max-width: 900px;
-                        min-width: 400px;
-                        min-height: 240px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    ">
-                        <canvas id="pong" width="1280" height="680" style="
-                            display: block;
-                            width: 100%;
-                            height: 100%;
-                            max-width: 100%;
-                            max-height: 100%;
-                        "></canvas>
-                        <div id="game-status" style="
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            color: white;
-                            font-size: 2rem;
-                            text-align: center;
-                            font-weight: bold;
-                            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-                            display: none;
-                        ">Waiting for opponent...</div>
-                    </div>
-                </div>
+				<!-- Game Arena (Beautiful like renderGame) -->
+				<div class="gris-game-arena" style="
+					width: 100%;
+					max-width: 900px;
+					margin: 0 auto;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					background: linear-gradient(120deg, #fffbe6 0%, #e9e4f0 100%);
+					border-radius: 24px;
+					box-shadow: ${GRIS_SHADOWS.lg};
+					padding: 28px 18px;
+				">
+					<div class="canvas-container" style="
+						position: relative;
+						border-radius: 16px;
+						overflow: hidden;
+						box-shadow: ${GRIS_SHADOWS.base};
+						background: transparent;
+						width: 100%;
+						aspect-ratio: 5/3;
+						max-width: 900px;
+						min-width: 400px;
+						min-height: 240px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+					">
+						<canvas id="pong" width="1280" height="680" style="
+							display: block;
+							width: 100%;
+							height: 100%;
+							max-width: 100%;
+							max-height: 100%;
+						"></canvas>
+						<div id="game-status" style="
+							position: absolute;
+							top: 50%;
+							left: 50%;
+							transform: translate(-50%, -50%);
+							color: white;
+							font-size: 2rem;
+							text-align: center;
+							font-weight: bold;
+							text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+							display: none;
+						">Waiting for opponent...</div>
+					</div>
+				</div>
 
-                <!-- Controls Info (Beautiful styling) -->
-                <div id="controls-info" style="
-                    margin-top: 2rem;
-                    text-align: center;
-                    color: ${GRIS_COLORS.primary};
-                    background: rgba(255, 255, 255, 0.8);
-                    padding: 1rem 2rem;
-                    border-radius: 1rem;
-                    box-shadow: ${GRIS_SHADOWS.sm};
-                    max-width: 600px;
-                    margin-left: auto;
-                    margin-right: auto;
-                ">
-                    <div id="controls-text" style="
-                        font-size: ${GRIS_TYPOGRAPHY.scale.base};
-                        font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
-                    ">Connecting to game...</div>
-                </div>
-            </div>
+				<!-- Controls Info (Beautiful styling) -->
+				<div id="controls-info" style="
+					margin-top: 2rem;
+					text-align: center;
+					color: ${GRIS_COLORS.primary};
+					background: rgba(255, 255, 255, 0.8);
+					padding: 1rem 2rem;
+					border-radius: 1rem;
+					box-shadow: ${GRIS_SHADOWS.sm};
+					max-width: 600px;
+					margin-left: auto;
+					margin-right: auto;
+				">
+					<div id="controls-text" style="
+						font-size: ${GRIS_TYPOGRAPHY.scale.base};
+						font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
+					">Connecting to game...</div>
+				</div>
+			</div>
 
-            <!-- Add CSS for hover effects -->
-            <style>
-                .player-sanctuary:hover {
-                    transform: translateY(-2px);
-                    box-shadow: ${GRIS_SHADOWS.lg};
-                }
-                .canvas-container canvas {
-                    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                }
-            </style>
-        `;
+			<!-- Add CSS for hover effects -->
+			<style>
+				.player-sanctuary:hover {
+					transform: translateY(-2px);
+					box-shadow: ${GRIS_SHADOWS.lg};
+				}
+				.canvas-container canvas {
+					background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+				}
+			</style>
+		`;
 
 		// Initialize background effects
 		setTimeout(initializeBackgroundEffects, 100);
@@ -605,21 +654,14 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		const rightSection = document.getElementById('right-player-section');
 
 		if (controlsText) {
-			if (side === 'left') {
-				controlsText.innerHTML = `
-                    <strong>Your Controls:</strong> W (Up) / S (Down)<br>
-                    <small>You are controlling the <strong>LEFT</strong> paddle</small>
-                `;
-				if (leftSection) leftSection.style.border = '3px solid #7fc7d9';
-				if (rightSection) rightSection.style.border = '1.5px solid #f7b267';
-			} else {
-				controlsText.innerHTML = `
-                    <strong>Your Controls:</strong> ↑ (Up) / ↓ (Down)<br>
-                    <small>You are controlling the <strong>RIGHT</strong> paddle</small>
-                `;
-				if (rightSection) rightSection.style.border = '3px solid #f7b267';
-				if (leftSection) leftSection.style.border = '1.5px solid #b6a6ca';
-			}
+			controlsText.innerHTML = `
+					<strong>Your Controls:</strong> W (Up) / S (Down)<br>
+					<small>You are controlling the <strong>LEFT</strong> paddle</small>
+				`;
+			if (leftSection)
+				leftSection.style.border = '3px solid #7fc7d9';
+			if (rightSection)
+				rightSection.style.border = '1.5px solid #f7b267';
 		}
 	}
 
@@ -656,7 +698,13 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		function render() {
 			if (!gameInSession) return;
 
-			// Clear canvas with beautiful background
+			ctx.save();
+
+			if (assignedSide === 'right') {
+				ctx.translate(canvas.width, 0);
+				ctx.scale(-1, 1);
+			}
+
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Draw background gradient
@@ -666,14 +714,11 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			ctx.fillStyle = gradient;
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-			// Draw net
 			drawNet(ctx, canvas);
 
-			// Draw paddles (scale to canvas size)
 			const scaleX = canvas.width / 1280;
 			const scaleY = canvas.height / 680;
 
-			// Left paddle
 			drawRect(ctx,
 				30 * scaleX,
 				gameState.leftPaddle.y * scaleY,
@@ -682,7 +727,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				GRIS_COLORS.depression
 			);
 
-			// Right paddle
 			drawRect(ctx,
 				(1280 - 30 - 12) * scaleX,
 				gameState.rightPaddle.y * scaleY,
@@ -691,13 +735,14 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				GRIS_COLORS.acceptance
 			);
 
-			// Draw ball
 			drawCircle(ctx,
 				gameState.ball.x * scaleX,
 				gameState.ball.y * scaleY,
 				10 * Math.min(scaleX, scaleY),
 				'#ffffff'
 			);
+
+			ctx.restore();
 
 			animationId = requestAnimationFrame(render);
 		}
@@ -709,58 +754,58 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		const modal = document.createElement('div');
 		modal.id = 'next-game-invite-modal';
 		modal.style.cssText = `
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(182, 166, 202, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(16px);
-            animation: fadeInModal 0.4s cubic-bezier(.4,.2,.3,1) both;
-        `;
+			position: fixed;
+			top: 0; left: 0;
+			width: 100vw; height: 100vh;
+			background: rgba(182, 166, 202, 0.7);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			backdrop-filter: blur(16px);
+			animation: fadeInModal 0.4s cubic-bezier(.4,.2,.3,1) both;
+		`;
 
 		modal.innerHTML = `
-            <div style="
-                background: rgba(255,255,255,0.98);
-                border-radius: 2rem;
-                box-shadow: ${GRIS_SHADOWS.xl};
-                padding: 2.5rem 2rem;
-                text-align: center;
-                min-width: 320px;
-                max-width: 96vw;
-            ">
-                <h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary}; font-size: ${GRIS_TYPOGRAPHY.scale.xl};">
-                    Next Game Invitation
-                </h2>
-                <p style="margin-bottom: 2rem; color: ${GRIS_COLORS.secondary}; font-size: ${GRIS_TYPOGRAPHY.scale.base};">
-                    ${fromPlayer} wants to play another game!
-                </p>
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button id="accept-btn" style="
-                        padding: 0.75rem 1.5rem;
-                        background: ${GRIS_COLORS.bargaining};
-                        color: white;
-                        border: none;
-                        border-radius: 0.5rem;
-                        cursor: pointer;
-                        font-weight: 600;
-                        transition: all 0.2s ease;
-                    ">Accept</button>
-                    <button id="decline-btn" style="
-                        padding: 0.75rem 1.5rem;
-                        background: ${GRIS_COLORS.anger};
-                        color: white;
-                        border: none;
-                        border-radius: 0.5rem;
-                        cursor: pointer;
-                        font-weight: 600;
-                        transition: all 0.2s ease;
-                    ">Decline</button>
-                </div>
-            </div>
-        `;
+			<div style="
+				background: rgba(255,255,255,0.98);
+				border-radius: 2rem;
+				box-shadow: ${GRIS_SHADOWS.xl};
+				padding: 2.5rem 2rem;
+				text-align: center;
+				min-width: 320px;
+				max-width: 96vw;
+			">
+				<h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary}; font-size: ${GRIS_TYPOGRAPHY.scale.xl};">
+					Next Game Invitation
+				</h2>
+				<p style="margin-bottom: 2rem; color: ${GRIS_COLORS.secondary}; font-size: ${GRIS_TYPOGRAPHY.scale.base};">
+					${fromPlayer} wants to play another game!
+				</p>
+				<div style="display: flex; gap: 1rem; justify-content: center;">
+					<button id="accept-btn" style="
+						padding: 0.75rem 1.5rem;
+						background: ${GRIS_COLORS.bargaining};
+						color: white;
+						border: none;
+						border-radius: 0.5rem;
+						cursor: pointer;
+						font-weight: 600;
+						transition: all 0.2s ease;
+					">Accept</button>
+					<button id="decline-btn" style="
+						padding: 0.75rem 1.5rem;
+						background: ${GRIS_COLORS.anger};
+						color: white;
+						border: none;
+						border-radius: 0.5rem;
+						cursor: pointer;
+						font-weight: 600;
+						transition: all 0.2s ease;
+					">Decline</button>
+				</div>
+			</div>
+		`;
 
 		modal.querySelector('#accept-btn')!.addEventListener('click', () => {
 			ws.send(JSON.stringify({ type: 'acceptNext' }));
@@ -780,45 +825,45 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		const modal = document.createElement('div');
 		modal.id = 'waiting-modal';
 		modal.style.cssText = `
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(182, 166, 202, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(16px);
-        `;
+			position: fixed;
+			top: 0; left: 0;
+			width: 100vw; height: 100vh;
+			background: rgba(182, 166, 202, 0.7);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			backdrop-filter: blur(16px);
+		`;
 
 		modal.innerHTML = `
-            <div style="
-                background: rgba(255,255,255,0.98);
-                border-radius: 2rem;
-                box-shadow: ${GRIS_SHADOWS.xl};
-                padding: 2rem;
-                text-align: center;
-                min-width: 320px;
-            ">
-                <h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary};">Please Wait</h2>
-                <p style="margin-bottom: 1.5rem; color: ${GRIS_COLORS.secondary};">${message}</p>
-                <div style="
-                    width: 40px;
-                    height: 40px;
-                    border: 4px solid ${GRIS_COLORS.surface};
-                    border-top: 4px solid ${GRIS_COLORS.primary};
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                    margin: 0 auto;
-                "></div>
-            </div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        `;
+			<div style="
+				background: rgba(255,255,255,0.98);
+				border-radius: 2rem;
+				box-shadow: ${GRIS_SHADOWS.xl};
+				padding: 2rem;
+				text-align: center;
+				min-width: 320px;
+			">
+				<h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary};">Please Wait</h2>
+				<p style="margin-bottom: 1.5rem; color: ${GRIS_COLORS.secondary};">${message}</p>
+				<div style="
+					width: 40px;
+					height: 40px;
+					border: 4px solid ${GRIS_COLORS.surface};
+					border-top: 4px solid ${GRIS_COLORS.primary};
+					border-radius: 50%;
+					animation: spin 1s linear infinite;
+					margin: 0 auto;
+				"></div>
+			</div>
+			<style>
+				@keyframes spin {
+					0% { transform: rotate(0deg); }
+					100% { transform: rotate(360deg); }
+				}
+			</style>
+		`;
 
 		document.body.appendChild(modal);
 	}
@@ -827,39 +872,39 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		const modal = document.createElement('div');
 		modal.id = 'declined-modal';
 		modal.style.cssText = `
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(182, 166, 202, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(16px);
-        `;
+			position: fixed;
+			top: 0; left: 0;
+			width: 100vw; height: 100vh;
+			background: rgba(182, 166, 202, 0.7);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			backdrop-filter: blur(16px);
+		`;
 
 		modal.innerHTML = `
-            <div style="
-                background: rgba(255,255,255,0.98);
-                border-radius: 2rem;
-                box-shadow: ${GRIS_SHADOWS.xl};
-                padding: 2rem;
-                text-align: center;
-                min-width: 320px;
-            ">
-                <h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.anger};">Game Declined</h2>
-                <p style="margin-bottom: 2rem; color: ${GRIS_COLORS.secondary};">${message}</p>
-                <button id="ok-btn" style="
-                    padding: 0.75rem 1.5rem;
-                    background: ${GRIS_COLORS.secondary};
-                    color: white;
-                    border: none;
-                    border-radius: 0.5rem;
-                    cursor: pointer;
-                    font-weight: 600;
-                ">OK</button>
-            </div>
-        `;
+			<div style="
+				background: rgba(255,255,255,0.98);
+				border-radius: 2rem;
+				box-shadow: ${GRIS_SHADOWS.xl};
+				padding: 2rem;
+				text-align: center;
+				min-width: 320px;
+			">
+				<h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.anger};">Game Declined</h2>
+				<p style="margin-bottom: 2rem; color: ${GRIS_COLORS.secondary};">${message}</p>
+				<button id="ok-btn" style="
+					padding: 0.75rem 1.5rem;
+					background: ${GRIS_COLORS.secondary};
+					color: white;
+					border: none;
+					border-radius: 0.5rem;
+					cursor: pointer;
+					font-weight: 600;
+				">OK</button>
+			</div>
+		`;
 
 		modal.querySelector('#ok-btn')!.addEventListener('click', () => {
 			modal.remove();
@@ -868,7 +913,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		document.body.appendChild(modal);
 	}
-
 	document.addEventListener('keydown', e => {
 		if (!assignedSide || !gameInSession) return;
 
@@ -888,8 +932,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
 			ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
 		}
-		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: e.key }));
-		}
 	});
+
 }

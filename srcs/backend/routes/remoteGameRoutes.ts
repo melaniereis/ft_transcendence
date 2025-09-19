@@ -143,7 +143,6 @@ function handleEnd(ws: AliveWebSocket, gameId: string, data: any) {
 	console.log(`Game ${gameId} ended`);
 }
 
-// FIXED: Handle invite next with connection check
 function handleInviteNext(ws: AliveWebSocket, gameId: string) {
 	const room = gameRooms.get(gameId);
 	if (!room) {
@@ -156,7 +155,6 @@ function handleInviteNext(ws: AliveWebSocket, gameId: string) {
 
 	const opponent = ws.side === 'left' ? room.right : room.left;
 
-	// CRITICAL FIX: Check if opponent is still connected
 	if (!opponent || opponent.readyState !== opponent.OPEN) {
 		ws.send(JSON.stringify({
 			type: 'opponentLeft',
@@ -176,7 +174,7 @@ function handleInviteNext(ws: AliveWebSocket, gameId: string) {
 	}));
 }
 
-// FIXED: Handle accept next with connection check
+
 function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
 	const room = gameRooms.get(gameId);
 	if (!room) {
@@ -189,7 +187,7 @@ function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
 
 	const opponent = ws.side === 'left' ? room.right : room.left;
 
-	// CRITICAL FIX: Check if opponent is still connected
+
 	if (!opponent || opponent.readyState !== opponent.OPEN) {
 		ws.send(JSON.stringify({
 			type: 'opponentLeft',
@@ -198,7 +196,6 @@ function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
 		return;
 	}
 
-	// Reset game state for new round
 	room.leftScore = 0;
 	room.rightScore = 0;
 	room.ballX = 1280 / 2;
@@ -221,9 +218,12 @@ function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
 		rightScore: 0
 	});
 
-	if (!room.intervalId) {
-		startGameLoop(room);
-	}
+	sendToBoth(room, { type: 'startCountdown' });
+		setTimeout(() => {
+			if (gameRooms.get(gameId)) {
+				startGameLoop(room!);
+			}
+		}, 3500);
 }
 
 function handleDeclineNext(ws: AliveWebSocket, gameId: string) {
