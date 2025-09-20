@@ -711,7 +711,6 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
 			});
 		});
 
-		// Close dropdown on outside click
 		document.addEventListener('click', (e) => {
 			if (
 				!introLanguageOptions.contains(e.target as Node) &&

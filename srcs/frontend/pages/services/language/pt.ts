@@ -331,7 +331,7 @@ export default {
 	nextSemifinal: 'Próxima Semifinal',
 	goToFinal: 'Ir para a Final',
 	tournamentFinished: '🏁 Torneio Concluído — Voltar ao Menu Principal',
-	goBackToMainMenu: "Please return to the main menu.",
+	goBackToMainMenu: "Por favor volte para o menu principal",
 	goBack: "Go Back",
 	result: "Resultado",
 	confirmDeleteUser: "Tem certeza de que deseja excluir o teu usuário?",
@@ -420,4 +420,21 @@ export default {
 	tournamentNameRequired: "O nome do torneio é obrigatório.",
 	invalidPlayerList: "Por favor, corrija os erros na lista de jogadores.",
 	quickTournament: "Torneio Rápido",
+	welcomeTo:  "Bem-vindo ao",
+	PleaseWait: "Por Favor, Aguarde",
+	wantsToPlay: "quer jogar outro jogo!",
+	yourControls: "Os Seus Controles",
+	WUp: "W (Cima)",
+	SDown: "S (Baixo)",
+	youAreControlling: "Estás a controlar a",
+	leftPaddle: "BARRA DA ESQUERDA",
+	connectingToGame: "Conectando ao jogo...",
+	connectionLost: "Conexão Perdida",
+	remotePongBestOf: "Remote Pong - Melhor de",
+	nextGameInvitation: "Convite para o próximo jogo",
+	aiOpponentLabel: "Jogar contra a IA",
+	round: "Ronda"
+
+
+
 }

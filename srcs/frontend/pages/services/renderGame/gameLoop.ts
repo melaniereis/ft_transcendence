@@ -6,10 +6,12 @@ import { updateScoreDisplay } from './gameControls.js';
 import { endGame } from './endGame.js';
 import { renderFrame } from './renderFrame.js';
 import { state } from './state.js';
+import { updateAIPaddle } from './aiLogic.js';
 
 type GameMode = 'single' | 'tournament' | 'quick';
 
-export function startGameLoop(
+export function startGameLoop
+(
 	canvas: HTMLCanvasElement,
 	ctx: CanvasRenderingContext2D,
 	left: Paddle,
@@ -18,13 +20,20 @@ export function startGameLoop(
 	maxGames: number,
 	onGameEnd: (score1: number, score2: number) => void,
 	mode: GameMode = 'single',
-	gameId?: number
-) {
+	gameId?: number,
+	isAI: boolean = false,
+	difficulty: string = 'normal'
+)
+{
 	let gameEnded = false;
 	let animationId: number;
 	let lastTime = 0;
 
-	function stopGameLoop() {
+	let lastAIUpdate = performance.now(); // for high-resolution timing
+	let aiTargetY = canvas.height / 2 - right.height / 2;
+
+	function stopGameLoop()
+	{
 		gameEnded = true;
 		if (animationId) {
 			cancelAnimationFrame(animationId);
@@ -46,7 +55,22 @@ export function startGameLoop(
 
 		// Update game objects
 		updatePaddle(left, canvas, gameEnded);
-		updatePaddle(right, canvas, gameEnded);
+		if (isAI)
+		{
+			const { updatedTargetY, updatedLastAIUpdate } = updateAIPaddle(
+				right,
+				ball,
+				canvas,
+				currentTime,
+				lastAIUpdate,
+				aiTargetY,
+				difficulty
+			);
+			aiTargetY = updatedTargetY;
+			lastAIUpdate = updatedLastAIUpdate;
+		}
+		else
+			updatePaddle(right, canvas, gameEnded);
 
 		updateBall(ball, left, right, canvas, maxGames, () => {
 			stopGameLoop();
@@ -55,7 +79,6 @@ export function startGameLoop(
 			const score2 = right.score;
 
 			if (mode === 'single' || mode === 'quick') {
-				// Restart same game
 				endGame(score1, score2, canvas, () => {
 					// Reset for new game
 					left.score = 0;
@@ -67,9 +90,12 @@ export function startGameLoop(
 					resetBall(ball, canvas, ball.initialSpeed);
 					gameEnded = false;
 					lastTime = 0;
+					lastAIUpdate = performance.now();
+					aiTargetY = canvas.height / 2 - right.height / 2;
 					loop();
 				}, left.nickname, right.nickname, mode, gameId);
-			} else {
+			}
+			else {
 				// Tournament mode - pass to parent handler
 				onGameEnd(score1, score2);
 			}

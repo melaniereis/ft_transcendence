@@ -57,7 +57,7 @@ export function renderGameLayout(config: GameLayoutConfig): string {
                         color: ${GRIS_COLORS.secondary};
                         font-size: ${GRIS_TYPOGRAPHY.scale.base};
                         font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
-                    ">Round ${config.round} • ${config.mode.charAt(0).toUpperCase() + config.mode.slice(1)}</div>
+                    ">${t.round} ${config.round} • ${config.mode.charAt(0).toUpperCase() + config.mode.slice(1)}</div>
                 </div>
 
                 <!-- Players Top Bar -->

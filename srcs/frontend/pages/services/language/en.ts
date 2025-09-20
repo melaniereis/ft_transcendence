@@ -420,5 +420,19 @@ export default {
 	duplicatePlayerNames: "Duplicate player names are not allowed.",
 	tournamentNameRequired: "Tournament name is required.",
 	invalidPlayerList: "Please fix player list errors.",
-	quickTournament: "Quick Tournament"
+	quickTournament: "Quick Tournament",
+	welcomeTo:  "Welcome to",
+	PleaseWait: "Please Wait",
+	wantsToPlay: "wants to play another game!",
+	yourControls: "Your Controls",
+	WUp: "W (Up)",
+	SDown: "S (Down)",
+	youAreControlling: "You are controlling the",
+	leftPaddle: "LEFT",
+	connectingToGame: "Connecting to game...",
+	connectionLost: "Connection Lost",
+	remotePongBestOf: "Remote Pong - Best of",
+	nextGameInvitation: "Next Game Invitation",
+	aiOpponentLabel :"Play against AI",
+	round: "Round"
 }

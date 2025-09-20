@@ -9,7 +9,6 @@ import { startMatchmaking } from './services/remote/matchmaking.js';
 import { renderQuickGameSetup } from './services/quickGame/quickGame.js';
 import { renderPlayerSelection } from './services/renderPlayerSelection.js';
 import { translations } from './services/language/translations.js';
-import { Language } from '../types/language.js';
 import { renderIntroScreen } from './services/renderIntro/renderIntro.js';
 import { renderLocalTournamentPage } from './services/quickTournament/quickTournament.js';
 
@@ -47,7 +46,6 @@ window.onpopstate = () => {
 	renderRoute(window.location.pathname);
 };
 
-// Helper to preload images
 function preloadImages(urls: string[]): Promise<void[]> {
 	return Promise.all(urls.map(url => new Promise<void>((resolve, reject) => {
 		const img = new window.Image();
@@ -68,7 +66,6 @@ function preloadAudio(url: string): Promise<void> {
 }
 
 async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
-	// Only show loader if NOT logged in
 	const token = localStorage.getItem('authToken');
 	const isLoggedIn = !!token;
 	if (!isLoggedIn && loaderWindow) 
@@ -102,43 +99,26 @@ function renderRoute(path: string): void {
 		appDiv.classList.add('fade-in');
 		const token = localStorage.getItem('authToken');
 		const isLoggedIn = !!token;
-		// Hide loader for all non-intro routes
-		if (path !== '/' && path !== '' && loaderWindow) {
+		if (path !== '/' && path !== '' && loaderWindow)
 			loaderWindow.style.display = 'none';
-		}
-		// Only show loader for route '/'
+
 		if (path === '/' || path === '') {
 			if (!isLoggedIn) {
 				showLoaderAndRenderIntro(appDiv);
-			} else {
+			}
+			else {
 				appDiv.innerHTML = `
-			<div style="
-			display: flex;
-			height: 100vh;
-			justify-content: center;
-			align-items: center;
-			text-align: center;
-			padding: 0 20px;
-			">
-			<h1 style="
-				font-size: 4rem;
-				font-weight: 900;
-				text-transform: uppercase;
-				color: #f0f0f0;
-				text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-				letter-spacing: 0.15em;
-				max-width: 800px;
-				line-height: 1.2;
-				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			">
-				Welcome to GRIS PONG!<br />
-			</h1>
-			</div>
-			`;
+					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
+						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
+						
+						<div style="height: 400px;"></div>
+
+						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
+					</div>
+					`;
 			}
 			return;
 		}
-		// Other routes: no loader
 		switch (path) {
 			case '/play':
 				renderPlayerSelection(appDiv);
@@ -183,11 +163,11 @@ function renderRoute(path: string): void {
 			default:
 				appDiv.innerHTML = `
 					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
-						<h1 style="font-size: 4rem; font-weight: 900; color: #f0f0f0; margin: 0;">Welcome to</h1>
+						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
 						
 						<div style="height: 400px;"></div>
 
-						<h1 style="font-size: 6rem; font-weight: 1000; color: #f0f0f0; margin: 0;">PONG</h1>
+						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
 					</div>
 					`;
 		}
@@ -271,6 +251,7 @@ if (!document.getElementById('fade-btn-animations')) {
 document.addEventListener('DOMContentLoaded', async () => {
 	const token = localStorage.getItem('authToken');
 	let isLoggedIn = false;
+	applyLanguage(localStorage.getItem('preferredLanguage') || 'en');
 	if (token) {
 		try {
 			const response = await fetch('/api/protected', {
@@ -285,21 +266,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 			} else {
 				localStorage.removeItem('authToken');
 			}
-		} catch (error) {
+		} 
+		catch (error) {
 			console.error('Error verifying token on page load:', error);
 			localStorage.removeItem('authToken');
 		}
 	}
 
 	updateUIBasedOnAuth();
-	// Only render intro screen after all resources are loaded
+
 	if (document.readyState === 'complete') {
 		if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
-		renderRoute(window.location.pathname);
-	} else {
+			renderRoute(window.location.pathname);
+	} 
+	else {
 		window.addEventListener('load', () => {
 			if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
-			renderRoute(window.location.pathname);
+				renderRoute(window.location.pathname);
 		});
 	}
 });
@@ -314,12 +297,6 @@ function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 			btn.classList.remove('fade-btn-in');
 		}, 380);
 	}, 380);
-}
-
-if (playBtn && playOptions) {
-	playBtn.addEventListener('click', () => {
-	playOptions.classList.toggle('hidden');
-	});
 }
 
 const playOptionsMap: Record<string, string> = {
@@ -402,7 +379,6 @@ if (quickTournamentBtn) {
 	});
 }
 
-// Logout button
 if (logoutBtn) {
 	logoutBtn.addEventListener('click', () => {
 		localStorage.removeItem('authToken');
@@ -415,18 +391,25 @@ if (logoutBtn) {
 
 if (languageBtn && languageOptions) {
 	languageBtn.addEventListener('click', () => {
-		if (languageOptions.classList.contains('hidden')) {
-		languageOptions.classList.remove('hidden');
-		} 
-		else {
-		languageOptions.classList.add('hidden');
-		}
+		if (languageOptions.classList.contains('hidden'))
+			languageOptions.classList.remove('hidden');
+		else
+			languageOptions.classList.add('hidden');
 	});
 }
+
+if (playBtn && playOptions) {
+	playBtn.addEventListener('click', () => {
+		if (playOptions.classList.contains('hidden'))
+			playOptions.classList.remove('hidden');
+		else 
+			playOptions.classList.add('hidden');
+	});
+}
+
 document.addEventListener('click', (event) => {
 	const target = event.target as HTMLElement;
 
-	// Close language options if click outside languageBtn and languageOptions
 	if (languageOptions && languageBtn && !languageOptions.contains(target) && !languageBtn.contains(target)) {
 		if (!languageOptions.classList.contains('hidden'))
 			languageOptions.classList.add('hidden');
@@ -438,7 +421,6 @@ document.addEventListener('click', (event) => {
 	}
 });
 
-// Update friend requests badge
 export async function updateFriendRequestsBadge(): Promise<void> {
 	const token = localStorage.getItem('authToken');
 	if (!token) {
@@ -464,14 +446,13 @@ export async function updateFriendRequestsBadge(): Promise<void> {
 	}
 }
 
-// Set user online status on load
 async function setOnlineOnLoad(): Promise<void> {
 	const token = localStorage.getItem('authToken');
-	if (!token) return;
+	if (!token) 
+		return;
 	await updateOnlineStatus(true);
 }
 
-// Update user online status
 async function updateOnlineStatus(isOnline: boolean): Promise<void> {
 	const token = localStorage.getItem('authToken');
 	if (!token) return;
@@ -484,36 +465,20 @@ async function updateOnlineStatus(isOnline: boolean): Promise<void> {
 			},
 			body: JSON.stringify({ online: isOnline })
 		});
-	} catch (error) {
+	} 
+	catch (error) {
 		console.error('Failed to update online status:', error);
 	}
 }
 
 export function applyLanguage(lang: string): void {
-	const safeLang = (['en', 'es', 'pt'].includes(lang) ? lang : 'en') as Language;
-	const t = translations[safeLang];
-
-	playBtn.innerHTML = `🎮 ${t.play}`;
-	settingsBtn.innerHTML = `⚙️ ${t.settings}`;
-	teamsBtn.innerHTML = `👥 ${t.teams}`;
-	if (loginBtn) 
-		loginBtn.innerHTML = `🔑 ${t.login}`;
-	if (logoutBtn) 
-		logoutBtn.innerHTML = `🚪 ${t.logout}`;
-	if (registerBtn) 
-		registerBtn.innerHTML = `📝 ${t.register}`;
-	profileBtn.innerHTML = `👤 ${t.profile}`;
-	friendRequestsBtn.innerHTML = `📧 ${t.friendRequests}`;
-	languageBtn.innerHTML = `🌐 ${t.language}`;
-	if (quickPlayBtn) 
-		quickPlayBtn.textContent = `⚡ ${t.quickPlay}`;
 	const playOptionPlay = document.getElementById('play-play');
 	const playOptionTournament = document.getElementById('play-tournament');
 	const playOptionMatchmaking = document.getElementById('play-matchmaking');
 	if (playOptionPlay) 
-		playOptionPlay.textContent = t.play;
+		playOptionPlay.textContent = `${t.play}`;
 	if (playOptionTournament) 
-		playOptionTournament.textContent = t.tournaments;
+		playOptionTournament.textContent = `${t.tournaments}`;
 	if (playOptionMatchmaking) 
-		playOptionMatchmaking.textContent = t.matchmaking;
+		playOptionMatchmaking.textContent = `${t.matchmaking}`;
 }
