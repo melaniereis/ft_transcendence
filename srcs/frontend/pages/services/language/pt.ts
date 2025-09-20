@@ -331,7 +331,7 @@ export default {
 	nextSemifinal: 'Próxima Semifinal',
 	goToFinal: 'Ir para a Final',
 	tournamentFinished: '🏁 Torneio Concluído — Voltar ao Menu Principal',
-	goBackToMainMenu: "Please return to the main menu.",
+	goBackToMainMenu: "Por favor volte para o menu principal",
 	goBack: "Go Back",
 	result: "Resultado",
 	confirmDeleteUser: "Tem certeza de que deseja excluir o teu usuário?",
