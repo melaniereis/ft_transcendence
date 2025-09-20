@@ -90,16 +90,12 @@ export function startGameLoop
 					resetBall(ball, canvas, ball.initialSpeed);
 					gameEnded = false;
 					lastTime = 0;
-					loop();
-					left.score = 0;
-					right.score = 0;
-					resetBall(ball, canvas, ball.initialSpeed);
-					gameEnded = false;
-					lastAIUpdate = performance.now(); // Reset
+					lastAIUpdate = performance.now();
 					aiTargetY = canvas.height / 2 - right.height / 2;
-					requestAnimationFrame(loop); // Restart with next frame
+					loop();
 				}, left.nickname, right.nickname, mode, gameId);
-			} else {
+			}
+			else {
 				// Tournament mode - pass to parent handler
 				onGameEnd(score1, score2);
 			}
