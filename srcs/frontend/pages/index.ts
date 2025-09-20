@@ -226,6 +226,11 @@ export function updateUIBasedOnAuth(): void {
 	if (isLoggedIn) {
 		updateFriendRequestsBadge();
 		setOnlineOnLoad();
+		
+		// Re-setup play button after login to ensure it works
+		setTimeout(() => {
+			setupPlayButton();
+		}, 100); // Small delay to ensure DOM is updated
 	}
 }
 
@@ -398,13 +403,50 @@ if (languageBtn && languageOptions) {
 	});
 }
 
+// Function to setup play button with fresh DOM references
+function setupPlayButton() {
+	const playBtnElement = document.getElementById('play-btn') as HTMLButtonElement;
+	const playOptionsElement = document.getElementById('play-options') as HTMLDivElement;
+	
+	if (playBtnElement && playOptionsElement) {
+		// Remove existing event listeners by cloning the element
+		const newPlayBtn = playBtnElement.cloneNode(true) as HTMLButtonElement;
+		playBtnElement.parentNode?.replaceChild(newPlayBtn, playBtnElement);
+		
+		newPlayBtn.addEventListener('click', (e) => {
+			console.log('Play button clicked with fresh setup!'); // Debug log
+			e.preventDefault();
+			e.stopPropagation();
+			
+			if (playOptionsElement.classList.contains('hidden')) {
+				playOptionsElement.classList.remove('hidden');
+				// Force display with inline styles as backup
+				playOptionsElement.style.display = 'block';
+				playOptionsElement.style.visibility = 'visible';
+				playOptionsElement.style.opacity = '1';
+				
+				// Debug: Check computed styles
+				const computedStyle = window.getComputedStyle(playOptionsElement);
+			} else {
+				playOptionsElement.classList.add('hidden');
+				// Force hide with inline styles as backup
+				playOptionsElement.style.display = 'none';
+			}
+		});
+		
+		console.log('Play button setup completed');
+		return true;
+	} else {
+		console.error('Play button or play options not found during setup:', { playBtnElement, playOptionsElement });
+		return false;
+	}
+}
+
+// Initial setup if elements exist
 if (playBtn && playOptions) {
-	playBtn.addEventListener('click', () => {
-		if (playOptions.classList.contains('hidden'))
-			playOptions.classList.remove('hidden');
-		else 
-			playOptions.classList.add('hidden');
-	});
+	setupPlayButton();
+} else {
+	console.error('Play button or play options not found at initialization:', { playBtn, playOptions });
 }
 
 document.addEventListener('click', (event) => {
