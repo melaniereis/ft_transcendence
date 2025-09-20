@@ -9,7 +9,7 @@ const t = translations[lang];
 
 export async function renderTournamentsPage(container: HTMLDivElement) {
 	container.className = 'flex flex-col items-center justify-center min-h-screen p-8';
-	container.style.background = GRIS_COLORS.gradients.ethereal;
+	container.style.backgroundImage = 'url("/Background2.jpg")'; 
 	container.style.borderRadius = '2rem';
 	container.style.boxShadow = '0 8px 32px 0 rgba(44, 34, 84, 0.18), 0 1.5px 8px 0 rgba(44,34,84,0.10)';
 	container.style.backdropFilter = 'blur(8px)';

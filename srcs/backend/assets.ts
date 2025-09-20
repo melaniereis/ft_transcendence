@@ -11,6 +11,7 @@
 	'Background.jpg',
 	'Background1.jpg',
 	'Background2.gif',
+	'Background2.jpg', 
 	'Background3.jpg',
 	'Background5.jpg',
 	'Background5.png',
