@@ -420,4 +420,18 @@ export default {
 	tournamentNameRequired: "O nome do torneio é obrigatório.",
 	invalidPlayerList: "Por favor, corrija os erros na lista de jogadores.",
 	quickTournament: "Torneio Rápido",
+	welcomeTo:  "Bem-vindo ao",
+	PleaseWait: "Por Favor, Aguarde",
+	wantsToPlay: "quer jogar outro jogo!",
+	yourControls: "Os Seus Controles",
+	WUp: "W (Cima)",
+	SDown: "S (Baixo)",
+	youAreControlling: "Estás a controlar a",
+	leftPaddle: "BARRA DA ESQUERDA",
+	connectingToGame: "Conectando ao jogo...",
+	connectionLost: "Conexão Perdida",
+	remotePongBestOf: "Remote Pong - Melhor de",
+	nextGameInvitation: "Convite para o próximo jogo"
+
+
 }

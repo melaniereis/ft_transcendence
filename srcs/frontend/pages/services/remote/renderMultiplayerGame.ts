@@ -12,7 +12,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	const { container, playerName, opponentName, gameId, maxGames, difficulty, playerAvatarUrl = 'default.png', opponentAvatarUrl = 'default.png' } = options;
 
 	let game_id = gameId;
-	// Create beautiful UI like renderGame
 	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames, playerAvatarUrl, opponentAvatarUrl);
 
 	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
@@ -191,7 +190,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 					color: ${GRIS_COLORS.anger};
 					font-size: ${GRIS_TYPOGRAPHY.scale.xl};
 					font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
-				">Connection Lost</h2>
+				">${t.connectionLost}</h2>
 				<p style="
 					margin-bottom: 2rem;
 					color: ${GRIS_COLORS.secondary};
@@ -209,7 +208,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 					box-shadow: ${GRIS_SHADOWS.base};
 					cursor: pointer;
 					transition: all 0.2s ease;
-				">Return to Main Menu</button>
+				">${t.goBackToMainMenu}</button>
 			</div>
 		`;
 
@@ -290,7 +289,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 						box-shadow: ${GRIS_SHADOWS.base};
 						cursor: pointer;
 						transition: all 0.2s ease;
-					">Next Game</button>
+					">${t.nextMatch}</button>
 					<button id="main-menu-btn" style="
 						padding: 0.85rem 2.2rem;
 						font-size: 1.15rem;
@@ -302,7 +301,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 						box-shadow: ${GRIS_SHADOWS.base};
 						cursor: pointer;
 						transition: all 0.2s ease;
-					">Main Menu</button>
+					">${t.mainMenu}</button>
 				</div>
 			</div>
 		`;
@@ -346,7 +345,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				position: relative;
 				overflow: hidden;
 			">
-				<!-- Optimized Background Atmosphere -->
 				<div class="gris-atmosphere" style="
 					position: fixed;
 					inset: 0;
@@ -361,7 +359,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 					"></canvas>
 				</div>
 
-				<!-- Game Header -->
 				<div class="ethereal-header" style="
 					text-align: center;
 					margin-bottom: ${GRIS_SPACING[4]};
@@ -373,11 +370,10 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 						font-size: ${GRIS_TYPOGRAPHY.scale.base};
 						font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
 					">
-						Remote Pong - Best of ${maxGames}
+						${t.remotePongBestOf} ${maxGames}
 					</div>
 				</div>
 
-                <!-- Players Top Bar (Beautiful like renderGame) -->
                 <div class="gris-players-topbar" style="
                     display: flex;
                     justify-content: space-between;
@@ -386,7 +382,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                     margin: 0 auto 18px auto;
                     gap: 18px;
                 ">
-                    <!-- Left Player -->
                     <div id="left-player-section" class="player-sanctuary left-sanctuary" style="
                         background: linear-gradient(120deg, #7fc7d9 0%, #b6a6ca 100%);
                         border-radius: 20px;
@@ -427,7 +422,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                         ">0</span>
                     </div>
 
-					<!-- VS Indicator -->
 					<div style="
 						display: flex;
 						align-items: center;
@@ -436,7 +430,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 						font-weight: bold;
 					">VS</div>
 
-                    <!-- Right Player -->
                     <div id="right-player-section" class="player-sanctuary right-sanctuary" style="
                         background: linear-gradient(120deg, #f7b267 0%, #b6a6ca 100%);
                         border-radius: 20px;
@@ -478,7 +471,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
                     </div>
                 </div>
 
-				<!-- Game Arena (Beautiful like renderGame) -->
 				<div class="gris-game-arena" style="
 					width: 100%;
 					max-width: 900px;
@@ -525,11 +517,10 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 							font-weight: bold;
 							text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
 							display: none;
-						">Waiting for opponent...</div>
+						">${t.waitingForOpponent}</div>
 					</div>
 				</div>
 
-				<!-- Controls Info (Beautiful styling) -->
 				<div id="controls-info" style="
 					margin-top: 2rem;
 					text-align: center;
@@ -545,11 +536,10 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 					<div id="controls-text" style="
 						font-size: ${GRIS_TYPOGRAPHY.scale.base};
 						font-weight: ${GRIS_TYPOGRAPHY.weights.medium};
-					">Connecting to game...</div>
+					">${t.connectingToGame}</div>
 				</div>
 			</div>
 
-			<!-- Add CSS for hover effects -->
 			<style>
 				.player-sanctuary:hover {
 					transform: translateY(-2px);
@@ -655,8 +645,8 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		if (controlsText) {
 			controlsText.innerHTML = `
-					<strong>Your Controls:</strong> W (Up) / S (Down)<br>
-					<small>You are controlling the <strong>LEFT</strong> paddle</small>
+				<strong>${t.yourControls}</strong>: ${t.WUp} / ${t.SDown}<br>
+				<small>${t.youAreControlling} <strong>${t.leftPaddle}</strong></small>
 				`;
 			if (leftSection)
 				leftSection.style.border = '3px solid #7fc7d9';
@@ -780,7 +770,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 					Next Game Invitation
 				</h2>
 				<p style="margin-bottom: 2rem; color: ${GRIS_COLORS.secondary}; font-size: ${GRIS_TYPOGRAPHY.scale.base};">
-					${fromPlayer} wants to play another game!
+					${fromPlayer} ${t.wantsToPlay}
 				</p>
 				<div style="display: flex; gap: 1rem; justify-content: center;">
 					<button id="accept-btn" style="
@@ -792,7 +782,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 						cursor: pointer;
 						font-weight: 600;
 						transition: all 0.2s ease;
-					">Accept</button>
+					">${t.accept}</button>
 					<button id="decline-btn" style="
 						padding: 0.75rem 1.5rem;
 						background: ${GRIS_COLORS.anger};
@@ -802,7 +792,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 						cursor: pointer;
 						font-weight: 600;
 						transition: all 0.2s ease;
-					">Decline</button>
+					">${t.reject}</button>
 				</div>
 			</div>
 		`;
@@ -845,7 +835,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				text-align: center;
 				min-width: 320px;
 			">
-				<h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary};">Please Wait</h2>
+				<h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary};">{${t.PleaseWait}}</h2>
 				<p style="margin-bottom: 1.5rem; color: ${GRIS_COLORS.secondary};">${message}</p>
 				<div style="
 					width: 40px;
@@ -916,19 +906,16 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	document.addEventListener('keydown', e => {
 		if (!assignedSide || !gameInSession) return;
 
-		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
+		if ((assignedSide === 'left' || assignedSide === 'right') && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
 			ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
-		}
-		else if (assignedSide === 'right' && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-			ws.send(JSON.stringify({ type: 'move', action: 'start', direction: e.key }));
 		}
 	});
 
 	document.addEventListener('keyup', e => {
 		if (!assignedSide || !gameInSession) return;
 
-		if (assignedSide === 'left' && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
+		if ((assignedSide === 'left' || assignedSide === 'right') && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
 			ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
 		}
