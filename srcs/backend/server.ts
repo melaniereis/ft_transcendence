@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 import { getEncryptionKey } from './services/vault/vault.js';
 import { decryptFile, encryptFile } from './services/vault/encrypt.js';
 import { waitForVaultReady } from './services/vault/waitForVault.js';
-import {registerAssetRoutes }from './asests.js'
+import { registerAssetRoutes } from './assets.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,10 +28,10 @@ try {
 		cert: fs.readFileSync(certPath),
 	};
 	console.log('✅ TLS certificates loaded');
-} 
+}
 catch (err: unknown) {
 	if (err instanceof Error)
-		console.error('❌ Failed to load TLS certificates:', err.message); 
+		console.error('❌ Failed to load TLS certificates:', err.message);
 	else
 		console.error('❌ Failed to load TLS certificates (non-Error):', err);
 	process.exit(1);
@@ -54,10 +54,10 @@ const shutdown = async () => {
 			await encryptFile(decryptedPath, encryptedPath, key);
 			fs.unlinkSync(decryptedPath);
 			console.log('✅ Database encrypted and decrypted copy removed');
-		} 
+		}
 		else
 			console.log('ℹ️ No decrypted database file found to clean up.');
-	} 
+	}
 	catch (err: unknown) {
 		if (err instanceof Error)
 			console.error('❌ Error during shutdown encryption:', err.message);
@@ -78,7 +78,7 @@ async function start() {
 		await waitForVaultReady();
 		key = await getEncryptionKey(); // ✅ sets global key
 		console.log('✅ Encryption key retrieved');
-	} 
+	}
 	catch (err: unknown) {
 		if (err instanceof Error)
 			console.error('❌ Error fetching encryption key:', err.message);
@@ -100,7 +100,7 @@ async function start() {
 				console.warn('⚠️ Decrypted DB is empty. You may need to initialize it.');
 		}
 
-        console.log('📋 Initializing database...');
+		console.log('📋 Initializing database...');
 		await import('../backend/db/database.js');
 		console.log('✅ Database initialized');
 
@@ -111,7 +111,7 @@ async function start() {
 			allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 			credentials: true, // Allow cookies/auth headers
 		});
-		
+
 		const pagesPath = path.join(process.cwd(), 'dist', 'frontend', 'pages');
 		console.log('📁 Serving static pages from:', pagesPath);
 
@@ -120,7 +120,7 @@ async function start() {
 			prefix: '/',
 			index: ['index.html'],
 		});
-		
+
 		fastify.setNotFoundHandler((request, reply) => {
 			if (!request.raw.url?.startsWith('/api'))
 				reply.type('text/html').send(fs.readFileSync(path.join(pagesPath, 'index.html')));
@@ -158,8 +158,8 @@ async function start() {
 		console.log('✅ Routes registered');
 		try {
 			await fastify.listen({ port: 3000, host: '0.0.0.0' });
-			console.log('✅ Server running at https://localhost:3000');
-		} 
+			console.log('✅ Server running at https://transcendence.local');
+		}
 		catch (err: unknown) {
 			if (err instanceof Error)
 				console.error('❌ Failed to start Fastify server:', err.message);
@@ -167,12 +167,12 @@ async function start() {
 				console.error('❌ Failed to start Fastify server (non-Error):', err);
 			process.exit(1);
 		}
-	} 
+	}
 	catch (err: unknown) {
 		if (err instanceof Error) {
 			console.error('❌ Server startup failed:', err.message);
 			console.error(err.stack);
-		} 
+		}
 		else
 			console.error('❌ Server startup failed with non-Error:', err);
 		process.exit(1);

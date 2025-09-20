@@ -1,17 +1,17 @@
 import { Match } from './types.js';
 import { GRID_COLORS, svgChartIcon, svgFlameIcon, svgMedalGold, svgBarChartIcon, svgStarIcon, svgClockIcon, svgTrendIcon, svgOpponentIcon, svgMedalSilver, svgMedalBronze } from './constants.js';
-import {bestPlayingDay, currentMomentum, longestWinStreak, mostActiveTime, opponentAnalysis} from './metrics.js';
+import { bestPlayingDay, currentMomentum, longestWinStreak, mostActiveTime, opponentAnalysis } from './metrics.js';
 import { translations } from '../language/translations.js';
 
-const lang = (['en','es','pt'].includes(localStorage.getItem('preferredLanguage') || '')
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
 	: 'en') as keyof typeof translations;
 const t = translations[lang];
 
 export function historyList(history: Match[]): string {
-const recent = history.slice(0, 5);
-if (!recent.length) {
-	return `
+	const recent = history.slice(0, 5);
+	if (!recent.length) {
+		return `
 	<div style="padding:40px;text-align:center;color:${GRID_COLORS.muted};
 				background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);border-radius:12px;">
 		<div style="font-size:48px;margin-bottom:15px">${svgChartIcon()}</div>
@@ -19,8 +19,8 @@ if (!recent.length) {
 		<p style="margin:0">${t.yourGameHistoryHere}</p>
 	</div>
 	`;
-}
-return `
+	}
+	return `
 	<div>
 	<style>
 	/* styles omitted for brevity */
@@ -62,10 +62,10 @@ return `
 		</div>
 		<div>
 ${recent.map((m, index) => {
-	const isWin = m.result === 'win';
-	const diff = Math.abs(m.user_score - m.opponent_score);
-	const opponentDisplay = m.opponent_display_name || m.opponent_username || m.opponent_name || `Player ${m.opponent_id}`;
-	return `
+		const isWin = m.result === 'win';
+		const diff = Math.abs(m.user_score - m.opponent_score);
+		const opponentDisplay = m.opponent_display_name || m.opponent_username || m.opponent_name || `Player ${m.opponent_id}`;
+		return `
 <div class="amazing-match-card" style="display:flex;align-items:center;gap:16px;padding:13px 0 13px 0;position:relative;min-height:50px;background:linear-gradient(90deg,rgba(255,255,255,0.13) 60%,rgba(76,225,123,0.09) 100%);border-radius:14px;box-shadow:0 2px 12px #b6a6ca22;">
 	<div style="position:absolute;left:0;top:10px;bottom:10px;width:5px;border-radius:5px;background:${isWin ? '#4be17b' : '#ff5c5c'};box-shadow:0 0 8px 0 ${isWin ? '#4be17b55' : '#ff5c5c44'};"></div>
 	<div style="margin-left:18px;display:flex;align-items:center;gap:10px;">
@@ -82,14 +82,14 @@ ${recent.map((m, index) => {
 	<div class="match-separator"></div>
 	</div>
 `;
-}).join('')}
+	}).join('')}
 		</div>
 	</div>
 	`;
 }
 
 export function historyDetailed(history: Match[]): string {
-return `
+	return `
 	<div>
 		<div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:15px;border-radius:8px;margin-bottom:20px;">
 		<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -112,14 +112,14 @@ return `
 		</div>
 		<div id="filtered-matches" style="display:grid;gap:22px">
 ${history.length === 0
-	? `<div style="padding:40px 0;text-align:center;color:${GRID_COLORS.muted};font-size:20px;font-weight:600;">${t.noMatchesForFilter}</div>`
-	: history.map((m, idx) => {
-		const isWin = m.result === 'win';
-		const diff = Math.abs(m.user_score - m.opponent_score);
-		const matchType = diff <= 2 ? t.matchTypeNailBiter : diff <= 5 ? t.matchTypeClose : diff <= 10 ? t.matchTypeCompetitive : t.matchTypeDominant;
-		const mvp = diff >= 10 ? svgMedalGold() + ' MVP' : '';
-		const barColor = isWin ? '#4be17b' : '#ff5c5c';
-		return `
+			? `<div style="padding:40px 0;text-align:center;color:${GRID_COLORS.muted};font-size:20px;font-weight:600;">${t.noMatchesForFilter}</div>`
+			: history.map((m, idx) => {
+				const isWin = m.result === 'win';
+				const diff = Math.abs(m.user_score - m.opponent_score);
+				const matchType = diff <= 2 ? t.matchTypeNailBiter : diff <= 5 ? t.matchTypeClose : diff <= 10 ? t.matchTypeCompetitive : t.matchTypeDominant;
+				const mvp = diff >= 10 ? svgMedalGold() + ' MVP' : '';
+				const barColor = isWin ? '#4be17b' : '#ff5c5c';
+				return `
 	<div class="amazing-match-card-detailed" style="display:flex;align-items:center;gap:24px;padding:28px 0 28px 0;position:relative;min-height:90px;background:rgba(255,255,255,0.22);border-radius:22px;box-shadow:0 4px 24px #b6a6ca22;overflow:hidden;backdrop-filter:blur(8px) saturate(1.13);">
 		<div style="position:absolute;left:0;top:18px;bottom:18px;width:10px;border-radius:10px;background:${barColor};box-shadow:0 0 18px 0 ${barColor}55;"></div>
 		<div style="margin-left:44px;display:flex;align-items:center;gap:0;">
@@ -151,14 +151,14 @@ ${history.length === 0
 		</div>
 	</div>
 	`;
-	}).join('')}
+			}).join('')}
 		</div>
 	</div>
 	`;
 }
 
 export function historyAnalysis(history: Match[]): string {
-return `
+	return `
 	<div>
 		<div style="background:linear-gradient(135deg, ${GRID_COLORS.cool} 0%, ${GRID_COLORS.bg} 100%);padding:28px 24px 24px 24px;border-radius:18px;margin-bottom:32px;box-shadow:0 8px 32px #b6a6ca33;">
 		<h4 style="margin:0 0 18px 0;color:${GRID_COLORS.primary};font-size:26px;letter-spacing:0.5px;font-weight:900;display:flex;align-items:center;gap:10px;">
@@ -182,10 +182,10 @@ return `
 			${t.performancePatterns}
 			</h4>
 ${[
-	{ label: t.bestDay, value: bestPlayingDay(history), desc: t.highestWinRate, color: GRID_COLORS.success, icon: svgStarIcon() },
-	{ label: t.preferredTime, value: mostActiveTime(history), desc: t.mostActivePeriod, color: GRID_COLORS.cool, icon: svgClockIcon() },
-	{ label: t.momentum, value: currentMomentum(history), desc: t.recentTrend, color: GRID_COLORS.cool, icon: svgTrendIcon() },
-	].map(p => `
+			{ label: t.bestDay, value: bestPlayingDay(history), desc: t.highestWinRate, color: GRID_COLORS.success, icon: svgStarIcon() },
+			{ label: t.preferredTime, value: mostActiveTime(history), desc: t.mostActivePeriod, color: GRID_COLORS.cool, icon: svgClockIcon() },
+			{ label: t.momentum, value: currentMomentum(history), desc: t.recentTrend, color: GRID_COLORS.cool, icon: svgTrendIcon() },
+		].map(p => `
 			<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0 14px 0;background:linear-gradient(135deg, ${GRID_COLORS.cool}11 0%, ${GRID_COLORS.bg} 100%);border-radius:12px;margin-bottom:14px;box-shadow:0 2px 8px #b6a6ca11;">
 				<div style="display:flex;align-items:center;gap:10px"><span style="display:inline-flex;align-items:center;">${p.icon}</span><div><div style="font-weight:900;color:${GRID_COLORS.primary};font-size:16px;">${p.label}</div><div style="font-size:13px;color:${GRID_COLORS.muted}">${p.desc}</div></div></div>
 				<div style="font-weight:900;color:${p.color};font-size:17px;">${p.value}</div>
@@ -198,9 +198,9 @@ ${[
 			${t.opponentAnalysis}
 			</h4>
 ${opponentAnalysis(history).map((o, i) => {
-	const medal = i === 0 ? svgMedalGold() : i === 1 ? svgMedalSilver() : i === 2 ? svgMedalBronze() : '';
-	const barColor = o.winRate >= 50 ? GRID_COLORS.success : GRID_COLORS.accent;
-	return `
+			const medal = i === 0 ? svgMedalGold() : i === 1 ? svgMedalSilver() : i === 2 ? svgMedalBronze() : '';
+			const barColor = o.winRate >= 50 ? GRID_COLORS.success : GRID_COLORS.accent;
+			return `
 	<div style="display:flex;align-items:center;gap:18px;padding:14px 0;border-bottom:1.5px solid rgba(0,174,239,0.10);position:relative;">
 		<div style="width:38px;height:38px;border-radius:50%;background:${GRID_COLORS.cool};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;box-shadow:0 2px 8px #b6a6ca22;">${medal || i + 1}</div>
 		<div style="flex:1;min-width:0;">
@@ -216,7 +216,7 @@ ${opponentAnalysis(history).map((o, i) => {
 		</div>
 	</div>
 	`;
-}).join('')}
+		}).join('')}
 		</div>
 		</div>
 	</div>

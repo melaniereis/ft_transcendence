@@ -29,6 +29,9 @@ export class CelestialAnimations {
 	private isDestroyed = false;
 
 
+	private milkyWayDrawn = false;
+
+
 	constructor(backgroundCanvas: HTMLCanvasElement, starsCanvas: HTMLCanvasElement, milkyWayCanvas: HTMLCanvasElement, orbsCanvas: HTMLCanvasElement) {
 		this.backgroundCanvas = backgroundCanvas;
 		this.starsCanvas = starsCanvas;
@@ -97,28 +100,28 @@ export class CelestialAnimations {
 
 
 	// Animation configuration
-	private sNumber = 900; // Slightly fewer stars for performance
-	private sSize = 0.22; // Slightly smaller base size
-	private sSizeR = 0.7; // More size variation
-	private sAlphaR = 0.85; // Brighter dreamy stars
+	private sNumber = 120; // Much fewer stars
+	private sSize = 0.22;
+	private sSizeR = 0.7;
+	private sAlphaR = 0.85;
 	private sMaxHueProportion = 0.7;
-	private shootingStarDensity = 0.008; // Fewer shooting stars
+	private shootingStarDensity = 0.003; // Even fewer shooting stars
 	private shootingStarBaseXspeed = 32;
 	private shootingStarBaseYspeed = 17;
 	private shootingStarBaseLength = 10;
 	private shootingStarBaseLifespan = 70;
 	private shootingStarsColors = ["#a1ffba", "#a1d2ff", "#fffaa1", "#ffa1a1", "#e8d5ff", "#bfa1ff"];
-	private mwStarCount = 100000; // Fewer milky way stars
+	private mwStarCount = 3500; // Much fewer milky way stars
 	private mwRandomStarProp = 0.22;
-	private mwClusterCount = 250; // Fewer clusters
-	private mwClusterStarCount = 1200; // Fewer stars per cluster
-	private mwClusterSize = 140; // Larger clusters
-	private mwClusterSizeR = 110; // More size variation
-	private mwClusterLayers = 8; // Fewer layers
-	private mwAngle = 0.7; // More dreamy tilt
-	private mwHueMin = 175; // More blue/purple
+	private mwClusterCount = 18; // Much fewer clusters
+	private mwClusterStarCount = 120; // Fewer stars per cluster
+	private mwClusterSize = 140;
+	private mwClusterSizeR = 110;
+	private mwClusterLayers = 4; // Fewer layers
+	private mwAngle = 0.7;
+	private mwHueMin = 175;
 	private mwHueMax = 285;
-	private mwWhiteProportionMin = 68; // Brighter clusters
+	private mwWhiteProportionMin = 68;
 	private mwWhiteProportionMax = 85;
 
 
@@ -271,8 +274,7 @@ export class CelestialAnimations {
 
 	private DrawMilkyWayCanvas() {
 		if (this.isDestroyed) return;
-
-
+		if (this.milkyWayDrawn) return;
 		this.ctxMw.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
 
@@ -299,6 +301,7 @@ export class CelestialAnimations {
 			let baseWhiteProportion = this.mwWhiteProportionMin + Math.random() * (this.mwWhiteProportionMax - this.mwWhiteProportionMin);
 			new this.class_MwStarCluster(xPos, yPos, size, hue, baseWhiteProportion, distToCenter).draw(this.ctxMw, this.mwClusterStarCount, this.mwClusterLayers);
 		}
+		this.milkyWayDrawn = true;
 	}
 
 
@@ -333,17 +336,40 @@ export class CelestialAnimations {
 
 		this.ShootingStarsArray = [];
 		this.DrawMilkyWayCanvas();
-		// Initialize empty orbs array (orbs disabled)
-		this.orbs = [];
+
+
+		// Initialize orbs with improved distribution
+		const centerX = window.innerWidth / 2;
+		const centerY = window.innerHeight / 2;
+		const orbConfigs = [
+			{ r: 32, color: '#fff', glow: 32, angle: Math.random() * Math.PI * 2, speed: 0.008, distance: 280 },
+			{ r: 24, color: '#fff', glow: 24, angle: Math.random() * Math.PI * 2, speed: -0.006, distance: 320 },
+			{ r: 16, color: '#fff', glow: 18, angle: Math.random() * Math.PI * 2, speed: 0.012, distance: 260 },
+			{ r: 12, color: '#fff', glow: 12, angle: Math.random() * Math.PI * 2, speed: -0.014, distance: 340 },
+			{ r: 8, color: '#fff', glow: 8, angle: Math.random() * Math.PI * 2, speed: 0.018, distance: 240 },
+			{ r: 20, color: '#fff', glow: 20, angle: Math.random() * Math.PI * 2, speed: 0.010, distance: 360 },
+			{ r: 14, color: '#fff', glow: 14, angle: Math.random() * Math.PI * 2, speed: -0.008, distance: 300 },
+			{ r: 10, color: '#fff', glow: 10, angle: Math.random() * Math.PI * 2, speed: 0.015, distance: 220 },
+		];
+
+
+		this.orbs = orbConfigs.map(cfg => new Orb(centerX, centerY, cfg.r, cfg.color, cfg.glow, cfg.angle, cfg.speed, cfg.distance));
 	}
 
 
 	private frameCount = 0;
+	private lastFrameTime = 0;
 	private animate = () => {
 		if (this.isDestroyed) return;
-
-
 		try {
+			const now = performance.now();
+			if (now - this.lastFrameTime < 33) {
+				this.animationId = requestAnimationFrame(this.animate);
+				return;
+			}
+			this.lastFrameTime = now;
+
+
 			// Clear canvases
 			this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 

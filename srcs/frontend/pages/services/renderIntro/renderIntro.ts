@@ -116,7 +116,6 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
             /* IMPROVED DIAMOND LAYOUT - Using CSS Grid for perfect positioning */
             #diamond-layout {
-                --layout-height-offset: 45px; /* Adjustable height offset - change this value to move entire layout up/down */
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -127,8 +126,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 grid-template-rows: 1fr 1fr 1fr;
                 gap: 0;
                 z-index: 1002;
-                pointer-events: none;
-                transform: translateY(var(--layout-height-offset));
+                pointer-events: auto;
             }
 
             /* Title positioned in center */
@@ -151,10 +149,53 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 text-align: center;
                 pointer-events: none;
                 z-index: 2000;
-                width: 100%;
-                height: 100%;
+            }
+
+            .play-container {
                 position: relative;
-                transform: translateY(0px);
+                grid-column: 2;
+                grid-row: 3;
+                align-self: start;
+                justify-self: center;
+                margin-top: 2rem;
+            }
+
+            /* Slight adjustment for dropdown positioning */
+            #play-options {
+                top: 100%;
+                margin-top: 0.5rem;
+            }
+
+            #play-options {
+                display: none; /* shown via JS */
+                position: absolute;
+                top: 100%;     /* just below Play button */
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(44, 34, 84, 0.9);
+                border-radius: 0.5rem;
+                box-shadow: 0 0 12px rgba(108, 79, 163, 0.7);
+                padding: 0.5rem 0;
+                z-index: 50;
+                min-width: 160px;
+                margin-top: 0.5rem; /* minor vertical spacing */
+            }
+
+            #play-options button {
+                width: 100%;
+                margin: 0.25rem 0;
+                border-radius: 0.5rem;
+                background: rgba(44, 34, 84, 0.1);
+                color: #e8d5ff;
+                cursor: pointer;
+                text-transform: uppercase;
+                font-weight: 400;
+                transition: background 0.2s ease;
+            }
+
+            #play-options button:hover {
+                background: #6c4fa3;
+                color: #fff;
             }
 
             /* Diamond button base style */
@@ -308,12 +349,6 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     grid-row: 3;
                     font-size: clamp(1.5rem, 8vw, 2.2rem);
 					z-index: 1200;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 100%;
-                    height: 100%;
-                    text-align: center;
                 }
 
                 #intro-login {
@@ -339,7 +374,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     align-self: center;
                     justify-self: center;
                 }
-                    
+
                 #intro-quicktournament {
                     grid-column: 1;
                     grid-row: 5;
@@ -487,11 +522,16 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
             <!-- Perfect diamond layout using CSS Grid -->
            <div id="diamond-layout">
-            <h1 id="intro-title">GRIS</h1>
+            <h1 id="intro-title">GRIS PONG</h1>
             <button id="intro-login" class="diamond-btn">${t.login}</button>
             <button id="intro-register" class="diamond-btn">${t.register}</button>
-            <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
-            <button id="intro-quicktournament" class="diamond-btn">${t.quickTournament}</button> 
+            <div class="play-container">
+                <button id="intro-play-btn" class="diamond-btn">${t.play}</button>
+                <div id="play-options" class="play-options">
+                    <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
+                    <button id="intro-quicktournament" class="diamond-btn">${t.quickTournament}</button>
+                </div>
+            </div>
             <div class="language-container">
                 <button id="intro-language-btn" class="diamond-btn">${t.language}</button>
                 <div id="intro-language-options">
@@ -539,101 +579,136 @@ function initializeCelestialEffects(): void {
 }
 
 function setupIntroEventListeners(onNavigate: (route: string) => void): void {
-  const introLogin = document.getElementById('intro-login');
-  const introRegister = document.getElementById('intro-register');
-  const introQuickplay = document.getElementById('intro-quickplay');
-  const quickTournamentBtn = document.getElementById('intro-quicktournament');
-  const introLanguageBtn = document.getElementById('intro-language-btn');
-  const introLanguageOptions = document.getElementById('intro-language-options');
+	const introLogin = document.getElementById('intro-login');
+	const introRegister = document.getElementById('intro-register');
+	const introQuickplay = document.getElementById('intro-quickplay');
+	const quickTournamentBtn = document.getElementById('intro-quicktournament');
+	const introLanguageBtn = document.getElementById('intro-language-btn');
+	const introLanguageOptions = document.getElementById('intro-language-options');
+	const playDropdown = document.getElementById('play-options');
+	const introPlayBtn = document.getElementById('intro-play-btn');
 
-  function addButtonPressEffect(button: HTMLElement) {
-    if (!button) 
-        return;
-    button.addEventListener('mousedown', () => {
-      button.style.transform = 'scale(0.95)';
-    });
-    button.addEventListener('mouseup', () => {
-      button.style.transform = 'scale(1)';
-    });
-    button.addEventListener('mouseleave', () => {
-      button.style.transform = 'scale(1)';
-    });
-  }
+	function addButtonPressEffect(button: HTMLElement) {
+		if (!button) return;
+		button.addEventListener('mousedown', () => {
+			button.style.transform = 'scale(0.95)';
+		});
+		button.addEventListener('mouseup', () => {
+			button.style.transform = 'scale(1)';
+		});
+		button.addEventListener('mouseleave', () => {
+			button.style.transform = 'scale(1)';
+		});
+	}
 
-  if (introLogin) {
-    addButtonPressEffect(introLogin);
-    introLogin.addEventListener('click', () => {
-      console.log('🔑 Intro login clicked');
-      onNavigate('/login');
-    });
-  }
+	if (introLogin) {
+		addButtonPressEffect(introLogin);
+		introLogin.addEventListener('click', () => {
+			console.log('🔑 Intro login clicked');
+			onNavigate('/login');
+		});
+	}
 
-  if (introRegister) {
-    addButtonPressEffect(introRegister);
-    introRegister.addEventListener('click', () => {
-      console.log('📝 Intro register clicked');
-      onNavigate('/register');
-    });
-  }
+	if (introRegister) {
+		addButtonPressEffect(introRegister);
+		introRegister.addEventListener('click', () => {
+			console.log('📝 Intro register clicked');
+			onNavigate('/register');
+		});
+	}
 
-  if (introQuickplay) {
-    addButtonPressEffect(introQuickplay);
-    introQuickplay.addEventListener('click', () => {
-      console.log('⚡ Intro quickplay clicked');
-      onNavigate('/quick-play');
-    });
-  }
+	if (introPlayBtn && playDropdown) {
+		addButtonPressEffect(introPlayBtn);
+		introPlayBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const isHidden = playDropdown.style.display === 'none' || !playDropdown.style.display;
+			playDropdown.style.display = isHidden ? 'block' : 'none';
+			console.log('🎮 Play dropdown toggled:', isHidden ? 'opened' : 'closed');
+		});
 
-  if (quickTournamentBtn) {
-    addButtonPressEffect(quickTournamentBtn);
-    quickTournamentBtn.addEventListener('click', () => {
-      console.log('🏆 Quick tournament button clicked');
-      onNavigate('/quick-tournament');
-    });
-  }
+		// Clicking outside closes the dropdown
+		document.addEventListener('click', (e) => {
+			if (
+				!playDropdown.contains(e.target as Node) &&
+				!introPlayBtn.contains(e.target as Node)
+			) {
+				playDropdown.style.display = 'none';
+			}
+		});
+	}
 
-  if (introLanguageBtn && introLanguageOptions) {
-    addButtonPressEffect(introLanguageBtn);
-    introLanguageBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isHidden = introLanguageOptions.style.display === 'none';
-      introLanguageOptions.style.display = isHidden ? 'block' : 'none';
-      console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
-    });
+	if (introQuickplay) {
+		addButtonPressEffect(introQuickplay);
+		introQuickplay.addEventListener('click', () => {
+			console.log('⚡ Intro quickplay clicked');
+			onNavigate('/quick-play');
+			playDropdown!.style.display = 'none';
+		});
+	}
 
-    introLanguageOptions?.querySelectorAll('button').forEach(btn => {
-      addButtonPressEffect(btn);
-      btn.addEventListener('click', () => {
-        const selectedLang = btn.getAttribute('data-lang') || 'en';
-        console.log(`Language changed to: ${selectedLang}`);
-        localStorage.setItem('preferredLanguage', selectedLang);
+	if (quickTournamentBtn) {
+		addButtonPressEffect(quickTournamentBtn);
+		quickTournamentBtn.addEventListener('click', () => {
+			console.log('🏆 Quick tournament clicked');
+			onNavigate('/quick-tournament');
+			playDropdown!.style.display = 'none';
+		});
+	}
 
-        setTimeout(() => {
-            introLanguageOptions.style.display = 'none';
-        }, 150);
 
-        applyLanguage(selectedLang);
+	if (quickTournamentBtn) {
+		addButtonPressEffect(quickTournamentBtn);
+		quickTournamentBtn.addEventListener('click', () => {
+			console.log('🏆 Quick tournament button clicked');
+			onNavigate('/quick-tournament');
+		});
+	}
 
-        const container = document.getElementById('app');
-        if (container) {
-            container.style.transition = 'opacity 0.3s ease';
-            container.style.opacity = '0.5';
-            setTimeout(() => {
-            renderIntroScreen(container, onNavigate);
-            container.style.opacity = '1';
-            }, 300);
-        }
-    });
+	if (introLanguageBtn && introLanguageOptions) {
+		addButtonPressEffect(introLanguageBtn);
 
-    });
+		introLanguageBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const isHidden = introLanguageOptions.style.display === 'none';
+			introLanguageOptions.style.display = isHidden ? 'block' : 'none';
+			console.log('🌐 Language menu toggled:', isHidden ? 'opened' : 'closed');
+		});
 
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (!introLanguageOptions.contains(e.target as Node) && e.target !== introLanguageBtn) {
-        introLanguageOptions.style.display = 'none';
-      }
-    });
-  }
+		introLanguageOptions.querySelectorAll('button').forEach((btn) => {
+			addButtonPressEffect(btn);
 
-  console.log('🎮 Intro screen event listeners setup complete');
+			btn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				const selectedLang = btn.getAttribute('data-lang') || 'en';
+				console.log(`Language changed to: ${selectedLang}`);
+				localStorage.setItem('preferredLanguage', selectedLang);
+
+				setTimeout(() => {
+					introLanguageOptions.style.display = 'none';
+				}, 150);
+
+				applyLanguage(selectedLang);
+
+				const container = document.getElementById('app');
+				if (container) {
+					container.style.transition = 'opacity 0.3s ease';
+					container.style.opacity = '0.5';
+					setTimeout(() => {
+						renderIntroScreen(container, onNavigate);
+						container.style.opacity = '1';
+					}, 300);
+				}
+			});
+		});
+
+		// Close dropdown on outside click
+		document.addEventListener('click', (e) => {
+			if (
+				!introLanguageOptions.contains(e.target as Node) &&
+				!introLanguageBtn.contains(e.target as Node)
+			) {
+				introLanguageOptions.style.display = 'none';
+			}
+		});
+	}
 }

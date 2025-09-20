@@ -43,6 +43,7 @@ export function startActivityMonitoring() {
 		if (document.hidden) {
 			updateOnlineStatus(false);
 		} else {
+			updateOnlineStatus(true); // Immediately set online
 			resetActivityTimer();
 		}
 	});
@@ -96,8 +97,6 @@ async function updateOnlineStatus(isOnline: boolean) {
 		if (!res.ok) {
 			const errorText = await res.text();
 			console.error(`❌ Status update failed (${res.status}): ${errorText}`);
-		} else {
-			console.log(`✅ Status updated to: ${isOnline ? 'online' : 'offline'}`);
 		}
 	} catch (error) {
 		console.error('❌ Network error updating status:', error);

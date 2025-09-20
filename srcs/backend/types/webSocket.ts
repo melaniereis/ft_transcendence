@@ -9,6 +9,37 @@ export interface AliveWebSocket extends WsWebSocket {
 	confirmed?: boolean;
 	selectedMaxGames?: number;
 	token?: string;
+	side?: 'left' | 'right'; // Track which side this player controls
+}
+
+export interface GameRoom {
+	left: AliveWebSocket | null;
+	right: AliveWebSocket | null;
+
+	// Ball state
+	ballX: number;
+	ballY: number;
+	ballVX: number;
+	ballVY: number;
+
+	// Paddle positions
+	leftY: number;
+	rightY: number;
+	paddleHeight: number;
+	paddleWidth: number;
+
+	// Paddle movement states
+	leftMovingUp: boolean;
+	leftMovingDown: boolean;
+	rightMovingUp: boolean;
+	rightMovingDown: boolean;
+
+	// Game state
+	leftScore: number;
+	rightScore: number;
+	maxScore: number;
+
+	intervalId?: NodeJS.Timeout;
 }
 
 export type PlayerData = {

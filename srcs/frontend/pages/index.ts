@@ -13,13 +13,13 @@ import { Language } from '../types/language.js';
 import { renderIntroScreen } from './services/renderIntro/renderIntro.js';
 import { renderLocalTournamentPage } from './services/quickTournament/quickTournament.js';
 
-
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
 	: 'en') as keyof typeof translations;
 const t = translations[lang];
 
 const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
+const playOptions = document.getElementById('play-options') as HTMLDivElement;
 const settingsBtn = document.getElementById('settings-btn') as HTMLButtonElement;
 const teamsBtn = document.getElementById('teams-btn') as HTMLButtonElement;
 const loginBtn = document.getElementById('login-btn') as HTMLButtonElement | null;
@@ -46,8 +46,6 @@ export function navigateTo(path: string): void {
 window.onpopstate = () => {
 	renderRoute(window.location.pathname);
 };
-
-// Route rendering with fade effect and background change
 
 // Helper to preload images
 function preloadImages(urls: string[]): Promise<void[]> {
@@ -81,9 +79,9 @@ async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
 			'/Background5.png',
 			'/Background.jpg',
 			'/Background1.jpg',
-			'Background2.jpg',
-			'Background5.jpg',
-			'Background7.jpg',
+			'/Background2.jpg',
+			'/Background5.jpg',
+			'/Background7.jpg',
 		]),
 		preloadAudio('/ambient.mp3'),
 	]);
@@ -251,7 +249,6 @@ export function updateUIBasedOnAuth(): void {
 	}
 }
 
-// On page load initialization
 // Inject fade-in/fade-out animation styles for buttons
 if (!document.getElementById('fade-btn-animations')) {
 	const style = document.createElement('style');
@@ -283,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const { startActivityMonitoring } = await import('./services/activity.js');
 				startActivityMonitoring();
 				await updateOnlineStatus(true);
-				updateFriendRequestsBadge();
+				await updateFriendRequestsBadge();
 				isLoggedIn = true;
 			} else {
 				localStorage.removeItem('authToken');
@@ -297,7 +294,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	updateUIBasedOnAuth();
 	// Only render intro screen after all resources are loaded
 	if (document.readyState === 'complete') {
-		// If logged in, hide loader immediately
 		if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
 		renderRoute(window.location.pathname);
 	} else {
@@ -308,7 +304,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 });
 
-// Event listeners for navigation buttons
 function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 	btn.classList.add('fade-btn-out');
 	setTimeout(() => {
@@ -317,50 +312,181 @@ function fadeButtonAndNavigate(btn: HTMLButtonElement, navFn: () => void) {
 		navFn();
 		setTimeout(() => {
 			btn.classList.remove('fade-btn-in');
-		}, 400);
+		}, 380);
 	}, 380);
 }
 
-playBtn.addEventListener('click', () => fadeButtonAndNavigate(playBtn, () => navigateTo('/play')));
-settingsBtn.addEventListener('click', () => fadeButtonAndNavigate(settingsBtn, () => navigateTo('/settings')));
-tournamentsBtn.addEventListener('click', () => fadeButtonAndNavigate(tournamentsBtn, () => navigateTo('/tournaments')));
-teamsBtn.addEventListener('click', () => fadeButtonAndNavigate(teamsBtn, () => navigateTo('/teams')));
-if(loginBtn){
-	loginBtn.addEventListener('click', () => fadeButtonAndNavigate(loginBtn, () => {
-		renderLoginForm(appDiv, () => {
-			updateUIBasedOnAuth();
-			navigateTo('/');
-		});
-	}));
+if (playBtn && playOptions) {
+	playBtn.addEventListener('click', () => {
+	playOptions.classList.toggle('hidden');
+	});
+}
+
+const playOptionsMap: Record<string, string> = {
+	'play-play': '/play',
+	'play-matchmaking': '/matchmaking',
+	'play-tournament': '/tournaments',
+};
+
+languageOptions.querySelectorAll('button[data-lang]').forEach(btn => {
+	btn.addEventListener('click', () => {
+		const selectedLang = btn.getAttribute('data-lang');
+		if (selectedLang) {
+		localStorage.setItem('preferredLanguage', selectedLang);
+		languageOptions.classList.add('hidden');  
+		applyLanguage(selectedLang);
+		location.reload();
+		}
+	});
+});
+
+playOptions.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target) return;
+
+    const route = playOptionsMap[target.id];
+    if (route) {
+        playOptions.classList.add('hidden');
+        navigateTo(route);
+    }
+});
+
+if (settingsBtn) {
+	settingsBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(settingsBtn, () => navigateTo('/settings'));
+	});
+}
+if (teamsBtn) {
+	teamsBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(teamsBtn, () => navigateTo('/teams'));
+	});
+}
+if (loginBtn) {
+	loginBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(loginBtn, () => navigateTo('/login'));
+	});
+}
+if (registerBtn) {
+	registerBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(registerBtn, () => navigateTo('/register'));
+	});
+}
+if (profileBtn) {
+	profileBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(profileBtn, () => navigateTo('/profile'));
+	});
+}
+if (friendRequestsBtn) {
+	friendRequestsBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(friendRequestsBtn, () => navigateTo('/friends'));
+	});
+}
+if (tournamentsBtn) {
+	tournamentsBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(tournamentsBtn, () => navigateTo('/tournaments'));
+	});
+}
+if (quickPlayBtn) {
+	quickPlayBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(quickPlayBtn, () => navigateTo('/quick-play'));
+	});
+}
+if (matchmakingBtn) {
+	matchmakingBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(matchmakingBtn, () => navigateTo('/matchmaking'));
+	});
 }
 if (quickTournamentBtn) {
-  quickTournamentBtn.addEventListener('click', () => {
-    fadeButtonAndNavigate(quickTournamentBtn, () => navigateTo('/quick-tournament'));
-  });
+	quickTournamentBtn.addEventListener('click', () => {
+		fadeButtonAndNavigate(quickTournamentBtn, () => navigateTo('/quick-tournament'));
+	});
 }
 
-if(registerBtn)
-	registerBtn.addEventListener('click', () => fadeButtonAndNavigate(registerBtn, () => navigateTo('/register')));
+// Logout button
+if (logoutBtn) {
+	logoutBtn.addEventListener('click', () => {
+		localStorage.removeItem('authToken');
+		localStorage.removeItem('playerId');
+		localStorage.removeItem('playerName');
+		updateUIBasedOnAuth();
+		navigateTo('/');
+	});
+}
 
-profileBtn.addEventListener('click', () => fadeButtonAndNavigate(profileBtn, () => navigateTo('/profile')));
-friendRequestsBtn.addEventListener('click', () => fadeButtonAndNavigate(friendRequestsBtn, () => navigateTo('/friends')));
-quickPlayBtn.addEventListener('click', () => fadeButtonAndNavigate(quickPlayBtn, () => navigateTo('/quick-play')));
-logoutBtn.addEventListener('click', () => fadeButtonAndNavigate(logoutBtn, () => {
-	localStorage.removeItem('authToken');
-	updateUIBasedOnAuth();
-	if (loaderWindow) loaderWindow.style.display = 'flex';
-	setTimeout(() => {
-		renderIntroScreen(appDiv, (route: string) => navigateTo(route));
-		setTimeout(() => {
-			if (loaderWindow) loaderWindow.style.display = 'none';
-		}, 250);
-	}, 250);
-}));
-matchmakingBtn.addEventListener('click', () => fadeButtonAndNavigate(matchmakingBtn, () => navigateTo('/matchmaking')));
+if (languageBtn && languageOptions) {
+	languageBtn.addEventListener('click', () => {
+		if (languageOptions.classList.contains('hidden')) {
+		languageOptions.classList.remove('hidden');
+		} 
+		else {
+		languageOptions.classList.add('hidden');
+		}
+	});
+}
+document.addEventListener('click', (event) => {
+	const target = event.target as HTMLElement;
 
-export async function fetchPendingFriendRequests(): Promise<number> {
-	// Mock API call; replace with actual API call to fetch pending friend requests count
-	return new Promise(resolve => setTimeout(() => resolve(3), 300));
+	// Close language options if click outside languageBtn and languageOptions
+	if (languageOptions && languageBtn && !languageOptions.contains(target) && !languageBtn.contains(target)) {
+		if (!languageOptions.classList.contains('hidden'))
+			languageOptions.classList.add('hidden');
+	}
+
+	if (playOptions && playBtn && target !== playBtn && !playOptions.contains(target)) {
+		if (!playOptions.classList.contains('hidden'))
+			playOptions.classList.add('hidden');
+	}
+});
+
+// Update friend requests badge
+export async function updateFriendRequestsBadge(): Promise<void> {
+	const token = localStorage.getItem('authToken');
+	if (!token) {
+		if (friendRequestsBadge) friendRequestsBadge.style.display = 'none';
+		return;
+	}
+	try {
+		const response = await fetch('/api/friendRequests/count', {
+			headers: { 'Authorization': `Bearer ${token}` }
+		});
+		if (!response.ok) throw new Error('Failed to fetch friend requests count');
+		const { count } = await response.json();
+		if (friendRequestsBadge) {
+			if (count > 0) {
+				friendRequestsBadge.textContent = count.toString();
+				friendRequestsBadge.style.display = 'inline-block';
+			} else {
+				friendRequestsBadge.style.display = 'none';
+			}
+		}
+	} catch (error) {
+		console.error('Error updating friend requests badge:', error);
+	}
+}
+
+// Set user online status on load
+async function setOnlineOnLoad(): Promise<void> {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+	await updateOnlineStatus(true);
+}
+
+// Update user online status
+async function updateOnlineStatus(isOnline: boolean): Promise<void> {
+	const token = localStorage.getItem('authToken');
+	if (!token) return;
+	try {
+		await fetch('/api/profile/status', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ online: isOnline })
+		});
+	} catch (error) {
+		console.error('Failed to update online status:', error);
+	}
 }
 
 export function applyLanguage(lang: string): void {
@@ -380,7 +506,7 @@ export function applyLanguage(lang: string): void {
 	friendRequestsBtn.innerHTML = `📧 ${t.friendRequests}`;
 	languageBtn.innerHTML = `🌐 ${t.language}`;
 	if (quickPlayBtn) 
-		quickPlayBtn.textContent = `⚡ ${t.quickPlay || 'Quick Play'}`;
+		quickPlayBtn.textContent = `⚡ ${t.quickPlay}`;
 	const playOptionPlay = document.getElementById('play-play');
 	const playOptionTournament = document.getElementById('play-tournament');
 	const playOptionMatchmaking = document.getElementById('play-matchmaking');
@@ -391,158 +517,3 @@ export function applyLanguage(lang: string): void {
 	if (playOptionMatchmaking) 
 		playOptionMatchmaking.textContent = t.matchmaking;
 }
-
-// Event listeners for buttons
-quickPlayBtn?.addEventListener('click', () => navigateTo('/quick-play'));
-
-languageBtn.addEventListener('click', (e) => {
-	e.stopPropagation();
-	languageOptions.classList.toggle('hidden');
-});
-
-languageOptions.querySelectorAll('button').forEach((btn) => {
-	btn.addEventListener('click', () => {
-		const lang = btn.getAttribute('data-lang') || 'en';
-		localStorage.setItem('preferredLanguage', lang);
-		applyLanguage(lang);
-		location.reload();
-	});
-});
-
-document.addEventListener('click', (e) => {
-	if (!languageOptions.contains(e.target as Node) && e.target !== languageBtn) {
-		languageOptions.classList.add('hidden');
-	}
-});
-
-const playOptions = document.getElementById('play-options');
-document.getElementById('play-tournament')?.addEventListener('click', () => navigateTo('/tournaments'));
-document.getElementById('play-play')?.addEventListener('click', () => navigateTo('/play'));
-document.getElementById('play-matchmaking')?.addEventListener('click', () => navigateTo('/matchmaking'));
-
-	// Only update the text node after the SVG for each button, preserving SVG markup
-	function setButtonText(btn: HTMLButtonElement, text: string) {
-		if (!btn) return;
-		// Find the first text node after the SVG
-		const svg = btn.querySelector('svg');
-		if (svg) {
-			// Remove all text nodes after SVG
-			let next = svg.nextSibling;
-			while (next) {
-				const toRemove = next;
-				next = next.nextSibling;
-				if (toRemove.nodeType === Node.TEXT_NODE || (toRemove.nodeType === Node.ELEMENT_NODE && toRemove.nodeName === 'SPAN')) {
-					btn.removeChild(toRemove);
-				}
-			}
-			// Add a single space and the new text
-			btn.appendChild(document.createTextNode(' ' + text));
-		}
-	}
-
-	setButtonText(playBtn, t.play);
-	setButtonText(settingsBtn, t.settings);
-	setButtonText(tournamentsBtn, t.tournaments);
-	setButtonText(teamsBtn, t.teams);
-	if(loginBtn)
-		setButtonText(loginBtn, t.login);
-	setButtonText(logoutBtn, t.logout);
-	if(registerBtn)
-		setButtonText(registerBtn, t.register);
-	setButtonText(profileBtn, t.profile);
-	setButtonText(friendRequestsBtn, t.friendRequests);
-	setButtonText(quickPlayBtn, t.quickPlay);
-	setButtonText(matchmakingBtn, t.matchmaking);
-	setButtonText(languageBtn, t.language);
-	
-
-// On load, apply preferred language
-const storedLang = localStorage.getItem('preferredLanguage') || 'en';
-applyLanguage(storedLang);
-
-// Export friend requests badge update function
-export async function updateFriendRequestsBadge() {
-	const token = localStorage.getItem('authToken');
-	if (!token) return;
-
-	try {
-		const response = await fetch('/api/friends/pending', {
-			headers: { 'Authorization': `Bearer ${token}` }
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			const pendingCount = data.pending?.length || 0;
-
-			if (pendingCount > 0) {
-				friendRequestsBadge.textContent = pendingCount.toString();
-				friendRequestsBadge.style.display = 'block';
-			} else {
-				friendRequestsBadge.style.display = 'none';
-			}
-		}
-	} catch (error) {
-		console.error('Error updating friend requests badge:', error);
-	}
-}
-
-// Update online status
-async function updateOnlineStatus(isOnline: boolean) {
-	const token = localStorage.getItem('authToken');
-	if (!token) return;
-
-	try {
-		await fetch('/api/profile/status', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`
-			},
-			body: JSON.stringify({ online: isOnline })
-		});
-		console.log(`Status updated to: ${isOnline ? 'online' : 'offline'}`);
-	} catch (error) {
-		console.error('Failed to update status:', error);
-	}
-}
-
-async function setOnlineOnLoad() {
-	const token = localStorage.getItem('authToken');
-	if (!token) return;
-	try {
-		await fetch('/api/profile/status', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`
-			},
-			body: JSON.stringify({ online: true })
-		});
-	} catch (error) {
-		console.error('Failed to set online on load:', error);
-	}
-}
-
-languageBtn.addEventListener('click', () => {
-	const isHidden = getComputedStyle(languageOptions).display === 'none';
-	languageOptions.style.display = isHidden ? 'block' : 'none';
-});
-registerBtn?.addEventListener('click', () => navigateTo('/register'));
-loginBtn?.addEventListener('click', () => navigateTo('/login'));
-logoutBtn.addEventListener('click', () => {
-	localStorage.clear();
-	updateUIBasedOnAuth();
-	navigateTo('/');
-});
-settingsBtn.addEventListener('click', () => navigateTo('/settings'));
-teamsBtn.addEventListener('click', () => navigateTo('/teams'));
-profileBtn.addEventListener('click', () => navigateTo('/profile'));
-friendRequestsBtn.addEventListener('click', () => navigateTo('/friends'));
-
-// Initial page load setup
-window.onload = () => {
-	const lang = localStorage.getItem('preferredLanguage') || 'en';
-	applyLanguage(lang);
-	updateUIBasedOnAuth();
-	renderRoute(window.location.pathname);
-};

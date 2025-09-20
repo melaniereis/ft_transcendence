@@ -1,8 +1,10 @@
-export type  MultiplayerGameOptions = {
-    container: HTMLElement;
-    playerName: string;
-    opponentName: string;
-    gameId: string;
-    maxGames: number;
-    difficulty: 'easy' | 'normal' | 'hard' | 'crazy';
+export type MultiplayerGameOptions = {
+	container: HTMLElement;
+	playerName: string;
+	opponentName: string;
+	gameId: string;
+	maxGames: number;
+	difficulty: 'easy' | 'normal' | 'hard' | 'crazy';
+	playerAvatarUrl?: string;
+	opponentAvatarUrl?: string;
 };

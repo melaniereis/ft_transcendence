@@ -6,7 +6,6 @@ export { statsRoutes } from './statsRoutes.js';
 export { authRoutes } from './authRoutes.js';
 export { websocketMatchmakingRoutes } from './webSocketRoutes.js';
 export { gameSocketRoutes } from './remoteGameRoutes.js';
-
 export { matchHistoryRoutes } from './matchHistoryRoutes.js';
 export { userProfileRoutes } from './userProfileRoutes.js';
 export { friendsRoutes } from './friendsRoutes.js';

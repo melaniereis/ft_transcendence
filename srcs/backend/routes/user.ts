@@ -24,7 +24,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 			try {
 				const displayName = await getDisplayNameById(userId);
 				if (!displayName) {
-					 return reply.send({ display_name: '' });
+					return reply.send({ display_name: '' });
 				}
 				return reply.send({ display_name: displayName });
 			} catch (err) {
@@ -53,15 +53,37 @@ export async function userRoutes(fastify: FastifyInstance) {
 			console.error('Error:', err);
 			return reply.status(500).send({ error: 'Internal server error' });
 		}
+		fastify.get('/api/users/:id', {
+			preHandler: authHook,
+			handler: async (request, reply) => {
+				const { id } = request.params as { id: string };
+				const userId = Number(id);
+				if (isNaN(userId)) {
+					return reply.status(400).send({ error: 'Invalid user id' });
+				}
+				try {
+					const { getUserById } = await import('../services/services.js');
+					const user = await getUserById(userId);
+					if (!user) {
+						return reply.status(404).send({ error: 'User not found' });
+					}
+					return reply.send(user);
+				} catch (err) {
+					console.error('Error fetching user by id:', err);
+					return reply.status(500).send({ error: 'Internal server error' });
+				}
+			}
+		});
 	});
 
-	fastify.get('/api/users/:username', {preHandler: authHook, handler: async (request, reply) => {
-		const { username } = request.params as { username: string };
-		const users = await getAllUsers();
-		const user = users.find((u: any) => u.username === username);
-		if (!user) 
-			return reply.status(404).send({ error: 'User not found' });
-		return reply.send(user);
+	fastify.get('/api/users/:username', {
+		preHandler: authHook, handler: async (request, reply) => {
+			const { username } = request.params as { username: string };
+			const users = await getAllUsers();
+			const user = users.find((u: any) => u.username === username);
+			if (!user)
+				return reply.status(404).send({ error: 'User not found' });
+			return reply.send(user);
 		}
 	});
 
@@ -78,7 +100,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 				const username = await getUsernameById(userId);
 				// Return empty string if no username found instead of 404
 				return reply.send('');
-			} 
+			}
 			catch (err) {
 				console.error('Error fetching username:', err);
 				return reply.status(500).send({ error: 'Internal server error' });
