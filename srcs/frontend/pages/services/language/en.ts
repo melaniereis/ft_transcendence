@@ -432,7 +432,8 @@ export default {
 	connectingToGame: "Connecting to game...",
 	connectionLost: "Connection Lost",
 	remotePongBestOf: "Remote Pong - Best of",
-	nextGameInvitation: "Next Game Invitation"
+	nextGameInvitation: "Next Game Invitation",
+	aiOpponentLabel :"Play against AI"
 
 
 

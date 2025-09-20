@@ -109,11 +109,11 @@ function renderRoute(path: string): void {
 			else {
 				appDiv.innerHTML = `
 					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
-						<h1 style="font-size: 4rem; font-weight: 900; color: #f0f0f0; margin: 0;">${t.welcomeTo}</h1>
+						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
 						
 						<div style="height: 400px;"></div>
 
-						<h1 style="font-size: 6rem; font-weight: 1000; color: #f0f0f0; margin: 0;">PONG</h1>
+						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
 					</div>
 					`;
 			}
@@ -163,11 +163,11 @@ function renderRoute(path: string): void {
 			default:
 				appDiv.innerHTML = `
 					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
-						<h1 style="font-size: 4rem; font-weight: 900; color: #f0f0f0; margin: 0;">Welcome to</h1>
+						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
 						
 						<div style="height: 400px;"></div>
 
-						<h1 style="font-size: 6rem; font-weight: 1000; color: #f0f0f0; margin: 0;">PONG</h1>
+						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
 					</div>
 					`;
 		}

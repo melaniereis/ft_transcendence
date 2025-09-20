@@ -767,7 +767,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				max-width: 96vw;
 			">
 				<h2 style="margin-bottom: 1rem; color: ${GRIS_COLORS.primary}; font-size: ${GRIS_TYPOGRAPHY.scale.xl};">
-					Next Game Invitation
+					${t.nextGameInvitation}
 				</h2>
 				<p style="margin-bottom: 2rem; color: ${GRIS_COLORS.secondary}; font-size: ${GRIS_TYPOGRAPHY.scale.base};">
 					${fromPlayer} ${t.wantsToPlay}

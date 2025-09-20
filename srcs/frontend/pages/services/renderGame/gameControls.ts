@@ -9,8 +9,8 @@ const controlState = {
 	eventListeners: [] as Array<{ element: Element | Window, event: string, handler: EventListener, options?: AddEventListenerOptions | boolean }>
 };
 
-export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number) {
-	cleanupControls();
+export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number, isAI: boolean = false) {
+	const keysPressed: Record<string, boolean> = {};
 
 	const keyDownHandler = (e: KeyboardEvent) => {
 		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
@@ -27,7 +27,7 @@ export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 		}
 		const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
 		controlState.keys[key] = false;
-		updatePaddleMovement(leftPaddle, rightPaddle, paddleSpeed);
+		updatePaddleMovement(leftPaddle, rightPaddle, paddleSpeed, isAI);
 	};
 
 	const addListener = (element: Element | Window, event: string, handler: EventListener, options?: AddEventListenerOptions | boolean) => {
@@ -46,7 +46,7 @@ export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 	setupTouchControls(leftPaddle, rightPaddle, paddleSpeed);
 }
 
-function updatePaddleMovement(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number) {
+function updatePaddleMovement(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number, isAI?: boolean) {
 	if (controlState.keys[leftPaddle.upKey.toLowerCase()]) {
 		leftPaddle.dy = -paddleSpeed;
 	} else if (controlState.keys[leftPaddle.downKey.toLowerCase()]) {
@@ -61,6 +61,18 @@ function updatePaddleMovement(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 		rightPaddle.dy = paddleSpeed;
 	} else {
 		rightPaddle.dy = 0;
+	}
+
+	if (!isAI)
+	{
+		rightPaddle.dy = controlState.keys[rightPaddle.upKey]? -paddleSpeed : controlState.keys[rightPaddle.downKey]
+		? paddleSpeed: 0;
+	}
+
+	if (!isAI)
+	{
+		rightPaddle.dy = controlState.keys[rightPaddle.upKey] ? -paddleSpeed : controlState.keys[rightPaddle.downKey]
+		? paddleSpeed: 0;
 	}
 }
 
@@ -218,4 +230,5 @@ export function updateScoreDisplay(score1: number, score2: number) {
         rightScoreEl.classList.add('score-update');
         setTimeout(() => rightScoreEl.classList.remove('score-update'), 300);
     }
+
 }

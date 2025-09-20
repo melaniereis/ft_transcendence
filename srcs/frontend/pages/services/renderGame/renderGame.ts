@@ -10,7 +10,6 @@ import { GRIS_COLORS, GRIS_TYPOGRAPHY, PERFORMANCE } from './constants.js';
 import { setOptimizedCanvasSize } from './gameCanvas.js';
 import { translations } from '../language/translations.js';
 
-
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
     ? localStorage.getItem('preferredLanguage') 
     : 'en') as keyof typeof translations;
@@ -22,8 +21,8 @@ let gameCleanupFunction: (() => void) | null = null;
 export function renderGame(container: HTMLElement, player1Name: string, player2Name: string,
 maxGames: number, difficulty: 'easy' | 'normal' | 'hard' | 'crazy' = 'normal',
 onGameEnd?: (canvas: HTMLCanvasElement, score1: number, score2: number) => void,
-mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, avatar1?: string, avatar2?: string) {
-    console.log('🎮 Initializing GRIS-inspired game...');
+mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, avatar1?: string, avatar2?: string,
+isAI: boolean = false) {
 
     if (gameCleanupFunction) {
         gameCleanupFunction();
@@ -97,7 +96,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, avatar1?: s
                 state.ball.dx *= scaleX;
                 state.ball.dy *= scaleY;
                 cleanupControls();
-                setupControls(state.player1, state.player2, 6);
+                setupControls(state.player1, state.player2, 6, isAI);
             }
             ctx.clearRect(0, 0, newWidth, newHeight);
             resizeTimeout = null;
@@ -122,7 +121,7 @@ mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number, avatar1?: s
         console.log('🧹 Game cleanup completed');
     };
 
-    startOptimizedCountdown(canvas, ctx, leftPaddle, rightPaddle, ball, maxGames, onGameEnd, mode, gameId);
+    startOptimizedCountdown(canvas, ctx, leftPaddle, rightPaddle, ball, maxGames, onGameEnd, mode, gameId, isAI);
 }
 
 
@@ -346,7 +345,7 @@ function initializeOptimizedEffects() {
 
 function startOptimizedCountdown(canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D,
 leftPaddle: any, rightPaddle: any, ball: any, maxGames: number, onGameEnd: any, mode: any,
-gameId?: number) {
+gameId?: number, isAI: boolean = false) {
     console.log('⏰ Starting countdown...');
     let countdown = 3;
     const countdownMessages = [t.ready, t.set, t.go];
@@ -380,7 +379,7 @@ gameId?: number) {
                         state.score1=score1; state.score2=score2;
                         triggerScoreAnimation();
                         if(onGameEnd) onGameEnd(canvas,score1,score2);
-                    }, mode, gameId
+                    }, mode, gameId, isAI
                 );
             }
         },1000);

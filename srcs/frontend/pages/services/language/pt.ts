@@ -431,7 +431,9 @@ export default {
 	connectingToGame: "Conectando ao jogo...",
 	connectionLost: "Conexão Perdida",
 	remotePongBestOf: "Remote Pong - Melhor de",
-	nextGameInvitation: "Convite para o próximo jogo"
+	nextGameInvitation: "Convite para o próximo jogo",
+	aiOpponentLabel: "Jogar contra a IA"
+
 
 
 }
