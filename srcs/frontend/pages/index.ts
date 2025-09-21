@@ -91,10 +91,16 @@ async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
 }
 
 export async function renderRoute(path: string): Promise<void> {
-	// Always cleanup game events before switching pages
+	// Always cleanup game events and controls before switching pages
 	try {
 		const { cleanupGameEvents } = await import('./services/renderGame/events.js');
 		cleanupGameEvents();
+	} catch (e) {
+		// ignore if not available
+	}
+	try {
+		const { cleanupControls } = await import('./services/renderGame/gameControls.js');
+		cleanupControls();
 	} catch (e) {
 		// ignore if not available
 	}
