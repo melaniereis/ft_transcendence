@@ -47,8 +47,8 @@ export async function renderTeamsPage(container: HTMLElement) {
 			}
 			.teams-panel {
 				background:linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%);
-				border-radius:2.8rem;
-				box-shadow:0 0 32px 8px #d6d8e8,0 16px 64px 0 rgba(44,34,84,0.08),0 2px 16px 0 rgba(44,34,84,0.04);
+				border-radius:2rem;
+				box-shadow:0 4px 32px 0 rgba(120,94,196,0.10), 0 2px 16px 0 rgba(120,94,196,0.03);
 				padding:2.2rem 1.6rem;
 				max-width:1280px;
 				width:100%;
@@ -59,18 +59,26 @@ export async function renderTeamsPage(container: HTMLElement) {
 				animation: fadeInPanel 1.2s cubic-bezier(.6,.2,.3,1) forwards;
 				z-index: 3;
 				padding-top: 72px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
 			}
 			.team-card {
-				background:linear-gradient(120deg,rgba(236,233,244,0.32) 0%,rgba(182,166,202,0.22) 100%);
+				background:linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%);
 				border-radius:2rem;
-				box-shadow:0 0 24px 6px #d6d8e8,0 8px 32px 0 rgba(44,34,84,0.08),0 2px 8px 0 rgba(44,34,84,0.04);
-				padding:1.6rem;
+				box-shadow:0 4px 24px 0 rgba(120,94,196,0.10), 0 2px 8px 0 rgba(120,94,196,0.04);
+				padding:2rem 1.2rem;
 				transition: box-shadow 0.3s, background 0.3s;
 				animation: fadeInPanel 1.2s cubic-bezier(.6,.2,.3,1) forwards;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
 			}
 			.team-card:hover {
-				background: rgba(255,255,255,0.88);
-				box-shadow: 0 0 32px 8px #a5b4fc, 0 12px 40px 0 rgba(44,34,84,0.18), 0 2px 12px 0 rgba(44,34,84,0.12);
+				background: rgba(255,255,255,0.96);
+				box-shadow: 0 8px 32px 0 #a5b4fc, 0 2px 12px 0 rgba(120,94,196,0.12);
 			}
 			.team-img {
 				box-shadow:0 4px 24px rgba(44,34,84,0.14);
@@ -210,36 +218,138 @@ export async function renderTeamsPage(container: HTMLElement) {
 // 🧩 Team Card Creator
 function createTeamStatsCard(team: { key: string; displayName: string; img: string }, members: any[] | null) {
 	const card = document.createElement('div');
-	card.className = 'team-card flex flex-col items-center justify-center overflow-hidden';
+	card.className = 'team-card';
+	card.style.background = 'linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%)';
+	card.style.borderRadius = '2rem';
+	card.style.boxShadow = '0 4px 24px 0 rgba(120,94,196,0.10), 0 2px 8px 0 rgba(120,94,196,0.04)';
+	card.style.padding = '2rem 1.2rem';
+	card.style.transition = 'box-shadow 0.3s, background 0.3s';
+	card.style.position = 'relative';
+	card.style.overflow = 'visible';
+	card.style.display = 'flex';
+	card.style.flexDirection = 'column';
+	card.style.alignItems = 'center';
+	card.style.justifyContent = 'center';
 
+	// Celestial glow and floating particles
 	card.innerHTML = `
-        <div class="flex justify-center mb-6 relative z-10">
-            <img src="${team.img}" alt="${team.displayName}" class="team-img" />
-        </div>
-    `;
+		<div style="position:absolute;top:-32px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;">
+			<svg width="180" height="60" viewBox="0 0 180 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<ellipse cx="90" cy="30" rx="80" ry="24" fill="#c7d2fe" opacity="0.13"/>
+				<ellipse cx="40" cy="18" rx="18" ry="8" fill="#a5b4fc" opacity="0.09"/>
+				<ellipse cx="140" cy="42" rx="14" ry="6" fill="#f7b267" opacity="0.07"/>
+				<ellipse cx="120" cy="16" rx="10" ry="4" fill="#fbcfe8" opacity="0.06"/>
+			</svg>
+		</div>
+		<div class="flex justify-center mb-6 relative z-10">
+			<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:50%;box-shadow:0 4px 24px rgba(120,94,196,0.10);background:rgba(199,210,254,0.18);">
+				<defs>
+					<radialGradient id="teamGlow" cx="48" cy="48" r="44" gradientUnits="userSpaceOnUse">
+						<stop stop-color="#818cf8"/>
+						<stop offset="1" stop-color="#fbcfe8"/>
+					</radialGradient>
+				</defs>
+				<circle cx="48" cy="48" r="44" fill="url(#teamGlow)" stroke="#818cf8" stroke-width="4"/>
+				<image href="${team.img}" x="12" y="12" height="72" width="72" clip-path="circle(36)"/>
+			</svg>
+		</div>
+	<h3 style="font-size: 2rem; font-weight: 700; color: #3b3663; margin-bottom: 0.8rem;letter-spacing: 0.04em; text-shadow: 0 4px 16px #a5b4fc, 0 2px 8px #818cf8;font-family:'Inter','EB Garamond',serif;">${team.displayName}</h3>
+	`;
 
 	const content = document.createElement('div');
-	content.className = 'team-content flex-grow overflow-auto text-center relative z-10';
+	content.className = 'team-content';
+	content.style.width = '100%';
+	content.style.background = 'linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%)';
+	content.style.borderRadius = '2rem';
+	content.style.boxShadow = '0 2px 12px 0 #a5b4fc, 0 1px 4px 0 rgba(120,94,196,0.04)';
+	content.style.padding = '1.2rem 0.8rem';
+	content.style.display = 'flex';
+	content.style.flexDirection = 'column';
+	content.style.alignItems = 'center';
 
 	if (!members || members.length === 0) {
-		content.innerHTML = `<p>${t.noMembersFound} ${formatTeamName(team.key)}</p>`;
+		content.innerHTML = `<p style="color:#64748b;font-size:1.1rem;">${typeof formatTeamName === 'function' ? t.noMembersFound + ' ' + formatTeamName(team.key) : t.noMembersFound}</p>`;
 	} else {
-		const avgWinRate = members.reduce((sum: number, m: any) => sum + (m.win_rate ?? 0), 0) / members.length;
+		// Show all members, even those with no stats
+		const allMembers = members.filter(m => m && typeof m.members === 'string' && m.members.length > 0);
+		const avgWinRate = allMembers.length > 0 ? allMembers.reduce((sum: number, m: any) => sum + (m.win_rate ?? 0), 0) / allMembers.length : 0;
+		// Sort by win_rate descending for podium
+		const sortedMembers = [...allMembers].sort((a, b) => (b.win_rate ?? 0) - (a.win_rate ?? 0));
+		const podium = sortedMembers.slice(0, 3);
 
-		// Build list of all members with stats
-		const memberStatsHtml = members.map((member: any) => `
-			<li>
-				<strong class="block mb-1" style="color:#818cf8;">${member.members}</strong>
-				<div>${t.wins}: ${member.victories}</div>
-				<div>${t.losses}: ${member.defeats}</div>
-				<div>${t.tournamentsWon}: ${member.tournaments_won}</div>
-				<div>${t.winRate}: ${(member.win_rate ?? 0).toFixed(2)}%</div>
-			</li>
-		`).join('');
+		const podiumHtml = podium.length ? `
+			<div style="display:flex;justify-content:center;align-items:flex-end;gap:1.2rem;margin-bottom:2rem;">
+				${podium.map((member, idx) => {
+			const initial = member.members[0] ? member.members[0].toUpperCase() : 'U';
+			const colors = [
+				'linear-gradient(120deg,rgba(251,207,232,0.18) 0%,rgba(129,140,248,0.18) 100%)', // 1st
+				'linear-gradient(120deg,rgba(199,210,254,0.13) 0%,rgba(165,180,252,0.13) 100%)', // 2nd
+				'linear-gradient(120deg,rgba(247,178,103,0.13) 0%,rgba(251,207,232,0.13) 100%)'  // 3rd
+			];
+			const heights = [72, 56, 44];
+			// SVG medal icons (no emoji)
+			const medalSvg = [
+				`<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#fbcfe8" opacity="0.7"/><circle cx="12" cy="12" r="7" fill="#fffbe6" opacity="0.8"/><text x="12" y="16" text-anchor="middle" font-size="13" fill="#818cf8" font-family="Inter, Arial, sans-serif">1</text></svg>`,
+				`<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#c7d2fe" opacity="0.7"/><circle cx="12" cy="12" r="7" fill="#fffbe6" opacity="0.8"/><text x="12" y="16" text-anchor="middle" font-size="13" fill="#a5b4fc" font-family="Inter, Arial, sans-serif">2</text></svg>`,
+				`<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#f7b267" opacity="0.7"/><circle cx="12" cy="12" r="7" fill="#fffbe6" opacity="0.8"/><text x="12" y="16" text-anchor="middle" font-size="13" fill="#fbcfe8" font-family="Inter, Arial, sans-serif">3</text></svg>`
+			];
+			return `<div style="display:flex;flex-direction:column;align-items:center;">
+							<svg width="${heights[idx]}" height="${heights[idx]}" viewBox="0 0 40 40" fill="none" style="margin-bottom:0.2rem;background:${colors[idx]};border-radius:50%;box-shadow:0 2px 12px #b6a6ca;">
+								<circle cx="20" cy="20" r="18" fill="#fff" stroke="#818cf8" stroke-width="2"/>
+								<text x="20" y="27" text-anchor="middle" font-size="1.3rem" fill="#818cf8" font-family="Inter, Arial, sans-serif" style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${initial}</text>
+							</svg>
+							<strong style="color:#818cf8;font-size:1.08rem;text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${member.members}</strong>
+							<span style="color:#a5b4fc;font-size:0.98rem;text-shadow:0 2px 8px #2c2254,0 1px 4px #818cf8;">${t.winRate}: ${(member.win_rate ?? 0).toFixed(2)}%</span>
+							<span style="font-size:0.88rem;">${medalSvg[idx]}</span>
+						</div>`;
+		}).join('')}
+			</div>
+		` : '';
+
+		const memberStatsHtml = allMembers.map((member: any) => {
+			const initial = member.members[0] ? member.members[0].toUpperCase() : 'U';
+			const hasStats = member.victories || member.defeats || member.tournaments_won || member.win_rate;
+			return `
+				<li style="background: linear-gradient(120deg,rgba(236,233,244,0.22) 0%,rgba(182,166,202,0.18) 100%);border-radius: 1rem; margin-bottom: 1.2rem; padding: 1.2rem 1rem;box-shadow: 0 2px 12px 0 #a5b4fc, 0 1px 4px 0 rgba(120,94,196,0.04);display: flex; flex-direction: column; align-items: center;position:relative;">
+					<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:0.4rem;">
+						<defs>
+							<radialGradient id="memberGlow${initial}" cx="20" cy="20" r="18" gradientUnits="userSpaceOnUse">
+								<stop stop-color="#818cf8"/>
+								<stop offset="1" stop-color="#fbcfe8"/>
+							</radialGradient>
+						</defs>
+						<circle cx="20" cy="20" r="18" fill="url(#memberGlow${initial})" stroke="#818cf8" stroke-width="2"/>
+						<text x="20" y="27" text-anchor="middle" font-size="1.3rem" fill="#fff" font-family="Inter, Arial, sans-serif" style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${initial}</text>
+					</svg>
+					<strong style="color:#818cf8;font-size:1.18rem;margin-bottom:0.4rem;text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${member.members}</strong>
+					${hasStats ? `
+					<div style="display:flex;align-items:center;gap:0.7rem;color:#818cf8;margin-bottom:0.2rem;">
+						<svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;"><circle cx="11" cy="11" r="10" fill="#fbcfe8" opacity="0.7" stroke="#818cf8" stroke-width="2"/><text x="11" y="16" text-anchor="middle" font-size="13" fill="#818cf8" font-family="Inter, Arial, sans-serif" style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">W</text></svg>
+						<span style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${t.wins}: <span style="font-weight:600;">${member.victories}</span></span>
+					</div>
+					<div style="display:flex;align-items:center;gap:0.7rem;color:#818cf8;margin-bottom:0.2rem;">
+						<svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;"><circle cx="11" cy="11" r="10" fill="#c7d2fe" opacity="0.7" stroke="#818cf8" stroke-width="2"/><text x="11" y="16" text-anchor="middle" font-size="13" fill="#818cf8" font-family="Inter, Arial, sans-serif" style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">L</text></svg>
+						<span style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${t.losses}: <span style="font-weight:600;">${member.defeats}</span></span>
+					</div>
+						<div style="display:flex;align-items:center;gap:0.7rem;color:#818cf8;margin-bottom:0.2rem;">
+							<svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;"><circle cx="11" cy="11" r="10" fill="#f7b267" opacity="0.7" stroke="#818cf8" stroke-width="2"/><text x="11" y="16" text-anchor="middle" font-size="13" fill="#818cf8" font-family="Inter, Arial, sans-serif" style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">T</text></svg>
+							<span style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${t.tournamentsWon}: <span style="font-weight:600;">${member.tournaments_won}</span></span>
+						</div>
+						<div style="display:flex;align-items:center;gap:0.7rem;color:#818cf8;margin-bottom:0.2rem;">
+							<svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;"><circle cx="11" cy="11" r="10" fill="#818cf8" opacity="0.7" stroke="#818cf8" stroke-width="2"/><text x="11" y="16" text-anchor="middle" font-size="13" fill="#fff" font-family="Inter, Arial, sans-serif" style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">%</text></svg>
+							<span style="text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;">${t.winRate}: <span style="font-weight:600;">${(member.win_rate ?? 0).toFixed(2)}%</span></span>
+						</div>
+					` : `<div style='color:#64748b;font-size:1rem;text-shadow:0 2px 8px #818cf8,0 1px 4px #fffbe6;'>No stats yet</div>`}
+				</li>
+			`;
+		}).join('');
 
 		content.innerHTML = `
-			<p class="italic mb-2">${t.averageWinRate}: <span class="font-semibold">${avgWinRate.toFixed(2)}%</span></p>
-			<ul class="team-list">${memberStatsHtml}</ul>
+			${podiumHtml}
+			<p class="italic mb-2" style="color:#818cf8;font-size:1.18rem;letter-spacing:0.02em;text-shadow:0 2px 8px #b6a6ca;">
+				${t.averageWinRate}: <span class="font-semibold" style="color:#22c55e;">${avgWinRate.toFixed(2)}%</span>
+			</p>
+			<ul class="team-list" style="list-style:none;padding:0;margin:0;">${memberStatsHtml}</ul>
 		`;
 	}
 
@@ -254,14 +364,13 @@ function formatTeamName(name: string): string {
 async function fetchTeamStats(teamKey: string) {
 	try {
 		const response = await fetch(`/api/teams/${teamKey}`);
-		if (!response.ok) 
+		if (!response.ok)
 			throw new Error(t.failedToLoadTeamStats);
 		const members = await response.json();
 		console.log(`Fetched members for ${teamKey}:`, members);
 		members.sort((a: any, b: any) => b.win_rate - a.win_rate);
 		return members;
-	} 
-	catch (err) {
+	} catch (err) {
 		console.error(`Error loading team stats for ${teamKey}:`, err);
 		return null;
 	}
