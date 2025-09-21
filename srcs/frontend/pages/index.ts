@@ -328,7 +328,11 @@ playOptions.addEventListener('click', (e) => {
 
     const route = playOptionsMap[target.id];
     if (route) {
+        // Hide the dropdown and clear any inline styles
         playOptions.classList.add('hidden');
+        playOptions.style.display = '';
+        playOptions.style.visibility = '';
+        playOptions.style.opacity = '';
         navigateTo(route);
     }
 });
@@ -403,36 +407,39 @@ if (languageBtn && languageOptions) {
 	});
 }
 
+// Store reference to the play button click handler to avoid multiple listeners
+let playButtonClickHandler: ((e: Event) => void) | null = null;
+
 // Function to setup play button with fresh DOM references
 function setupPlayButton() {
 	const playBtnElement = document.getElementById('play-btn') as HTMLButtonElement;
 	const playOptionsElement = document.getElementById('play-options') as HTMLDivElement;
 	
 	if (playBtnElement && playOptionsElement) {
-		// Remove existing event listeners by cloning the element
-		const newPlayBtn = playBtnElement.cloneNode(true) as HTMLButtonElement;
-		playBtnElement.parentNode?.replaceChild(newPlayBtn, playBtnElement);
+		// Clear any inline styles that might interfere
+		playOptionsElement.style.display = '';
+		playOptionsElement.style.visibility = '';
+		playOptionsElement.style.opacity = '';
 		
-		newPlayBtn.addEventListener('click', (e) => {
-			console.log('Play button clicked with fresh setup!'); // Debug log
+		// Remove existing event listener if it exists
+		if (playButtonClickHandler) {
+			playBtnElement.removeEventListener('click', playButtonClickHandler);
+		}
+		
+		// Create new event handler
+		playButtonClickHandler = (e: Event) => {
 			e.preventDefault();
 			e.stopPropagation();
 			
 			if (playOptionsElement.classList.contains('hidden')) {
 				playOptionsElement.classList.remove('hidden');
-				// Force display with inline styles as backup
-				playOptionsElement.style.display = 'block';
-				playOptionsElement.style.visibility = 'visible';
-				playOptionsElement.style.opacity = '1';
-				
-				// Debug: Check computed styles
-				const computedStyle = window.getComputedStyle(playOptionsElement);
 			} else {
 				playOptionsElement.classList.add('hidden');
-				// Force hide with inline styles as backup
-				playOptionsElement.style.display = 'none';
 			}
-		});
+		};
+		
+		// Add the new event listener
+		playBtnElement.addEventListener('click', playButtonClickHandler);
 		
 		console.log('Play button setup completed');
 		return true;
@@ -452,14 +459,27 @@ if (playBtn && playOptions) {
 document.addEventListener('click', (event) => {
 	const target = event.target as HTMLElement;
 
-	if (languageOptions && languageBtn && !languageOptions.contains(target) && !languageBtn.contains(target)) {
-		if (!languageOptions.classList.contains('hidden'))
-			languageOptions.classList.add('hidden');
+	// Use fresh DOM queries for language dropdown
+	const currentLanguageOptions = document.getElementById('language-options') as HTMLDivElement;
+	const currentLanguageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+	
+	if (currentLanguageOptions && currentLanguageBtn && !currentLanguageOptions.contains(target) && !currentLanguageBtn.contains(target)) {
+		if (!currentLanguageOptions.classList.contains('hidden'))
+			currentLanguageOptions.classList.add('hidden');
 	}
 
-	if (playOptions && playBtn && target !== playBtn && !playOptions.contains(target)) {
-		if (!playOptions.classList.contains('hidden'))
-			playOptions.classList.add('hidden');
+	// Use fresh DOM queries for play dropdown
+	const currentPlayOptions = document.getElementById('play-options') as HTMLDivElement;
+	const currentPlayBtn = document.getElementById('play-btn') as HTMLButtonElement;
+	
+	if (currentPlayOptions && currentPlayBtn && target !== currentPlayBtn && !currentPlayOptions.contains(target)) {
+		if (!currentPlayOptions.classList.contains('hidden')) {
+			currentPlayOptions.classList.add('hidden');
+			// Clear any inline styles
+			currentPlayOptions.style.display = '';
+			currentPlayOptions.style.visibility = '';
+			currentPlayOptions.style.opacity = '';
+		}
 	}
 });
 
