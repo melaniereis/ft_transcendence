@@ -39,7 +39,6 @@ export function startGameLoop
 			cancelAnimationFrame(animationId);
 		}
 	}
-
 	function loop(currentTime: number = 0) {
 		if (gameEnded) return;
 
@@ -92,7 +91,7 @@ export function startGameLoop
 					lastTime = 0;
 					lastAIUpdate = performance.now();
 					aiTargetY = canvas.height / 2 - right.height / 2;
-					loop();
+					loop(performance.now());
 				}, left.nickname, right.nickname, mode, gameId);
 			}
 			else {
@@ -109,7 +108,8 @@ export function startGameLoop
 	}
 
 	// Start the game loop
-	loop();
+	lastTime = performance.now();
+	loop(performance.now());
 
 	// Return cleanup function
 	return stopGameLoop;
