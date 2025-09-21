@@ -171,6 +171,15 @@ function renderRoute(path: string): void {
 					</div>
 					`;
 		}
+		
+		// Re-initialize play button after each page navigation
+		setTimeout(() => {
+			const token = localStorage.getItem('authToken');
+			const isLoggedIn = !!token;
+			if (isLoggedIn) {
+				setupPlayButton();
+			}
+		}, 100);
 	}, 500);
 }
 
@@ -226,6 +235,11 @@ export function updateUIBasedOnAuth(): void {
 	if (isLoggedIn) {
 		updateFriendRequestsBadge();
 		setOnlineOnLoad();
+		
+		// Re-setup play button after login to ensure it works
+		setTimeout(() => {
+			setupPlayButton();
+		}, 100); // Small delay to ensure DOM is updated
 	}
 }
 
@@ -323,7 +337,11 @@ playOptions.addEventListener('click', (e) => {
 
     const route = playOptionsMap[target.id];
     if (route) {
+        // Hide the dropdown and clear any inline styles
         playOptions.classList.add('hidden');
+        playOptions.style.display = '';
+        playOptions.style.visibility = '';
+        playOptions.style.opacity = '';
         navigateTo(route);
     }
 });
@@ -398,26 +416,79 @@ if (languageBtn && languageOptions) {
 	});
 }
 
+// Store reference to the play button click handler to avoid multiple listeners
+let playButtonClickHandler: ((e: Event) => void) | null = null;
+
+// Function to setup play button with fresh DOM references
+function setupPlayButton() {
+	const playBtnElement = document.getElementById('play-btn') as HTMLButtonElement;
+	const playOptionsElement = document.getElementById('play-options') as HTMLDivElement;
+	
+	if (playBtnElement && playOptionsElement) {
+		// Clear any inline styles that might interfere
+		playOptionsElement.style.display = '';
+		playOptionsElement.style.visibility = '';
+		playOptionsElement.style.opacity = '';
+		
+		// Remove existing event listener if it exists
+		if (playButtonClickHandler) {
+			playBtnElement.removeEventListener('click', playButtonClickHandler);
+		}
+		
+		// Create new event handler
+		playButtonClickHandler = (e: Event) => {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			if (playOptionsElement.classList.contains('hidden')) {
+				playOptionsElement.classList.remove('hidden');
+			} else {
+				playOptionsElement.classList.add('hidden');
+			}
+		};
+		
+		// Add the new event listener
+		playBtnElement.addEventListener('click', playButtonClickHandler);
+		
+		console.log('Play button setup completed');
+		return true;
+	} else {
+		console.error('Play button or play options not found during setup:', { playBtnElement, playOptionsElement });
+		return false;
+	}
+}
+
+// Initial setup if elements exist
 if (playBtn && playOptions) {
-	playBtn.addEventListener('click', () => {
-		if (playOptions.classList.contains('hidden'))
-			playOptions.classList.remove('hidden');
-		else 
-			playOptions.classList.add('hidden');
-	});
+	setupPlayButton();
+} else {
+	console.error('Play button or play options not found at initialization:', { playBtn, playOptions });
 }
 
 document.addEventListener('click', (event) => {
 	const target = event.target as HTMLElement;
 
-	if (languageOptions && languageBtn && !languageOptions.contains(target) && !languageBtn.contains(target)) {
-		if (!languageOptions.classList.contains('hidden'))
-			languageOptions.classList.add('hidden');
+	// Use fresh DOM queries for language dropdown
+	const currentLanguageOptions = document.getElementById('language-options') as HTMLDivElement;
+	const currentLanguageBtn = document.getElementById('language-btn') as HTMLButtonElement;
+	
+	if (currentLanguageOptions && currentLanguageBtn && !currentLanguageOptions.contains(target) && !currentLanguageBtn.contains(target)) {
+		if (!currentLanguageOptions.classList.contains('hidden'))
+			currentLanguageOptions.classList.add('hidden');
 	}
 
-	if (playOptions && playBtn && target !== playBtn && !playOptions.contains(target)) {
-		if (!playOptions.classList.contains('hidden'))
-			playOptions.classList.add('hidden');
+	// Use fresh DOM queries for play dropdown
+	const currentPlayOptions = document.getElementById('play-options') as HTMLDivElement;
+	const currentPlayBtn = document.getElementById('play-btn') as HTMLButtonElement;
+	
+	if (currentPlayOptions && currentPlayBtn && target !== currentPlayBtn && !currentPlayOptions.contains(target)) {
+		if (!currentPlayOptions.classList.contains('hidden')) {
+			currentPlayOptions.classList.add('hidden');
+			// Clear any inline styles
+			currentPlayOptions.style.display = '';
+			currentPlayOptions.style.visibility = '';
+			currentPlayOptions.style.opacity = '';
+		}
 	}
 });
 

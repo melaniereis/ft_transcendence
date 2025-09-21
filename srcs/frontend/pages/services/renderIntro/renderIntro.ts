@@ -207,7 +207,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 height: clamp(40px, 5vw, 56px);
                 background: rgba(44,34,84,0.10);
                 border: none;
-                color: #e8d5ff;
+                color: #fff;
                 font-size: clamp(0.9rem, 2vw, 1.15rem);
                 font-weight: 400;
                 border-radius: 1.5rem;
@@ -335,31 +335,29 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
             }
 
             @media (max-width: 600px) {
+                .orbital-container { display: none !important; }
+                .orbit-dot { display: none !important; }
+                #intro-svg { display: none !important; }
+                #backgroundCanvas, #milkyWayCanvas, #starsCanvas, #orbsCanvas { display: none !important; }
                 /* Stack buttons vertically on very small screens */
                 #diamond-layout {
                     grid-template-columns: 1fr;
                     grid-template-rows: auto auto auto auto auto;
-                    gap: 1rem;
-                    padding: 2rem;
                     box-sizing: border-box;
+                    padding-top: 34.5vh;
+                    padding-left: 16vw;
+                    height: 75vh;
+                    width: 0;
                 }
 
                 #intro-title {
                     grid-column: 1;
-                    grid-row: 3;
+                    grid-row: 1;
                     font-size: clamp(1.5rem, 8vw, 2.2rem);
 					z-index: 1200;
                 }
 
                 #intro-login {
-                    grid-column: 1;
-                    grid-row: 1;
-                    margin: 0;
-                    align-self: center;
-                    justify-self: center;
-                }
-
-                #intro-register {
                     grid-column: 1;
                     grid-row: 2;
                     margin: 0;
@@ -367,9 +365,21 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     justify-self: center;
                 }
 
-                #intro-quickplay {
+                #intro-register {
+                    grid-column: 1;
+                    grid-row: 3;
+                    margin: 0;
+                    align-self: center;
+                    justify-self: center;
+                }
+                .play-container {
+                    margin-top: 0;
                     grid-column: 1;
                     grid-row: 4;
+                }
+                #intro-quickplay {
+                    grid-column: 1;
+                    grid-row: 5;
                     margin: 0;
                     align-self: center;
                     justify-self: center;
@@ -377,7 +387,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
                 #intro-quicktournament {
                     grid-column: 1;
-                    grid-row: 5;
+                    grid-row: 6;
                     align-self: start;
                     justify-self: start;
                     margin-top: 2rem;
@@ -385,7 +395,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
                 .language-container {
                     grid-column: 1;
-                    grid-row: 5;
+                    grid-row: 7;
                     margin: 0;
                     align-self: center;
                     justify-self: center;
@@ -522,7 +532,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
             <!-- Perfect diamond layout using CSS Grid -->
            <div id="diamond-layout">
-            <h1 id="intro-title">GRIS PONG</h1>
+            <h1 id="intro-title">GRIS</h1>
             <button id="intro-login" class="diamond-btn">${t.login}</button>
             <button id="intro-register" class="diamond-btn">${t.register}</button>
             <div class="play-container">
