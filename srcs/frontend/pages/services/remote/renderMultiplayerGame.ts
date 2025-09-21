@@ -150,6 +150,44 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			}
 			hideAllModals();
 			showOpponentLeftModal(data.message);
+
+			let winnerScore = 3;
+			let loserScore = 0;
+
+			if (assignedSide === 'left') {
+				gameState.leftScore = winnerScore;
+				gameState.rightScore = loserScore;
+			} 
+			else {
+				gameState.leftScore = loserScore;
+				gameState.rightScore = winnerScore;
+			}
+
+			(async () => {
+				try {
+					const res = await fetch(`/games/${gameId}/end`, {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+						},
+						body: JSON.stringify({
+							score_player1: gameState.leftScore,
+							score_player2: gameState.rightScore,
+							winner_id: assignedSide === 'left' ? gameState.leftPlayerName : gameState.rightPlayerName
+						})
+					});
+
+					if (res.ok) {
+						const result = await res.json();
+						console.log('Game ended and winner updated in DB:', result);
+					} 
+					else
+						console.error('Failed to update game result in DB');
+				} catch (err) {
+					console.error('Error while updating game result:', err);
+				}
+			})();
 		}
 	};
 

@@ -161,12 +161,12 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
             }
 
             /* Slight adjustment for dropdown positioning */
-            #play-options {
+            #iplay-options {
                 top: 100%;
                 margin-top: 0.5rem;
             }
 
-            #play-options {
+            #iplay-options {
                 display: none; /* shown via JS */
                 position: absolute;
                 top: 100%;     /* just below Play button */
@@ -181,7 +181,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 margin-top: 0.5rem; /* minor vertical spacing */
             }
 
-            #play-options button {
+            #iplay-options button {
                 width: 100%;
                 margin: 0.25rem 0;
                 border-radius: 0.5rem;
@@ -193,7 +193,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 transition: background 0.2s ease;
             }
 
-            #play-options button:hover {
+            #iplay-options button:hover {
                 background: #6c4fa3;
                 color: #fff;
             }
@@ -207,7 +207,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                 height: clamp(40px, 5vw, 56px);
                 background: rgba(44,34,84,0.10);
                 border: none;
-                color: #e8d5ff;
+                color: #fff;
                 font-size: clamp(0.9rem, 2vw, 1.15rem);
                 font-weight: 400;
                 border-radius: 1.5rem;
@@ -335,31 +335,29 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
             }
 
             @media (max-width: 600px) {
+                .orbital-container { display: none !important; }
+                .orbit-dot { display: none !important; }
+                #intro-svg { display: none !important; }
+                #backgroundCanvas, #milkyWayCanvas, #starsCanvas, #orbsCanvas { display: none !important; }
                 /* Stack buttons vertically on very small screens */
                 #diamond-layout {
                     grid-template-columns: 1fr;
                     grid-template-rows: auto auto auto auto auto;
-                    gap: 1rem;
-                    padding: 2rem;
                     box-sizing: border-box;
+                    padding-top: 34.5vh;
+                    padding-left: 16vw;
+                    height: 75vh;
+                    width: 0;
                 }
 
                 #intro-title {
                     grid-column: 1;
-                    grid-row: 3;
+                    grid-row: 1;
                     font-size: clamp(1.5rem, 8vw, 2.2rem);
 					z-index: 1200;
                 }
 
                 #intro-login {
-                    grid-column: 1;
-                    grid-row: 1;
-                    margin: 0;
-                    align-self: center;
-                    justify-self: center;
-                }
-
-                #intro-register {
                     grid-column: 1;
                     grid-row: 2;
                     margin: 0;
@@ -367,9 +365,21 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
                     justify-self: center;
                 }
 
-                #intro-quickplay {
+                #intro-register {
+                    grid-column: 1;
+                    grid-row: 3;
+                    margin: 0;
+                    align-self: center;
+                    justify-self: center;
+                }
+                .play-container {
+                    margin-top: 0;
                     grid-column: 1;
                     grid-row: 4;
+                }
+                #intro-quickplay {
+                    grid-column: 1;
+                    grid-row: 5;
                     margin: 0;
                     align-self: center;
                     justify-self: center;
@@ -377,7 +387,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
                 #intro-quicktournament {
                     grid-column: 1;
-                    grid-row: 5;
+                    grid-row: 6;
                     align-self: start;
                     justify-self: start;
                     margin-top: 2rem;
@@ -385,7 +395,7 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
                 .language-container {
                     grid-column: 1;
-                    grid-row: 5;
+                    grid-row: 7;
                     margin: 0;
                     align-self: center;
                     justify-self: center;
@@ -522,12 +532,12 @@ export function renderIntroScreen(container: HTMLElement, onNavigate: (route: st
 
             <!-- Perfect diamond layout using CSS Grid -->
            <div id="diamond-layout">
-            <h1 id="intro-title">GRIS PONG</h1>
+            <h1 id="intro-title">GRIS</h1>
             <button id="intro-login" class="diamond-btn">${t.login}</button>
             <button id="intro-register" class="diamond-btn">${t.register}</button>
             <div class="play-container">
                 <button id="intro-play-btn" class="diamond-btn">${t.play}</button>
-                <div id="play-options" class="play-options">
+                <div id="iplay-options" class="iplay-options">
                     <button id="intro-quickplay" class="diamond-btn">${t.quickPlay}</button>
                     <button id="intro-quicktournament" class="diamond-btn">${t.quickTournament}</button>
                 </div>
@@ -585,7 +595,7 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
 	const quickTournamentBtn = document.getElementById('intro-quicktournament');
 	const introLanguageBtn = document.getElementById('intro-language-btn');
 	const introLanguageOptions = document.getElementById('intro-language-options');
-	const playDropdown = document.getElementById('play-options');
+	const iplayDropdown = document.getElementById('iplay-options');
 	const introPlayBtn = document.getElementById('intro-play-btn');
 
 	function addButtonPressEffect(button: HTMLElement) {
@@ -617,22 +627,22 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
 		});
 	}
 
-	if (introPlayBtn && playDropdown) {
+	if (introPlayBtn && iplayDropdown) {
 		addButtonPressEffect(introPlayBtn);
 		introPlayBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
-			const isHidden = playDropdown.style.display === 'none' || !playDropdown.style.display;
-			playDropdown.style.display = isHidden ? 'block' : 'none';
+			const isHidden = iplayDropdown.style.display === 'none' || !iplayDropdown.style.display;
+			iplayDropdown.style.display = isHidden ? 'block' : 'none';
 			console.log('🎮 Play dropdown toggled:', isHidden ? 'opened' : 'closed');
 		});
 
 		// Clicking outside closes the dropdown
 		document.addEventListener('click', (e) => {
 			if (
-				!playDropdown.contains(e.target as Node) &&
+				!iplayDropdown.contains(e.target as Node) &&
 				!introPlayBtn.contains(e.target as Node)
 			) {
-				playDropdown.style.display = 'none';
+				iplayDropdown.style.display = 'none';
 			}
 		});
 	}
@@ -642,7 +652,7 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
 		introQuickplay.addEventListener('click', () => {
 			console.log('⚡ Intro quickplay clicked');
 			onNavigate('/quick-play');
-			playDropdown!.style.display = 'none';
+			iplayDropdown!.style.display = 'none';
 		});
 	}
 
@@ -651,7 +661,7 @@ function setupIntroEventListeners(onNavigate: (route: string) => void): void {
 		quickTournamentBtn.addEventListener('click', () => {
 			console.log('🏆 Quick tournament clicked');
 			onNavigate('/quick-tournament');
-			playDropdown!.style.display = 'none';
+			iplayDropdown!.style.display = 'none';
 		});
 	}
 

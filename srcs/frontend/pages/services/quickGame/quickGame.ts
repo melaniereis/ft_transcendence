@@ -72,6 +72,7 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			width: 100%;
 			max-width: 600px;
 			margin: 0 auto;
+			margin-top: 8vh;
 			}
 
 			.inner-container {
@@ -185,6 +186,46 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			input[type="checkbox"]:checked + .toggle-switch::before {
 			transform: translateX(25px);
 			}
+			@media (max-width: 768px) {
+			.form-container {
+				padding: 16px;
+				margin-top: 6vh;
+			}
+
+			.title {
+				font-size: 2.2rem;
+			}
+
+			.input-field {
+				padding: 14px;
+				font-size: 1rem;
+			}
+
+			.start-game-btn {
+				font-size: 1.2rem;
+				width: 100%;
+			}
+			}
+
+			@media (max-width: 480px) {
+			.title {
+				font-size: 1.8rem;
+			}
+
+			.form-label {
+				font-size: 1.1rem;
+			}
+
+			.input-field {
+				font-size: 0.95rem;
+			}
+
+			.start-game-btn {
+				font-size: 1rem;
+				padding: 14px;
+			}
+			}
+
 		</style>
 		`;
 
