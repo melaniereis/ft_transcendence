@@ -212,7 +212,6 @@ function createTeamStatsCard(team: { key: string; displayName: string; img: stri
 	const card = document.createElement('div');
 	card.className = 'team-card flex flex-col items-center justify-center overflow-hidden';
 
-	// Team image
 	card.innerHTML = `
         <div class="flex justify-center mb-6 relative z-10">
             <img src="${team.img}" alt="${team.displayName}" class="team-img" />
@@ -224,46 +223,46 @@ function createTeamStatsCard(team: { key: string; displayName: string; img: stri
 
 	if (!members || members.length === 0) {
 		content.innerHTML = `<p>${t.noMembersFound} ${formatTeamName(team.key)}</p>`;
-	} 
-	else {
+	} else {
 		const avgWinRate = members.reduce((sum: number, m: any) => sum + (m.win_rate ?? 0), 0) / members.length;
+
+		// Build list of all members with stats
+		const memberStatsHtml = members.map((member: any) => `
+			<li>
+				<strong class="block mb-1" style="color:#818cf8;">${member.members}</strong>
+				<div>${t.wins}: ${member.victories}</div>
+				<div>${t.losses}: ${member.defeats}</div>
+				<div>${t.tournamentsWon}: ${member.tournaments_won}</div>
+				<div>${t.winRate}: ${(member.win_rate ?? 0).toFixed(2)}%</div>
+			</li>
+		`).join('');
+
 		content.innerHTML = `
-            <p class="italic mb-2">${t.averageWinRate}: <span class="font-semibold">${avgWinRate.toFixed(2)}%</span></p>
-			<ul class="team-list">
-				${(() => {
-					const member = members[0];
-					return `
-						<li>
-							<strong class="block mb-1" style="color:#818cf8;">${member.members}</strong>
-							<div>${t.wins}: ${member.victories}</div>
-							<div>${t.losses}: ${member.defeats}</div>
-							<div>${t.tournamentsWon}: ${member.tournaments_won}</div>
-							<div>${t.winRate}: ${(member.win_rate ?? 0).toFixed(2)}%</div>
-						</li>
-					`;
-				})()}
-			</ul>
-        `;
+			<p class="italic mb-2">${t.averageWinRate}: <span class="font-semibold">${avgWinRate.toFixed(2)}%</span></p>
+			<ul class="team-list">${memberStatsHtml}</ul>
+		`;
 	}
 
 	card.appendChild(content);
 	return card;
 }
 
-// 🧠 Helper: Format team name
 function formatTeamName(name: string): string {
 	return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// 🌐 Fetch team stats
 async function fetchTeamStats(teamKey: string) {
 	try {
 		const response = await fetch(`/api/teams/${teamKey}`);
-		if (!response.ok) throw new Error(t.failedToLoadTeamStats);
+		if (!response.ok) 
+			throw new Error(t.failedToLoadTeamStats);
 		const members = await response.json();
+		console.log(`Fetched members for ${teamKey}:`, members);
 		members.sort((a: any, b: any) => b.win_rate - a.win_rate);
 		return members;
-	} catch (err) {
+	} 
+	catch (err) {
+		console.error(`Error loading team stats for ${teamKey}:`, err);
 		return null;
 	}
 }

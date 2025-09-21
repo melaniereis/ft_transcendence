@@ -31,47 +31,38 @@ export async function syncUserStatsToTeam(userId: number): Promise<void> {
 		}
 
 		const teamUsers = await getAllUsersFromTeam(user.team);
-		if (!teamUsers.length)
+		if (!teamUsers.length) {
+			console.warn(`⚠️ No users found for team ${user.team}`);
 			return;
-
-		let totalVictories = 0;
-		let totalTournamentsWon = 0;
-		let totalDefeats = 0;
-		let totalGames = 0;
+		}
 
 		for (const teammate of teamUsers) {
 			const stats = await getUserStatsById(teammate.id);
-			if (!stats) 
+			if (!stats) {
+				console.warn(`⚠️ No stats found for user ${teammate.username}`);
 				continue;
+			}
 
-			totalVictories += stats.matches_won;
-			totalTournamentsWon += stats.tournaments_won;
-			totalDefeats += stats.matches_lost;
-			totalGames += stats.matches_played; 
+			const winRate = stats.matches_played > 0
+				? Math.round((stats.matches_won / stats.matches_played) * 100)
+				: 0;
+
+			// 👇 This should insert or update based on username or id
+			await upsertTeamMember(teamTable, {
+				username: teammate.username,
+				victories: stats.matches_won,
+				defeats: stats.matches_lost,
+				tournaments_won: stats.tournaments_won,
+				win_rate: winRate
+			});
 		}
 
-		const winRate = totalGames > 0 ? Math.round((totalVictories / totalGames) * 100) : 0;
-
-		const memberNames = teamUsers.map(u => u.username).join(', ');
-
-		const teamRows = await getAllTeamMembers(teamTable);
-		if (!teamRows.length) {
-			console.warn(`⚠️ No rows found in table ${teamTable}`);
-			return;
-		}
-
-		const teamRow = teamRows[0];
-
-		await updateTeamMember(teamTable,teamRow.id,memberNames,
-		totalVictories, totalTournamentsWon,totalDefeats,winRate
-		);
-
-		console.log(`✅ Team '${user.team}' updated successfully`);
-	}
-	catch (err) {
+		console.log(`✅ Team '${user.team}' updated with individual stats`);
+	} catch (err) {
 		console.error(`❌ Failed to sync team stats for user ${userId}:`, err);
 	}
 }
+
 
 function runAsync(query: string, params: any[] = []): Promise<void> {
 	return new Promise((resolve, reject) => {
@@ -175,4 +166,35 @@ export async function getTeamMembersString(team: string): Promise<string | null>
 	const query = `SELECT members FROM ${table} LIMIT 1`;
 	const row = await getAsync<{ members: string }>(query);
 	return row ? row.members : null;
+}
+async function upsertTeamMember(table: string,
+data: {
+	username: string;
+	victories: number;
+	defeats: number;
+	tournaments_won: number;
+	win_rate: number;
+}
+): Promise<void> {
+	// Check if user already exists in team table
+	const existing = await getAsync<TeamStats>(`SELECT * FROM ${table} WHERE members = ?`, [data.username]);
+
+	if (existing) {
+		// Update
+		await runAsync(
+			`UPDATE ${table} 
+			SET victories = ?, defeats = ?, tournaments_won = ?, win_rate = ? 
+			WHERE members = ?`,
+			[data.victories, data.defeats, data.tournaments_won, data.win_rate, data.username]
+		);
+	} 
+	else {
+		// Insert
+		await runAsync(
+			`INSERT INTO ${table} 
+			(members, victories, defeats, tournaments_won, win_rate) 
+			VALUES (?, ?, ?, ?, ?)`,
+			[data.username, data.victories, data.defeats, data.tournaments_won, data.win_rate]
+		);
+	}
 }
