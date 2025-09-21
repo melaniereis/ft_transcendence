@@ -37,9 +37,9 @@ const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonE
 const quickTournamentBtn = document.getElementById('quick-tournament-btn') as HTMLButtonElement | null;
 
 // Route navigation
-export function navigateTo(path: string): void {
+export async function navigateTo(path: string): Promise<void> {
 	history.pushState({}, '', path);
-	renderRoute(path);
+	await renderRoute(path);
 }
 
 window.onpopstate = () => {
@@ -68,7 +68,7 @@ function preloadAudio(url: string): Promise<void> {
 async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
 	const token = localStorage.getItem('authToken');
 	const isLoggedIn = !!token;
-	if (!isLoggedIn && loaderWindow) 
+	if (!isLoggedIn && loaderWindow)
 		loaderWindow.style.display = 'flex';
 	await Promise.all([
 		preloadImages([
@@ -90,7 +90,14 @@ async function showLoaderAndRenderIntro(appDiv: HTMLElement) {
 	}, 250);
 }
 
-function renderRoute(path: string): void {
+export async function renderRoute(path: string): Promise<void> {
+	// Always cleanup game events before switching pages
+	try {
+		const { cleanupGameEvents } = await import('./services/renderGame/events.js');
+		cleanupGameEvents();
+	} catch (e) {
+		// ignore if not available
+	}
 	appDiv.innerHTML = '';
 	appDiv.classList.add('fade-out');
 	setTimeout(() => {
@@ -110,7 +117,7 @@ function renderRoute(path: string): void {
 				appDiv.innerHTML = `
 					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
 						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
-						
+
 						<div style="height: 400px;"></div>
 
 						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
@@ -164,14 +171,14 @@ function renderRoute(path: string): void {
 				appDiv.innerHTML = `
 					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
 						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
-						
+
 						<div style="height: 400px;"></div>
 
 						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
 					</div>
 					`;
 		}
-		
+
 		// Re-initialize play button after each page navigation
 		setTimeout(() => {
 			const token = localStorage.getItem('authToken');
@@ -218,7 +225,7 @@ export function updateUIBasedOnAuth(): void {
 	if (topBar) {
 		topBar.style.display = isLoggedIn ? 'flex' : 'none';
 	}
-	
+
 	friendRequestsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 	playBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
 	settingsBtn.style.display = isLoggedIn ? 'inline-block' : 'none';
@@ -235,7 +242,7 @@ export function updateUIBasedOnAuth(): void {
 	if (isLoggedIn) {
 		updateFriendRequestsBadge();
 		setOnlineOnLoad();
-		
+
 		// Re-setup play button after login to ensure it works
 		setTimeout(() => {
 			setupPlayButton();
@@ -280,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			} else {
 				localStorage.removeItem('authToken');
 			}
-		} 
+		}
 		catch (error) {
 			console.error('Error verifying token on page load:', error);
 			localStorage.removeItem('authToken');
@@ -291,12 +298,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	if (document.readyState === 'complete') {
 		if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
-			renderRoute(window.location.pathname);
-	} 
+		renderRoute(window.location.pathname);
+	}
 	else {
 		window.addEventListener('load', () => {
 			if (isLoggedIn && loaderWindow) loaderWindow.style.display = 'none';
-				renderRoute(window.location.pathname);
+			renderRoute(window.location.pathname);
 		});
 	}
 });
@@ -323,27 +330,27 @@ languageOptions.querySelectorAll('button[data-lang]').forEach(btn => {
 	btn.addEventListener('click', () => {
 		const selectedLang = btn.getAttribute('data-lang');
 		if (selectedLang) {
-		localStorage.setItem('preferredLanguage', selectedLang);
-		languageOptions.classList.add('hidden');  
-		applyLanguage(selectedLang);
-		location.reload();
+			localStorage.setItem('preferredLanguage', selectedLang);
+			languageOptions.classList.add('hidden');
+			applyLanguage(selectedLang);
+			location.reload();
 		}
 	});
 });
 
 playOptions.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    if (!target) return;
+	const target = e.target as HTMLElement;
+	if (!target) return;
 
-    const route = playOptionsMap[target.id];
-    if (route) {
-        // Hide the dropdown and clear any inline styles
-        playOptions.classList.add('hidden');
-        playOptions.style.display = '';
-        playOptions.style.visibility = '';
-        playOptions.style.opacity = '';
-        navigateTo(route);
-    }
+	const route = playOptionsMap[target.id];
+	if (route) {
+		// Hide the dropdown and clear any inline styles
+		playOptions.classList.add('hidden');
+		playOptions.style.display = '';
+		playOptions.style.visibility = '';
+		playOptions.style.opacity = '';
+		navigateTo(route);
+	}
 });
 
 if (settingsBtn) {
@@ -423,33 +430,33 @@ let playButtonClickHandler: ((e: Event) => void) | null = null;
 function setupPlayButton() {
 	const playBtnElement = document.getElementById('play-btn') as HTMLButtonElement;
 	const playOptionsElement = document.getElementById('play-options') as HTMLDivElement;
-	
+
 	if (playBtnElement && playOptionsElement) {
 		// Clear any inline styles that might interfere
 		playOptionsElement.style.display = '';
 		playOptionsElement.style.visibility = '';
 		playOptionsElement.style.opacity = '';
-		
+
 		// Remove existing event listener if it exists
 		if (playButtonClickHandler) {
 			playBtnElement.removeEventListener('click', playButtonClickHandler);
 		}
-		
+
 		// Create new event handler
 		playButtonClickHandler = (e: Event) => {
 			e.preventDefault();
 			e.stopPropagation();
-			
+
 			if (playOptionsElement.classList.contains('hidden')) {
 				playOptionsElement.classList.remove('hidden');
 			} else {
 				playOptionsElement.classList.add('hidden');
 			}
 		};
-		
+
 		// Add the new event listener
 		playBtnElement.addEventListener('click', playButtonClickHandler);
-		
+
 		console.log('Play button setup completed');
 		return true;
 	} else {
@@ -471,7 +478,7 @@ document.addEventListener('click', (event) => {
 	// Use fresh DOM queries for language dropdown
 	const currentLanguageOptions = document.getElementById('language-options') as HTMLDivElement;
 	const currentLanguageBtn = document.getElementById('language-btn') as HTMLButtonElement;
-	
+
 	if (currentLanguageOptions && currentLanguageBtn && !currentLanguageOptions.contains(target) && !currentLanguageBtn.contains(target)) {
 		if (!currentLanguageOptions.classList.contains('hidden'))
 			currentLanguageOptions.classList.add('hidden');
@@ -480,7 +487,7 @@ document.addEventListener('click', (event) => {
 	// Use fresh DOM queries for play dropdown
 	const currentPlayOptions = document.getElementById('play-options') as HTMLDivElement;
 	const currentPlayBtn = document.getElementById('play-btn') as HTMLButtonElement;
-	
+
 	if (currentPlayOptions && currentPlayBtn && target !== currentPlayBtn && !currentPlayOptions.contains(target)) {
 		if (!currentPlayOptions.classList.contains('hidden')) {
 			currentPlayOptions.classList.add('hidden');
@@ -519,7 +526,7 @@ export async function updateFriendRequestsBadge(): Promise<void> {
 
 async function setOnlineOnLoad(): Promise<void> {
 	const token = localStorage.getItem('authToken');
-	if (!token) 
+	if (!token)
 		return;
 	await updateOnlineStatus(true);
 }
@@ -536,7 +543,7 @@ async function updateOnlineStatus(isOnline: boolean): Promise<void> {
 			},
 			body: JSON.stringify({ online: isOnline })
 		});
-	} 
+	}
 	catch (error) {
 		console.error('Failed to update online status:', error);
 	}
@@ -546,10 +553,10 @@ export function applyLanguage(lang: string): void {
 	const playOptionPlay = document.getElementById('play-play');
 	const playOptionTournament = document.getElementById('play-tournament');
 	const playOptionMatchmaking = document.getElementById('play-matchmaking');
-	if (playOptionPlay) 
+	if (playOptionPlay)
 		playOptionPlay.textContent = `${t.play}`;
-	if (playOptionTournament) 
+	if (playOptionTournament)
 		playOptionTournament.textContent = `${t.tournaments}`;
-	if (playOptionMatchmaking) 
+	if (playOptionMatchmaking)
 		playOptionMatchmaking.textContent = `${t.matchmaking}`;
 }
