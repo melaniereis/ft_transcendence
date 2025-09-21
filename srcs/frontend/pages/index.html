@@ -148,23 +148,87 @@
 			}
 
 			#mobile-menu-btn {
-				display: block; /* Temporarily visible for testing */
+				display: block;
 				position: fixed;
-				top: 1rem;
-				right: 1rem;
+				top: max(1rem, env(safe-area-inset-top, 0px) + 0.5rem);
+				right: max(1rem, env(safe-area-inset-right, 0px) + 0.5rem);
 				z-index: 1001;
 				background: rgba(44, 34, 84, 0.8);
 				color: #e8d5ff;
 				border: none;
-				border-radius: 8px;
-				padding: 0.75rem;
+				border-radius: 12px;
+				padding: 1rem;
 				cursor: pointer;
 				backdrop-filter: blur(8px);
+				transition: all 0.25s ease;
+				box-shadow: 0 4px 12px rgba(44, 34, 84, 0.25);
+				min-width: 44px;
+				min-height: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#mobile-menu-btn:hover {
+				background: rgba(44, 34, 84, 0.9);
+				transform: scale(1.05);
+				box-shadow: 0 6px 16px rgba(44, 34, 84, 0.35);
+			}
+
+			#mobile-menu-btn:active {
+				transform: scale(0.95);
+			}
+
+			@media (max-width: 480px) {
+				#mobile-menu-btn {
+					top: max(0.75rem, env(safe-area-inset-top, 0px) + 0.25rem);
+					right: max(0.75rem, env(safe-area-inset-right, 0px) + 0.25rem);
+					padding: 0.875rem;
+					border-radius: 10px;
+				}
+			}
+
+			@media (max-width: 360px) {
+				#mobile-menu-btn {
+					top: max(0.5rem, env(safe-area-inset-top, 0px) + 0.125rem);
+					right: max(0.5rem, env(safe-area-inset-right, 0px) + 0.125rem);
+					padding: 0.75rem;
+					border-radius: 8px;
+					min-width: 40px;
+					min-height: 40px;
+				}
+			}
+
+			@media (max-width: 320px) {
+				#mobile-menu-btn {
+					top: max(0.375rem, env(safe-area-inset-top, 0px));
+					right: max(0.375rem, env(safe-area-inset-right, 0px));
+					padding: 0.625rem;
+					border-radius: 6px;
+					min-width: 36px;
+					min-height: 36px;
+				}
+			}
+
+			@media (max-width: 280px) {
+				#mobile-menu-btn {
+					top: max(0.25rem, env(safe-area-inset-top, 0px));
+					right: max(0.25rem, env(safe-area-inset-right, 0px));
+					padding: 0.5rem;
+					border-radius: 4px;
+					min-width: 32px;
+					min-height: 32px;
+				}
+
+				#mobile-menu-btn svg {
+					width: 16px;
+					height: 16px;
+				}
 			}
 
 			@media (min-width: 601px) {
 				#mobile-menu-btn {
-					display: none; /* Hide on desktop */
+					display: none !important;
 				}
 			}
 		</style>

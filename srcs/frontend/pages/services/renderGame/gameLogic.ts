@@ -57,11 +57,37 @@ export function updateBall(
 	// Move the ball using time-based calculation
 	ball.x += moveX;
 	ball.y += moveY;
-	// Bounce off top/bottom walls
-	if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
-		ball.dy = -ball.dy;
-		if (ball.speed < MAX_SPEED) {
-			ball.speed += SPEED_INCREMENT;
+	
+	// Continuous collision detection for top/bottom walls (same logic as paddles)
+	if (ball.dy < 0) { // Ball moving up
+		// Check if ball crossed the top wall this frame
+		if (prevY - ball.radius > 0 && ball.y - ball.radius <= 0) {
+			// Calculate where the ball would be when it hits the top wall
+			const timeToCollision = (prevY - ball.radius) / Math.abs(moveY);
+			const collisionX = prevX + moveX * timeToCollision;
+			
+			ball.dy = -ball.dy;
+			ball.y = ball.radius; // Position ball correctly at top wall
+			ball.x = collisionX; // Use collision X position
+			
+			if (ball.speed < MAX_SPEED) {
+				ball.speed += SPEED_INCREMENT;
+			}
+		}
+	} else if (ball.dy > 0) { // Ball moving down
+		// Check if ball crossed the bottom wall this frame
+		if (prevY + ball.radius < canvas.height && ball.y + ball.radius >= canvas.height) {
+			// Calculate where the ball would be when it hits the bottom wall
+			const timeToCollision = (canvas.height - prevY - ball.radius) / Math.abs(moveY);
+			const collisionX = prevX + moveX * timeToCollision;
+			
+			ball.dy = -ball.dy;
+			ball.y = canvas.height - ball.radius; // Position ball correctly at bottom wall
+			ball.x = collisionX; // Use collision X position
+			
+			if (ball.speed < MAX_SPEED) {
+				ball.speed += SPEED_INCREMENT;
+			}
 		}
 	}
 
