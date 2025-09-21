@@ -77,11 +77,11 @@ function handlePaddleCollisions(r: GameRoom) {
 // Check if the ball is out of bounds and update scores
 function checkScoring(r: GameRoom) {
 	if (r.ballX + ballRadius < 0) {
-		// Right player scores
+		// Ball went off left side - Right player scores (left player missed)
 		r.rightScore++;
 		handleScoreUpdate(r);
 	} else if (r.ballX - ballRadius > canvasWidth) {
-		// Left player scores
+		// Ball went off right side - Left player scores (right player missed)
 		r.leftScore++;
 		handleScoreUpdate(r);
 	}
