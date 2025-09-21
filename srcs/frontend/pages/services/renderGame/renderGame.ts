@@ -105,7 +105,7 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 				state.ball.dx *= scaleX;
 				state.ball.dy *= scaleY;
 				cleanupControls();
-				setupControls(state.player1, state.player2, 6, isAI);
+				setupControls(state.player1, state.player2, 400, isAI);
 			}
 			ctx.clearRect(0, 0, newWidth, newHeight);
 			resizeTimeout = null;
