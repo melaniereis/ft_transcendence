@@ -30,11 +30,10 @@ export async function syncUserStatsToTeam(userId: number): Promise<void> {
 			return;
 		}
 
-		// Get all users in the same team
 		const teamUsers = await getAllUsersFromTeam(user.team);
-		if (!teamUsers.length) return;
+		if (!teamUsers.length)
+			return;
 
-		// Aggregate stats
 		let totalVictories = 0;
 		let totalTournamentsWon = 0;
 		let totalDefeats = 0;
@@ -53,17 +52,15 @@ export async function syncUserStatsToTeam(userId: number): Promise<void> {
 
 		const winRate = totalGames > 0 ? Math.round((totalVictories / totalGames) * 100) : 0;
 
-		// Compose member string
 		const memberNames = teamUsers.map(u => u.username).join(', ');
 
-		// Always use the first (and only) row in team table
 		const teamRows = await getAllTeamMembers(teamTable);
 		if (!teamRows.length) {
 			console.warn(`⚠️ No rows found in table ${teamTable}`);
 			return;
 		}
 
-		const teamRow = teamRows[0]; // Assuming one row per team
+		const teamRow = teamRows[0];
 
 		await updateTeamMember(teamTable,teamRow.id,memberNames,
 		totalVictories, totalTournamentsWon,totalDefeats,winRate
@@ -143,7 +140,6 @@ export function deleteTeamMember(table: string, id: number): Promise<void> {
 	return runAsync(query, [id]);
 }
 
-// Updated addMemberToTeam to normalize team string to table name internally
 export async function addMemberToTeam(team: string, newMember: string): Promise<void> {
 	const table = mapTeamToTable(team);
 	if (!table) {

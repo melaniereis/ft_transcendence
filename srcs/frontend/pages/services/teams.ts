@@ -224,21 +224,25 @@ function createTeamStatsCard(team: { key: string; displayName: string; img: stri
 
 	if (!members || members.length === 0) {
 		content.innerHTML = `<p>${t.noMembersFound} ${formatTeamName(team.key)}</p>`;
-	} else {
+	} 
+	else {
 		const avgWinRate = members.reduce((sum: number, m: any) => sum + (m.win_rate ?? 0), 0) / members.length;
 		content.innerHTML = `
             <p class="italic mb-2">${t.averageWinRate}: <span class="font-semibold">${avgWinRate.toFixed(2)}%</span></p>
-            <ul class="team-list">
-                ${members.map((member: any) => `
-                    <li>
-                        <strong class="block mb-1" style="color:#818cf8;">${member.members}</strong>
-                        <div>${t.wins}: ${member.victories}</div>
-                        <div>${t.losses}: ${member.defeats}</div>
-                        <div>${t.tournamentsWon}: ${member.tournaments_won}</div>
-                        <div>${t.winRate}: ${(member.win_rate ?? 0).toFixed(2)}%</div>
-                    </li>
-                `).join('')}
-            </ul>
+			<ul class="team-list">
+				${(() => {
+					const member = members[0];
+					return `
+						<li>
+							<strong class="block mb-1" style="color:#818cf8;">${member.members}</strong>
+							<div>${t.wins}: ${member.victories}</div>
+							<div>${t.losses}: ${member.defeats}</div>
+							<div>${t.tournamentsWon}: ${member.tournaments_won}</div>
+							<div>${t.winRate}: ${(member.win_rate ?? 0).toFixed(2)}%</div>
+						</li>
+					`;
+				})()}
+			</ul>
         `;
 	}
 
