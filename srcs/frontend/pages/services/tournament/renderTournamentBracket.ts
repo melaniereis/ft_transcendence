@@ -7,8 +7,8 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export function renderTournamentBracket(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
-players: { id: number; name: string }[], winners: { semifinal1?: number; semifinal2?: number; final?: number },
-onNext?: () => void) {
+	players: { id: number; name: string }[], winners: { semifinal1?: number; semifinal2?: number; final?: number },
+	onNext?: () => void) {
 	if (!ctx || players.length !== 4) return;
 
 	// Modern GRIS-inspired bracket background
@@ -30,7 +30,9 @@ onNext?: () => void) {
 	const roundGap = w * 0.28;
 	const semiGap = h * 0.19;
 
-	ctx.font = `bold ${Math.max(16, Math.round(h * 0.07))}px "Poppins", sans-serif`;
+	// Responsive font size for mobile: smaller minimum, scales with height
+	const baseFontSize = Math.max(12, Math.round(h * 0.045));
+	ctx.font = `bold ${baseFontSize}px "Poppins", sans-serif`;
 	ctx.textAlign = 'center';
 	ctx.textBaseline = 'middle';
 	ctx.lineWidth = Math.max(2, w * 0.008);
@@ -67,8 +69,18 @@ onNext?: () => void) {
 			ctx.stroke();
 			ctx.shadowBlur = 0;
 			ctx.fillStyle = GRIS_COLORS.primary;
-			ctx.font = 'bold 22px "Poppins", sans-serif';
-			ctx.fillText(player.name, pos.x + slotW / 2, pos.y);
+			let displayName = player.name;
+			if (displayName.length > 16) {
+				displayName = displayName.slice(0, 13) + '...';
+			}
+			let fontSize = baseFontSize;
+			ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+			// Reduce font size until text fits in slot
+			while (ctx.measureText(displayName).width > slotW * 0.95 && fontSize > 10) {
+				fontSize--;
+				ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+			}
+			ctx.fillText(displayName, pos.x + slotW / 2, pos.y);
 			ctx.restore();
 		}
 	});
@@ -112,7 +124,10 @@ onNext?: () => void) {
 
 	// Draw semifinal winners with gold highlight and large slot
 	if (winners.semifinal1) {
-		const winnerName = players.find(p => p.id === winners.semifinal1)?.name || 'Winner';
+		let winnerName = players.find(p => p.id === winners.semifinal1)?.name || 'Winner';
+		if (winnerName.length > 16) {
+			winnerName = winnerName.slice(0, 13) + '...';
+		}
 		const pos = positions.semi1;
 		ctx.save();
 		ctx.shadowColor = GRIS_COLORS.acceptanceGold;
@@ -131,12 +146,20 @@ onNext?: () => void) {
 		ctx.stroke();
 		ctx.shadowBlur = 0;
 		ctx.fillStyle = GRIS_COLORS.acceptanceGold;
-		ctx.font = 'bold 22px "Poppins", sans-serif';
+		let fontSize = baseFontSize;
+		ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+		while (ctx.measureText(winnerName).width > slotW * 0.95 && fontSize > 10) {
+			fontSize--;
+			ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+		}
 		ctx.fillText(winnerName, pos.x + slotW / 2, pos.y);
 		ctx.restore();
 	}
 	if (winners.semifinal2) {
-		const winnerName = players.find(p => p.id === winners.semifinal2)?.name || 'Winner';
+		let winnerName = players.find(p => p.id === winners.semifinal2)?.name || 'Winner';
+		if (winnerName.length > 16) {
+			winnerName = winnerName.slice(0, 13) + '...';
+		}
 		const pos = positions.semi2;
 		ctx.save();
 		ctx.shadowColor = GRIS_COLORS.acceptanceGold;
@@ -155,7 +178,12 @@ onNext?: () => void) {
 		ctx.stroke();
 		ctx.shadowBlur = 0;
 		ctx.fillStyle = GRIS_COLORS.acceptanceGold;
-		ctx.font = 'bold 22px "Poppins", sans-serif';
+		let fontSize = baseFontSize;
+		ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+		while (ctx.measureText(winnerName).width > slotW * 0.95 && fontSize > 10) {
+			fontSize--;
+			ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+		}
 		ctx.fillText(winnerName, pos.x + slotW / 2, pos.y);
 		ctx.restore();
 	}
@@ -182,7 +210,10 @@ onNext?: () => void) {
 
 	// Draw final winner with trophy and gold highlight
 	if (winners.final) {
-		const winnerName = players.find(p => p.id === winners.final)?.name || 'Champion';
+		let winnerName = players.find(p => p.id === winners.final)?.name || 'Champion';
+		if (winnerName.length > 16) {
+			winnerName = winnerName.slice(0, 13) + '...';
+		}
 		const pos = positions.final;
 		ctx.save();
 		ctx.shadowColor = GRIS_COLORS.acceptanceGold;
@@ -201,8 +232,14 @@ onNext?: () => void) {
 		ctx.stroke();
 		ctx.shadowBlur = 0;
 		ctx.fillStyle = GRIS_COLORS.acceptanceGold;
-		ctx.font = 'bold 26px "Poppins", sans-serif';
-		ctx.fillText(`🏆 ${winnerName}`, pos.x + (slotW + 20) / 2, pos.y);
+		let finalText = `🏆 ${winnerName}`;
+		let fontSize = Math.max(baseFontSize, Math.round(baseFontSize * 1.2));
+		ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+		while (ctx.measureText(finalText).width > (slotW + 20) * 0.95 && fontSize > 10) {
+			fontSize--;
+			ctx.font = `bold ${fontSize}px "Poppins", sans-serif`;
+		}
+		ctx.fillText(finalText, pos.x + (slotW + 20) / 2, pos.y);
 		ctx.restore();
 	}
 

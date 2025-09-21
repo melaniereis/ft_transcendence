@@ -126,11 +126,12 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 	if (!ctx)
 		return;
 
+	const truncateName = (name: string) => name.length > 16 ? name.slice(0, 13) + '...' : name;
 	const players = [
-		{ id: player1_id, name: await getUserName(player1_id) },
-		{ id: player2_id, name: await getUserName(player2_id) },
-		{ id: player3_id, name: await getUserName(player3_id) },
-		{ id: player4_id, name: await getUserName(player4_id) }
+		{ id: player1_id, name: truncateName(await getUserName(player1_id)) },
+		{ id: player2_id, name: truncateName(await getUserName(player2_id)) },
+		{ id: player3_id, name: truncateName(await getUserName(player3_id)) },
+		{ id: player4_id, name: truncateName(await getUserName(player4_id)) }
 	];
 
 	const winners: { semifinal1?: number; semifinal2?: number; final?: number } = {};
@@ -171,10 +172,10 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 			modal.style.zIndex = '9999';
 			modal.innerHTML = `
 			<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
-				<span style="color:#333333; font-weight: bold;">${playerA}</span> 
-				<span style="color:#333333; font-weight: bold;"> 
+				<span style="color:#333333; font-weight: bold;">${playerA}</span>
+				<span style="color:#333333; font-weight: bold;">
 					<span style="color:#b6a6ca; font-weight: bold;">vs</span>
-				</span> 
+				</span>
 				<span style="color:#333333; font-weight: bold;">${playerB}</span>
 				</h2>
 				<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">

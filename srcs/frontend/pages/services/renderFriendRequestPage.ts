@@ -40,6 +40,10 @@ const TEAM_LOGOS = {
 };
 
 // SVG ICON HELPERS (local, for requests page)
+// Helper to truncate names
+function truncateName(name: string, maxLen: number = 16): string {
+	return name && name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
+}
 function svgInboxIcon() {
 	return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b6a6ca" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>`;
 }
@@ -298,18 +302,18 @@ async function loadPendingRequests(token: string) {
 						${pendingRequests.map((request: any, i: number) => `
 							<div class="pending-request" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-radius: 2.2rem; background: linear-gradient(90deg, #e3e7f1 0%, #f8fafc 100%); box-shadow: 0 4px 24px 0 rgba(44,34,84,0.10); opacity:0; animation: fadeInCard 0.7s ${0.2 + i * 0.12}s cubic-bezier(.6,.2,.3,1) forwards;">
 								<div style="display:flex;flex-direction:column;gap:2px;">
-									<strong style="font-size:1.18rem;color:#2c2254;font-family:'Inter','EB Garamond',serif;font-weight:700;">${request.display_name || request.name}</strong>
-									<span style="font-size:0.98rem;color:#b6a6ca;">@${request.username}</span>
+									<strong style="font-size:1.18rem;color:#2c2254;font-family:'Inter','EB Garamond',serif;font-weight:700;">${truncateName(request.display_name || request.name)}</strong>
+									<span style="font-size:0.98rem;color:#b6a6ca;">@${truncateName(request.username)}</span>
 									<span style="font-size:0.92rem;color:#b6a6ca;">${t.team}: ${request.team}</span>
 									<span style="font-size:0.92rem;color:#b6a6ca;">${t.sent}: ${new Date(request.created_at).toLocaleDateString()}</span>
 								</div>
 								<div style="display: flex; gap: 10px;">
-									<button class="accept-btn" data-friend-id="${request.user_id}" data-friend-name="${request.display_name || request.name}"
+									<button class="accept-btn" data-friend-id="${request.user_id}" data-friend-name="${truncateName(request.display_name || request.name)}"
 										style="background:linear-gradient(90deg,#a5b4fc 0%,#f8fafc 100%);border:2px solid #2c2254;color:#2c2254;font-weight:700;padding:1.4rem;border-radius:1.4rem;font-size:1.18rem;box-shadow:0 8px 32px rgba(44,34,84,0.14);transition:background 0.2s,color 0.2s,box-shadow 0.2s;cursor:pointer;display:flex;align-items:center;gap:6px;"
 										title="${t.acceptFriendRequest}">
 										${svgAcceptIcon()} <span>${t.accept}</span>
 									</button>
-									<button class="reject-btn" data-friend-id="${request.user_id}" data-friend-name="${request.display_name || request.name}"
+									<button class="reject-btn" data-friend-id="${request.user_id}" data-friend-name="${truncateName(request.display_name || request.name)}"
 										style="background:linear-gradient(90deg,#a5b4fc 0%,#f8fafc 100%);border:2px solid #2c2254;color:#2c2254;font-weight:700;padding:1.4rem;border-radius:1.4rem;font-size:1.18rem;box-shadow:0 8px 32px rgba(44,34,84,0.14);transition:background 0.2s,color 0.2s,box-shadow 0.2s;cursor:pointer;display:flex;align-items:center;gap:6px;"
 										title="${t.rejectFriendRequest}">
 										${svgRejectIcon()} <span>${t.reject}</span>

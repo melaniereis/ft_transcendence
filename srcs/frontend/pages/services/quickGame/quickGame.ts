@@ -19,11 +19,11 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			<div class="inner-container">
 			<label class="form-label">
 				<span>${t.username} 1:</span>
-				<input type="text" id="player1-name" placeholder="${t.username} 1" class="input-field" />
+				<input type="text" id="player1-name" placeholder="${t.username} 1" class="input-field" maxlength="16" />
 			</label>
 			<label class="form-label">
 				<span>${t.username} 2:</span>
-				<input type="text" id="player2-name" placeholder="${t.username} 2" class="input-field" />
+				<input type="text" id="player2-name" placeholder="${t.username} 2" class="input-field" maxlength="16" />
 			</label>
 			<label class="form-label">
 				<span>${t.aiOpponentLabel || 'Play vs AI:'}</span>
@@ -234,7 +234,7 @@ export function renderQuickGameSetup(container: HTMLElement) {
 	const aiCheckbox = document.getElementById('ai-opponent') as HTMLInputElement;
 	const player2Input = document.getElementById('player2-name') as HTMLInputElement;
 
-  // event listener for the AI checkbox
+	// event listener for the AI checkbox
 	aiCheckbox.addEventListener('change', () => {
 		player2Input.value = aiCheckbox.checked ? 'AI Bot' : '';
 		player2Input.readOnly = aiCheckbox.checked;
@@ -251,23 +251,20 @@ export function renderQuickGameSetup(container: HTMLElement) {
 			| 'crazy';
 		const isAI = aiCheckbox.checked;
 
-		if (!player1Name)
-		{
+		if (!player1Name) {
 			errorDiv.textContent = t.invalidOpponent || 'Please enter a player 1 name.';
-			return ;
+			return;
 		}
-		if (!isAI && !player2Name)
-		{
+		if (!isAI && !player2Name) {
 			errorDiv.textContent = t.invalidOpponent || 'Please enter a player 2 name or select AI opponent.';
-			return ;
+			return;
 		}
-		if (!isAI && player1Name === player2Name)
-		{
+		if (!isAI && player1Name === player2Name) {
 			errorDiv.textContent = t.invalidOpponent || 'Please enter two different player names.';
-			return ;
+			return;
 		}
 
 		container.innerHTML = '';
-		renderGame(container, player1Name, player2Name, maxGames, difficulty, undefined, 'quick', undefined, undefined , undefined, isAI);
+		renderGame(container, player1Name, player2Name, maxGames, difficulty, undefined, 'quick', undefined, undefined, undefined, isAI);
 	});
 }

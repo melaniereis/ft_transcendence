@@ -6,18 +6,18 @@ import { renderTournamentBracket } from '../tournament/renderTournamentBracket.j
 import { endGame } from '../renderGame/endGame.js';
 import { translations } from '../language/translations.js';
 
-const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
-? localStorage.getItem('preferredLanguage') 
-: 'en') as keyof typeof translations;
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
 const t = translations[lang];
 
 function shuffleArray<T>(array: T[]): T[] {
-const result = [...array];
-for (let i = result.length -1; i > 0; i--) {
-	const j = Math.floor(Math.random() * (i + 1));
-	[result[i], result[j]] = [result[j], result[i]];
-}
-return result;
+	const result = [...array];
+	for (let i = result.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[result[i], result[j]] = [result[j], result[i]];
+	}
+	return result;
 }
 
 export async function startTournament(container: HTMLElement, tournament: any, selectedPlayers: any[], authToken?: string) {
@@ -35,16 +35,16 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 		if (!token) return user.name;
 
 		try {
-		const response = await fetch(`/users/${userId}/display_name`, {
-			method: 'GET',
-			headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-		});
-		const data = response.ok ? await response.json() : null;
-		const nameToUse = data?.display_name || user.name;
-		cachedNames.set(userId, nameToUse);
-		return nameToUse;
+			const response = await fetch(`/users/${userId}/display_name`, {
+				method: 'GET',
+				headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+			});
+			const data = response.ok ? await response.json() : null;
+			const nameToUse = data?.display_name || user.name;
+			cachedNames.set(userId, nameToUse);
+			return nameToUse;
 		} catch {
-		return user.name;
+			return user.name;
 		}
 	}
 
@@ -84,11 +84,12 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 		return;
 	}
 
+	const truncateName = (name: string) => name.length > 16 ? name.slice(0, 13) + '...' : name;
 	const players = [
-		{ id: player1.id, name: await getUserName(player1.id) },
-		{ id: player2.id, name: await getUserName(player2.id) },
-		{ id: player3.id, name: await getUserName(player3.id) },
-		{ id: player4.id, name: await getUserName(player4.id) }
+		{ id: player1.id, name: truncateName(await getUserName(player1.id)) },
+		{ id: player2.id, name: truncateName(await getUserName(player2.id)) },
+		{ id: player3.id, name: truncateName(await getUserName(player3.id)) },
+		{ id: player4.id, name: truncateName(await getUserName(player4.id)) }
 	];
 
 	const winners: { semifinal1?: number; semifinal2?: number; final?: number } = {};
@@ -100,25 +101,25 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 		canvas.width = parentWidth;
 		canvas.height = parentHeight;
 		if (redraw && ctx)
-		renderTournamentBracket(canvas, ctx, players, winners);
+			renderTournamentBracket(canvas, ctx, players, winners);
 	}
 	resizeCanvas(false);
 	window.addEventListener('resize', () => resizeCanvas(true));
 
 	async function showMatchModal(playerA: string, playerB: string) {
 		return new Promise<void>((resolve) => {
-		const modal = document.createElement('div');
-		modal.style.position = 'fixed';
-		modal.style.top = '0';
-		modal.style.left = '0';
-		modal.style.width = '100vw';
-		modal.style.height = '100vh';
-		modal.style.background = 'rgba(182,166,202,0.45)';
-		modal.style.display = 'flex';
-		modal.style.alignItems = 'center';
-		modal.style.justifyContent = 'center';
-		modal.style.zIndex = '9999';
-		modal.innerHTML = `
+			const modal = document.createElement('div');
+			modal.style.position = 'fixed';
+			modal.style.top = '0';
+			modal.style.left = '0';
+			modal.style.width = '100vw';
+			modal.style.height = '100vh';
+			modal.style.background = 'rgba(182,166,202,0.45)';
+			modal.style.display = 'flex';
+			modal.style.alignItems = 'center';
+			modal.style.justifyContent = 'center';
+			modal.style.zIndex = '9999';
+			modal.innerHTML = `
 			<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
 			${playerA} <span style="color:#b6a6ca;">vs</span> ${playerB}
 			</h2>
@@ -126,11 +127,11 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 				${t.startMatchButton}
 			</button>
 			</div>`;
-		document.body.appendChild(modal);
-		modal.querySelector('#start-match-btn')!.addEventListener('click', () => {
-			modal.remove();
-			resolve();
-		});
+			document.body.appendChild(modal);
+			modal.querySelector('#start-match-btn')!.addEventListener('click', () => {
+				modal.remove();
+				resolve();
+			});
 		});
 	}
 
@@ -145,119 +146,119 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 		state.ball = null;
 
 		renderGame(
-		gameWrapper,
-		await getUserName(player1.id),
-		await getUserName(player2.id),
-		maxGames,
-		difficulty,
-		async (gameCanvas, score1, score2) => {
-			await endGame(
-			score1,
-			score2,
-			gameCanvas,
-			async (winnerId) => {
-				if (!winnerId)
-				score1 > score2 ? winnerId = player1.id as number : winnerId = player2.id as number;
-				await updateMatch(id, 'semifinal1', winnerId);
-				winners.semifinal1 = winnerId;
-
-				bracketWrapper.style.display = 'flex';
-				gameWrapper.style.display = 'none';
-
-				// Semifinal 2
-				renderTournamentBracket(canvas, ctx, players, winners, async () => {
-				await showMatchModal(await getUserName(player3.id), await getUserName(player4.id));
-				bracketWrapper.style.display = 'none';
-				gameWrapper.innerHTML = '';
-				gameWrapper.style.display = 'block';
-
-				// const game2 = await fetchGame(player3.id, player4.id);
-				state.player1 = null;
-				state.player2 = null;
-				state.ball = null;
-
-				renderGame(
-					gameWrapper,
-					await getUserName(player3.id),
-					await getUserName(player4.id),
-					maxGames,
-					difficulty,
-					async (gameCanvas2, score3, score4) => {
-					await endGame(
-						score3,
-						score4,
-						gameCanvas2,
-						async (winner2Id) => {
-						if (!winner2Id)
-							score3 > score4 ? winner2Id = player3.id as number : winner2Id = player4.id as number;
-						await updateMatch(id, 'semifinal2', winner2Id);
-						winners.semifinal2 = winner2Id;
+			gameWrapper,
+			await getUserName(player1.id),
+			await getUserName(player2.id),
+			maxGames,
+			difficulty,
+			async (gameCanvas, score1, score2) => {
+				await endGame(
+					score1,
+					score2,
+					gameCanvas,
+					async (winnerId) => {
+						if (!winnerId)
+							score1 > score2 ? winnerId = player1.id as number : winnerId = player2.id as number;
+						await updateMatch(id, 'semifinal1', winnerId);
+						winners.semifinal1 = winnerId;
 
 						bracketWrapper.style.display = 'flex';
 						gameWrapper.style.display = 'none';
 
-						// Final
-						const finalLeftId = winners.semifinal1!;
-						const finalRightId = winners.semifinal2!;
-
+						// Semifinal 2
 						renderTournamentBracket(canvas, ctx, players, winners, async () => {
-							await showMatchModal(await getUserName(finalLeftId), await getUserName(finalRightId));
+							await showMatchModal(await getUserName(player3.id), await getUserName(player4.id));
 							bracketWrapper.style.display = 'none';
 							gameWrapper.innerHTML = '';
 							gameWrapper.style.display = 'block';
 
+							// const game2 = await fetchGame(player3.id, player4.id);
 							state.player1 = null;
 							state.player2 = null;
 							state.ball = null;
 
 							renderGame(
-							gameWrapper,
-							await getUserName(finalLeftId),
-							await getUserName(finalRightId),
-							maxGames,
-							difficulty,
-							async (finalCanvas, scoreF1, scoreF2) => {
-								await endGame(
-								scoreF1,
-								scoreF2,
-								finalCanvas,
-								async (finalWinnerId) =>{
-									if (!finalWinnerId)
-									scoreF1 > scoreF2 ? finalWinnerId = finalLeftId as number : finalWinnerId = finalRightId as number;
-									await updateMatch(id, 'final', finalWinnerId);
-									winners.final = finalWinnerId;
+								gameWrapper,
+								await getUserName(player3.id),
+								await getUserName(player4.id),
+								maxGames,
+								difficulty,
+								async (gameCanvas2, score3, score4) => {
+									await endGame(
+										score3,
+										score4,
+										gameCanvas2,
+										async (winner2Id) => {
+											if (!winner2Id)
+												score3 > score4 ? winner2Id = player3.id as number : winner2Id = player4.id as number;
+											await updateMatch(id, 'semifinal2', winner2Id);
+											winners.semifinal2 = winner2Id;
 
-									bracketWrapper.style.display = 'flex';
-									gameWrapper.style.display = 'none';
+											bracketWrapper.style.display = 'flex';
+											gameWrapper.style.display = 'none';
 
-									renderTournamentBracket(canvas, ctx, players, winners, () => {
-									renderLocalTournamentPage(container as HTMLDivElement);
-									});
+											// Final
+											const finalLeftId = winners.semifinal1!;
+											const finalRightId = winners.semifinal2!;
+
+											renderTournamentBracket(canvas, ctx, players, winners, async () => {
+												await showMatchModal(await getUserName(finalLeftId), await getUserName(finalRightId));
+												bracketWrapper.style.display = 'none';
+												gameWrapper.innerHTML = '';
+												gameWrapper.style.display = 'block';
+
+												state.player1 = null;
+												state.player2 = null;
+												state.ball = null;
+
+												renderGame(
+													gameWrapper,
+													await getUserName(finalLeftId),
+													await getUserName(finalRightId),
+													maxGames,
+													difficulty,
+													async (finalCanvas, scoreF1, scoreF2) => {
+														await endGame(
+															scoreF1,
+															scoreF2,
+															finalCanvas,
+															async (finalWinnerId) => {
+																if (!finalWinnerId)
+																	scoreF1 > scoreF2 ? finalWinnerId = finalLeftId as number : finalWinnerId = finalRightId as number;
+																await updateMatch(id, 'final', finalWinnerId);
+																winners.final = finalWinnerId;
+
+																bracketWrapper.style.display = 'flex';
+																gameWrapper.style.display = 'none';
+
+																renderTournamentBracket(canvas, ctx, players, winners, () => {
+																	renderLocalTournamentPage(container as HTMLDivElement);
+																});
+															},
+															await getUserName(finalLeftId),
+															await getUserName(finalRightId),
+															'tournament',
+														);
+													},
+													'tournament',
+												);
+											});
+										},
+										await getUserName(player3.id),
+										await getUserName(player4.id),
+										'tournament',
+									);
 								},
-								await getUserName(finalLeftId),
-								await getUserName(finalRightId),
 								'tournament',
-								);
-							},
-							'tournament',
 							);
 						});
-						},
-						await getUserName(player3.id),
-						await getUserName(player4.id),
-						'tournament',
-					);
 					},
+					await getUserName(player1.id),
+					await getUserName(player2.id),
 					'tournament',
 				);
-				});
 			},
-			await getUserName(player1.id),
-			await getUserName(player2.id),
 			'tournament',
-			);
-		},
-		'tournament',
 		);
 	});
 }

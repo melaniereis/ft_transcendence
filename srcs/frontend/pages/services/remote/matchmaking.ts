@@ -1,4 +1,8 @@
 // matchmaking.ts
+// Helper to truncate names
+function truncateName(name: string, maxLen: number = 16): string {
+	return name && name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
+}
 import { renderMultiplayerGame } from './renderMultiplayerGame.js';
 import { renderMatchReadyScreen } from './renderMatchReadyScreen.js';
 import { translations } from '../language/translations.js';
@@ -11,6 +15,11 @@ const t = translations[lang];
 
 export function startMatchmaking(appDiv: HTMLDivElement, playerId: number,
 	playerName: string, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): void {
+	// Helper to truncate names
+	function truncateName(name: string, maxLen: number = 16): string {
+		return name && name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
+	}
+	const safePlayerName = truncateName(playerName);
 	const token = localStorage.getItem('authToken');
 	if (!token) {
 		appDiv.innerHTML = `<p style="position:relative;z-index:1;">${t.loginRequired}</p><div style="position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;background:url('/Background3.jpg') center center / cover no-repeat fixed;"></div>`;
@@ -25,8 +34,8 @@ export function startMatchmaking(appDiv: HTMLDivElement, playerId: number,
 
 		socket = new WebSocket(wsUrl);
 
-		socket.onopen = () => handleSocketOpen(playerId, playerName, difficulty);
-		socket.onmessage = (event) => handleSocketMessage(event, appDiv, playerName, difficulty);
+		socket.onopen = () => handleSocketOpen(playerId, safePlayerName, difficulty);
+		socket.onmessage = (event) => handleSocketMessage(event, appDiv, safePlayerName, difficulty);
 		socket.onclose = () => handleSocketClose(appDiv);
 		socket.onerror = (err) => handleSocketError(err, appDiv);
 	}
@@ -75,7 +84,9 @@ function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, player
 			break;
 
 		case 'ready':
-			renderMatchReadyScreen(appDiv, playerName, data.opponent, data.maxGames, () => {
+			// Truncate opponent name for display
+			const safeOpponentName = typeof data.opponent === 'string' ? truncateName(data.opponent) : data.opponent;
+			renderMatchReadyScreen(appDiv, playerName, safeOpponentName, data.maxGames, () => {
 				console.log('Confirm ready clicked');
 				socket!.send(JSON.stringify({ type: 'confirmReady' }));
 			});
@@ -86,11 +97,13 @@ function handleSocketMessage(event: MessageEvent, appDiv: HTMLDivElement, player
 			let opponentAvatarUrl = '/default.png';
 			const token = localStorage.getItem('authToken');
 			const currentUsername = playerName;
+			// Truncate opponent name for display
+			const safeOpponentName = typeof data.opponent === 'string' ? truncateName(data.opponent) : data.opponent;
 			const startGameWithAvatars = (playerAvatar: string, opponentAvatar: string) => {
 				renderMultiplayerGame({
 					container: appDiv,
 					playerName,
-					opponentName: data.opponent,
+					opponentName: safeOpponentName,
 					gameId: data.game_id,
 					maxGames: data.maxGames,
 					difficulty: difficulty as 'easy' | 'normal' | 'hard' | 'crazy',
