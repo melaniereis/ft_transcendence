@@ -189,7 +189,7 @@ export function renderSettingsPage(container: HTMLElement) {
 		}
 
 		try {
-			const response = await fetch('/users/me', {
+			const response = await fetch('/api/profile', {
 				headers: { Authorization: `Bearer ${token}` },
 			});
 			if (!response.ok) throw new Error(t.failedToFetchUser);
@@ -203,7 +203,15 @@ export function renderSettingsPage(container: HTMLElement) {
 				method: 'DELETE',
 				headers: { Authorization: `Bearer ${token}` },
 			});
-			if (!deleteResponse.ok) throw new Error(t.failedToDeleteUser);
+			
+			if (!deleteResponse.ok) {
+				// Check if the response is HTML (404 page) instead of JSON
+				const contentType = deleteResponse.headers.get('content-type');
+				if (contentType && contentType.includes('text/html')) {
+					throw new Error('Delete endpoint not found - contact administrator');
+				}
+				throw new Error(t.failedToDeleteUser);
+			}
 
 			result.innerText = `🗑️ ${t.userDeleted} "${user.username}"`;
 			localStorage.removeItem('authToken');
