@@ -218,21 +218,10 @@ function renderSettingsContent(): string {
 
 function initializeOptimizedEffects() {
 	console.log('🌟 Initializing background effects...');
-	let atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
-	if (!atmosphereCanvas) {
-		setTimeout(initializeOptimizedEffects, 100);
-		console.log('⏳ Waiting for atmosphere canvas...');
-		return;
-	}
-	const atmosphereCtx = atmosphereCanvas.getContext('2d');
-	if (!atmosphereCtx) {
-		setTimeout(initializeOptimizedEffects, 100);
-		console.log('⏳ Waiting for atmosphere canvas context...');
-		return;
-	}
-	atmosphereCanvas.width = window.innerWidth;
-	atmosphereCanvas.height = window.innerHeight;
-
+	// Celestial animation: robust, performant, single loop
+	let animationId: number | null = null;
+	let softParticles: CelestialParticle[] = [];
+	let sharpParticles: CelestialParticle[] = [];
 	const CELESTIAL_COLORS = [
 		'#b6a6ca', '#7fc7d9', '#e6c79c', '#f7b267',
 		'#fffbe6', '#dab883', '#a3d9b1', '#f4f6fa', '#faaca8',
@@ -242,38 +231,37 @@ function initializeOptimizedEffects() {
 		x: number; y: number; vx: number; vy: number; color: string; radius: number;
 		opacity: number; glow: boolean; life: number; maxLife: number;
 		shape: 'circle' | 'star' | 'moon';
-
-		constructor(layer: 'soft' | 'sharp') {
-			this.x = Math.random() * atmosphereCanvas.width;
-			this.y = Math.random() * atmosphereCanvas.height;
-			this.vx = (Math.random() - 0.5) * (layer === 'soft' ? 0.2 : 0.6);
-			this.vy = (Math.random() - 0.5) * (layer === 'soft' ? 0.2 : 0.6);
+		constructor(layer: 'soft' | 'sharp', width: number, height: number) {
+			this.x = Math.random() * width;
+			this.y = Math.random() * height;
+			this.vx = (Math.random() - 0.5) * (layer === 'soft' ? 0.15 : 0.4);
+			this.vy = (Math.random() - 0.5) * (layer === 'soft' ? 0.15 : 0.4);
 			this.color = CELESTIAL_COLORS[Math.floor(Math.random() * CELESTIAL_COLORS.length)];
-			this.radius = layer === 'soft' ? Math.random() * 60 + 30 : Math.random() * 18 + 8;
-			this.opacity = layer === 'soft' ? Math.random() * 0.18 + 0.08 : Math.random() * 0.3 + 0.2;
+			this.radius = layer === 'soft' ? Math.random() * 30 + 15 : Math.random() * 10 + 4;
+			this.opacity = layer === 'soft' ? Math.random() * 0.12 + 0.08 : Math.random() * 0.2 + 0.1;
 			this.glow = layer === 'soft';
 			this.life = 0;
-			this.maxLife = Math.random() * 4000 + 2000;
+			this.maxLife = Math.random() * 3000 + 1200;
 			if (layer === 'sharp' && Math.random() < 0.08) {
 				this.shape = Math.random() < 0.5 ? 'star' : 'moon';
 			} else {
 				this.shape = 'circle';
 			}
 		}
-		update() {
+		update(width: number, height: number) {
 			this.x += this.vx; this.y += this.vy; this.life++;
-			if (this.x < -this.radius) this.x = atmosphereCanvas.width + this.radius;
-			if (this.x > atmosphereCanvas.width + this.radius) this.x = -this.radius;
-			if (this.y < -this.radius) this.y = atmosphereCanvas.height + this.radius;
-			if (this.y > atmosphereCanvas.height + this.radius) this.y = -this.radius;
+			if (this.x < -this.radius) this.x = width + this.radius;
+			if (this.x > width + this.radius) this.x = -this.radius;
+			if (this.y < -this.radius) this.y = height + this.radius;
+			if (this.y > height + this.radius) this.y = -this.radius;
 			const ageRatio = this.life / this.maxLife;
-			this.opacity = Math.max(0, (this.glow ? 0.18 : 0.3) * (1 - ageRatio));
+			this.opacity = Math.max(0, (this.glow ? 0.12 : 0.2) * (1 - ageRatio));
 			return this.life < this.maxLife;
 		}
 		draw(ctx: CanvasRenderingContext2D) {
 			ctx.save();
 			ctx.globalAlpha = this.opacity;
-			if (this.glow) { ctx.shadowColor = this.color; ctx.shadowBlur = 32; }
+			if (this.glow) { ctx.shadowColor = this.color; ctx.shadowBlur = 16; }
 			if (this.shape === 'circle') {
 				const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
 				gradient.addColorStop(0, this.color);
@@ -301,56 +289,101 @@ function initializeOptimizedEffects() {
 		}
 	}
 
-	const MAX_PARTICLES = Math.min(PERFORMANCE.maxParticles, 120);
-	const softParticles: CelestialParticle[] = []; const sharpParticles: CelestialParticle[] = [];
-	for (let i = 0; i < Math.floor(MAX_PARTICLES * 0.6); i++) { softParticles.push(new CelestialParticle('soft')); }
-	for (let i = 0; i < Math.floor(MAX_PARTICLES * 0.7); i++) { sharpParticles.push(new CelestialParticle('sharp')); }
-	let animationId: number;
+	function setupParticles(width: number, height: number) {
+		// Dynamically set particle count based on device performance
+		let maxParticles = PERFORMANCE.maxParticles;
+		if (window.devicePixelRatio > 1.5 || width * height > 2_000_000) {
+			maxParticles = Math.min(maxParticles, 36);
+		}
+		softParticles = [];
+		sharpParticles = [];
+		for (let i = 0; i < Math.floor(maxParticles * 0.6); i++) softParticles.push(new CelestialParticle('soft', width, height));
+		for (let i = 0; i < Math.floor(maxParticles * 0.7); i++) sharpParticles.push(new CelestialParticle('sharp', width, height));
+	}
 
 	function animateParticles() {
-		atmosphereCtx!.clearRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
-		const gradient = atmosphereCtx!.createRadialGradient(
+		let atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
+		if (!atmosphereCanvas) {
+			if (animationId) cancelAnimationFrame(animationId);
+			setTimeout(animateParticles, 100);
+			return;
+		}
+		const atmosphereCtx = atmosphereCanvas.getContext('2d');
+		if (!atmosphereCtx) {
+			if (animationId) cancelAnimationFrame(animationId);
+			setTimeout(animateParticles, 100);
+			return;
+		}
+		atmosphereCanvas.width = window.innerWidth;
+		atmosphereCanvas.height = window.innerHeight;
+		// Re-setup particles if needed
+		if (softParticles.length === 0 || sharpParticles.length === 0) {
+			setupParticles(atmosphereCanvas.width, atmosphereCanvas.height);
+		}
+		atmosphereCtx.clearRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
+		const gradient = atmosphereCtx.createRadialGradient(
 			atmosphereCanvas.width / 2, atmosphereCanvas.height / 2, 0,
 			atmosphereCanvas.width / 2, atmosphereCanvas.height / 2, Math.max(atmosphereCanvas.width, atmosphereCanvas.height) / 2
 		);
 		gradient.addColorStop(0, '#fffbe6'); gradient.addColorStop(0.25, '#b6a6ca');
 		gradient.addColorStop(0.45, '#7fc7d9'); gradient.addColorStop(0.65, '#e6c79c');
 		gradient.addColorStop(0.85, '#faaca8'); gradient.addColorStop(1, '#f4f6fa');
-		atmosphereCtx!.fillStyle = gradient;
-		atmosphereCtx!.fillRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
+		atmosphereCtx.fillStyle = gradient;
+		atmosphereCtx.fillRect(0, 0, atmosphereCanvas.width, atmosphereCanvas.height);
 
-		atmosphereCtx!.globalCompositeOperation = 'destination-over';
+		atmosphereCtx.globalCompositeOperation = 'destination-over';
 		for (let i = softParticles.length - 1; i >= 0; i--) {
 			const particle = softParticles[i];
-			if (!particle.update()) { softParticles.splice(i, 1); softParticles.push(new CelestialParticle('soft')); }
-			else { particle.draw(atmosphereCtx!); }
+			if (!particle.update(atmosphereCanvas.width, atmosphereCanvas.height)) {
+				softParticles.splice(i, 1); softParticles.push(new CelestialParticle('soft', atmosphereCanvas.width, atmosphereCanvas.height));
+			} else {
+				particle.draw(atmosphereCtx);
+			}
 		}
 		for (let i = sharpParticles.length - 1; i >= 0; i--) {
 			const particle = sharpParticles[i];
-			if (!particle.update()) { sharpParticles.splice(i, 1); sharpParticles.push(new CelestialParticle('sharp')); }
-			else { particle.draw(atmosphereCtx!); }
+			if (!particle.update(atmosphereCanvas.width, atmosphereCanvas.height)) {
+				sharpParticles.splice(i, 1); sharpParticles.push(new CelestialParticle('sharp', atmosphereCanvas.width, atmosphereCanvas.height));
+			} else {
+				particle.draw(atmosphereCtx);
+			}
 		}
-		if (Math.random() < 0.03) {
-			atmosphereCtx!.save(); atmosphereCtx!.globalAlpha = 0.12;
-			atmosphereCtx!.globalCompositeOperation = 'lighter';
+		if (Math.random() < 0.02) {
+			atmosphereCtx.save(); atmosphereCtx.globalAlpha = 0.08;
+			atmosphereCtx.globalCompositeOperation = 'lighter';
 			const rayX = Math.random() * atmosphereCanvas.width; const rayY = Math.random() * atmosphereCanvas.height;
-			const rayLength = Math.random() * 180 + 120; const rayAngle = Math.random() * Math.PI * 2;
-			atmosphereCtx!.translate(rayX, rayY); atmosphereCtx!.rotate(rayAngle);
-			const rayGradient = atmosphereCtx!.createLinearGradient(0, 0, rayLength, 0);
+			const rayLength = Math.random() * 120 + 80; const rayAngle = Math.random() * Math.PI * 2;
+			atmosphereCtx.translate(rayX, rayY); atmosphereCtx.rotate(rayAngle);
+			const rayGradient = atmosphereCtx.createLinearGradient(0, 0, rayLength, 0);
 			rayGradient.addColorStop(0, '#fffbe6');
 			rayGradient.addColorStop(0.5, '#e6c79c');
 			rayGradient.addColorStop(1, 'transparent');
-			atmosphereCtx!.fillStyle = rayGradient; atmosphereCtx!.fillRect(0, -6, rayLength, 12);
-			atmosphereCtx!.restore();
+			atmosphereCtx.fillStyle = rayGradient; atmosphereCtx.fillRect(0, -4, rayLength, 8);
+			atmosphereCtx.restore();
 		}
 		animationId = requestAnimationFrame(animateParticles);
 	}
+
+	// Cancel any previous animation loop before starting
+	if (animationId) cancelAnimationFrame(animationId);
+	setupParticles(window.innerWidth, window.innerHeight);
 	animateParticles();
 	console.log('✨ Background effects initialized');
-	const resizeBg = () => { atmosphereCanvas.width = window.innerWidth; atmosphereCanvas.height = window.innerHeight; };
+	const resizeBg = () => {
+		let atmosphereCanvas = document.getElementById('gris-bg-particles') as HTMLCanvasElement;
+		if (atmosphereCanvas) {
+			atmosphereCanvas.width = window.innerWidth;
+			atmosphereCanvas.height = window.innerHeight;
+			setupParticles(window.innerWidth, window.innerHeight);
+		}
+	};
 	window.addEventListener('resize', resizeBg);
 	const originalCleanup = gameCleanupFunction;
-	gameCleanupFunction = () => { cancelAnimationFrame(animationId); window.removeEventListener('resize', resizeBg); if (originalCleanup) originalCleanup(); };
+	gameCleanupFunction = () => {
+		if (typeof animationId === 'number') cancelAnimationFrame(animationId);
+		window.removeEventListener('resize', resizeBg);
+		if (originalCleanup) originalCleanup();
+	};
 }
 
 function startOptimizedCountdown(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
@@ -361,9 +394,7 @@ function startOptimizedCountdown(canvas: HTMLCanvasElement, ctx: CanvasRendering
 	const countdownMessages = [t.ready, t.set, t.go];
 	function drawCountdown() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-		gradient.addColorStop(0, '#1a1a2e'); gradient.addColorStop(1, '#16213e');
-		ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvas.width, canvas.height);
+		// Transparent overlay: do not fill with opaque gradient, just clear
 		ctx.save(); ctx.fillStyle = '#ffffff'; ctx.shadowColor = GRIS_COLORS.acceptance; ctx.shadowBlur = 30;
 		ctx.font = `bold ${Math.min(canvas.width / 8, 120)}px ${GRIS_TYPOGRAPHY.fonts.display}`;
 		ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

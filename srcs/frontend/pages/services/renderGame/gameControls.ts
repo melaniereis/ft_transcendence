@@ -62,13 +62,7 @@ export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 	document.body.style.overflow = 'hidden';
 	document.documentElement.style.overflow = 'hidden';
 
-	// Focus the game canvas if present
-	setTimeout(() => {
-		const canvas = document.getElementById('pong');
-		if (canvas) {
-			(canvas as HTMLCanvasElement).focus();
-		}
-	}, 100);
+	// Removed canvas focus to prevent animation flashes
 
 	setupTouchControls(leftPaddle, rightPaddle, paddleSpeed);
 }
@@ -230,7 +224,7 @@ export function cleanupControls() {
 
 export function updateScoreDisplay(score1: number, score2: number) {
 	console.log(`🎯 updateScoreDisplay called with: score1=${score1}, score2=${score2}, round=${state.round}`);
-	
+
 	// Update round number in top bar
 	const roundEl = document.querySelector('.game-oracle');
 	if (roundEl && typeof state.round === 'number' && state.mode) {
@@ -240,9 +234,9 @@ export function updateScoreDisplay(score1: number, score2: number) {
 	// Update player section scores (top bar)
 	const leftPlayerScore = document.querySelector('.player-sanctuary.left-sanctuary span:last-child');
 	const rightPlayerScore = document.querySelector('.player-sanctuary.right-sanctuary span:last-child');
-	
+
 	console.log(`🎯 Found elements: leftPlayerScore=${!!leftPlayerScore}, rightPlayerScore=${!!rightPlayerScore}`);
-	
+
 	if (leftPlayerScore) {
 		console.log(`🎯 Setting left score to: ${score1}`);
 		leftPlayerScore.textContent = score1.toString();
