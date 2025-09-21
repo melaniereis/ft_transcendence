@@ -171,6 +171,15 @@ function renderRoute(path: string): void {
 					</div>
 					`;
 		}
+		
+		// Re-initialize play button after each page navigation
+		setTimeout(() => {
+			const token = localStorage.getItem('authToken');
+			const isLoggedIn = !!token;
+			if (isLoggedIn) {
+				setupPlayButton();
+			}
+		}, 100);
 	}, 500);
 }
 
