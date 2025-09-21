@@ -1,10 +1,10 @@
 import { renderGame } from '../renderGame/renderGame.js';
 import { state } from '../renderGame/state.js';
 import { updateMatch } from './updateMatch.js';
-import { renderLocalTournamentPage } from './quickTournament.js';
 import { renderTournamentBracket } from '../tournament/renderTournamentBracket.js';
 import { endGame } from '../renderGame/endGame.js';
 import { translations } from '../language/translations.js';
+import { navigateTo } from '../../index.js'
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
@@ -29,10 +29,13 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 
 	const cachedNames = new Map<number, string>();
 	async function getUserName(userId: number) {
-		if (cachedNames.has(userId)) return cachedNames.get(userId)!;
+		if (cachedNames.has(userId))
+			return cachedNames.get(userId)!;
 		const user = selectedPlayers.find(u => u.id === userId);
-		if (!user) return `User ${userId}`;
-		if (!token) return user.name;
+		if (!user)
+			return `User ${userId}`;
+		if (!token)
+			return user.name;
 
 		try {
 			const response = await fetch(`/users/${userId}/display_name`, {
@@ -43,7 +46,8 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 			const nameToUse = data?.display_name || user.name;
 			cachedNames.set(userId, nameToUse);
 			return nameToUse;
-		} catch {
+		}
+		catch {
 			return user.name;
 		}
 	}
@@ -120,13 +124,17 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 			modal.style.justifyContent = 'center';
 			modal.style.zIndex = '9999';
 			modal.innerHTML = `
-			<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
-			${playerA} <span style="color:#b6a6ca;">vs</span> ${playerB}
-			</h2>
-			<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);cursor:pointer;">
-				${t.startMatchButton}
-			</button>
-			</div>`;
+				<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
+					<span style="color:#333333; font-weight: bold;">${playerA}</span>
+					<span style="color:#333333; font-weight: bold;">
+						<span style="color:#b6a6ca; font-weight: bold;">vs</span>
+					</span>
+					<span style="color:#333333; font-weight: bold;">${playerB}</span>
+					</h2>
+					<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">
+						${t.startMatchButton}
+					</button>
+				</div>`;
 			document.body.appendChild(modal);
 			modal.querySelector('#start-match-btn')!.addEventListener('click', () => {
 				modal.remove();
@@ -232,7 +240,7 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 																gameWrapper.style.display = 'none';
 
 																renderTournamentBracket(canvas, ctx, players, winners, () => {
-																	renderLocalTournamentPage(container as HTMLDivElement);
+																	navigateTo('/');
 																});
 															},
 															await getUserName(finalLeftId),
