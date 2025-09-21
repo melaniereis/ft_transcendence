@@ -34,11 +34,12 @@ export function createPaddles(canvas: HTMLCanvasElement, player1: string, player
 }
 
 export function createBall(canvas: HTMLCanvasElement, difficulty: 'easy' | 'normal' | 'hard' | 'crazy'): Ball {
+	// Base speed multiplier for time-based movement (will be multiplied by PIXELS_PER_SECOND)
 	const baseSpeed = {
-		easy: 3,
-		normal: 5,
-		hard: 7,
-		crazy: 10
+		easy: 0.8,    // Slower for easy mode
+		normal: 1.0,  // Normal speed
+		hard: 1.3,    // Faster for hard mode
+		crazy: 1.6    // Much faster for crazy mode
 	}[difficulty];
 
 	return {
@@ -47,7 +48,7 @@ export function createBall(canvas: HTMLCanvasElement, difficulty: 'easy' | 'norm
 		radius: Math.max(4, canvas.width * 0.01),
 		speed: baseSpeed,
 		initialSpeed: baseSpeed,
-		dx: baseSpeed * (Math.random() > 0.5 ? 1 : -1),
-		dy: baseSpeed * (Math.random() * 2 - 1),
+		dx: Math.random() > 0.5 ? 1 : -1,  // Direction normalized (-1 or 1)
+		dy: (Math.random() * 2 - 1),      // Direction normalized (-1 to 1)
 	};
 }

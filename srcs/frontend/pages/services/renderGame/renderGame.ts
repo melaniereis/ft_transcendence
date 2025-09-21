@@ -104,7 +104,7 @@ isAI: boolean = false) {
     };
     window.addEventListener('resize', resizeHandler);
 
-    if (state.player1 && state.player2) setupControls(state.player1, state.player2, 6);
+    if (state.player1 && state.player2) setupControls(state.player1, state.player2, 400); // 400 pixels per second for time-based movement
     setupGameEvents(container);
 
     gameCleanupFunction = () => {

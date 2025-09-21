@@ -1,6 +1,6 @@
 import { Paddle, Ball } from './types';
 
-const BASE_PADDLE_SPEED = 5;
+const BASE_PADDLE_SPEED = 400; // pixels per second for time-based movement
 const PREDICTION_ERROR_FACTOR = 0.15;
 
 export function updateAIPaddle(
@@ -30,6 +30,7 @@ export function updateAIPaddle(
 	const paddleSpeed = getAIPaddleSpeed(difficulty);
 	const paddleCenterY = paddle.y + paddle.height / 2;
 
+	// Set velocity based on target position
 	if (paddleCenterY < newTargetY - paddle.height * 0.1)
 		paddle.dy = paddleSpeed; // Move down
   	else if (paddleCenterY > newTargetY + paddle.height * 0.1)
@@ -37,11 +38,7 @@ export function updateAIPaddle(
 	else
 		paddle.dy = 0; // Stop
 
-	paddle.y += paddle.dy;
-	if (paddle.y < 0)
-		paddle.y = 0;
-	if (paddle.y + paddle.height > canvas.height)
-		paddle.y = canvas.height - paddle.height;
+	// Note: Actual position update is handled by updatePaddle() function with deltaTime
 
 	return { updatedTargetY: newTargetY, updatedLastAIUpdate: newLastAIUpdate };
 }
