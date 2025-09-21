@@ -434,5 +434,5 @@ export default {
 	remotePongBestOf: "Remote Pong - Best of",
 	nextGameInvitation: "Next Game Invitation",
 	aiOpponentLabel :"Play against AI",
-	round: "Round"
+	round: "Round",
 }

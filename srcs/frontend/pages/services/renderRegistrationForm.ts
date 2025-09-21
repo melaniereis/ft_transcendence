@@ -40,6 +40,14 @@ export function renderRegistrationForm(container: HTMLElement): void {
 						<input type="password" id="password" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.password}" />
 					</label>
 					<div id="password-error" class="w-full text-red-600 text-lg text-center"></div>
+
+					<!-- Confirm Password -->
+					<label class="w-full text-xl font-semibold text-[#2c2254] flex flex-col items-start">
+						<span class="mb-2">${t.confirmPassword ?? 'Confirm Password'}:</span>
+						<input type="password" id="confirm-password" required class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white/60 backdrop-blur placeholder-gray-500 text-[#2c2254] transition" placeholder="${t.confirmPassword ?? 'Confirm Password'}" />
+					</label>
+					<div id="confirm-password-error" class="w-full text-red-600 text-lg text-center"></div>
+
 					<button type="submit" class="mx-auto w-2/3 py-4 text-2xl font-bold text-[#2c2254] bg-gradient-to-r from-[#e8d5ff] to-[#6c4fa3] border-none rounded-full shadow-lg hover:from-[#6c4fa3] hover:to-[#e8d5ff] hover:text-white focus:outline-none focus:ring-4 focus:ring-indigo-400 transition-all duration-200">
 						${t.register}
 					</button>
@@ -60,6 +68,7 @@ export function renderRegistrationForm(container: HTMLElement): void {
 	const form = document.getElementById('register-form') as HTMLFormElement;
 	const resultDiv = document.getElementById('register-result') as HTMLDivElement;
 	const passwordErrorDiv = document.getElementById('password-error') as HTMLDivElement;
+	const confirmPasswordErrorDiv = document.getElementById('confirm-password-error') as HTMLDivElement;
 
 	form.addEventListener('submit', async (e: Event) => {
 		e.preventDefault();
@@ -67,15 +76,35 @@ export function renderRegistrationForm(container: HTMLElement): void {
 		const name = (document.getElementById('name') as HTMLInputElement).value.trim();
 		const username = (document.getElementById('username') as HTMLInputElement).value.trim();
 		const team = (document.getElementById('team') as HTMLSelectElement).value;
-		const password = (document.getElementById('password') as HTMLInputElement).value;
+		const password = (document.getElementById('password') as HTMLInputElement).value.trim();
+		const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value.trim();
 		const email = (document.getElementById('email') as HTMLInputElement).value.trim();
 
 		passwordErrorDiv.textContent = '';
+		confirmPasswordErrorDiv.textContent = '';
 		resultDiv.textContent = '';
 
+		// Email validation
+		const atIndex = email.indexOf('@');
+		const isValidEmail = (
+			email &&
+			atIndex > 0 &&
+			email.indexOf('@', atIndex + 1) === -1 &&
+			email.indexOf('.', atIndex) > atIndex + 1
+		);
+
+		if (email && !isValidEmail) {
+			resultDiv.textContent = t.invalidEmail || 'Please enter a valid email address.';
+			return;
+		}
+
 		if (!isStrongPassword(password)) {
-			passwordErrorDiv.textContent = t.passwordStrengthError ||
-				'Password must be at least 8 characters and include a number, a special character, and an uppercase letter.';
+			passwordErrorDiv.textContent = t.passwordStrengthError || 'Password must be at least 8 characters and include a number, a special character, and an uppercase letter.';
+			return;
+		}
+
+		if (password !== confirmPassword) {
+			confirmPasswordErrorDiv.textContent = t.passwordMismatch || 'Passwords do not match.';
 			return;
 		}
 
@@ -100,13 +129,12 @@ export function renderRegistrationForm(container: HTMLElement): void {
 				setTimeout(() => {
 					navigateTo('/login');
 				}, 1000);
-			}
-			else {
+			} else {
 				resultDiv.textContent = `${t.registrationError} ${result.error}`;
 				resultDiv.classList.remove('text-green-600');
 				resultDiv.classList.add('text-red-600');
 			}
-		}
+		} 
 		catch (err) {
 			resultDiv.textContent = t.registrationFailed || 'Registration failed. Please try again.';
 			resultDiv.classList.remove('text-green-600');

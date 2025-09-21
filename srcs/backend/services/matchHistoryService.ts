@@ -26,11 +26,11 @@ export async function getMatchHistory(userId: number): Promise<MatchHistoryRecor
 	return new Promise((resolve, reject) => {
 		db.all(
 			`SELECT mh.*,
-				COALESCE(u.display_name, u.username, '') AS opponentDisplayName,
-				u.username AS opponentUsername
-			 FROM match_history mh
-			 LEFT JOIN users u ON u.id = mh.opponent_id
-			 WHERE mh.user_id = ? ORDER BY date_played DESC LIMIT 20`,
+				   COALESCE(u.display_name, u.username, '') AS opponentDisplayName,
+				   u.username AS opponentUsername
+					FROM match_history mh
+					LEFT JOIN users u ON u.id = mh.opponent_id
+					WHERE mh.user_id = ? ORDER BY date_played DESC`,
 			[userId],
 			(err, rows) => {
 				if (err) {

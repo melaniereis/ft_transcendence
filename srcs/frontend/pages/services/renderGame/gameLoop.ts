@@ -53,8 +53,8 @@ export function startGameLoop
 			return;
 		}
 
-		// Update game objects
-		updatePaddle(left, canvas, gameEnded);
+		// Update game objects with deltaTime for smooth, frame-rate independent movement
+		updatePaddle(left, canvas, gameEnded, deltaTime);
 		if (isAI)
 		{
 			const { updatedTargetY, updatedLastAIUpdate } = updateAIPaddle(
@@ -70,7 +70,7 @@ export function startGameLoop
 			lastAIUpdate = updatedLastAIUpdate;
 		}
 		else
-			updatePaddle(right, canvas, gameEnded);
+			updatePaddle(right, canvas, gameEnded, deltaTime);
 
 		updateBall(ball, left, right, canvas, maxGames, () => {
 			stopGameLoop();
@@ -99,7 +99,7 @@ export function startGameLoop
 				// Tournament mode - pass to parent handler
 				onGameEnd(score1, score2);
 			}
-		});
+		}, deltaTime);
 
 		// Render the frame
 		renderFrame(ctx, canvas, left, right, ball, currentTime);

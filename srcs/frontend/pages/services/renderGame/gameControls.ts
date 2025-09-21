@@ -6,7 +6,7 @@ import { state } from './state.js';
 const controlState = {
 	keys: {} as Record<string, boolean>,
 	touchActive: false,
-	eventListeners: [] as Array<{ element: Element | Window, event: string, handler: EventListener, options?: AddEventListenerOptions | boolean }>
+	eventListeners: [] as Array<{ element: Element | Window | Document, event: string, handler: EventListener, options?: AddEventListenerOptions | boolean }>
 };
 
 export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpeed: number, isAI: boolean = false) {
@@ -39,9 +39,29 @@ export function setupControls(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 	addListener(window, 'keydown', keyDownHandler as EventListener, { passive: false });
 	addListener(window, 'keyup', keyUpHandler as EventListener, { passive: false });
 
+	// Global fallback to prevent arrow key scrolling everywhere
+	const globalArrowKeyPreventer: EventListener = function (e) {
+		const evt = e as KeyboardEvent;
+		if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(evt.key)) {
+			evt.preventDefault();
+		}
+	};
+	window.addEventListener('keydown', globalArrowKeyPreventer, { passive: false });
+	document.addEventListener('keydown', globalArrowKeyPreventer, { passive: false });
+	controlState.eventListeners.push({ element: window, event: 'keydown', handler: globalArrowKeyPreventer, options: { passive: false } });
+	controlState.eventListeners.push({ element: document, event: 'keydown', handler: globalArrowKeyPreventer, options: { passive: false } });
+
 	// Hide page scrollbars during active game controls
 	document.body.style.overflow = 'hidden';
 	document.documentElement.style.overflow = 'hidden';
+
+	// Focus the game canvas if present
+	setTimeout(() => {
+		const canvas = document.getElementById('pong');
+		if (canvas) {
+			(canvas as HTMLCanvasElement).focus();
+		}
+	}, 100);
 
 	setupTouchControls(leftPaddle, rightPaddle, paddleSpeed);
 }
@@ -63,16 +83,14 @@ function updatePaddleMovement(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 		rightPaddle.dy = 0;
 	}
 
-	if (!isAI)
-	{
-		rightPaddle.dy = controlState.keys[rightPaddle.upKey]? -paddleSpeed : controlState.keys[rightPaddle.downKey]
-		? paddleSpeed: 0;
+	if (!isAI) {
+		rightPaddle.dy = controlState.keys[rightPaddle.upKey] ? -paddleSpeed : controlState.keys[rightPaddle.downKey]
+			? paddleSpeed : 0;
 	}
 
-	if (!isAI)
-	{
+	if (!isAI) {
 		rightPaddle.dy = controlState.keys[rightPaddle.upKey] ? -paddleSpeed : controlState.keys[rightPaddle.downKey]
-		? paddleSpeed: 0;
+			? paddleSpeed : 0;
 	}
 }
 
@@ -204,31 +222,31 @@ export function cleanupControls() {
 }
 
 export function updateScoreDisplay(score1: number, score2: number) {
-    // Update round number in top bar
-    const roundEl = document.querySelector('.game-oracle');
-    if (roundEl && typeof state.round === 'number' && state.mode) {
-        roundEl.textContent = `Round ${state.round} • ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
-    }
+	// Update round number in top bar
+	const roundEl = document.querySelector('.game-oracle');
+	if (roundEl && typeof state.round === 'number' && state.mode) {
+		roundEl.textContent = `Round ${state.round} • ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
+	}
 
-    // Update player section scores (top bar)
-    const leftPlayerScore = document.querySelector('.player-sanctuary.left-sanctuary span:last-child');
-    const rightPlayerScore = document.querySelector('.player-sanctuary.right-sanctuary span:last-child');
-    if (leftPlayerScore) leftPlayerScore.textContent = score1.toString();
-    if (rightPlayerScore) rightPlayerScore.textContent = score2.toString();
+	// Update player section scores (top bar)
+	const leftPlayerScore = document.querySelector('.player-sanctuary.left-sanctuary span:last-child');
+	const rightPlayerScore = document.querySelector('.player-sanctuary.right-sanctuary span:last-child');
+	if (leftPlayerScore) leftPlayerScore.textContent = score1.toString();
+	if (rightPlayerScore) rightPlayerScore.textContent = score2.toString();
 
-    // Canvas scores (legacy, if used)
-    const leftScoreEl = document.querySelector('.mystical-score.left-score');
-    const rightScoreEl = document.querySelector('.mystical-score.right-score');
-    
-    if (leftScoreEl) {
-        leftScoreEl.textContent = score1.toString();
-        leftScoreEl.classList.add('score-update');
-        setTimeout(() => leftScoreEl.classList.remove('score-update'), 300);
-    }
-    if (rightScoreEl) {
-        rightScoreEl.textContent = score2.toString();
-        rightScoreEl.classList.add('score-update');
-        setTimeout(() => rightScoreEl.classList.remove('score-update'), 300);
-    }
+	// Canvas scores (legacy, if used)
+	const leftScoreEl = document.querySelector('.mystical-score.left-score');
+	const rightScoreEl = document.querySelector('.mystical-score.right-score');
+
+	if (leftScoreEl) {
+		leftScoreEl.textContent = score1.toString();
+		leftScoreEl.classList.add('score-update');
+		setTimeout(() => leftScoreEl.classList.remove('score-update'), 300);
+	}
+	if (rightScoreEl) {
+		rightScoreEl.textContent = score2.toString();
+		rightScoreEl.classList.add('score-update');
+		setTimeout(() => rightScoreEl.classList.remove('score-update'), 300);
+	}
 
 }
