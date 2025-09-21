@@ -35,9 +35,17 @@ const loaderWindow = document.getElementById('loader-window') as HTMLDivElement;
 const tournamentsBtn = document.getElementById('tournaments-btn') as HTMLButtonElement;
 const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonElement;
 const quickTournamentBtn = document.getElementById('quick-tournament-btn') as HTMLButtonElement | null;
+const mobileMenuBtn = document.getElementById('mobile-menu-btn') as HTMLButtonElement;
+const topBar = document.getElementById('top-bar') as HTMLElement;
 
 // Route navigation
 export async function navigateTo(path: string): Promise<void> {
+	// Close mobile menu on navigation
+	const topBar = document.getElementById('top-bar');
+	if (topBar) {
+		topBar.classList.remove('mobile-menu-open');
+	}
+	
 	history.pushState({}, '', path);
 	await renderRoute(path);
 }
@@ -121,12 +129,34 @@ export async function renderRoute(path: string): Promise<void> {
 			}
 			else {
 				appDiv.innerHTML = `
-					<div style="display: flex; flex-direction: column; height: 100vh; padding: 80px 20px; text-align: center;">
-						<h1 style="font-size: 6rem; font-weight: 900; color: #f0f0f0; margin: 200;">${t.welcomeTo}</h1>
-
-						<div style="height: 400px;"></div>
-
-						<h1 style="font-size: 8rem; font-weight: 1000; color: #f0f0f0; margin: 0;margin-top: 200px;">PONG</h1>
+					<style>
+					.Title-Intro {
+						display: flex;
+						flex-direction: column;
+						height: 100vh;
+						padding: 12vh 3vw;
+						text-align: center;
+					}
+					.Title-Welcome {
+						font-size: 6rem;
+						font-weight: 900;
+						color: #f0f0f0;
+					}
+					.Title-Pong {
+						font-size: 8rem;
+						font-weight: 1000;
+						color: #f0f0f0;
+						margin: 0;
+						margin-top: 200px;
+					}
+					@media (max-width: 600px) {
+						.Title-Intro { display: none; }
+					}
+					</style>
+					<div class="Title-Intro">
+						<h1 class="Title-Welcome">${t.welcomeTo}</h1>
+						<div style="height: 6.5vh;"></div>
+						<h1 class="Title-Pong">PONG</h1>
 					</div>
 					`;
 			}
@@ -426,6 +456,26 @@ if (languageBtn && languageOptions) {
 			languageOptions.classList.remove('hidden');
 		else
 			languageOptions.classList.add('hidden');
+	});
+}
+
+// Mobile menu toggle functionality
+if (mobileMenuBtn && topBar) {
+	mobileMenuBtn.addEventListener('click', () => {
+		topBar.classList.toggle('mobile-menu-open');
+	});
+
+	// Close mobile menu when clicking on navigation items
+	topBar.addEventListener('click', (e) => {
+		const target = e.target as HTMLElement;
+		if (target.classList.contains('nav-btn') || target.closest('.nav-btn')) {
+			topBar.classList.remove('mobile-menu-open');
+		}
+	});
+
+	// Close mobile menu when clicking outside (on the app content)
+	appDiv.addEventListener('click', () => {
+		topBar.classList.remove('mobile-menu-open');
 	});
 }
 
