@@ -1,10 +1,10 @@
 import { renderGame } from '../renderGame/renderGame.js';
 import { state } from '../renderGame/state.js';
 import { updateMatch } from './updateMatch.js';
-import { renderLocalTournamentPage } from './quickTournament.js';
 import { renderTournamentBracket } from '../tournament/renderTournamentBracket.js';
 import { endGame } from '../renderGame/endGame.js';
 import { translations } from '../language/translations.js';
+import {navigateTo} from '../../index.js'
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '') 
 ? localStorage.getItem('preferredLanguage') 
@@ -12,12 +12,12 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 function shuffleArray<T>(array: T[]): T[] {
-const result = [...array];
-for (let i = result.length -1; i > 0; i--) {
-	const j = Math.floor(Math.random() * (i + 1));
-	[result[i], result[j]] = [result[j], result[i]];
-}
-return result;
+	const result = [...array];
+	for (let i = result.length -1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[result[i], result[j]] = [result[j], result[i]];
+	}
+	return result;
 }
 
 export async function startTournament(container: HTMLElement, tournament: any, selectedPlayers: any[], authToken?: string) {
@@ -29,22 +29,26 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 
 	const cachedNames = new Map<number, string>();
 	async function getUserName(userId: number) {
-		if (cachedNames.has(userId)) return cachedNames.get(userId)!;
+		if (cachedNames.has(userId)) 
+			return cachedNames.get(userId)!;
 		const user = selectedPlayers.find(u => u.id === userId);
-		if (!user) return `User ${userId}`;
-		if (!token) return user.name;
+		if (!user) 
+			return `User ${userId}`;
+		if (!token) 
+			return user.name;
 
 		try {
-		const response = await fetch(`/users/${userId}/display_name`, {
-			method: 'GET',
-			headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-		});
-		const data = response.ok ? await response.json() : null;
-		const nameToUse = data?.display_name || user.name;
-		cachedNames.set(userId, nameToUse);
+			const response = await fetch(`/users/${userId}/display_name`, {
+				method: 'GET',
+				headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+			});
+			const data = response.ok ? await response.json() : null;
+			const nameToUse = data?.display_name || user.name;
+			cachedNames.set(userId, nameToUse);
 		return nameToUse;
-		} catch {
-		return user.name;
+		} 
+		catch {
+			return user.name;
 		}
 	}
 
@@ -100,37 +104,41 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 		canvas.width = parentWidth;
 		canvas.height = parentHeight;
 		if (redraw && ctx)
-		renderTournamentBracket(canvas, ctx, players, winners);
+			renderTournamentBracket(canvas, ctx, players, winners);
 	}
 	resizeCanvas(false);
 	window.addEventListener('resize', () => resizeCanvas(true));
 
 	async function showMatchModal(playerA: string, playerB: string) {
 		return new Promise<void>((resolve) => {
-		const modal = document.createElement('div');
-		modal.style.position = 'fixed';
-		modal.style.top = '0';
-		modal.style.left = '0';
-		modal.style.width = '100vw';
-		modal.style.height = '100vh';
-		modal.style.background = 'rgba(182,166,202,0.45)';
-		modal.style.display = 'flex';
-		modal.style.alignItems = 'center';
-		modal.style.justifyContent = 'center';
-		modal.style.zIndex = '9999';
-		modal.innerHTML = `
-			<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
-			${playerA} <span style="color:#b6a6ca;">vs</span> ${playerB}
-			</h2>
-			<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);cursor:pointer;">
-				${t.startMatchButton}
-			</button>
-			</div>`;
-		document.body.appendChild(modal);
-		modal.querySelector('#start-match-btn')!.addEventListener('click', () => {
-			modal.remove();
-			resolve();
-		});
+			const modal = document.createElement('div');
+			modal.style.position = 'fixed';
+			modal.style.top = '0';
+			modal.style.left = '0';
+			modal.style.width = '100vw';
+			modal.style.height = '100vh';
+			modal.style.background = 'rgba(182,166,202,0.45)';
+			modal.style.display = 'flex';
+			modal.style.alignItems = 'center';
+			modal.style.justifyContent = 'center';
+			modal.style.zIndex = '9999';
+			modal.innerHTML = `
+				<div style="background:rgba(255,251,230,0.98);border-radius:2rem;box-shadow:0 8px 32px rgba(44,34,84,0.18);padding:2.5rem 2rem;text-align:center;max-width:340px;">
+					<span style="color:#333333; font-weight: bold;">${playerA}</span> 
+					<span style="color:#333333; font-weight: bold;"> 
+						<span style="color:#b6a6ca; font-weight: bold;">vs</span>
+					</span> 
+					<span style="color:#333333; font-weight: bold;">${playerB}</span>
+					</h2>
+					<button id="start-match-btn" style="width:100%;background:linear-gradient(135deg, #fffbe6 0%, #f0d6b3 30%, #e6c79c 100%);border:2px solid #6b7a8f;color:#6b7a8f;font-weight:700;padding:1.2rem;border-radius:1.2rem;font-size:1.1rem;box-shadow:0 4px 16px rgba(44,34,84,0.10);transition:background 0.2s,color 0.2s;cursor:pointer;">
+						${t.startMatchButton}
+					</button>
+				</div>`;
+			document.body.appendChild(modal);
+			modal.querySelector('#start-match-btn')!.addEventListener('click', () => {
+				modal.remove();
+				resolve();
+			});
 		});
 	}
 
@@ -144,20 +152,11 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 		state.player2 = null;
 		state.ball = null;
 
-		renderGame(
-		gameWrapper,
-		await getUserName(player1.id),
-		await getUserName(player2.id),
-		maxGames,
-		difficulty,
+		renderGame(gameWrapper, await getUserName(player1.id), await getUserName(player2.id), maxGames, difficulty,
 		async (gameCanvas, score1, score2) => {
-			await endGame(
-			score1,
-			score2,
-			gameCanvas,
-			async (winnerId) => {
+			await endGame(score1, score2, gameCanvas, async (winnerId) => {
 				if (!winnerId)
-				score1 > score2 ? winnerId = player1.id as number : winnerId = player2.id as number;
+					score1 > score2 ? winnerId = player1.id as number : winnerId = player2.id as number;
 				await updateMatch(id, 'semifinal1', winnerId);
 				winners.semifinal1 = winnerId;
 
@@ -176,17 +175,9 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 				state.player2 = null;
 				state.ball = null;
 
-				renderGame(
-					gameWrapper,
-					await getUserName(player3.id),
-					await getUserName(player4.id),
-					maxGames,
-					difficulty,
+				renderGame(gameWrapper, await getUserName(player3.id), await getUserName(player4.id), maxGames, difficulty,
 					async (gameCanvas2, score3, score4) => {
-					await endGame(
-						score3,
-						score4,
-						gameCanvas2,
+					await endGame(score3, score4, gameCanvas2,
 						async (winner2Id) => {
 						if (!winner2Id)
 							score3 > score4 ? winner2Id = player3.id as number : winner2Id = player4.id as number;
@@ -210,20 +201,11 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 							state.player2 = null;
 							state.ball = null;
 
-							renderGame(
-							gameWrapper,
-							await getUserName(finalLeftId),
-							await getUserName(finalRightId),
-							maxGames,
-							difficulty,
+							renderGame(gameWrapper, await getUserName(finalLeftId), await getUserName(finalRightId), maxGames, difficulty,
 							async (finalCanvas, scoreF1, scoreF2) => {
-								await endGame(
-								scoreF1,
-								scoreF2,
-								finalCanvas,
-								async (finalWinnerId) =>{
+								await endGame(scoreF1, scoreF2, finalCanvas, async (finalWinnerId) =>{
 									if (!finalWinnerId)
-									scoreF1 > scoreF2 ? finalWinnerId = finalLeftId as number : finalWinnerId = finalRightId as number;
+										scoreF1 > scoreF2 ? finalWinnerId = finalLeftId as number : finalWinnerId = finalRightId as number;
 									await updateMatch(id, 'final', finalWinnerId);
 									winners.final = finalWinnerId;
 
@@ -231,7 +213,7 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 									gameWrapper.style.display = 'none';
 
 									renderTournamentBracket(canvas, ctx, players, winners, () => {
-									renderLocalTournamentPage(container as HTMLDivElement);
+									navigateTo('/');
 									});
 								},
 								await getUserName(finalLeftId),

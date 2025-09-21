@@ -2,6 +2,13 @@
 
 import { Paddle } from './types.js';
 import { state } from './state.js';
+import { translations } from '../language/translations.js';
+
+const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
+	? localStorage.getItem('preferredLanguage')
+	: 'en') as keyof typeof translations;
+const t = translations[lang];
+
 
 const controlState = {
 	keys: {} as Record<string, boolean>,
@@ -225,7 +232,7 @@ export function updateScoreDisplay(score1: number, score2: number) {
 	// Update round number in top bar
 	const roundEl = document.querySelector('.game-oracle');
 	if (roundEl && typeof state.round === 'number' && state.mode) {
-		roundEl.textContent = `Round ${state.round} • ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
+		roundEl.textContent = `${t.round} ${state.round} • ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
 	}
 
 	// Update player section scores (top bar)
