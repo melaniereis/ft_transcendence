@@ -229,6 +229,8 @@ export function cleanupControls() {
 }
 
 export function updateScoreDisplay(score1: number, score2: number) {
+	console.log(`🎯 updateScoreDisplay called with: score1=${score1}, score2=${score2}, round=${state.round}`);
+	
 	// Update round number in top bar
 	const roundEl = document.querySelector('.game-oracle');
 	if (roundEl && typeof state.round === 'number' && state.mode) {
@@ -238,8 +240,17 @@ export function updateScoreDisplay(score1: number, score2: number) {
 	// Update player section scores (top bar)
 	const leftPlayerScore = document.querySelector('.player-sanctuary.left-sanctuary span:last-child');
 	const rightPlayerScore = document.querySelector('.player-sanctuary.right-sanctuary span:last-child');
-	if (leftPlayerScore) leftPlayerScore.textContent = score1.toString();
-	if (rightPlayerScore) rightPlayerScore.textContent = score2.toString();
+	
+	console.log(`🎯 Found elements: leftPlayerScore=${!!leftPlayerScore}, rightPlayerScore=${!!rightPlayerScore}`);
+	
+	if (leftPlayerScore) {
+		console.log(`🎯 Setting left score to: ${score1}`);
+		leftPlayerScore.textContent = score1.toString();
+	}
+	if (rightPlayerScore) {
+		console.log(`🎯 Setting right score to: ${score2}`);
+		rightPlayerScore.textContent = score2.toString();
+	}
 
 	// Canvas scores (legacy, if used)
 	const leftScoreEl = document.querySelector('.mystical-score.left-score');
