@@ -76,22 +76,15 @@ function updatePaddleMovement(leftPaddle: Paddle, rightPaddle: Paddle, paddleSpe
 		leftPaddle.dy = 0;
 	}
 
-	if (controlState.keys[rightPaddle.upKey]) {
-		rightPaddle.dy = -paddleSpeed;
-	} else if (controlState.keys[rightPaddle.downKey]) {
-		rightPaddle.dy = paddleSpeed;
-	} else {
-		rightPaddle.dy = 0;
-	}
-
+	// Only allow manual control of right paddle if NOT AI
 	if (!isAI) {
-		rightPaddle.dy = controlState.keys[rightPaddle.upKey] ? -paddleSpeed : controlState.keys[rightPaddle.downKey]
-			? paddleSpeed : 0;
-	}
-
-	if (!isAI) {
-		rightPaddle.dy = controlState.keys[rightPaddle.upKey] ? -paddleSpeed : controlState.keys[rightPaddle.downKey]
-			? paddleSpeed : 0;
+		if (controlState.keys[rightPaddle.upKey]) {
+			rightPaddle.dy = -paddleSpeed;
+		} else if (controlState.keys[rightPaddle.downKey]) {
+			rightPaddle.dy = paddleSpeed;
+		} else {
+			rightPaddle.dy = 0;
+		}
 	}
 }
 

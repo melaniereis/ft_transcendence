@@ -32,11 +32,17 @@ export function updateAIPaddle(
 
 	// Set velocity based on target position
 	if (paddleCenterY < newTargetY - paddle.height * 0.1)
+	{
 		paddle.dy = paddleSpeed; // Move down
+	}
   	else if (paddleCenterY > newTargetY + paddle.height * 0.1)
+	{
     	paddle.dy = -paddleSpeed; // Move up
+	}
 	else
+	{
 		paddle.dy = 0; // Stop
+	}
 
 	// Note: Actual position update is handled by updatePaddle() function with deltaTime
 
@@ -80,15 +86,15 @@ function getAIUpdateInterval(difficulty: string): number
 	switch (difficulty)
 	{
 		case 'easy':
-			return (1200);
+			return (1600);
 		case 'normal':
-			return (1000); // 1 second
+			return (1200);
 		case 'hard':
-			return (600);
+			return (800);
 		case 'crazy':
-			return (500);
+			return (650);
 		default:
-			return (1000);
+			return (1400);
 	}
 }
 
@@ -98,15 +104,15 @@ function getAIPaddleSpeed(difficulty: string): number
 	switch (difficulty)
 	{
 		case 'easy':
-			return (baseSpeed * 0.7);
+			return (baseSpeed * 0.5); // Reduced from 0.7 to 0.5
 		case 'normal':
-			return (baseSpeed * 1.0); // Default
+			return (baseSpeed * 0.7); // Reduced from 1.0 to 0.7
 		case 'hard':
-			return (baseSpeed * 1.4); // 40% faster
+			return (baseSpeed * 1.0); // Reduced from 1.4 to 1.0
 		case 'crazy':
-			return (baseSpeed * 1.6);
+			return (baseSpeed * 1.2); // Reduced from 1.6 to 1.2
 		default:
-			return (baseSpeed);
+			return (baseSpeed * 0.7);
 	}
 }
 

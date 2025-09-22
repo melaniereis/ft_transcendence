@@ -37,12 +37,12 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 	const safePlayer1Name = truncateName(player1Name);
 	const safePlayer2Name = truncateName(player2Name);
 
-	initializeGameState(safePlayer1Name, safePlayer2Name, maxGames, mode, gameId, avatar1, avatar2);
-
+	// Create basic UI layout first
 	container.innerHTML = renderGameLayout({
-		player1: state.player1!, player2: state.player2!,
-		score1: state.score1, score2: state.score2, round: state.round, mode: state.mode,
-		avatar1: state.player1?.avatarUrl, avatar2: state.player2?.avatarUrl, canvasId: 'pong',
+		player1: { nickname: safePlayer1Name, avatarUrl: avatar1 || '/default.png' } as any, 
+		player2: { nickname: safePlayer2Name, avatarUrl: avatar2 || '/default.png' } as any,
+		score1: 0, score2: 0, round: 1, mode: mode,
+		avatar1: avatar1, avatar2: avatar2, canvasId: 'pong',
 		showControls: true, modalsHtml: renderModals()
 	});
 
@@ -60,18 +60,17 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 	const ctx = canvas.getContext('2d')!;
 	setOptimizedCanvasSize(canvas);
 
-	let leftPaddle, rightPaddle, ball;
-	if (state.player1 && state.player2 && state.ball) {
-		leftPaddle = state.player1;
-		rightPaddle = state.player2;
-		ball = state.ball;
-	} else {
-		[leftPaddle, rightPaddle] = createPaddles(canvas, player1Name, player2Name);
-		ball = createBall(canvas, difficulty);
-		state.player1 = leftPaddle;
-		state.player2 = rightPaddle;
-		state.ball = ball;
-	}
+	// Now create the actual game objects with proper canvas dimensions
+	const [leftPaddle, rightPaddle] = createPaddles(canvas, safePlayer1Name, safePlayer2Name);
+	const ball = createBall(canvas, difficulty);
+	
+	// Initialize game state with the actual game objects
+	state.player1 = leftPaddle;
+	state.player2 = rightPaddle;
+	state.ball = ball;
+	
+	// Initialize other state properties
+	initializeGameState(safePlayer1Name, safePlayer2Name, maxGames, mode, gameId, avatar1, avatar2);
 
 	let resizeTimeout: number | null = null;
 	const resizeHandler = () => {
@@ -113,7 +112,7 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 	};
 	window.addEventListener('resize', resizeHandler);
 
-	if (state.player1 && state.player2) setupControls(state.player1, state.player2, 400); // 400 pixels per second for time-based movement
+	if (state.player1 && state.player2) setupControls(state.player1, state.player2, 400, isAI); // 400 pixels per second for time-based movement
 	setupGameEvents(container);
 
 	gameCleanupFunction = () => {
@@ -130,24 +129,38 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 		console.log('🧹 Game cleanup completed');
 	};
 
-	startOptimizedCountdown(canvas, ctx, leftPaddle, rightPaddle, ball, maxGames, onGameEnd, mode, gameId, isAI);
+	startOptimizedCountdown(canvas, ctx, state.player1!, state.player2!, state.ball!, maxGames, onGameEnd, mode, gameId, isAI, difficulty);
 }
 
 
 function initializeGameState(player1Name: string, player2Name: string, maxGames: number, mode: any,
 	gameId?: number, avatar1?: string, avatar2?: string) {
-	state.player1 = {
-		nickname: player1Name,
-		avatarUrl: avatar1 || '/default.png',
-		x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
-		upKey: 'w', downKey: 's'
-	};
-	state.player2 = {
-		nickname: player2Name,
-		avatarUrl: avatar2 || '/default.png',
-		x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
-		upKey: 'ArrowUp', downKey: 'ArrowDown'
-	};
+	// Only initialize if paddles don't exist, otherwise just update the metadata
+	if (!state.player1) {
+		state.player1 = {
+			nickname: player1Name,
+			avatarUrl: avatar1 || '/default.png',
+			x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
+			upKey: 'w', downKey: 's'
+		};
+	} else {
+		// Update existing paddle metadata without replacing the object
+		state.player1.nickname = player1Name;
+		state.player1.avatarUrl = avatar1 || '/default.png';
+	}
+	
+	if (!state.player2) {
+		state.player2 = {
+			nickname: player2Name,
+			avatarUrl: avatar2 || '/default.png',
+			x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
+			upKey: 'ArrowUp', downKey: 'ArrowDown'
+		};
+	} else {
+		// Update existing paddle metadata without replacing the object
+		state.player2.nickname = player2Name;
+		state.player2.avatarUrl = avatar2 || '/default.png';
+	}
 	state.score1 = 0;
 	state.score2 = 0;
 	state.round = 1;
@@ -388,7 +401,7 @@ function initializeOptimizedEffects() {
 
 function startOptimizedCountdown(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
 	leftPaddle: any, rightPaddle: any, ball: any, maxGames: number, onGameEnd: any, mode: any,
-	gameId?: number, isAI: boolean = false) {
+	gameId?: number, isAI: boolean = false, difficulty: string = 'normal') {
 	console.log('⏰ Starting countdown...');
 	let countdown = 3;
 	const countdownMessages = [t.ready, t.set, t.go];
@@ -420,7 +433,7 @@ function startOptimizedCountdown(canvas: HTMLCanvasElement, ctx: CanvasRendering
 						state.score1 = score1; state.score2 = score2;
 						triggerScoreAnimation();
 						if (onGameEnd) onGameEnd(canvas, score1, score2);
-					}, mode, gameId, isAI
+					}, mode, gameId, isAI, difficulty
 				);
 			}
 		}, 1000);
