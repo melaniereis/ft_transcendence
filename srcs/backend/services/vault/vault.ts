@@ -66,12 +66,17 @@ export async function storeEncryptionKey(key: string): Promise<void> {
 
 	for (let attempt = 1; attempt <= maxRetries; attempt++) {
 		try {
+			console.log(`Attempt ${attempt}: Storing key in Vault at URL: ${url}`);
+			console.log('Request body:', JSON.stringify(body));
+			console.log('Request headers:', vaultHeaders());
 
 			await axios.put(url, body, { headers: vaultHeaders() });
 			console.log('Encryption key stored successfully');
 			return; // success, exit function
 		} 
 		catch (err: any) {
+			console.log(`Attempt ${attempt} failed.`);
+			console.log('Vault error response data:', err.response?.data);
 
 			if (attempt === maxRetries) {
 				if (err.response?.status === 404) {

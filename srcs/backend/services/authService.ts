@@ -25,6 +25,7 @@ export async function registerUser({ username, password, name, team, display_nam
 					console.error('Error inserting user:', err);
 					reject(err);
 				} else {
+					console.log('New user created successfully');
 					resolve({ id: this.lastID });
 				}
 			}
@@ -45,7 +46,7 @@ export async function loginUser(username: string, password: string):
 				}
 
 				if (!userRaw) {
-					console.warn('⚠️ User not found');
+					console.log('⚠️ User not found');
 					return resolve(null);
 				}
 
@@ -88,6 +89,7 @@ export async function loginUser(username: string, password: string):
 											console.error('Error updating online status:', err);
 											reject(err);
 										} else {
+											console.log(`User ${user.id} set to online`);
 											resolve({
 												token,
 												user: {
@@ -143,6 +145,7 @@ export async function cleanExpiredSessions(): Promise<void> {
 					console.error('Erro ao limpar sessões expiradas:', err);
 					reject(err);
 				} else {
+					console.log(`${this.changes} sessões expiradas removidas`);
 					resolve();
 				}
 			}

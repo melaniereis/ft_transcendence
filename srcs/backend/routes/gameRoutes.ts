@@ -11,6 +11,7 @@ export async function gameRoutes(fastify: FastifyInstance) {
 		preHandler: authHook,
 		handler: async (req: FastifyRequest, reply: FastifyReply) => {
 			const { gameId } = req.params as { gameId: string };
+			console.log(`🔍 GET /games/${gameId} called`);
 
 			try {
 				const game = await getGameById(Number(gameId));
@@ -18,6 +19,8 @@ export async function gameRoutes(fastify: FastifyInstance) {
 					console.warn(`⚠️ Game ${gameId} not found`);
 					return reply.status(404).send({ error: 'Game not found' });
 				}
+
+				console.log('✅ Game data found:', game);
 
 				reply.send({
 					game_id: game.game_id, player1_id: game.player1_id, player2_id: game.player2_id,
@@ -42,8 +45,11 @@ export async function gameRoutes(fastify: FastifyInstance) {
 				time_started: string;
 			};
 
+			console.log('🆕 POST /games called with:', { player1_id, player2_id, max_games, time_started });
+
 			try {
 				const gameId = await createGame(player1_id, player2_id, max_games, time_started);
+				console.log(`✅ Game created with ID: ${gameId}`);
 
 				reply.status(201).send({ message: 'Game created', game_id: gameId });
 			}
@@ -73,10 +79,14 @@ export async function gameRoutes(fastify: FastifyInstance) {
 				const gameIdNum = Number(gameId);
 				const { player1Id, player2Id } = await getPlayersFromGame(gameIdNum);
 
+				console.log('Players:', { player1Id, player2Id });
+
 				const winnerId =
 					score_player1 > score_player2 ? player1Id :
 						score_player2 > score_player1 ? player2Id :
 							null;
+
+				console.log('Calculated winnerId:', winnerId);
 
 				if (winnerId !== null)
 					await db.run('UPDATE games SET winner_id = ? WHERE game_id = ?', [winnerId, gameIdNum]);
@@ -89,6 +99,8 @@ export async function gameRoutes(fastify: FastifyInstance) {
 
 				await createMatchHistoryRecord(gameIdNum, player1Id, player2Id, score_player1, score_player2, 0);
 				await createMatchHistoryRecord(gameIdNum, player2Id, player1Id, score_player2, score_player1, 0);
+
+				console.log(`🎮 Game ${gameIdNum} ended. Winner: ${winnerId ?? 'Draw'}`);
 
 				reply.status(200).send({ message: 'Game ended successfully', winner_id: winnerId });
 			}
