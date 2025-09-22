@@ -91,7 +91,13 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		const clickListener = function (e: Event) {
 			const target = e.target as HTMLElement;
-			if (target.tagName === 'BUTTON' && gameInSession) {
+			// Prevent triggering on main menu or return buttons
+			if (
+				target.tagName === 'BUTTON' &&
+				gameInSession &&
+				!target.closest('#main-menu-btn') &&
+				!target.closest('#return-main-btn')
+			) {
 				handleUserLeave(t.connectionLost);
 			}
 		};
@@ -145,11 +151,26 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		}
 
 		if (data.type === 'scoreUpdate') {
-			gameState.leftScore = data.leftScore;
-			gameState.rightScore = data.rightScore;
-			gameState.leftPlayerName = data.leftPlayerName || playerName;
-			gameState.rightPlayerName = data.rightPlayerName || opponentName;
-			updateScoreDisplay(gameState.leftScore, gameState.rightScore);
+			if (assignedSide === 'left') {
+				gameState.leftScore = data.leftScore;
+				gameState.rightScore = data.rightScore;
+				gameState.leftPlayerName = playerName;
+				gameState.rightPlayerName = opponentName;
+				updateScoreDisplay(data.leftScore, data.rightScore);
+			} else if (assignedSide === 'right') {
+				gameState.leftScore = data.rightScore;
+				gameState.rightScore = data.leftScore;
+				gameState.leftPlayerName = playerName;
+				gameState.rightPlayerName = opponentName;
+				updateScoreDisplay(data.rightScore, data.leftScore);
+			} else {
+				// fallback if side not assigned
+				gameState.leftScore = data.leftScore;
+				gameState.rightScore = data.rightScore;
+				gameState.leftPlayerName = data.leftPlayerName || playerName;
+				gameState.rightPlayerName = data.rightPlayerName || opponentName;
+				updateScoreDisplay(data.leftScore, data.rightScore);
+			}
 		}
 
 		if (data.type === 'end') {
