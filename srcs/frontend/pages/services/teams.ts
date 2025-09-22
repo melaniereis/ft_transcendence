@@ -213,6 +213,24 @@ export async function renderTeamsPage(container: HTMLElement) {
 		const team = teams[idx];
 		grid.appendChild(createTeamStatsCard(team, members));
 	});
+
+	// Store the refresh function globally for use when tournaments are won
+	(window as any).refreshTeamsData = async () => {
+		const grid = container.querySelector('#teams-grid') as HTMLElement;
+		if (!grid) return;
+
+		// Clear existing team cards
+		grid.innerHTML = '';
+
+		// Fetch fresh data
+		const statsPromises = teams.map(team => fetchTeamStats(team.key));
+		const allTeamsStats = await Promise.all(statsPromises);
+
+		allTeamsStats.forEach((members, idx) => {
+			const team = teams[idx];
+			grid.appendChild(createTeamStatsCard(team, members));
+		});
+	};
 }
 
 // 🧩 Team Card Creator

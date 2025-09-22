@@ -1,3 +1,4 @@
+export { startOptimizedCountdown, initializeGameState };
 import { createBall, createPaddles } from './setupGame.js';
 import { Ball } from './types.js';
 import { startGameLoop } from './gameLoop.js';
@@ -39,8 +40,8 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 
 	// Create basic UI layout first
 	container.innerHTML = renderGameLayout({
-		player1: { nickname: safePlayer1Name, avatarUrl: avatar1 || '/default.png' } as any, 
-		player2: { nickname: safePlayer2Name, avatarUrl: avatar2 || '/default.png' } as any,
+		player1: { nickname: safePlayer1Name, avatarUrl: avatar1 || '/default.png', isAI: isAI } as any,
+		player2: { nickname: safePlayer2Name, avatarUrl: avatar2 || '/default.png', isAI: false } as any,
 		score1: 0, score2: 0, round: 1, mode: mode,
 		avatar1: avatar1, avatar2: avatar2, canvasId: 'pong',
 		showControls: true, modalsHtml: renderModals()
@@ -63,14 +64,14 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 	// Now create the actual game objects with proper canvas dimensions
 	const [leftPaddle, rightPaddle] = createPaddles(canvas, safePlayer1Name, safePlayer2Name);
 	const ball = createBall(canvas, difficulty);
-	
+
 	// Initialize game state with the actual game objects
 	state.player1 = leftPaddle;
 	state.player2 = rightPaddle;
 	state.ball = ball;
-	
+
 	// Initialize other state properties
-	initializeGameState(safePlayer1Name, safePlayer2Name, maxGames, mode, gameId, avatar1, avatar2);
+	initializeGameState(safePlayer1Name, safePlayer2Name, maxGames, mode, gameId, avatar1, avatar2, isAI);
 
 	let resizeTimeout: number | null = null;
 	const resizeHandler = () => {
@@ -134,32 +135,35 @@ export function renderGame(container: HTMLElement, player1Name: string, player2N
 
 
 function initializeGameState(player1Name: string, player2Name: string, maxGames: number, mode: any,
-	gameId?: number, avatar1?: string, avatar2?: string) {
+	gameId?: number, avatar1?: string, avatar2?: string, isAI: boolean = false) {
 	// Only initialize if paddles don't exist, otherwise just update the metadata
 	if (!state.player1) {
 		state.player1 = {
 			nickname: player1Name,
 			avatarUrl: avatar1 || '/default.png',
 			x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
-			upKey: 'w', downKey: 's'
+			upKey: 'w', downKey: 's',
+			isAI: isAI
 		};
 	} else {
 		// Update existing paddle metadata without replacing the object
 		state.player1.nickname = player1Name;
 		state.player1.avatarUrl = avatar1 || '/default.png';
+		state.player1.isAI = isAI;
 	}
-	
 	if (!state.player2) {
 		state.player2 = {
 			nickname: player2Name,
 			avatarUrl: avatar2 || '/default.png',
 			x: 0, y: 0, width: 10, height: 80, dy: 0, score: 0,
-			upKey: 'ArrowUp', downKey: 'ArrowDown'
+			upKey: 'ArrowUp', downKey: 'ArrowDown',
+			isAI: false
 		};
 	} else {
 		// Update existing paddle metadata without replacing the object
 		state.player2.nickname = player2Name;
 		state.player2.avatarUrl = avatar2 || '/default.png';
+		state.player2.isAI = false;
 	}
 	state.score1 = 0;
 	state.score2 = 0;

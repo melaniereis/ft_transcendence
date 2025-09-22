@@ -17,6 +17,7 @@ export interface Paddle {
 	downKey: string;
 	nickname: string;
 	avatarUrl?: string;
+	isAI?: boolean;
 }
 
 export interface Ball {

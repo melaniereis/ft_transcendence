@@ -2,7 +2,10 @@
 
 import { GRIS_COLORS, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from './constants.js';
 import { showOptimizedFeedback } from './events.js';
+import { startOptimizedCountdown, initializeGameState } from './renderGame.js';
+import { state } from './state.js';
 import { translations } from '../language/translations.js';
+import { updateScoreDisplay } from './gameControls.js';
 
 let confettiAnimationId: number | null = null;
 
@@ -76,8 +79,8 @@ function launchOptimizedConfetti(winnerName: string) {
 }
 
 export function renderEndGameModal(score1: number, score2: number, player1Name: string,
-player2Name: string, mode: 'single' | 'tournament' | 'quick', onRestart: (winnerId?: number) => void,
-winnerId?: number) {
+	player2Name: string, mode: 'single' | 'tournament' | 'quick', onRestart: (winnerId?: number) => void,
+	winnerId?: number) {
 
 	// Só mostra modal se o jogo ainda está ativo
 	const gameContainer = document.getElementById('pong');
@@ -259,11 +262,55 @@ winnerId?: number) {
 		};
 	}
 
+	const isAI = state.player1?.isAI || state.player2?.isAI || false;
+
 	restartBtn.onclick = () => {
 		modal.remove();
 		document.body.style.overflow = '';
 		if ((window as any).stopConfetti) (window as any).stopConfetti();
-		onRestart(winnerId);
+		if (mode === 'tournament') {
+			// Let tournament flow handle next match/modal
+			onRestart(winnerId);
+			return;
+		}
+		const canvas = document.getElementById('pong') as HTMLCanvasElement;
+		const ctx = canvas.getContext('2d');
+		if (!canvas || !ctx) return;
+
+		// Clean scores before initializing game
+		if (state.player1) state.player1.score = 0;
+		if (state.player2) state.player2.score = 0;
+		state.score1 = 0;
+		state.score2 = 0;
+		// Update score display to zero
+		updateScoreDisplay(0, 0);
+
+		const currentRound = state.round;
+		initializeGameState(
+			state.player1?.nickname || player1Name,
+			state.player2?.nickname || player2Name,
+			state.maxRounds || 1,
+			mode,
+			state.gameId,
+			state.player1?.avatarUrl,
+			state.player2?.avatarUrl,
+			isAI // pass isAI flag
+		);
+		state.round = currentRound + 1; // increment round
+
+		startOptimizedCountdown(
+			canvas,
+			ctx,
+			state.player1!,
+			state.player2!,
+			state.ball!,
+			state.maxRounds || 1,
+			undefined, // onGameEnd
+			mode,
+			state.gameId,
+			isAI,
+			"normal"
+		);
 	};
 
 	content.appendChild(buttonRow);
@@ -284,8 +331,8 @@ winnerId?: number) {
 	showOptimizedFeedback(t.gameOver, GRIS_COLORS.primary);
 }
 
-export async function endGame(score1: number,score2: number,canvas: HTMLCanvasElement,onRestart: (winnerId?: number) => void,
-player1Name: string, player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
+export async function endGame(score1: number, score2: number, canvas: HTMLCanvasElement, onRestart: (winnerId?: number) => void,
+	player1Name: string, player2Name: string, mode: 'single' | 'tournament' | 'quick' = 'single', gameId?: number) {
 	let winnerId: number | undefined;
 
 	if (gameId) {
@@ -303,7 +350,7 @@ player1Name: string, player2Name: string, mode: 'single' | 'tournament' | 'quick
 				const data = await res.json();
 				winnerId = data.winner_id;
 			}
-		} 
+		}
 		catch (err) {
 		}
 	}

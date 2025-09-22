@@ -1,7 +1,7 @@
 import type { MultiplayerGameOptions } from '../../../types/remoteTypes.js';
 import { drawRect, drawCircle, drawNet, setOptimizedCanvasSize } from '../renderGame/gameCanvas.js';
 import { GRIS_COLORS, GRIS_SPACING, GRIS_SHADOWS, GRIS_TYPOGRAPHY } from '../renderGame/constants.js'
-import { translations } from '../language/translations.js';;
+import { translations } from '../language/translations.js';
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
@@ -11,7 +11,14 @@ const t = translations[lang];
 export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	// Detect user navigation or click outside game controls
 	function handleUserLeave(reason = t.connectionLost) {
-		if (!gameInSession) return;
+		// Only trigger leave logic if the game is still in session
+		if (!gameInSession) {
+			// If game already ended, just close connection and return to menu
+			if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+			hideAllModals();
+			window.location.href = '/';
+			return;
+		}
 		gameInSession = false;
 		if (animationId) {
 			cancelAnimationFrame(animationId);
@@ -77,6 +84,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		// Define listeners for this game session so they reference the correct state
 		const leaveListener = function (e: Event) {
 			if (gameInSession) handleUserLeave(t.connectionLost);
+			console.log('User is leaving the page');
 		};
 		(window as any)._leaveListener = leaveListener;
 		window.addEventListener('beforeunload', leaveListener);
@@ -95,9 +103,13 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			if (
 				target.tagName === 'BUTTON' &&
 				gameInSession &&
-				!target.closest('#main-menu-btn') &&
-				!target.closest('#return-main-btn')
+				!(
+					target.closest('#main-menu-btn') ||
+					target.closest('#return-main-btn') ||
+					target.closest('#return-menu-btn')
+				)
 			) {
+				console.log('User is clicking outside the game');
 				handleUserLeave(t.connectionLost);
 			}
 		};
@@ -151,26 +163,12 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		}
 
 		if (data.type === 'scoreUpdate') {
-			if (assignedSide === 'left') {
-				gameState.leftScore = data.leftScore;
-				gameState.rightScore = data.rightScore;
-				gameState.leftPlayerName = playerName;
-				gameState.rightPlayerName = opponentName;
-				updateScoreDisplay(data.leftScore, data.rightScore);
-			} else if (assignedSide === 'right') {
-				gameState.leftScore = data.rightScore;
-				gameState.rightScore = data.leftScore;
-				gameState.leftPlayerName = playerName;
-				gameState.rightPlayerName = opponentName;
-				updateScoreDisplay(data.rightScore, data.leftScore);
-			} else {
-				// fallback if side not assigned
-				gameState.leftScore = data.leftScore;
-				gameState.rightScore = data.rightScore;
-				gameState.leftPlayerName = data.leftPlayerName || playerName;
-				gameState.rightPlayerName = data.rightPlayerName || opponentName;
-				updateScoreDisplay(data.leftScore, data.rightScore);
-			}
+			gameState.leftScore = data.leftScore;
+			gameState.rightScore = data.rightScore;
+			gameState.leftPlayerName = data.leftPlayerName || playerName;
+			gameState.rightPlayerName = data.rightPlayerName || opponentName;
+			updateScoreDisplay(data.leftScore, data.rightScore);
+
 		}
 
 		if (data.type === 'end') {
@@ -219,12 +217,14 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			showWaitingModal(data.message);
 		if (data.type === 'nextGameStarted') {
 			hideAllModals();
+			// Reset scores and player names before countdown
+			gameState.leftScore = 0;
+			gameState.rightScore = 0;
+			gameState.leftPlayerName = playerName;
+			gameState.rightPlayerName = opponentName;
+			updateScoreDisplay(0, 0);
 			if (data.gameId) {
 				currentGameId = data.gameId;
-				// Reset scores before countdown
-				gameState.leftScore = 0;
-				gameState.rightScore = 0;
-				updateScoreDisplay(0, 0);
 				// Show countdown before starting next game
 				showCountdown(() => {
 					startGameSession(currentGameId);
@@ -243,11 +243,10 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				animationId = null;
 			}
 			hideAllModals();
-			// Show correct message for the winner
-			showOpponentLeftModal(t.opponentLeftYouWin);
-
-			// Only the stayer (not the leaver) should update the backend
+			// Only show modal if this client is not the leaver
 			if (!data.leaverName || playerName !== data.leaverName) {
+				// Show correct message for the winner
+				showOpponentLeftModal(t.opponentLeftYouWin);
 				let winnerScore = maxGames;
 				let loserScore = 0;
 				let winnerName = playerName;
@@ -454,6 +453,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		});
 
 		modal.querySelector('#main-menu-btn')!.addEventListener('click', () => {
+			gameInSession = false; // Ensure we do not trigger disconnect win logic
 			if (ws && ws.readyState === WebSocket.OPEN) {
 				ws.send(JSON.stringify({ type: 'playerLeaving' }));
 			}

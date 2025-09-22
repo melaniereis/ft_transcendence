@@ -288,6 +288,11 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 													await updateMatch(id, 'final', finalWinnerId);
 													winners.final = finalWinnerId;
 
+													// Refresh teams data to reflect tournament win
+													if (typeof (window as any).refreshTeamsData === 'function') {
+														await (window as any).refreshTeamsData();
+													}
+
 													bracketWrapper.style.display = 'flex';
 
 													// Hide the game canvas when showing the bracket
