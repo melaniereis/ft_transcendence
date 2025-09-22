@@ -9,13 +9,46 @@ const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguag
 const t = translations[lang];
 
 export function renderMultiplayerGame(options: MultiplayerGameOptions) {
-	const { container, playerName, opponentName, gameId, maxGames, difficulty, playerAvatarUrl = 'default.png', opponentAvatarUrl = 'default.png' } = options;
+	// Detect user navigation or click outside game controls
+	function handleUserLeave(reason = t.connectionLost) {
+		if (!gameInSession) return;
+		gameInSession = false;
+		if (animationId) {
+			cancelAnimationFrame(animationId);
+			animationId = null;
+		}
+		hideAllModals();
+		// Assign scores: leaver loses, stayer wins
+		let winnerScore = maxGames;
+		let loserScore = 0;
+		let winnerName, loserName;
+		if (assignedSide === 'left') {
+			gameState.leftScore = loserScore;
+			gameState.rightScore = winnerScore;
+			winnerName = gameState.rightPlayerName;
+			loserName = gameState.leftPlayerName;
+		} else {
+			gameState.leftScore = winnerScore;
+			gameState.rightScore = loserScore;
+			winnerName = gameState.leftPlayerName;
+			loserName = gameState.rightPlayerName;
+		}
+		// Show correct message for the leaver (loser)
+		showOpponentLeftModal(t.youLostByLeaving);
+		// Do not update backend here; only the stayer should update the score
+		if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+	}
 
-	let game_id = gameId;
+	// Event listeners will be defined per game session
+
+
+	const { container, playerName, opponentName, maxGames, difficulty, playerAvatarUrl = 'default.png', opponentAvatarUrl = 'default.png' } = options;
+
+	let currentGameId = options.gameId;
 	createBeautifulMultiplayerUI(container, playerName, opponentName, maxGames, playerAvatarUrl, opponentAvatarUrl);
 
-	const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-	const ws = new WebSocket(`${protocol}://${location.host}/game/${gameId}`);
+	let ws: WebSocket | undefined;
+	let protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 	let updatedb = 0;
 	let assignedSide: 'left' | 'right' | null = null;
 	let gameInSession = false;
@@ -31,15 +64,73 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		rightPlayerName: opponentName
 	};
 
-	ws.onopen = () => {
-		ws.send(JSON.stringify({
-			type: 'join',
-			playerName: playerName,
-			maxScore: maxGames
-		}));
-	};
+	function startGameSession(gameId: string) {
+		// Clean up previous ws and listeners
+		if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+		window.removeEventListener('beforeunload', (window as any)._leaveListener);
+		document.removeEventListener('visibilitychange', (document as any)._visibilityListener);
+		document.body.removeEventListener('click', (document as any)._clickListener, true);
+		document.removeEventListener('keydown', (document as any)._keydownListener);
 
-	ws.onmessage = ev => {
+		ws = new WebSocket(`${protocol}://${location.host}/game/${gameId}`);
+
+		// Define listeners for this game session so they reference the correct state
+		const leaveListener = function (e: Event) {
+			if (gameInSession) handleUserLeave(t.connectionLost);
+		};
+		(window as any)._leaveListener = leaveListener;
+		window.addEventListener('beforeunload', leaveListener);
+
+		const visibilityListener = function () {
+			if (document.visibilityState === 'hidden' && gameInSession) {
+				handleUserLeave(t.connectionLost);
+			}
+		};
+		(document as any)._visibilityListener = visibilityListener;
+		document.addEventListener('visibilitychange', visibilityListener);
+
+		const clickListener = function (e: Event) {
+			const target = e.target as HTMLElement;
+			// Prevent triggering on main menu or return buttons
+			if (
+				target.tagName === 'BUTTON' &&
+				gameInSession &&
+				!target.closest('#main-menu-btn') &&
+				!target.closest('#return-main-btn')
+			) {
+				handleUserLeave(t.connectionLost);
+			}
+		};
+		(document as any)._clickListener = clickListener;
+		document.body.addEventListener('click', clickListener, true);
+
+		const keydownListener = function (e: KeyboardEvent) {
+			if (!gameInSession) return;
+			if (e.key === 'h' || e.key === 'Escape') {
+				handleUserLeave(t.connectionLost);
+			}
+		};
+		(document as any)._keydownListener = keydownListener;
+		document.addEventListener('keydown', keydownListener);
+
+		// ...existing ws.onopen and ws.onmessage logic...
+	}
+
+	// Start first game session
+	startGameSession(currentGameId);
+
+	if (ws) {
+		ws.onopen = () => {
+			ws!.send(JSON.stringify({
+				type: 'join',
+				playerName: playerName,
+				maxScore: maxGames
+			}));
+		};
+	}
+
+	if (!ws) return;
+	ws.onmessage = (ev: MessageEvent) => {
 		const data = JSON.parse(ev.data);
 
 		if (data.type === 'assignSide') {
@@ -60,70 +151,65 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		}
 
 		if (data.type === 'scoreUpdate') {
-			gameState.leftScore = data.leftScore;
-			gameState.rightScore = data.rightScore;
-			gameState.leftPlayerName = data.leftPlayerName || playerName;
-			gameState.rightPlayerName = data.rightPlayerName || opponentName;
-			updateScoreDisplay(gameState.leftScore, gameState.rightScore);
+			if (assignedSide === 'left') {
+				gameState.leftScore = data.leftScore;
+				gameState.rightScore = data.rightScore;
+				gameState.leftPlayerName = playerName;
+				gameState.rightPlayerName = opponentName;
+				updateScoreDisplay(data.leftScore, data.rightScore);
+			} else if (assignedSide === 'right') {
+				gameState.leftScore = data.rightScore;
+				gameState.rightScore = data.leftScore;
+				gameState.leftPlayerName = playerName;
+				gameState.rightPlayerName = opponentName;
+				updateScoreDisplay(data.rightScore, data.leftScore);
+			} else {
+				// fallback if side not assigned
+				gameState.leftScore = data.leftScore;
+				gameState.rightScore = data.rightScore;
+				gameState.leftPlayerName = data.leftPlayerName || playerName;
+				gameState.rightPlayerName = data.rightPlayerName || opponentName;
+				updateScoreDisplay(data.leftScore, data.rightScore);
+			}
 		}
 
 		if (data.type === 'end') {
-			(async () => {
-				gameInSession = false;
-				if (animationId) {
-					cancelAnimationFrame(animationId);
-					animationId = null;
-				}
-				showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
-				++updatedb;
-				console.log(updatedb);
-				if (updatedb === 3) {
-					const response = await fetch(`/games/${gameId}`, {
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`
+			gameInSession = false;
+			if (animationId) {
+				cancelAnimationFrame(animationId);
+				animationId = null;
+			}
+			showRemoteEndGameModal(data.leftScore, data.rightScore, data.leftPlayerName, data.rightPlayerName);
+			// Only the winner sends backend update for normal game end
+			const winnerName = data.leftScore > data.rightScore ? data.leftPlayerName : data.rightPlayerName;
+			if (playerName === winnerName) {
+				(async () => {
+					try {
+						const res = await fetch(`/games/${currentGameId}/end`, {
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json',
+								'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+							},
+							body: JSON.stringify({
+								score_player1: data.leftScore,
+								score_player2: data.rightScore,
+								winner_id: winnerName,
+								loser_id: data.leftScore > data.rightScore ? data.rightPlayerName : data.leftPlayerName,
+								reason: 'game-ended'
+							})
+						});
+						if (res.ok) {
+							const result = await res.json();
+							console.log('Game ended and result updated in DB:', result);
+						} else {
+							console.error('Failed to update game result in DB');
 						}
-					});
-					const game = await response.json();
-
-					const createRes = await fetch('/games', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: `Bearer ${localStorage.getItem('authToken') || ''}`
-						},
-						body: JSON.stringify({
-							player1_id: game.player1.id,
-							player2_id: game.player2.id,
-							max_games: maxGames,
-							time_started: new Date().toISOString()
-						})
-					});
-
-					const createData = await createRes.json();
-					game_id = createData.game_id;
-					updatedb = 1;
-				}
-				if (updatedb === 1 && game_id) {
-					(async () => {
-						try {
-							console.log("ENTREI");
-							const res = await fetch(`/games/${game_id}/end`, {
-								method: 'PUT',
-								headers: {
-									'Content-Type': 'application/json',
-									'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-								},
-								body: JSON.stringify({
-									score_player1: Number(document.getElementById('left-score')?.textContent),
-									score_player2: Number(document.getElementById('right-score')?.textContent)
-								})
-							});
-						}
-						catch (err) {
-						}
-					})();
-				}
-			})();
+					} catch (err) {
+						console.error('Error while updating game result:', err);
+					}
+				})();
+			}
 		}
 
 		if (data.type === 'nextGameInvite')
@@ -133,6 +219,10 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			showWaitingModal(data.message);
 		if (data.type === 'nextGameStarted') {
 			hideAllModals();
+			if (data.gameId) {
+				currentGameId = data.gameId;
+				startGameSession(currentGameId);
+			}
 			gameInSession = true;
 			gameState.leftScore = 0;
 			gameState.rightScore = 0;
@@ -149,45 +239,55 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 				animationId = null;
 			}
 			hideAllModals();
-			showOpponentLeftModal(data.message);
+			// Show correct message for the winner
+			showOpponentLeftModal(t.opponentLeftYouWin);
 
-			let winnerScore = 3;
-			let loserScore = 0;
-
-			if (assignedSide === 'left') {
-				gameState.leftScore = winnerScore;
-				gameState.rightScore = loserScore;
-			} 
-			else {
-				gameState.leftScore = loserScore;
-				gameState.rightScore = winnerScore;
-			}
-
-			(async () => {
-				try {
-					const res = await fetch(`/games/${gameId}/end`, {
-						method: 'PUT',
-						headers: {
-							'Content-Type': 'application/json',
-							'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-						},
-						body: JSON.stringify({
-							score_player1: gameState.leftScore,
-							score_player2: gameState.rightScore,
-							winner_id: assignedSide === 'left' ? gameState.leftPlayerName : gameState.rightPlayerName
-						})
-					});
-
-					if (res.ok) {
-						const result = await res.json();
-						console.log('Game ended and winner updated in DB:', result);
-					} 
-					else
-						console.error('Failed to update game result in DB');
-				} catch (err) {
-					console.error('Error while updating game result:', err);
+			// Only the stayer (not the leaver) should update the backend
+			if (!data.leaverName || playerName !== data.leaverName) {
+				let winnerScore = maxGames;
+				let loserScore = 0;
+				let winnerName = playerName;
+				let loserName = opponentName;
+				let score_player1, score_player2;
+				// Pair scores with correct player IDs
+				if (winnerName === gameState.leftPlayerName) {
+					score_player1 = winnerScore;
+					score_player2 = loserScore;
+				} else {
+					score_player1 = loserScore;
+					score_player2 = winnerScore;
 				}
-			})();
+				gameState.leftScore = score_player1;
+				gameState.rightScore = score_player2;
+
+				(async () => {
+					try {
+						const res = await fetch(`/games/${currentGameId}/end`, {
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json',
+								'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+							},
+							body: JSON.stringify({
+								score_player1,
+								score_player2,
+								winner_id: winnerName,
+								loser_id: loserName,
+								reason: 'left-game'
+							})
+						});
+
+						if (res.ok) {
+							const result = await res.json();
+							console.log('Game ended and winner updated in DB:', result);
+						}
+						else
+							console.error('Failed to update game result in DB');
+					} catch (err) {
+						console.error('Error while updating game result:', err);
+					}
+				})();
+			}
 		}
 	};
 
@@ -251,7 +351,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		`;
 
 		modal.querySelector('#return-main-btn')!.addEventListener('click', () => {
-			ws.close();
+			if (ws) ws.close();
 			window.location.href = '/';
 		});
 
@@ -345,15 +445,15 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		`;
 
 		modal.querySelector('#next-game-btn')!.addEventListener('click', () => {
-			ws.send(JSON.stringify({ type: 'inviteNext' }));
+			if (ws) ws.send(JSON.stringify({ type: 'inviteNext' }));
 			modal.remove();
 		});
 
 		modal.querySelector('#main-menu-btn')!.addEventListener('click', () => {
-			if (ws.readyState === WebSocket.OPEN) {
+			if (ws && ws.readyState === WebSocket.OPEN) {
 				ws.send(JSON.stringify({ type: 'playerLeaving' }));
 			}
-			ws.close();
+			if (ws) ws.close();
 			window.location.href = '/';
 		});
 
@@ -840,12 +940,12 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 		`;
 
 		modal.querySelector('#accept-btn')!.addEventListener('click', () => {
-			ws.send(JSON.stringify({ type: 'acceptNext' }));
+			if (ws) ws.send(JSON.stringify({ type: 'acceptNext' }));
 			modal.remove();
 		});
 
 		modal.querySelector('#decline-btn')!.addEventListener('click', () => {
-			ws.send(JSON.stringify({ type: 'declineNext' }));
+			if (ws) ws.send(JSON.stringify({ type: 'declineNext' }));
 			modal.remove();
 			window.location.href = '/';
 		});
@@ -950,7 +1050,7 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		if ((assignedSide === 'left' || assignedSide === 'right') && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
-			ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'start', direction }));
 		}
 	});
 
@@ -959,31 +1059,31 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 		if ((assignedSide === 'left' || assignedSide === 'right') && (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S')) {
 			const direction = (e.key === 'w' || e.key === 'W') ? 'ArrowUp' : 'ArrowDown';
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction }));
 		}
 	});
 
 	window.addEventListener('blur', () => {
 		if (!assignedSide || !gameInSession) return;
-		ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
-		ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
+		if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
+		if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
 	});
 
 	document.addEventListener('visibilitychange', () => {
 		if (document.hidden && assignedSide && gameInSession) {
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
 		}
 	});
 
 	// Track if mouse is inside the window
 	let mouseInWindow = true;
 	let lastMouseLeaveTime = 0;
-	
+
 	document.addEventListener('mouseenter', () => {
 		mouseInWindow = true;
 	});
-	
+
 	document.addEventListener('mouseleave', () => {
 		mouseInWindow = false;
 		lastMouseLeaveTime = Date.now();
@@ -992,13 +1092,13 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	// Only stop paddle if window loses focus AND mouse was recently outside
 	window.addEventListener('blur', () => {
 		if (!assignedSide || !gameInSession) return;
-		
+
 		// Check if mouse left the window recently (within 100ms) before focus loss
 		// This indicates a click outside the window
 		const timeSinceMouseLeave = Date.now() - lastMouseLeaveTime;
 		if (!mouseInWindow && timeSinceMouseLeave < 100) {
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
 		}
 	});
 
