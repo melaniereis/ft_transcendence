@@ -73,8 +73,6 @@ export function insertUserMatch(userId: string | number, match: UserMatch): void
 	db.run(query, [result, match_duration, goals_scored, goals_conceded, date_played], (err: Error | null) => {
 		if (err)
 			console.error(`❌ Failed to insert match for user ${userId}:`, err.message);
-		else
-			console.log(`✅ Match inserted for user ${userId}`);
 	});
 }
 
@@ -174,7 +172,6 @@ export function updateUserStatsForTournament(userId: number, isWinner: boolean):
 					teamRow.win_rate
 					);
 
-					console.log(`✅ Team '${user.team}' tournament count updated`);
 				} catch (teamErr) {
 					console.error(`❌ Failed to update team tournament wins:`, teamErr);
 				}
@@ -214,7 +211,6 @@ export function updateUserStatsForTournament(userId: number, isWinner: boolean):
 					await updateTeamMember(tableName, teamRow.id, teamRow.members, teamRow.victories,
 					updatedTeamTournamentsWon, teamRow.defeats, teamRow.win_rate);
 
-					console.log(`✅ Team '${user.team}' tournament count updated`);
 				} catch (teamErr) {
 					console.error(`❌ Failed to update team tournament wins:`, teamErr);
 				}

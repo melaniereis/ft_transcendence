@@ -3,7 +3,6 @@ import { verifyToken } from '../services/authService.js';
 
 export async function authHook(request: FastifyRequest, reply: FastifyReply) {
 	const authHeader = request.headers.authorization;
-	console.log('🔐 authHook: Authorization header:', authHeader);
 
 	if (!authHeader) {
 		console.warn('🚫 No Authorization header provided');
@@ -27,7 +26,6 @@ export async function authHook(request: FastifyRequest, reply: FastifyReply) {
 		}
 
 		(request as any).userId = userId;  // Ensure type cast if needed
-		console.log(`✅ authHook: User authenticated with ID: ${userId}`);
 
 	} 
 	catch (err) {

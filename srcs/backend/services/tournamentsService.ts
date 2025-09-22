@@ -5,8 +5,6 @@ import {updateUserStatsForTournament} from '../services/userStatsService.js'
 export async function createTournament(name: string, playerIds: number[]): Promise<Tournament> {
 	const [p1, p2, p3, p4] = playerIds;
 
-	console.log('Creating tournament:', { name, playerIds });
-
 	const tournamentId = await new Promise<number>((resolve, reject) => {
 		db.run(
 			`INSERT INTO tournaments (
@@ -22,15 +20,12 @@ export async function createTournament(name: string, playerIds: number[]): Promi
 					console.error('Insert params:', { name, p1, p2, p3, p4 });
 					return reject(err);
 				}
-				console.log('✅ Tournament created with ID:', this.lastID);
 				resolve(this.lastID);
 			}
 		);
 	});
 
-	console.log('Fetching tournament by ID:', tournamentId);
 	const tournament = await getTournamentById(tournamentId);
-	console.log('Tournament fetched:', tournament);
 	return tournament;
 }
 

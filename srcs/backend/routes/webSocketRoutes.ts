@@ -92,12 +92,6 @@ async function handleMessage(ws: AliveWebSocket, data: any, fastify: FastifyInst
 function handleJoin(ws: AliveWebSocket, data: any) {
 	const { id, username, difficulty } = data;
 
-	console.log('[handleJoin] Received data:');
-	console.log('  id:', id);
-	console.log('  username:', username);
-	console.log('  difficulty:', difficulty);
-	console.log('  token (from query):', ws.token);
-
 	if (typeof id !== 'number' || typeof username !== 'string') {
 		ws.send(JSON.stringify({ type: 'error', message: 'Invalid player data' }));
 		return;
@@ -110,7 +104,6 @@ function handleJoin(ws: AliveWebSocket, data: any) {
 	if (!waitingRoom.player1) {
 		waitingRoom.player1 = { id, username, difficulty, connection: ws };
 		ws.send(JSON.stringify({ type: 'chooseMaxGames' }));
-		console.log(`🧍 Player 1 joined matchmaking: ${username}`);
 	}
 	else if (!waitingRoom.player2) {
 		waitingRoom.player2 = { id, username, difficulty, connection: ws };
@@ -120,7 +113,6 @@ function handleJoin(ws: AliveWebSocket, data: any) {
 		else
 			ws.send(JSON.stringify({ type: 'waitingForGameSelection' }));
 
-		console.log(`🧍 Player 2 joined matchmaking: ${username}`);
 	}
 }
 
@@ -141,7 +133,6 @@ function handleGameSelection(ws: AliveWebSocket, data: any) {
 	else
 		ws.send(JSON.stringify({ type: 'waitingForOpponent' }));
 
-	console.log(`🧮 Player 1 selected maxGames: ${maxGames}`);
 }
 
 async function handleConfirmReady(ws: AliveWebSocket, fastify: FastifyInstance) {
@@ -150,7 +141,6 @@ async function handleConfirmReady(ws: AliveWebSocket, fastify: FastifyInstance) 
 		return;
 	}
 	waitingRoom.confirmations.add(ws.playerId!);
-	console.log(`✅ Player ${ws.username} confirmed ready`);
 
 	if (waitingRoom.confirmations.size === 2)
 		await startGame(fastify);
@@ -204,8 +194,6 @@ async function startGame(fastify: FastifyInstance) {
 		game_id: gameData.game_id,
 		maxGames,
 	}));
-
-	console.log(`✅ Match started: ${p1.username} vs ${p2.username} (game_id=${gameData.game_id})`);
 
 	waitingRoom.player1 = null;
 	waitingRoom.player2 = null;

@@ -57,7 +57,6 @@ export async function syncUserStatsToTeam(userId: number): Promise<void> {
 			});
 		}
 
-		console.log(`✅ Team '${user.team}' updated with individual stats`);
 	} catch (err) {
 		console.error(`❌ Failed to sync team stats for user ${userId}:`, err);
 	}
@@ -149,10 +148,6 @@ export async function addMemberToTeam(team: string, newMember: string): Promise<
 		const updatedMembers = membersArray.join(', ');
 		const query = `UPDATE ${table} SET members = ? WHERE id = 1`;
 		await runAsync(query, [updatedMembers]);
-		console.log(`✅ Added member '${newMember}' to team '${team}'`);
-	} 
-	else {
-		console.log(`ℹ️ Member '${newMember}' already in team '${team}'`);
 	}
 }
 

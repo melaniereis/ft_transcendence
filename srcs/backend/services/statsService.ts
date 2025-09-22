@@ -9,7 +9,6 @@ export function createUserStats(userId: number): Promise<void> {
                 console.error(`❌ Failed to insert stats for user ${userId}:`, err.message);
                 reject(err);
             } else {
-                console.log(`✅ Stats initialized for user ${userId}.`);
                 resolve();
             }
         });
@@ -19,17 +18,15 @@ export function createUserStats(userId: number): Promise<void> {
 export async function updateUserStatsAfterGame(gameId: number,player1Id: number,
 player2Id: number, score1: number, score2: number): Promise<void> {
     return new Promise(async (resolve, reject) => {
-        console.log(`🔄 Starting updateUserStatsAfterGame for game ${gameId}`);
 
         try {
             await ensureUserStatsExist(player1Id);
             await ensureUserStatsExist(player2Id);
 
-            db.serialize(() => {
+            db.serialize(() => { 
                 let completed = 0;
 
                 const updateStats = (userId: number, scored: number, conceded: number, won: boolean) => {
-                    console.log(`📊 Updating stats for user ${userId}: scored=${scored}, conceded=${conceded}, won=${won}`);
                     const winInc = won ? 1 : 0;
                     const lossInc = won ? 0 : 1;
 
@@ -48,10 +45,8 @@ player2Id: number, score1: number, score2: number): Promise<void> {
                                 console.error(`❌ Error updating stats for user ${userId}:`, err.message);
                                 return reject(err);
                             }
-                            console.log(`✅ Successfully updated stats for user ${userId}`);
                             completed++;
                             if (completed === 2) {
-                                console.log(`🏁 Finished updating stats for game ${gameId}`);
                                 resolve();
                             }
                         }
