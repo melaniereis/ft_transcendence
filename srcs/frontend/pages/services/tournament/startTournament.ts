@@ -1,10 +1,10 @@
 import { renderGame } from '../renderGame/renderGame.js';
 import { state } from '../renderGame/state.js';
 import { updateMatch } from './updateMatch.js';
-import { renderTournamentsPage } from './tournaments.js';
 import { renderTournamentBracket } from './renderTournamentBracket.js';
 import { endGame } from '../renderGame/endGame.js';
 import { translations } from '../language/translations.js';
+import { navigateTo } from '../../index.js';
 
 const lang = (['en', 'es', 'pt'].includes(localStorage.getItem('preferredLanguage') || '')
 	? localStorage.getItem('preferredLanguage')
@@ -298,7 +298,7 @@ export async function startTournament(container: HTMLElement, tournament: any, s
 													// Hide the game canvas when showing the bracket
 													gameWrapper.style.display = 'none';
 													renderTournamentBracket(canvas, ctx, players, winners, () => {
-														renderTournamentsPage(container as HTMLDivElement);
+															navigateTo('/');
 													});
 												},
 													await getUserName(winners.semifinal1!),

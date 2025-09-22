@@ -332,12 +332,6 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 					font-size: ${GRIS_TYPOGRAPHY.scale.xl};
 					font-weight: ${GRIS_TYPOGRAPHY.weights.bold};
 				">${t.connectionLost}</h2>
-				<p style="
-					margin-bottom: 2rem;
-					color: ${GRIS_COLORS.secondary};
-					font-size: ${GRIS_TYPOGRAPHY.scale.base};
-					line-height: 1.5;
-				">${message}</p>
 				<button id="return-main-btn" style="
 					padding: 0.85rem 2.2rem;
 					font-size: 1.15rem;
