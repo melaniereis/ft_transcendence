@@ -67,9 +67,14 @@ export function startGameLoop
 			);
 			aiTargetY = updatedTargetY;
 			lastAIUpdate = updatedLastAIUpdate;
+			
+			// IMPORTANT: Still need to call updatePaddle to actually move the AI paddle
+			updatePaddle(right, canvas, gameEnded, deltaTime);
 		}
 		else
+		{
 			updatePaddle(right, canvas, gameEnded, deltaTime);
+		}
 
 		updateBall(ball, left, right, canvas, maxGames, () => {
 			stopGameLoop();
