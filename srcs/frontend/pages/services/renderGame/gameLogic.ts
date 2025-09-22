@@ -4,6 +4,17 @@ import { Paddle, Ball } from './types.js';
 import { state } from './state.js';
 import { updateScoreDisplay } from './gameControls.js';
 
+const POINT_PAUSE_DURATION = 1000; // 1 second pause between points
+
+// Pause the game briefly between points to give players time to prepare
+function pauseBetweenPoints() {
+	state.isPaused = true;
+	
+	setTimeout(() => {
+		state.isPaused = false;
+	}, POINT_PAUSE_DURATION);
+}
+
 export function resetBall(ball: Ball, canvas: HTMLCanvasElement, initialSpeed: number) {
 	ball.x = canvas.width / 2;
 	ball.y = canvas.height / 2;
@@ -161,6 +172,9 @@ export function updateBall(
 		if (announcer) {
 			announcer.textContent = `${rightPaddle.nickname} scores! Score: ${leftPaddle.score} - ${rightPaddle.score}`;
 		}
+
+		// Pause game for 2 seconds between points
+		pauseBetweenPoints();
 	}
 	else if (ball.x - ball.radius > canvas.width) {
 		// Left player scores
@@ -175,6 +189,9 @@ export function updateBall(
 		if (announcer) {
 			announcer.textContent = `${leftPaddle.nickname} scores! Score: ${leftPaddle.score} - ${rightPaddle.score}`;
 		}
+
+		// Pause game for 2 seconds between points
+		pauseBetweenPoints();
 	}
 
 	// End game check
