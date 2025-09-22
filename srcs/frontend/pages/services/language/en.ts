@@ -437,4 +437,8 @@ export default {
 	nextGameInvitation: "Next Game Invitation",
 	aiOpponentLabel: "Play against AI",
 	round: "Round",
+	playDescription: "Start a game",
+	settingsDescription: "Change your preferences",
+	profileDescription: "View your player profile",
+	friendRequestsDescription: "See your pending friend requests",
 }
