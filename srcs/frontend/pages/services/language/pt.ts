@@ -1,4 +1,6 @@
 export default {
+	opponentLeftYouWin: "O adversário saiu, você venceu!",
+	youLostByLeaving: "Você perdeu porque saiu do jogo.",
 	play: "Jogar",
 	stats: "Estatísticas",
 	settings: "Configurações",
@@ -420,7 +422,7 @@ export default {
 	tournamentNameRequired: "O nome do torneio é obrigatório.",
 	invalidPlayerList: "Por favor, corrija os erros na lista de jogadores.",
 	quickTournament: "Torneio Rápido",
-	welcomeTo:  "Bem-vindo ao",
+	welcomeTo: "Bem-vindo ao",
 	PleaseWait: "Por Favor, Aguarde",
 	wantsToPlay: "quer jogar outro jogo!",
 	yourControls: "Os Seus Controles",

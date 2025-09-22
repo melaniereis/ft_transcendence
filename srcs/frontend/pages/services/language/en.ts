@@ -1,4 +1,6 @@
 export default {
+	opponentLeftYouWin: "Opponent left, you win!",
+	youLostByLeaving: "You lost because you left the game.",
 	play: "Play",
 	settings: "Settings",
 	stats: "Stats",
@@ -421,7 +423,7 @@ export default {
 	tournamentNameRequired: "Tournament name is required.",
 	invalidPlayerList: "Please fix player list errors.",
 	quickTournament: "Quick Tournament",
-	welcomeTo:  "Welcome to",
+	welcomeTo: "Welcome to",
 	PleaseWait: "Please Wait",
 	wantsToPlay: "wants to play another game!",
 	yourControls: "Your Controls",
@@ -433,6 +435,6 @@ export default {
 	connectionLost: "Connection Lost",
 	remotePongBestOf: "Remote Pong - Best of",
 	nextGameInvitation: "Next Game Invitation",
-	aiOpponentLabel :"Play against AI",
+	aiOpponentLabel: "Play against AI",
 	round: "Round",
 }
