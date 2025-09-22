@@ -1065,25 +1065,25 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 
 	window.addEventListener('blur', () => {
 		if (!assignedSide || !gameInSession) return;
-		ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
-		ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
+		if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
+		if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
 	});
 
 	document.addEventListener('visibilitychange', () => {
 		if (document.hidden && assignedSide && gameInSession) {
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
 		}
 	});
 
 	// Track if mouse is inside the window
 	let mouseInWindow = true;
 	let lastMouseLeaveTime = 0;
-	
+
 	document.addEventListener('mouseenter', () => {
 		mouseInWindow = true;
 	});
-	
+
 	document.addEventListener('mouseleave', () => {
 		mouseInWindow = false;
 		lastMouseLeaveTime = Date.now();
@@ -1092,13 +1092,13 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 	// Only stop paddle if window loses focus AND mouse was recently outside
 	window.addEventListener('blur', () => {
 		if (!assignedSide || !gameInSession) return;
-		
+
 		// Check if mouse left the window recently (within 100ms) before focus loss
 		// This indicates a click outside the window
 		const timeSinceMouseLeave = Date.now() - lastMouseLeaveTime;
 		if (!mouseInWindow && timeSinceMouseLeave < 100) {
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
-			ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowUp' }));
+			if (ws) ws.send(JSON.stringify({ type: 'move', action: 'end', direction: 'ArrowDown' }));
 		}
 	});
 
