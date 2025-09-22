@@ -10,7 +10,7 @@ const waitingRoom: WaitingRoom = {
 };
 
 export async function websocketMatchmakingRoutes(fastify: FastifyInstance) {
-	const heartbeatInterval = setInterval(runHeartbeat, 30000);
+	const heartbeatInterval = setInterval(runHeartbeat,  600000);
 	fastify.addHook('onClose', () => clearInterval(heartbeatInterval));
 
 	fastify.get('/matchmaking', { websocket: true }, (ws: AliveWebSocket, req: FastifyRequest) => {
