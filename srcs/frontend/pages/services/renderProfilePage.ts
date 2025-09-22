@@ -10,7 +10,7 @@ const t = translations[lang];
 export async function renderProfilePage(container: HTMLElement) {
 	const token = localStorage.getItem('authToken');
 	if (!token) {
-		container.innerHTML = `<p>${t.loginRequired}</p>`;
+		container.innerHTML = `<p style="color:#e11d48;font-size:1.18rem;font-weight:600;text-align:center;min-height:100vh;display:flex;align-items:center;justify-content:center;">${t.loginRequired}</p>`;
 		return;
 	}
 
