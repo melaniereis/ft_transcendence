@@ -37,7 +37,20 @@ const matchmakingBtn = document.getElementById('matchmaking-btn') as HTMLButtonE
 const quickTournamentBtn = document.getElementById('quick-tournament-btn') as HTMLButtonElement | null;
 const mobileMenuBtn = document.getElementById('mobile-menu-btn') as HTMLButtonElement;
 const topBar = document.getElementById('top-bar') as HTMLElement;
-
+if (playBtn) 
+	playBtn.title = t.playDescription;
+if (settingsBtn) 
+	settingsBtn.title = t.settingsDescription;
+if (profileBtn) 
+	profileBtn.title = t.profileDescription;
+if (friendRequestsBtn) 
+	friendRequestsBtn.title = t.friendRequestsDescription;
+if (teamsBtn)
+	teamsBtn.title = t.team;
+if (logoutBtn)
+	logoutBtn.title = t.logout;
+if (languageBtn)
+	languageBtn.title = t.language;
 // Route navigation
 export async function navigateTo(path: string): Promise<void> {
 	// Close mobile menu on navigation

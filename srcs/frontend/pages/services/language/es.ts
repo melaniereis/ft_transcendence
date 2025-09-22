@@ -436,10 +436,9 @@ export default {
 	remotePongBestOf: "Remote Pong - Lo Mejor de",
 	nextGameInvitation: "Invitación al siguiente juego",
 	aiOpponentLabel: "Jugar contra la IA",
-	round: "Ronda"
-
-
-
-
-
+	round: "Ronda",
+	playDescription: "Comenzar una partida",
+	settingsDescription: "Cambiar tus preferencias",
+	profileDescription: "Ver tu perfil de jugador",
+	friendRequestsDescription: "Ver tus solicitudes de amistad pendientes",
 }
