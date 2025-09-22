@@ -211,6 +211,12 @@ function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
 	room.rightMovingUp = false;
 	room.rightMovingDown = false;
 
+	// Stop existing game loop before starting new one
+	if (room.intervalId) {
+		clearInterval(room.intervalId);
+		room.intervalId = undefined;
+	}
+
 	sendToBoth(room, {
 		type: 'nextGameStarted',
 		message: 'New game started!',
