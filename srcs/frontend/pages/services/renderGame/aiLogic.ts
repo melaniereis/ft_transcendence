@@ -104,13 +104,13 @@ function getAIPaddleSpeed(difficulty: string): number
 	switch (difficulty)
 	{
 		case 'easy':
-			return (baseSpeed * 0.5); // Reduced from 0.7 to 0.5
+			return (baseSpeed * 0.5);
 		case 'normal':
-			return (baseSpeed * 0.7); // Reduced from 1.0 to 0.7
+			return (baseSpeed * 0.7);
 		case 'hard':
-			return (baseSpeed * 1.0); // Reduced from 1.4 to 1.0
+			return (baseSpeed * 1.0);
 		case 'crazy':
-			return (baseSpeed * 1.2); // Reduced from 1.6 to 1.2
+			return (baseSpeed * 1.2);
 		default:
 			return (baseSpeed * 0.7);
 	}
