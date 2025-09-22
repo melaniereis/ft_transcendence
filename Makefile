@@ -1,5 +1,5 @@
 COMPOSE=docker-compose
-COMPOSE_FILE=srcs/docker-compose.yml
+COMPOSE_FILE=docker-compose.yml
 
 all: build up
 
