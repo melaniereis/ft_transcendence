@@ -200,8 +200,13 @@ function handleAcceptNext(ws: AliveWebSocket, gameId: string) {
 	room.rightScore = 0;
 	room.ballX = 1280 / 2;
 	room.ballY = 680 / 2;
-	room.ballVX = 7 * (Math.random() > 0.5 ? 1 : -1);
-	room.ballVY = 5 * (Math.random() > 0.5 ? 1 : -1);
+	
+	// Reset ball with new physics properties
+	room.ballSpeed = room.ballInitialSpeed;
+	room.ballDX = Math.random() > 0.5 ? 1 : -1;
+	room.ballDY = (Math.random() * 2 - 1);
+	room.ballVX = room.ballDX * 300 * room.ballSpeed; // Legacy compatibility
+	room.ballVY = room.ballDY * 300 * room.ballSpeed; // Legacy compatibility
 
 	room.leftY = 680 / 2 - 50;
 	room.rightY = 680 / 2 - 50;
@@ -274,14 +279,23 @@ function createNewRoom(ws: AliveWebSocket, maxScore: number = 5): GameRoom {
 	const canvasHeight = 680;
 	const paddleHeight = 100;
 	const paddleWidth = 12;
+	
+	// Initialize ball properties matching frontend setup
+	const initialSpeed = 1.0; // Normal speed for multiplayer
+	const ballDX = Math.random() > 0.5 ? 1 : -1;
+	const ballDY = (Math.random() * 2 - 1);
 
 	return {
 		left: ws,
 		right: null,
 		ballX: canvasWidth / 2,
 		ballY: canvasHeight / 2,
-		ballVX: 7,
-		ballVY: 5,
+		ballVX: ballDX * 300 * initialSpeed, // Legacy velocity for compatibility
+		ballVY: ballDY * 300 * initialSpeed, // Legacy velocity for compatibility
+		ballDX: ballDX, // Normalized direction
+		ballDY: ballDY, // Normalized direction
+		ballSpeed: initialSpeed, // Speed multiplier
+		ballInitialSpeed: initialSpeed, // For resets
 		leftY: canvasHeight / 2 - paddleHeight / 2,
 		rightY: canvasHeight / 2 - paddleHeight / 2,
 		paddleHeight,
@@ -294,6 +308,7 @@ function createNewRoom(ws: AliveWebSocket, maxScore: number = 5): GameRoom {
 		rightScore: 0,
 		maxScore,
 		intervalId: undefined,
+		lastUpdateTime: undefined,
 	};
 }
 
