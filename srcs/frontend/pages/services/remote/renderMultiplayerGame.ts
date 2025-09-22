@@ -221,12 +221,16 @@ export function renderMultiplayerGame(options: MultiplayerGameOptions) {
 			hideAllModals();
 			if (data.gameId) {
 				currentGameId = data.gameId;
-				startGameSession(currentGameId);
+				// Reset scores before countdown
+				gameState.leftScore = 0;
+				gameState.rightScore = 0;
+				updateScoreDisplay(0, 0);
+				// Show countdown before starting next game
+				showCountdown(() => {
+					startGameSession(currentGameId);
+					gameInSession = true;
+				});
 			}
-			gameInSession = true;
-			gameState.leftScore = 0;
-			gameState.rightScore = 0;
-			updateScoreDisplay(0, 0);
 		}
 
 		if (data.type === 'nextGameDeclined')
