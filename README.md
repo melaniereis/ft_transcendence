@@ -90,10 +90,10 @@ make
 
 ## 👥 **Team GRISPONG**
 
-- **[hfilipe-](https://profile.intra.42.fr/users/hfilipe-)** -
-- **[mde-agui](https://profile.intra.42.fr/users/mde-agui)** -  
-- **[afogonca](https://profile.intra.42.fr/users/afogonca)** - 
-- **[meferraz](https://profile.intra.42.fr/users/meferraz)** -
+- **[hfilipe-](https://profile.intra.42.fr/users/hfilipe-)**
+- **[mde-agui](https://profile.intra.42.fr/users/mde-agui)**
+- **[afogonca](https://profile.intra.42.fr/users/afogonca)**
+- **[meferraz](https://profile.intra.42.fr/users/meferraz)**
 
 ***
 
