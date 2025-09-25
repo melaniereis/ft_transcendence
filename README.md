@@ -1,6 +1,5 @@
 # 🚀 **FT_TRANSCENDENCE** - Beyond the Game
 
-(see the generated image above)
 
 *Classic Pong transcended into a sophisticated gaming platform - built in 7-8 weeks*
 
