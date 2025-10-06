@@ -3,7 +3,7 @@
 
 *Classic Pong transcended into a sophisticated gaming platform - built in 7-8 weeks*
 
-![MainMenu](./Gris.gif)
+![MainMenu](./gris.gif)
 
 ## 🌟 **Project Overview**
 
