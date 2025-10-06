@@ -3,6 +3,8 @@
 
 *Classic Pong transcended into a sophisticated gaming platform - built in 7-8 weeks*
 
+![]gris.png
+
 ## 🌟 **Project Overview**
 
 **ft_transcendence** is the ultimate capstone project for 42 School, transforming the classic 1972 Pong arcade game into a modern, secure web platform. Developed in an intense **7-8 week sprint**, this project demonstrates mastery of full-stack development, cybersecurity, and user experience design.
