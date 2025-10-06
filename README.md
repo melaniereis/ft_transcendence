@@ -13,6 +13,8 @@ Our team **GRISPONG** achieved an outstanding **110% score**, exceeding requirem
 
 ***
 
+![Game Visualization](./gris2.png)
+
 ## ⚡ **Core Features**
 
 ### 🎮 **Gaming Experience**
